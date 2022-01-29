@@ -111,12 +111,10 @@ authRouter.post('/', async ({ body }: Request, res: Response): Promise<void> => 
 authRouter.delete('/', async (req: Request, res: Response): Promise<void> => {
     try {
         const { userId, bearer } = req.token;
-        await Prisma.token.delete({
+        await Prisma.token.deleteMany({
             where: {
-                userId_bearer: {
-                    userId,
-                    bearer
-                }
+                userId,
+                bearer
             }
         });
         res.send({});

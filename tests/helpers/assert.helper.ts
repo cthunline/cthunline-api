@@ -18,7 +18,7 @@ export const assertUser = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
-    expect(data.id).to.be.a('number');
+    expect(data.id).to.be.a('string');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('email');
@@ -40,7 +40,7 @@ export const assertToken = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('userId');
-    expect(data.userId).to.be.a('number');
+    expect(data.userId).to.be.a('string');
     expect(data).to.have.property('bearer');
     expect(data.bearer).to.be.a('string');
     expect(data).to.have.property('limit');

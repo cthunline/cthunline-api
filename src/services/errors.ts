@@ -1,4 +1,8 @@
 /* eslint-disable max-classes-per-file */
+import {
+    PrismaClientValidationError,
+    PrismaClientKnownRequestError
+} from '@prisma/client/runtime';
 import { Request, Response, NextFunction } from 'express';
 import Log from './log';
 
@@ -50,15 +54,31 @@ declare global {
 export const errorMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     res.error = (err: Error): void => {
         const { message, stack } = err;
-        const statusCode = err instanceof CustomError ? err.status : 500;
-        if (statusCode === 500) {
-            Log.error(stack);
-        }
+        let statusCode = 500;
         const response: Record<string, any> = {
-            error: message ?? 'Intern error'
+            error: 'Intern error'
         };
-        if (err instanceof CustomError && err.data) {
-            response.data = err.data;
+        if (err instanceof CustomError) {
+            statusCode = err.status;
+            if (err.data) {
+                response.data = err.data;
+            }
+        } else if (err instanceof PrismaClientValidationError) {
+            statusCode = 400;
+            response.message = message;
+        } else if (err instanceof PrismaClientKnownRequestError) {
+            const { code } = err;
+            response.message = message;
+            switch (code) {
+                case 'P2023':
+                    statusCode = 400;
+                    break;
+                default:
+                    statusCode = 500;
+                    break;
+            }
+        } else {
+            Log.error(stack);
         }
         res.status(statusCode).json(response);
     };

@@ -30,17 +30,3 @@ export const decodeBase64 = (base64: string): string => (
 );
 
 export type RequestQuery = Record<string, (string | number)[]>;
-
-export const parseQuery = (query: Record<string, any>): RequestQuery => {
-    const parsed: RequestQuery = {};
-    const parseValue = (val: string): string | number => (
-        /^\d+$/.test(val) ? parseInt(val) : val
-    );
-    for (const key of Object.keys(query)) {
-        const value = query[key];
-        if (value && typeof value === 'string') {
-            parsed[key] = value.split(',').map(parseValue);
-        }
-    }
-    return parsed;
-};

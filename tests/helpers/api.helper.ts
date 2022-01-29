@@ -341,11 +341,14 @@ const Api = {
             '987654',
             'azeqsd',
             '1a2s3f56a4',
-            '321-654-987'
+            '321-654-987',
+            '61f5655bb7c63e78815de1c6',
+            '61f5655bb7c63e78815de1c7',
+            '61f5655cb7c63e78815de1c8'
         ];
         await Promise.all(
             invalidIds.map((id) => (async () => {
-                const isInvalid = !/^\d+$/.test(id);
+                const isInvalid = !/^[0-9a-f]{24}$/.test(id);
                 const response = await Api.request({
                     method,
                     route: route.split(':id').join(id),

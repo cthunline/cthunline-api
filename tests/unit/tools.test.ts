@@ -4,8 +4,7 @@ import {
     encodeBase64,
     decodeBase64,
     hashPassword,
-    verifyPassword,
-    parseQuery
+    verifyPassword
 } from '../../src/services/tools';
 
 describe('[Unit] Tools', () => {
@@ -49,30 +48,6 @@ describe('[Unit] Tools', () => {
                     const hash = await hashPassword(string);
                     expect(await verifyPassword(string, hash)).to.be.true;
                 })())
-            );
-        });
-    });
-
-    describe('parseQuery', () => {
-        it('Should parse URL query parameters', async () => {
-            const data = {
-                parameters: {
-                    test: 'test',
-                    stringNumber: '123',
-                    stringList: 'abc,def,ghe',
-                    numberList: '1,2,3'
-                },
-                expected: {
-                    test: ['test'],
-                    stringNumber: [123],
-                    stringList: ['abc', 'def', 'ghe'],
-                    numberList: [1, 2, 3]
-                }
-            };
-            expect(
-                parseQuery(data.parameters)
-            ).to.deep.equal(
-                data.expected
             );
         });
     });

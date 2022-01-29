@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction } from 'express';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { ValidationError } from './errors';
@@ -21,26 +20,4 @@ export default (schema: Record<string, any>) => {
             validate.errors
         );
     };
-};
-
-export const paramsMiddleware = (
-    { params }: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    for (const key of Object.keys(params)) {
-        if (/[a-zA-Z]+/.test(key)) {
-            const value = params[key];
-            const error = `Invalid ${key} URL parameter ${value}`;
-            try {
-                if (!/^\d+$/.test(value)) {
-                    throw new ValidationError(error);
-                }
-            } catch (err: any) {
-                res.error(err);
-                return;
-            }
-        }
-    }
-    next();
 };

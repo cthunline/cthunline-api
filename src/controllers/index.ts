@@ -8,9 +8,9 @@ import { NotFoundError } from '../services/errors';
 import authRouter, { authMiddleware } from './auth';
 import userRouter from './user';
 
-const router = Router();
+const apiRouter = Router();
 
-router.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+apiRouter.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (req.method === 'POST' && req.path === '/auth') {
         next();
     } else {
@@ -18,14 +18,14 @@ router.use(async (req: Request, res: Response, next: NextFunction): Promise<void
     }
 });
 
-router.use('/auth', authRouter);
+apiRouter.use('/auth', authRouter);
 
-router.use('/users', userRouter);
+apiRouter.use('/users', userRouter);
 
-router.use('*', (req: Request, res: Response) => {
+apiRouter.use('*', (req: Request, res: Response) => {
     res.error(
         new NotFoundError('Route does not exist')
     );
 });
 
-export default router;
+export default apiRouter;

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import Express from 'express';
 import Helmet from 'helmet';
 import Cors from 'cors';
@@ -5,12 +6,14 @@ import Cors from 'cors';
 import { errorMiddleware } from './services/errors';
 import Log from './services/log';
 import { initDb } from './services/prisma';
-import router from './controllers';
+import apiRouter from './controllers';
+import wsRouter from './sockets';
 
 const app = Express();
 
 (async () => {
     try {
+        //
         Log.info('Setting middlewares');
         app.use(Cors());
         app.use(Helmet());
@@ -20,17 +23,21 @@ const app = Express();
         }));
         app.use(errorMiddleware);
 
-        Log.info('Setting routes');
-        app.use(router);
+        Log.info('Initializing API routes');
+        app.use(apiRouter);
 
         Log.info('Initializing database');
         await initDb();
 
-        const port = 8198;
-        app.listen(port, () => {
-            Log.info(`API running on port ${port}`);
+        const port = process.env.PORT ?? 8080;
+        const server = app.listen(port, () => {
+            Log.info(`Listening on port ${port}`);
             app.emit('ready');
         });
+
+        Log.info('Initializing web sockets');
+        wsRouter(server);
+        //
     } catch (err: any) {
         Log.error('Error while starting app');
         Log.error(err.stack);

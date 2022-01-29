@@ -10,7 +10,7 @@ import {
 } from '../services/prisma';
 import { hashPassword } from '../services/tools';
 import { ConflictError } from '../services/errors';
-import Validator, { paramsMiddleware as pMid } from '../services/validator';
+import Validator from '../services/validator';
 import UserSchemas from './schemas/user.json';
 
 const validateCreate = Validator(UserSchemas.create);
@@ -18,7 +18,7 @@ const validateUpdate = Validator(UserSchemas.update);
 
 export type UserSelect = Omit<User, 'password'>;
 
-export const userSelect = {
+const userSelect = {
     id: true,
     name: true,
     email: true,
@@ -65,7 +65,7 @@ userRouter.post('/', async ({ body }: Request, res: Response): Promise<void> => 
     }
 });
 
-userRouter.get('/:userId', pMid, async ({ params }: Request, res: Response): Promise<void> => {
+userRouter.get('/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         const user = await handleNotFound<UserSelect>(
@@ -73,7 +73,7 @@ userRouter.get('/:userId', pMid, async ({ params }: Request, res: Response): Pro
                 Prisma.user.findUnique({
                     select: userSelect,
                     where: {
-                        id: parseInt(userId)
+                        id: userId
                     }
                 })
             )
@@ -84,14 +84,14 @@ userRouter.get('/:userId', pMid, async ({ params }: Request, res: Response): Pro
     }
 });
 
-userRouter.post('/:userId', pMid, async ({ params, body }: Request, res: Response): Promise<void> => {
+userRouter.post('/:userId', async ({ params, body }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         const user = await handleNotFound<User>(
             'User', (
                 Prisma.user.findUnique({
                     where: {
-                        id: parseInt(userId)
+                        id: userId
                     }
                 })
             )

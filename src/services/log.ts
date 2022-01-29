@@ -2,7 +2,7 @@ import Path from 'path';
 import Fs from 'fs';
 import Winston, { format } from 'winston';
 
-const logDir = '/var/log/sample-express-ts';
+const logDir = process.env.LOG_DIR;
 
 const printf = (i: Winston.Logform.TransformableInfo) => (
     `${i.timestamp} [${i.level}] ${i.message}`
@@ -38,7 +38,7 @@ if (!logDir) {
     }
 }
 
-if (!fileTransportError) {
+if (logDir && !fileTransportError) {
     transports.push(
         new Winston.transports.File({
             level: 'info',
