@@ -1,0 +1,16 @@
+[{
+    "id": 1,
+    "name": "Test",
+    "email": "test@test.com",
+    "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm"
+}, {
+    "id": 2,
+    "name": "Anna Maria Jopek",
+    "email": "am.jopek@test.com",
+    "password": "$2b$10$yHCJMJbRrv3aDhOo3ySBtexdktnbc1T/3Q1RZiHliN1cwFeEQ7FtS"
+}, {
+    "id": 3,
+    "name": "Susanne Sundfor",
+    "email": "s.sundfor@test.com",
+    "password": "$2b$10$/lhUvkJ1b9aXMvxXSW7Qye.MV1UCErhl2pKHkK8s7RlXMoGjlo6q6"
+}]
