@@ -29,7 +29,20 @@ model User {
     updatedAt DateTime @updatedAt
 
     tokens Token[]
+    games Game[]
 
     @@unique(email)
     @@map("Users")
+}
+
+model Game {
+    id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    name String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    masterId String @db.ObjectId
+    master User @relation(fields: [masterId], references: [id])
+
+    @@map("Games")
 }

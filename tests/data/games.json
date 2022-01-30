@@ -1,0 +1,13 @@
+[{
+    "id": "51f537ca1790b30562a66d33",
+    "name": "Game 1",
+    "masterId": "61f537cc1790b30562a66d44"
+}, {
+    "id": "51f537cc1790b30562a66d34",
+    "name": "Game 2",
+    "masterId": "61f537cc1790b30562a66d44"
+}, {
+    "id": "51f537cd1790b30562a66d35",
+    "name": "Game 3",
+    "masterId": "61f537cd1790b30562a66d45"
+}]

@@ -34,6 +34,23 @@ export const assertUser = (
     }
 };
 
+export const assertGame = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('name');
+    expect(data.name).to.be.a('string');
+    if (expected) {
+        Object.keys(expected).forEach((key) => {
+            expect(data).to.have.property(key);
+            expect(data[key]).to.equal(expected[key]);
+        });
+    }
+};
+
 export const assertToken = (
     data: Record<string, any>,
     expected?: Record<string, any>

@@ -7,6 +7,7 @@ import {
 import { NotFoundError } from '../services/errors';
 import authRouter, { authMiddleware } from './auth';
 import userRouter from './user';
+import gameRouter from './game';
 
 const apiRouter = Router();
 
@@ -19,8 +20,8 @@ apiRouter.use(async (req: Request, res: Response, next: NextFunction): Promise<v
 });
 
 apiRouter.use('/auth', authRouter);
-
 apiRouter.use('/users', userRouter);
+apiRouter.use('/games', gameRouter);
 
 apiRouter.use('*', (req: Request, res: Response) => {
     res.error(
