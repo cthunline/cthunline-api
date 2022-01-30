@@ -32,17 +32,6 @@ const getBearer = (req: Request): string | null => {
     return null;
 };
 
-export const getBearerValidToken = async (bearer: string): Promise<Token | null> => (
-    Prisma.token.findFirst({
-        where: {
-            bearer,
-            limit: {
-                gt: new Date()
-            }
-        }
-    })
-);
-
 export const authMiddleware = async (
     req: Request,
     res: Response,
@@ -53,7 +42,14 @@ export const authMiddleware = async (
         if (!bearer) {
             throw new AuthenticationError();
         }
-        const token = await getBearerValidToken(bearer);
+        const token = await Prisma.token.findFirst({
+            where: {
+                bearer,
+                limit: {
+                    gt: new Date()
+                }
+            }
+        });
         if (!token) {
             throw new AuthenticationError();
         }

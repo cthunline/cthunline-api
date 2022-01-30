@@ -22,9 +22,9 @@
         "comma-dangle": "off",
         "indent": "off",
         "lines-between-class-members": "off",
-        // "no-param-reassign": ["error", {
-        //     "props": false
-        // }],
+        "no-param-reassign": ["error", {
+            "props": false
+        }],
         "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"],
         "radix": "off"
     }
