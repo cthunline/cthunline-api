@@ -29,4 +29,6 @@ export const decodeBase64 = (base64: string): string => (
     Buffer.from(base64, 'base64').toString()
 );
 
-export type RequestQuery = Record<string, (string | number)[]>;
+export const sum = (numbers: number[]) => (
+    numbers.reduce((i, j) => i + j, 0)
+);

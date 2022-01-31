@@ -35,6 +35,11 @@ const connectionMiddleware = async (socket: Socket, next: Function) => {
         }
         // set data on socket
         socket.data.userId = token.userId;
+        socket.data.user = await Prisma.user.findUnique({
+            where: {
+                id: token.userId
+            }
+        });
         socket.data.gameId = game.id;
         socket.data.isMaster = game.masterId === token.userId;
         // join game room
