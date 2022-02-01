@@ -17,7 +17,7 @@ model Token {
     user User @relation(fields: [userId], references: [id])
 
     @@index([userId])
-    @@map("Tokens")
+    @@map("tokens")
 }
 
 model User {
@@ -30,9 +30,10 @@ model User {
 
     tokens Token[]
     games Game[]
+    characters Character[]
 
     @@unique(email)
-    @@map("Users")
+    @@map("users")
 }
 
 model Game {
@@ -44,5 +45,18 @@ model Game {
     masterId String @db.ObjectId
     master User @relation(fields: [masterId], references: [id])
 
-    @@map("Games")
+    @@map("games")
+}
+
+model Character {
+    id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    name String
+    fields Json
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId String @db.ObjectId
+    user User @relation(fields: [userId], references: [id])
+
+    @@map("characters")
 }
