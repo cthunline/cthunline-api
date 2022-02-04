@@ -1,6 +1,9 @@
 {
     "name": "cthunline-v2",
     "version": "0.0.1",
+    "prisma": {
+        "schema": "src/prisma/schema.prisma"
+    },
     "scripts": {
         "prod": "cross-env NODE_ENV=prod node build/index.js",
         "dev": "cross-env NODE_ENV=dev nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node src/index.ts\"",
@@ -10,6 +13,7 @@
         "pretest": "dotenv -e .env.test -- npx prisma db push",
         "test": "nyc dotenv -e .env.test -- mocha --exit"
     },
+    
     "dependencies": {
         "@prisma/client": "^3.8.1",
         "ajv": "^8.9.0",
