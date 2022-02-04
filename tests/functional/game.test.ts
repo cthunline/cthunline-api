@@ -1,30 +1,30 @@
 import { expect } from 'chai';
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
-import { assertGame } from '../helpers/assert.helper';
-import gamesData from '../data/games.json';
+import { assertSession } from '../helpers/assert.helper';
+import sessionsData from '../data/sessions.json';
 
-describe('[Functional] Games', () => {
+describe('[Functional] Sessions', () => {
     beforeEach(async () => {
         await Data.reset();
         await Api.login();
     });
 
-    describe('GET /games', () => {
-        it('Should list all games', async () => {
+    describe('GET /sessions', () => {
+        it('Should list all sessions', async () => {
             await Api.testGetList({
-                route: '/games',
-                listKey: 'games',
-                data: gamesData,
-                assert: assertGame
+                route: '/sessions',
+                listKey: 'sessions',
+                data: sessionsData,
+                assert: assertSession
             });
         });
     });
 
-    describe('POST /games', () => {
+    describe('POST /sessions', () => {
         it('Should throw a validation error', async () => {
             await Api.testValidationError({
-                route: '/games',
+                route: '/sessions',
                 data: [{
                     invalidProperty: 'Test'
                 }, {
@@ -33,38 +33,38 @@ describe('[Functional] Games', () => {
                 }, {}]
             });
         });
-        it('Should create a game', async () => {
+        it('Should create a session', async () => {
             await Api.testCreate({
-                route: '/games',
+                route: '/sessions',
                 data: {
                     name: 'Test'
                 },
-                assert: assertGame
+                assert: assertSession
             });
         });
     });
 
-    describe('GET /games/:id', () => {
+    describe('GET /sessions/:id', () => {
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'GET',
-                route: '/games/:id'
+                route: '/sessions/:id'
             });
         });
-        it('Should get a game', async () => {
+        it('Should get a session', async () => {
             await Api.testGetOne({
-                route: '/games/:id',
-                data: gamesData[0],
-                assert: assertGame
+                route: '/sessions/:id',
+                data: sessionsData[0],
+                assert: assertSession
             });
         });
     });
 
-    describe('POST /games/:id', () => {
+    describe('POST /sessions/:id', () => {
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'POST',
-                route: '/games/:id',
+                route: '/sessions/:id',
                 body: {
                     name: 'Test'
                 }
@@ -73,7 +73,7 @@ describe('[Functional] Games', () => {
         it('Should throw a validation error', async () => {
             const response = await Api.request({
                 method: 'POST',
-                route: '/games',
+                route: '/sessions',
                 body: {
                     name: 'Test'
                 }
@@ -81,7 +81,7 @@ describe('[Functional] Games', () => {
             expect(response).to.have.status(200);
             const { body: { id } } = response;
             await Api.testValidationError({
-                route: `/games/${id}`,
+                route: `/sessions/${id}`,
                 data: [{
                     invalidProperty: 'Test'
                 }, {
@@ -90,10 +90,10 @@ describe('[Functional] Games', () => {
                 }, {}]
             });
         });
-        it('Should edit a game', async () => {
+        it('Should edit a session', async () => {
             const response = await Api.request({
                 method: 'POST',
-                route: '/games',
+                route: '/sessions',
                 body: {
                     name: 'Test'
                 }
@@ -101,11 +101,11 @@ describe('[Functional] Games', () => {
             expect(response).to.have.status(200);
             const { body: { id } } = response;
             await Api.testEdit({
-                route: `/games/${id}`,
+                route: `/sessions/${id}`,
                 data: {
                     name: 'Test1'
                 },
-                assert: assertGame
+                assert: assertSession
             });
         });
     });

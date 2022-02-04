@@ -34,7 +34,7 @@ export const assertUser = (
     }
 };
 
-export const assertGame = (
+export const assertSession = (
     data: Record<string, any>,
     expected?: Record<string, any>
 ) => {

@@ -23,15 +23,15 @@ const connectionMiddleware = async (socket: Socket, next: Function) => {
         if (!token) {
             throw new AuthenticationError('Invalid authentication token');
         }
-        // check game exists
-        const gameId = socket.handshake.query.gameId as string;
-        const game = await Prisma.game.findUnique({
+        // check session exists
+        const sessionId = socket.handshake.query.sessionId as string;
+        const session = await Prisma.session.findUnique({
             where: {
-                id: gameId as string
+                id: sessionId as string
             }
         });
-        if (!game) {
-            throw new NotFoundError(`Game with ID ${gameId} does not exist`);
+        if (!session) {
+            throw new NotFoundError(`Session with ID ${sessionId} does not exist`);
         }
         // set data on socket
         socket.data.userId = token.userId;
@@ -40,10 +40,10 @@ const connectionMiddleware = async (socket: Socket, next: Function) => {
                 id: token.userId
             }
         });
-        socket.data.gameId = game.id;
-        socket.data.isMaster = game.masterId === token.userId;
-        // join game room
-        socket.join(game.id);
+        socket.data.sessionId = session.id;
+        socket.data.isMaster = session.masterId === token.userId;
+        // join session room
+        socket.join(session.id);
         //
         next();
     } catch (err) {
@@ -52,8 +52,8 @@ const connectionMiddleware = async (socket: Socket, next: Function) => {
 };
 
 const onConnect = (socket: Socket) => {
-    const { userId, gameId, isMaster } = socket.data;
-    Log.info(`Socket connected (userId: ${userId}, gameId: ${gameId}, isMaster: ${isMaster})`);
+    const { userId, sessionId, isMaster } = socket.data;
+    Log.info(`Socket connected (userId: ${userId}, sessionId: ${sessionId}, isMaster: ${isMaster})`);
     socket.on('disconnect', (reason: string) => {
         Log.info(`Socket disconnected (${reason})`);
     });

@@ -29,14 +29,14 @@ model User {
     updatedAt DateTime @updatedAt
 
     tokens Token[]
-    games Game[]
+    sessions Session[]
     characters Character[]
 
     @@unique(email)
     @@map("users")
 }
 
-model Game {
+model Session {
     id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
     name String
     createdAt DateTime @default(now())
@@ -45,7 +45,7 @@ model Game {
     masterId String @db.ObjectId
     master User @relation(fields: [masterId], references: [id])
 
-    @@map("games")
+    @@map("sessions")
 }
 
 model Character {
