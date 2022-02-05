@@ -1,7 +1,13 @@
 # Cthunline v2
 
+* [Requirements](#requirements)
 * [Configuration](#configuration)
 * [Usage](#usage)
+
+## Requirements
+
+* NodeJS >= 16
+* MongoDB >= 5
 
 ## Configuration
 
