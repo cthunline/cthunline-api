@@ -50,8 +50,9 @@ model Session {
 
 model Character {
     id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    game String
     name String
-    fields Json
+    data Json
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 

@@ -13,7 +13,6 @@
         "pretest": "dotenv -e .env.test -- npx prisma db push",
         "test": "nyc dotenv -e .env.test -- mocha --exit"
     },
-    
     "dependencies": {
         "@prisma/client": "^3.9.1",
         "ajv": "^8.9.0",
