@@ -62,7 +62,7 @@ export const authMiddleware = async (
 
 const authRouter = Router();
 
-authRouter.get('/', async (req: Request, res: Response): Promise<void> => {
+authRouter.get('/auth', async (req: Request, res: Response): Promise<void> => {
     try {
         res.send(req.token);
     } catch (err: any) {
@@ -70,7 +70,7 @@ authRouter.get('/', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-authRouter.post('/', async ({ body }: Request, res: Response): Promise<void> => {
+authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void> => {
     try {
         validateLogin(body);
         const { email, password } = body;
@@ -103,7 +103,7 @@ authRouter.post('/', async ({ body }: Request, res: Response): Promise<void> => 
     }
 });
 
-authRouter.delete('/', async (req: Request, res: Response): Promise<void> => {
+authRouter.delete('/auth', async (req: Request, res: Response): Promise<void> => {
     try {
         const { userId, bearer } = req.token;
         await Prisma.token.deleteMany({

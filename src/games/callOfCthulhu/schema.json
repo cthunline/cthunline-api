@@ -1,0 +1,285 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "CoCBiography": {
+            "properties": {
+                "age": {
+                    "type": "number"
+                },
+                "birthPlace": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "occupation": {
+                    "type": "string"
+                },
+                "residence": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CoCCharacteristic": {
+            "properties": {
+                "fifth": {
+                    "type": "number"
+                },
+                "half": {
+                    "type": "number"
+                },
+                "regular": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "CoCCharacteristics": {
+            "properties": {
+                "appearance": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                },
+                "constitution": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                },
+                "dexterity": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                },
+                "education": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                },
+                "hitPoints": {
+                    "$ref": "#/definitions/CoCPoints"
+                },
+                "intelligence": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                },
+                "luck": {
+                    "$ref": "#/definitions/CoCLuck"
+                },
+                "magicPoints": {
+                    "$ref": "#/definitions/CoCPoints"
+                },
+                "power": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                },
+                "sanity": {
+                    "$ref": "#/definitions/CoCSanity"
+                },
+                "size": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                },
+                "strength": {
+                    "$ref": "#/definitions/CoCCharacteristic"
+                }
+            },
+            "type": "object"
+        },
+        "CoCCombat": {
+            "properties": {
+                "build": {
+                    "type": "number"
+                },
+                "damageBonus": {
+                    "type": "string"
+                },
+                "move": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "CoCLuck": {
+            "properties": {
+                "current": {
+                    "type": "number"
+                },
+                "starting": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "CoCPoints": {
+            "properties": {
+                "current": {
+                    "type": "number"
+                },
+                "maximum": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "CoCSanity": {
+            "properties": {
+                "current": {
+                    "type": "number"
+                },
+                "insane": {
+                    "type": "number"
+                },
+                "maximum": {
+                    "type": "number"
+                },
+                "starting": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "CoCSkill": {
+            "properties": {
+                "base": {
+                    "type": "string"
+                },
+                "developed": {
+                    "type": "boolean"
+                },
+                "development": {
+                    "type": "boolean"
+                },
+                "fifth": {
+                    "type": "number"
+                },
+                "half": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "regular": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "CoCStatus": {
+            "properties": {
+                "dying": {
+                    "type": "boolean"
+                },
+                "indefiniteInsanity": {
+                    "type": "boolean"
+                },
+                "majorWound": {
+                    "type": "boolean"
+                },
+                "temporaryInsanity": {
+                    "type": "boolean"
+                },
+                "unconscious": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "CoCStory": {
+            "properties": {
+                "arcaneTomesAndSpells": {
+                    "type": "string"
+                },
+                "assets": {
+                    "type": "string"
+                },
+                "cash": {
+                    "type": "string"
+                },
+                "encountersWithStrangeEntities": {
+                    "type": "string"
+                },
+                "gearAndPossessions": {
+                    "type": "string"
+                },
+                "ideologyAndBeliefs": {
+                    "type": "string"
+                },
+                "injuriesAndScars": {
+                    "type": "string"
+                },
+                "meaningfulLocations": {
+                    "type": "string"
+                },
+                "personalDescription": {
+                    "type": "string"
+                },
+                "phobiasAndManias": {
+                    "type": "string"
+                },
+                "significantPeople": {
+                    "type": "string"
+                },
+                "spendingLevel": {
+                    "type": "string"
+                },
+                "story": {
+                    "type": "string"
+                },
+                "traits": {
+                    "type": "string"
+                },
+                "treasuredPossessions": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CoCWeapon": {
+            "properties": {
+                "ammo": {
+                    "type": "string"
+                },
+                "attacks": {
+                    "type": "string"
+                },
+                "base": {
+                    "type": "string"
+                },
+                "damage": {
+                    "type": "string"
+                },
+                "malfunction": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "range": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "biography": {
+            "$ref": "#/definitions/CoCBiography"
+        },
+        "characteristics": {
+            "$ref": "#/definitions/CoCCharacteristics"
+        },
+        "combat": {
+            "$ref": "#/definitions/CoCCombat"
+        },
+        "skills": {
+            "items": {
+                "$ref": "#/definitions/CoCSkill"
+            },
+            "type": "array"
+        },
+        "status": {
+            "$ref": "#/definitions/CoCStatus"
+        },
+        "story": {
+            "$ref": "#/definitions/CoCStory"
+        },
+        "weapons": {
+            "items": {
+                "$ref": "#/definitions/CoCWeapon"
+            },
+            "type": "array"
+        }
+    },
+    "type": "object"
+}

@@ -28,7 +28,7 @@ const userSelect = {
 
 const userRouter = Router();
 
-userRouter.get('/', async (req: Request, res: Response): Promise<void> => {
+userRouter.get('/users', async (req: Request, res: Response): Promise<void> => {
     try {
         const users = await Prisma.user.findMany({
             select: userSelect
@@ -39,7 +39,7 @@ userRouter.get('/', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-userRouter.post('/', async ({ body }: Request, res: Response): Promise<void> => {
+userRouter.post('/users', async ({ body }: Request, res: Response): Promise<void> => {
     try {
         validateCreate(body);
         const checkEmail = await Prisma.user.findUnique({
@@ -65,7 +65,7 @@ userRouter.post('/', async ({ body }: Request, res: Response): Promise<void> => 
     }
 });
 
-userRouter.get('/:userId', async ({ params }: Request, res: Response): Promise<void> => {
+userRouter.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         const user = await handleNotFound<UserSelect>(
@@ -84,7 +84,7 @@ userRouter.get('/:userId', async ({ params }: Request, res: Response): Promise<v
     }
 });
 
-userRouter.post('/:userId', async ({ params, body }: Request, res: Response): Promise<void> => {
+userRouter.post('/users/:userId', async ({ params, body }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         const user = await handleNotFound<User>(

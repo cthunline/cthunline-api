@@ -16,7 +16,7 @@ const validateUpdate = Validator(SessionSchemas.update);
 
 const sessionRouter = Router();
 
-sessionRouter.get('/', async (req: Request, res: Response): Promise<void> => {
+sessionRouter.get('/sessions', async (req: Request, res: Response): Promise<void> => {
     try {
         const sessions = await Prisma.session.findMany();
         res.json({ sessions });
@@ -25,7 +25,7 @@ sessionRouter.get('/', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-sessionRouter.post('/', async (req: Request, res: Response): Promise<void> => {
+sessionRouter.post('/sessions', async (req: Request, res: Response): Promise<void> => {
     try {
         validateCreate(req.body);
         const session = await Prisma.session.create({
@@ -40,7 +40,7 @@ sessionRouter.post('/', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-sessionRouter.get('/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
+sessionRouter.get('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
         const session = await handleNotFound<Session>(
@@ -58,7 +58,7 @@ sessionRouter.get('/:sessionId', async ({ params }: Request, res: Response): Pro
     }
 });
 
-sessionRouter.post('/:sessionId', async ({ params, body }: Request, res: Response): Promise<void> => {
+sessionRouter.post('/sessions/:sessionId', async ({ params, body }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
         const session = await handleNotFound<Session>(
@@ -78,6 +78,29 @@ sessionRouter.post('/:sessionId', async ({ params, body }: Request, res: Respons
             }
         });
         res.json(updatedSession);
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+sessionRouter.delete('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
+    try {
+        const { sessionId } = params;
+        await handleNotFound<Session>(
+            'Session', (
+                Prisma.session.findUnique({
+                    where: {
+                        id: sessionId
+                    }
+                })
+            )
+        );
+        await Prisma.session.delete({
+            where: {
+                id: sessionId
+            }
+        });
+        res.send({});
     } catch (err: any) {
         res.error(err);
     }

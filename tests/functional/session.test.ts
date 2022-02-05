@@ -109,4 +109,28 @@ describe('[Functional] Sessions', () => {
             });
         });
     });
+
+    describe('DELETE /sessions/:id', () => {
+        it('Should throw error because of invalid ID', async () => {
+            await Api.testInvalidIdError({
+                method: 'DELETE',
+                route: '/sessions/:id'
+            });
+        });
+        it('Should delete a session', async () => {
+            const response = await Api.request({
+                method: 'POST',
+                route: '/sessions',
+                body: {
+                    name: 'Test'
+                }
+            });
+            expect(response).to.have.status(200);
+            const { body: { id } } = response;
+            await Api.testDelete({
+                route: `/sessions/${id}`,
+                testGet: true
+            });
+        });
+    });
 });
