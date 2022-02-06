@@ -27,6 +27,6 @@
         "no-param-reassign": ["error", {
             "props": false
         }],
-        // "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"]
+        "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"]
     }
 }

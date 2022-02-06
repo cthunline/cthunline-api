@@ -12,7 +12,7 @@ import {
     handleNotFound
 } from '../services/prisma';
 import Validator from '../services/validator';
-import { NotFoundError } from '../services/errors';
+import { ValidationError } from '../services/errors';
 import CharacterSchemas from './schemas/character.json';
 import { Games, GameId } from '../games';
 
@@ -59,12 +59,12 @@ characterRouter.get('/users/:userId/characters', async ({ params }: Request, res
 
 characterRouter.post('/users/:userId/characters', async ({ body, params }: Request, res: Response): Promise<void> => {
     try {
-        validateCreate(body);
         const { userId } = params;
         await controlUser(userId);
+        validateCreate(body);
         const { gameId, name, data } = body;
         if (!Object.keys(Games).includes(gameId)) {
-            throw new NotFoundError(`Game ${gameId} does no exist`);
+            throw new ValidationError(`Invalid gameId ${gameId}`);
         }
         Games[gameId as GameId].validator(data);
         const character = await Prisma.character.create({

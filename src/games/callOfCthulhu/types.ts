@@ -35,7 +35,6 @@ export interface CoCLuck {
 export interface CoCSanity {
     starting: number;
     maximum: number;
-    insane: number;
     current: number;
 }
 
@@ -74,7 +73,7 @@ export interface CoCSkill {
 
 export interface CoCCombat {
     move: number;
-    build: number;
+    build: string;
     damageBonus: string;
 }
 
@@ -101,6 +100,7 @@ export interface CoCStory {
     arcaneTomesAndSpells: string;
     encountersWithStrangeEntities: string;
     gearAndPossessions: string;
+    fellowInvestigators: string;
     spendingLevel: string;
     cash: string;
     assets: string;

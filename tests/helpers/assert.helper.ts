@@ -1,4 +1,7 @@
 import Chai, { expect } from 'chai';
+import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
+
+Chai.use(DeepEqualInAnyOrder);
 
 const ChaiDateString = require('chai-date-string');
 
@@ -47,6 +50,31 @@ export const assertSession = (
         Object.keys(expected).forEach((key) => {
             expect(data).to.have.property(key);
             expect(data[key]).to.equal(expected[key]);
+        });
+    }
+};
+
+export const assertCharacter = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('userId');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('gameId');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('name');
+    expect(data.id).to.be.a('string');
+    if (expected) {
+        Object.keys(expected).forEach((key) => {
+            if (key !== 'data') {
+                expect(data).to.have.property(key);
+                expect(data[key]).to.equal(expected[key]);
+            } else {
+                expect(data[key]).to.deep.equalInAnyOrder(expected[key]);
+            }
         });
     }
 };

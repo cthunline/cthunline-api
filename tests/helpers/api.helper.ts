@@ -346,19 +346,17 @@ const Api = {
             '61f5655bb7c63e78815de1c7',
             '61f5655cb7c63e78815de1c8'
         ];
-        await Promise.all(
-            invalidIds.map((id) => (async () => {
-                const isInvalid = !/^[0-9a-f]{24}$/.test(id);
-                const response = await Api.request({
-                    method,
-                    route: route.split(':id').join(id),
-                    body
-                });
-                expect(response).to.have.status(isInvalid ? 400 : 404);
-                expect(response).to.be.json;
-                assertError(response.body);
-            })())
-        );
+        for (const id of invalidIds) {
+            const isInvalid = !/^[0-9a-f]{24}$/.test(id);
+            const response = await Api.request({
+                method,
+                route: route.split(':id').join(id),
+                body
+            });
+            expect(response).to.have.status(isInvalid ? 400 : 404);
+            expect(response).to.be.json;
+            assertError(response.body);
+        }
     },
 
     async testValidationError(options: ValidationOptions): Promise<void> {
@@ -366,18 +364,16 @@ const Api = {
             route,
             data
         } = options;
-        await Promise.all(
-            data.map((body) => (async () => {
-                const response = await Api.request({
-                    method: 'POST',
-                    route,
-                    body
-                });
-                expect(response).to.have.status(400);
-                expect(response).to.be.json;
-                assertError(response.body);
-            })())
-        );
+        for (const body of data) {
+            const response = await Api.request({
+                method: 'POST',
+                route,
+                body
+            });
+            expect(response).to.have.status(400);
+            expect(response).to.be.json;
+            assertError(response.body);
+        }
     }
 };
 

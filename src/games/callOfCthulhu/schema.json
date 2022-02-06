@@ -1,7 +1,9 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
     "definitions": {
         "CoCBiography": {
+            "additionalProperties": false,
             "properties": {
                 "age": {
                     "type": "number"
@@ -22,6 +24,7 @@
             "type": "object"
         },
         "CoCCharacteristic": {
+            "additionalProperties": false,
             "properties": {
                 "fifth": {
                     "type": "number"
@@ -36,6 +39,7 @@
             "type": "object"
         },
         "CoCCharacteristics": {
+            "additionalProperties": false,
             "properties": {
                 "appearance": {
                     "$ref": "#/definitions/CoCCharacteristic"
@@ -77,9 +81,10 @@
             "type": "object"
         },
         "CoCCombat": {
+            "additionalProperties": false,
             "properties": {
                 "build": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "damageBonus": {
                     "type": "string"
@@ -91,6 +96,7 @@
             "type": "object"
         },
         "CoCLuck": {
+            "additionalProperties": false,
             "properties": {
                 "current": {
                     "type": "number"
@@ -102,6 +108,7 @@
             "type": "object"
         },
         "CoCPoints": {
+            "additionalProperties": false,
             "properties": {
                 "current": {
                     "type": "number"
@@ -113,11 +120,9 @@
             "type": "object"
         },
         "CoCSanity": {
+            "additionalProperties": false,
             "properties": {
                 "current": {
-                    "type": "number"
-                },
-                "insane": {
                     "type": "number"
                 },
                 "maximum": {
@@ -130,6 +135,7 @@
             "type": "object"
         },
         "CoCSkill": {
+            "additionalProperties": false,
             "properties": {
                 "base": {
                     "type": "string"
@@ -156,6 +162,7 @@
             "type": "object"
         },
         "CoCStatus": {
+            "additionalProperties": false,
             "properties": {
                 "dying": {
                     "type": "boolean"
@@ -176,6 +183,7 @@
             "type": "object"
         },
         "CoCStory": {
+            "additionalProperties": false,
             "properties": {
                 "arcaneTomesAndSpells": {
                     "type": "string"
@@ -187,6 +195,9 @@
                     "type": "string"
                 },
                 "encountersWithStrangeEntities": {
+                    "type": "string"
+                },
+                "fellowInvestigators": {
                     "type": "string"
                 },
                 "gearAndPossessions": {
@@ -226,6 +237,7 @@
             "type": "object"
         },
         "CoCWeapon": {
+            "additionalProperties": false,
             "properties": {
                 "ammo": {
                     "type": "string"

@@ -39,7 +39,7 @@ npx prisma db push
 
 # Character sheet JSON schemas are automaticly generated with this tool:
 # https://github.com/YousefED/typescript-json-schema
-typescript-json-schema src/games/[game]/types.ts [type] -o src/games/[game]/schema.json
+typescript-json-schema src/games/[game]/types.ts [type] -o src/games/[game]/schema.json --noExtraProps
 ```
 
 ### Production
