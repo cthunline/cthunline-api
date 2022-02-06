@@ -4,10 +4,14 @@
         "additionalProperties": false,
         "required": [
             "gameId",
+            "name",
             "data"
         ],
         "properties": {
             "gameId": {
+                "type": "string"
+            },
+            "name": {
                 "type": "string"
             },
             "data": {
@@ -19,10 +23,11 @@
     "update": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "data"
-        ],
+        "minProperties": 1,
         "properties": {
+            "name": {
+                "type": "string"
+            },
             "data": {
                 "type": "object",
                 "additionalProperties": true

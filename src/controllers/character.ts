@@ -12,15 +12,13 @@ import {
     handleNotFound
 } from '../services/prisma';
 import Validator from '../services/validator';
-import { NotFoundError } from '../services/errors';
 import CharacterSchemas from './schemas/character.json';
-import Games from '../games/games.json';
-import CoCCharacterSheet from '../games/callOfCthulhu';
+import { CharacterSheet, GameId } from '../games';
 
 const validateCreate = Validator(CharacterSchemas.create);
 const validateUpdate = Validator(CharacterSchemas.update);
 
-const controlUser = async (userId: string) => (
+const controlUser = async (userId: string): Promise<User> => (
     handleNotFound<User>(
         'User', (
             Prisma.user.findUnique({
@@ -31,22 +29,6 @@ const controlUser = async (userId: string) => (
         )
     )
 );
-
-const controlGame = (gameId: string) => {
-    if (!Object.keys(Games).includes(gameId)) {
-        throw new NotFoundError('Game not found');
-    }
-};
-
-// TODO
-// TODO
-// TODO
-// rendre CoCCharacterSheet générique?
-// utiliser les type génériques selon le jeu?
-// sinon supporter des jeux différents car actuellement ne supporte que cthulhu
-// TODO
-// TODO
-// TODO
 
 const characterRouter = Router();
 
@@ -79,9 +61,13 @@ characterRouter.post('/users/:userId/characters', async ({ body, params }: Reque
         validateCreate(body);
         const { userId } = params;
         await controlUser(userId);
-        const { gameId, data } = body;
-        controlGame(gameId);
-        const characterInstance = new CoCCharacterSheet(data, userId);
+        const { gameId, name, data } = body;
+        const characterInstance = new CharacterSheet({
+            userId,
+            gameId,
+            name,
+            data
+        });
         const character = await characterInstance.save();
         res.json(character);
     } catch (err: any) {
@@ -112,9 +98,32 @@ characterRouter.post('/users/:userId/characters/:characterId', async ({ params, 
     try {
         const { userId, characterId } = params;
         await controlUser(userId);
+        const {
+            id,
+            gameId,
+            name,
+            data
+        } = await handleNotFound<Character>(
+            'Character', (
+                Prisma.character.findUnique({
+                    where: {
+                        id: characterId
+                    }
+                })
+            )
+        );
         validateUpdate(body);
-        const { data } = body;
-        const characterInstance = new CoCCharacterSheet(data, userId, characterId);
+        const {
+            name: updatedName,
+            data: updatedData
+        } = body;
+        const characterInstance = new CharacterSheet({
+            id,
+            userId,
+            gameId: gameId as GameId,
+            name: updatedName ?? name,
+            data: updatedData ?? data
+        });
         const character = await characterInstance.save();
         res.json(character);
     } catch (err: any) {
