@@ -12,8 +12,9 @@ import {
     handleNotFound
 } from '../services/prisma';
 import Validator from '../services/validator';
+import { NotFoundError } from '../services/errors';
 import CharacterSchemas from './schemas/character.json';
-import { CharacterSheet, GameId } from '../games';
+import { Games, GameId } from '../games';
 
 const validateCreate = Validator(CharacterSchemas.create);
 const validateUpdate = Validator(CharacterSchemas.update);
@@ -62,13 +63,18 @@ characterRouter.post('/users/:userId/characters', async ({ body, params }: Reque
         const { userId } = params;
         await controlUser(userId);
         const { gameId, name, data } = body;
-        const characterInstance = new CharacterSheet({
-            userId,
-            gameId,
-            name,
-            data
+        if (!Object.keys(Games).includes(gameId)) {
+            throw new NotFoundError(`Game ${gameId} does no exist`);
+        }
+        Games[gameId as GameId].validator(data);
+        const character = await Prisma.character.create({
+            data: {
+                userId,
+                gameId,
+                name,
+                data
+            }
         });
-        const character = await characterInstance.save();
         res.json(character);
     } catch (err: any) {
         res.error(err);
@@ -98,12 +104,7 @@ characterRouter.post('/users/:userId/characters/:characterId', async ({ params, 
     try {
         const { userId, characterId } = params;
         await controlUser(userId);
-        const {
-            id,
-            gameId,
-            name,
-            data
-        } = await handleNotFound<Character>(
+        const { gameId } = await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({
                     where: {
@@ -113,18 +114,15 @@ characterRouter.post('/users/:userId/characters/:characterId', async ({ params, 
             )
         );
         validateUpdate(body);
-        const {
-            name: updatedName,
-            data: updatedData
-        } = body;
-        const characterInstance = new CharacterSheet({
-            id,
-            userId,
-            gameId: gameId as GameId,
-            name: updatedName ?? name,
-            data: updatedData ?? data
+        if (body.data) {
+            Games[gameId as GameId].validator(body.data);
+        }
+        const character = await Prisma.character.update({
+            data: body,
+            where: {
+                id: characterId
+            }
         });
-        const character = await characterInstance.save();
         res.json(character);
     } catch (err: any) {
         res.error(err);
