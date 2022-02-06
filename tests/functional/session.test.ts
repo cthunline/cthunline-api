@@ -29,6 +29,7 @@ describe('[Functional] Sessions', () => {
                     invalidProperty: 'Test'
                 }, {
                     name: 'Test',
+                    sketch: {},
                     invalidProperty: 'Test'
                 }, {}]
             });
@@ -38,6 +39,15 @@ describe('[Functional] Sessions', () => {
                 route: '/sessions',
                 data: {
                     name: 'Test'
+                },
+                assert: assertSession
+            });
+            const { sketch } = sessionsData[0];
+            await Api.testCreate({
+                route: '/sessions',
+                data: {
+                    name: 'Test',
+                    sketch
                 },
                 assert: assertSession
             });
@@ -86,6 +96,7 @@ describe('[Functional] Sessions', () => {
                     invalidProperty: 'Test'
                 }, {
                     name: 'Test',
+                    sketch: {},
                     invalidProperty: 'Test'
                 }, {}]
             });
@@ -104,6 +115,15 @@ describe('[Functional] Sessions', () => {
                 route: `/sessions/${id}`,
                 data: {
                     name: 'Test1'
+                },
+                assert: assertSession
+            });
+            const { sketch } = sessionsData[1];
+            await Api.testEdit({
+                route: `/sessions/${id}`,
+                data: {
+                    name: 'Test2',
+                    sketch
                 },
                 assert: assertSession
             });

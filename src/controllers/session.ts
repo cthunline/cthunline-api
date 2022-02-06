@@ -27,10 +27,14 @@ sessionRouter.get('/sessions', async (req: Request, res: Response): Promise<void
 
 sessionRouter.post('/sessions', async (req: Request, res: Response): Promise<void> => {
     try {
-        validateCreate(req.body);
+        const createData = req.body;
+        validateCreate(createData);
+        if (!createData.sketch) {
+            createData.sketch = {};
+        }
         const session = await Prisma.session.create({
             data: {
-                ...req.body,
+                ...createData,
                 masterId: req.token.userId
             }
         });

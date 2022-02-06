@@ -46,10 +46,16 @@ export const assertSession = (
     expect(data.id).to.be.a('string');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
+    expect(data).to.have.property('sketch');
+    expect(data.sketch).to.be.an('object');
     if (expected) {
         Object.keys(expected).forEach((key) => {
-            expect(data).to.have.property(key);
-            expect(data[key]).to.equal(expected[key]);
+            if (key === 'sketch') {
+                expect(data[key]).to.deep.equalInAnyOrder(expected[key]);
+            } else {
+                expect(data).to.have.property(key);
+                expect(data[key]).to.equal(expected[key]);
+            }
         });
     }
 };
@@ -69,11 +75,11 @@ export const assertCharacter = (
     expect(data.id).to.be.a('string');
     if (expected) {
         Object.keys(expected).forEach((key) => {
-            if (key !== 'data') {
+            if (key === 'data') {
+                expect(data[key]).to.deep.equalInAnyOrder(expected[key]);
+            } else {
                 expect(data).to.have.property(key);
                 expect(data[key]).to.equal(expected[key]);
-            } else {
-                expect(data[key]).to.deep.equalInAnyOrder(expected[key]);
             }
         });
     }
