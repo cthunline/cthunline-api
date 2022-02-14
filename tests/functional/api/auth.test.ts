@@ -1,7 +1,7 @@
-import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
+import Api from '../../helpers/api.helper';
+import Data from '../../helpers/data.helper';
 
-describe('[Functional] Authentication', () => {
+describe('[API] Authentication', () => {
     beforeEach(async () => {
         await Data.reset();
     });

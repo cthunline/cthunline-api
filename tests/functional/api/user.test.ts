@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
-import { assertUser, assertError } from '../helpers/assert.helper';
-import usersData from '../data/users.json';
+import Api from '../../helpers/api.helper';
+import Data from '../../helpers/data.helper';
+import { assertUser, assertError } from '../../helpers/assert.helper';
+import usersData from '../../data/users.json';
 
-describe('[Functional] Users', () => {
+describe('[API] Users', () => {
     beforeEach(async () => {
         await Data.reset();
         await Api.login();

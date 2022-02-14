@@ -9,37 +9,40 @@ import Log from './log';
 class CustomError extends Error {
     status: number;
     data: any;
-
-    constructor(message: string, status: number, data: any = null) {
+    constructor(message: string, status: number, data?: any) {
         super(message);
         this.status = status;
-        this.data = data;
+        // property used to return data in the error
+        // if data equals true we set value to an object with status (useful for socket errors)
+        this.data = data === true ? {
+            status
+        } : data;
     }
 }
 
 export class InternError extends CustomError {
-    constructor(message: string = 'Intern error') {
-        super(message, 500);
+    constructor(message: string = 'Intern error', data?: any) {
+        super(message, 500, data);
     }
 }
 export class NotFoundError extends CustomError {
-    constructor(message: string = 'Not found') {
-        super(message, 404);
+    constructor(message: string = 'Not found', data?: any) {
+        super(message, 404, data);
     }
 }
 export class ValidationError extends CustomError {
-    constructor(message: string = 'Invalid data', data: any = null) {
+    constructor(message: string = 'Invalid data', data?: any) {
         super(message, 400, data);
     }
 }
 export class AuthenticationError extends CustomError {
-    constructor(message: string = 'Authentication failed') {
-        super(message, 401);
+    constructor(message: string = 'Authentication failed', data?: any) {
+        super(message, 401, data);
     }
 }
 export class ConflictError extends CustomError {
-    constructor(message: string = 'Conflict error') {
-        super(message, 409);
+    constructor(message: string = 'Conflict error', data?: any) {
+        super(message, 409, data);
     }
 }
 

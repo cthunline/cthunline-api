@@ -1,17 +1,27 @@
 import { Server as SocketIoServer, Socket } from 'socket.io';
 import { Server } from 'http';
+import { ObjectId } from 'bson';
+
 import { Prisma } from '../services/prisma';
 import Log from '../services/log';
 import {
     AuthenticationError,
-    NotFoundError
+    NotFoundError,
+    ValidationError
 } from '../services/errors';
 import bindDice from './dice';
 
 const connectionMiddleware = async (socket: Socket, next: Function) => {
     try {
-        // verify auth token
         const bearer = socket.handshake.auth.token as string;
+        if (!bearer) {
+            throw new ValidationError('Missing bearer token in handshare auth', true);
+        }
+        const sessionId = socket.handshake.query.sessionId as string;
+        if (!sessionId || !ObjectId.isValid(sessionId)) {
+            throw new ValidationError('Missing session ID in handshare query', true);
+        }
+        // verify auth token
         const token = await Prisma.token.findFirst({
             where: {
                 bearer,
@@ -21,17 +31,16 @@ const connectionMiddleware = async (socket: Socket, next: Function) => {
             }
         });
         if (!token) {
-            throw new AuthenticationError('Invalid authentication token');
+            throw new AuthenticationError('Invalid authentication token', true);
         }
         // check session exists
-        const sessionId = socket.handshake.query.sessionId as string;
         const session = await Prisma.session.findUnique({
             where: {
-                id: sessionId as string
+                id: sessionId
             }
         });
         if (!session) {
-            throw new NotFoundError(`Session with ID ${sessionId} does not exist`);
+            throw new NotFoundError(`Session with ID ${sessionId} does not exist`, true);
         }
         // set data on socket
         socket.data.userId = token.userId;

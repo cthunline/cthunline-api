@@ -2,6 +2,7 @@ import Path from 'path';
 import Fs from 'fs';
 import Winston, { format } from 'winston';
 
+const isLogEnabled = !!parseInt(process.env.LOG_ENABLED ?? '1');
 const logDir = process.env.LOG_DIR;
 
 const printf = (i: Winston.Logform.TransformableInfo) => (
@@ -54,10 +55,16 @@ if (logDir && !fileTransportError) {
     );
 }
 
-const Log = Winston.createLogger({
-    transports,
-    exitOnError: false
-});
+const Log = isLogEnabled ? (
+    Winston.createLogger({
+        transports,
+        exitOnError: false
+    })
+) : {
+    info: () => {},
+    warn: () => {},
+    error: () => {}
+};
 
 if (fileTransportError) {
     Log.warn(`Winston file transport could not be initialized (${fileTransportError})`);
