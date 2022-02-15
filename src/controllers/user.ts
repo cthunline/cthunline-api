@@ -4,6 +4,7 @@ import {
     Response
 } from 'express';
 import { User } from '@prisma/client';
+
 import {
     Prisma,
     handleNotFound
@@ -11,6 +12,7 @@ import {
 import { hashPassword } from '../services/tools';
 import { ConflictError } from '../services/errors';
 import Validator from '../services/validator';
+
 import UserSchemas from './schemas/user.json';
 
 const validateCreate = Validator(UserSchemas.create);
@@ -18,6 +20,7 @@ const validateUpdate = Validator(UserSchemas.update);
 
 export type UserSelect = Omit<User, 'password'>;
 
+// prisma select object to exclude password in returned data
 const userSelect = {
     id: true,
     name: true,
@@ -28,6 +31,7 @@ const userSelect = {
 
 const userRouter = Router();
 
+// get all users
 userRouter.get('/users', async (req: Request, res: Response): Promise<void> => {
     try {
         const users = await Prisma.user.findMany({
@@ -39,6 +43,7 @@ userRouter.get('/users', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
+// create a user
 userRouter.post('/users', async ({ body }: Request, res: Response): Promise<void> => {
     try {
         validateCreate(body);
@@ -65,6 +70,7 @@ userRouter.post('/users', async ({ body }: Request, res: Response): Promise<void
     }
 });
 
+// get a user
 userRouter.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
@@ -84,6 +90,7 @@ userRouter.get('/users/:userId', async ({ params }: Request, res: Response): Pro
     }
 });
 
+// edit user
 userRouter.post('/users/:userId', async ({ params, body }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;

@@ -6,20 +6,21 @@ import {
 import { Request, Response, NextFunction } from 'express';
 import Log from './log';
 
-class CustomError extends Error {
+// custom error class with additional http status and data
+// unless realy necessary do not throw error using this class
+export class CustomError extends Error {
     status: number;
     data: any;
     constructor(message: string, status: number, data?: any) {
         super(message);
         this.status = status;
-        // property used to return data in the error
-        // if data equals true we set value to an object with status (useful for socket errors)
-        this.data = data === true ? {
-            status
-        } : data;
+        if (data) {
+            this.data = data;
+        }
     }
 }
 
+// specific custom error classes that should be used to throw errors
 export class InternError extends CustomError {
     constructor(message: string = 'Intern error', data?: any) {
         super(message, 500, data);
@@ -54,6 +55,8 @@ declare global {
     }
 }
 
+// express middlware injecting a response.error function that handles custom errors
+// it returns the correct status code and additional data if specified
 export const errorMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     res.error = (err: Error): void => {
         const { message, stack } = err;

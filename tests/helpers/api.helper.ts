@@ -102,14 +102,17 @@ export interface CredentialOptions {
 }
 
 const Api = {
-    userId: null,
-    bearer: null,
+    userId: '',
+    bearer: '',
     credentials: {
         email: 'test@test.com',
         password: 'test'
     },
 
-    async login(credentials?: CredentialOptions, expectSuccess: boolean = true): Promise<void> {
+    async login(
+        credentials?: CredentialOptions,
+        expectSuccess: boolean = true
+    ): Promise<string | null> {
         const response = await Api.request({
             method: 'POST',
             route: '/auth',
@@ -121,11 +124,12 @@ const Api = {
             assertToken(body);
             Api.bearer = body.bearer;
             Api.userId = body.userId;
-        } else {
-            expect(response).to.have.status(401);
-            expect(response).to.be.json;
-            assertError(body);
+            return body.bearer;
         }
+        expect(response).to.have.status(401);
+        expect(response).to.be.json;
+        assertError(body);
+        return null;
     },
 
     async logout(expectSuccess: boolean = true): Promise<void> {
@@ -137,8 +141,8 @@ const Api = {
             expect(response).to.have.status(200);
             expect(response).to.be.json;
             expect(response.body).to.be.an('object').and.be.empty;
-            Api.bearer = null;
-            Api.userId = null;
+            Api.bearer = '';
+            Api.userId = '';
         } else {
             expect(response).to.have.status(401);
             expect(response).to.be.json;

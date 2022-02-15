@@ -5,6 +5,8 @@ import { NotFoundError } from './errors';
 
 export const Prisma = new PrismaClient();
 
+// database initialization tasks
+// create a default user if users collection is empty
 export const initDb = async () => {
     const users = await Prisma.user.findMany();
     if (!users.length) {
@@ -19,6 +21,7 @@ export const initDb = async () => {
     }
 };
 
+// execute query and throw a not found error if there's no result
 export const handleNotFound = async <T>(
     name: string,
     queryPromise: Promise<T | null>

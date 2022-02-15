@@ -1,6 +1,7 @@
 import Validator from '../services/validator';
 import CoCCharacterSchema from './callOfCthulhu/schema.json';
 
+// list of available games
 export const Games = {
     callOfCthulhu: {
         name: 'Call of Cthulhu',

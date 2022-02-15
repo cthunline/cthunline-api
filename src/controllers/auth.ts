@@ -7,11 +7,13 @@ import {
 import DaysJs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { Token } from '@prisma/client';
+
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { AuthenticationError } from '../services/errors';
-import AuthSchemas from './schemas/auth.json';
 import { verifyPassword } from '../services/tools';
+
+import AuthSchemas from './schemas/auth.json';
 
 const validateLogin = Validator(AuthSchemas.login);
 
@@ -23,6 +25,7 @@ declare global {
     }
 }
 
+// extract bearer token from http header
 const getBearer = (req: Request): string | null => {
     const bearerPrefix = 'Bearer ';
     const authHeader = req.get('Authorization');
@@ -32,6 +35,8 @@ const getBearer = (req: Request): string | null => {
     return null;
 };
 
+// express middleware controling bearer token validity
+// injects token data in express request object
 export const authMiddleware = async (
     req: Request,
     res: Response,
@@ -62,6 +67,7 @@ export const authMiddleware = async (
 
 const authRouter = Router();
 
+// check authentication validity
 authRouter.get('/auth', async (req: Request, res: Response): Promise<void> => {
     try {
         res.send(req.token);
@@ -70,6 +76,7 @@ authRouter.get('/auth', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
+// login
 authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void> => {
     try {
         validateLogin(body);
@@ -103,6 +110,7 @@ authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void>
     }
 });
 
+// logout
 authRouter.delete('/auth', async (req: Request, res: Response): Promise<void> => {
     try {
         const { userId, bearer } = req.token;

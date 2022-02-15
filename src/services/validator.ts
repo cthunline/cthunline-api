@@ -8,6 +8,7 @@ const ajv = new Ajv({
 
 addFormats(ajv);
 
+// return a function that validates data against a json schema
 export default (schema: Record<string, any>) => {
     const validate = ajv.compile(schema);
     return (data: Record<string, any>) => {

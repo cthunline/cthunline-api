@@ -13,7 +13,7 @@ export enum DiceType {
 export type DiceRequest = Partial<Record<DiceType, number>>;
 
 export interface DiceResult {
-    user: User
-    request: DiceRequest
+    user: User,
+    request: DiceRequest,
     result: number
 }

@@ -1,0 +1,37 @@
+{
+    "request": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+            "d4": {
+                "type": "number",
+                "minimum": 1
+            },
+            "d6": {
+                "type": "number",
+                "minimum": 1
+            },
+            "d8": {
+                "type": "number",
+                "minimum": 1
+            },
+            "d10": {
+                "type": "number",
+                "minimum": 1
+            },
+            "d12": {
+                "type": "number",
+                "minimum": 1
+            },
+            "d20": {
+                "type": "number",
+                "minimum": 1
+            },
+            "d100": {
+                "type": "number",
+                "minimum": 1
+            }
+        }
+    }
+}

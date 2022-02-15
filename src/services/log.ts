@@ -13,6 +13,7 @@ const timestamp = {
     format: 'YYYY-MM-DD HH:mm:ss'
 };
 
+// default log transport in console
 const transports: Winston.transport[] = [
     new Winston.transports.Console({
         level: 'info',
@@ -25,7 +26,7 @@ const transports: Winston.transport[] = [
     })
 ];
 
-// controls log directory
+// control log file directory exists and is writable
 let fileTransportError = null;
 if (!logDir) {
     fileTransportError = 'no log directory provided';
@@ -40,6 +41,7 @@ if (!logDir) {
 }
 
 if (logDir && !fileTransportError) {
+    // log transport in file
     transports.push(
         new Winston.transports.File({
             level: 'info',
@@ -55,6 +57,8 @@ if (logDir && !fileTransportError) {
     );
 }
 
+// logging instance to use in code
+// if logging is disabled return a fake log object
 const Log = isLogEnabled ? (
     Winston.createLogger({
         transports,

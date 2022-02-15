@@ -1,33 +1,8 @@
-import { expect } from 'chai';
-import { io } from 'socket.io-client';
-
 import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
+import Sockets from '../../helpers/sockets.helper';
 
 import sessionsData from '../../data/sessions.json';
-
-const socketUrl = 'http://localhost:8080';
-
-interface FailSocketConnectionData {
-    handshake: object;
-    status: number;
-}
-
-const failSocketConnection = async ({
-    handshake,
-    status
-}: FailSocketConnectionData): Promise<void> => (
-    new Promise((resolve, reject) => {
-        const socket = io(socketUrl, handshake);
-        socket.on('connect', () => {
-            reject();
-        });
-        socket.on('connect_error', (err: any) => {
-            expect(err.data.status).to.equal(status);
-            resolve();
-        });
-    })
-);
 
 describe('[Sockets] Authentication', () => {
     beforeEach(async () => {
@@ -35,7 +10,7 @@ describe('[Sockets] Authentication', () => {
     });
 
     it('Should fail to connect socket because of invalid handshake data', async () => {
-        await Promise.all([{
+        const invalidHandshakes = [{
             auth: {
                 token: 'someToken'
             },
@@ -48,16 +23,17 @@ describe('[Sockets] Authentication', () => {
         }, {
             auth: {},
             query: {}
-        }, {}].map((handshake) => (
-            failSocketConnection({
+        }, {}];
+        for (const handshake of invalidHandshakes) {
+            await Sockets.failConnect({
                 handshake,
                 status: 400
-            })
-        )));
+            });
+        }
     });
 
     it('Should fail to connect socket because of invalid authentication token', async () => {
-        await failSocketConnection({
+        await Sockets.failConnect({
             handshake: {
                 auth: {
                     token: 'invalidToken'
@@ -73,7 +49,7 @@ describe('[Sockets] Authentication', () => {
     it('Should fail to connect socket because of invalid sessionId', async () => {
         await Api.login();
         const { bearer } = Api;
-        await failSocketConnection({
+        await Sockets.failConnect({
             handshake: {
                 auth: {
                     token: bearer
@@ -89,7 +65,7 @@ describe('[Sockets] Authentication', () => {
     it('Should fail to connect socket because of not found sessionId', async () => {
         await Api.login();
         const { bearer } = Api;
-        await failSocketConnection({
+        await Sockets.failConnect({
             handshake: {
                 auth: {
                     token: bearer
@@ -105,22 +81,9 @@ describe('[Sockets] Authentication', () => {
     it('Should connect to socket', async () => {
         await Api.login();
         const { bearer } = Api;
-        await new Promise<void>((resolve, reject) => {
-            const socket = io(socketUrl, {
-                auth: {
-                    token: bearer
-                },
-                query: {
-                    sessionId: sessionsData[0].id
-                }
-            });
-            socket.on('connect', () => {
-                socket.disconnect();
-                resolve();
-            });
-            socket.on('connect_error', () => {
-                reject();
-            });
+        await Sockets.connect({
+            bearer,
+            sessionId: sessionsData[1].id
         });
     });
 });
