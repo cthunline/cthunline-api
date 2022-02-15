@@ -3,15 +3,10 @@ import {
     Request,
     Response
 } from 'express';
-import {
-    User,
-    Character
-} from '@prisma/client';
+import { Character } from '@prisma/client';
 
-import {
-    Prisma,
-    handleNotFound
-} from '../services/prisma';
+import { findUser } from './user';
+import { Prisma, handleNotFound } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
 import { Games, GameId } from '../games';
@@ -20,19 +15,6 @@ import CharacterSchemas from './schemas/character.json';
 
 const validateCreate = Validator(CharacterSchemas.create);
 const validateUpdate = Validator(CharacterSchemas.update);
-
-// check a user exists
-const controlUser = async (userId: string): Promise<User> => (
-    handleNotFound<User>(
-        'User', (
-            Prisma.user.findUnique({
-                where: {
-                    id: userId
-                }
-            })
-        )
-    )
-);
 
 const characterRouter = Router();
 
@@ -50,7 +32,7 @@ characterRouter.get('/characters', async (req: Request, res: Response): Promise<
 characterRouter.get('/users/:userId/characters', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
-        await controlUser(userId);
+        await findUser(userId);
         const characters = await Prisma.character.findMany({
             where: {
                 userId
@@ -66,7 +48,7 @@ characterRouter.get('/users/:userId/characters', async ({ params }: Request, res
 characterRouter.post('/users/:userId/characters', async ({ body, params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
-        await controlUser(userId);
+        await findUser(userId);
         validateCreate(body);
         const { gameId, name, data } = body;
         if (!Object.keys(Games).includes(gameId)) {
@@ -91,7 +73,7 @@ characterRouter.post('/users/:userId/characters', async ({ body, params }: Reque
 characterRouter.get('/users/:userId/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId, characterId } = params;
-        await controlUser(userId);
+        await findUser(userId);
         const character = await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({
@@ -111,7 +93,7 @@ characterRouter.get('/users/:userId/characters/:characterId', async ({ params }:
 characterRouter.post('/users/:userId/characters/:characterId', async ({ params, body }: Request, res: Response): Promise<void> => {
     try {
         const { userId, characterId } = params;
-        await controlUser(userId);
+        await findUser(userId);
         const { gameId } = await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({
@@ -141,7 +123,7 @@ characterRouter.post('/users/:userId/characters/:characterId', async ({ params, 
 characterRouter.delete('/users/:userId/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId, characterId } = params;
-        await controlUser(userId);
+        await findUser(userId);
         await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({

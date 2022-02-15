@@ -29,6 +29,21 @@ const userSelect = {
     updatedAt: true
 };
 
+// check a user exists and return it
+// returned user data will not contain password
+export const findUser = async (userId: string): Promise<UserSelect> => (
+    handleNotFound<UserSelect>(
+        'User', (
+            Prisma.user.findUnique({
+                select: userSelect,
+                where: {
+                    id: userId
+                }
+            })
+        )
+    )
+);
+
 const userRouter = Router();
 
 // get all users
@@ -74,16 +89,7 @@ userRouter.post('/users', async ({ body }: Request, res: Response): Promise<void
 userRouter.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
-        const user = await handleNotFound<UserSelect>(
-            'User', (
-                Prisma.user.findUnique({
-                    select: userSelect,
-                    where: {
-                        id: userId
-                    }
-                })
-            )
-        );
+        const user = await findUser(userId);
         res.json(user);
     } catch (err: any) {
         res.error(err);
