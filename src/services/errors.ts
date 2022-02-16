@@ -66,15 +66,16 @@ export const errorMiddleware = (req: Request, res: Response, next: NextFunction)
         };
         if (err instanceof CustomError) {
             statusCode = err.status;
+            response.error = message;
             if (err.data) {
                 response.data = err.data;
             }
         } else if (err instanceof PrismaClientValidationError) {
             statusCode = 400;
-            response.message = message;
+            response.error = message;
         } else if (err instanceof PrismaClientKnownRequestError) {
             const { code } = err;
-            response.message = message;
+            response.error = message;
             switch (code) {
                 case 'P2023':
                     statusCode = 400;

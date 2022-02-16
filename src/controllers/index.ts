@@ -8,6 +8,7 @@ import {
 import { NotFoundError } from '../services/errors';
 import authRouter, { authMiddleware } from './auth';
 import userRouter from './user';
+import assetRouter from './asset';
 import sessionRouter from './session';
 import characterRouter from './character';
 
@@ -25,6 +26,7 @@ apiRouter.use(async (req: Request, res: Response, next: NextFunction): Promise<v
 // apply routers
 apiRouter.use(authRouter);
 apiRouter.use(userRouter);
+apiRouter.use(assetRouter);
 apiRouter.use(sessionRouter);
 apiRouter.use(characterRouter);
 

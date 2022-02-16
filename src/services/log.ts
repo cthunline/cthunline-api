@@ -30,13 +30,12 @@ const transports: Winston.transport[] = [
 let fileTransportError = null;
 if (!logDir) {
     fileTransportError = 'no log directory provided';
-} else if (!Fs.existsSync(logDir)) {
-    fileTransportError = `directory ${logDir} does not exist`;
 } else {
     try {
+        Fs.accessSync(logDir, Fs.constants.F_OK);
         Fs.accessSync(logDir, Fs.constants.W_OK);
     } catch (err) {
-        fileTransportError = `no write permission on ${logDir} directory`;
+        fileTransportError = `log directory ${logDir} does not exist or is not writable`;
     }
 }
 

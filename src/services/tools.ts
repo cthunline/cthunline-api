@@ -35,6 +35,6 @@ export const decodeBase64 = (base64: string): string => (
 );
 
 // return sum of an array of numbers
-export const sum = (numbers: number[]) => (
+export const sum = (numbers: number[]): number => (
     numbers.reduce((i, j) => i + j, 0)
 );

@@ -1,3 +1,4 @@
+import Fs from 'fs';
 import {
     Router,
     Request,
@@ -8,16 +9,39 @@ import Formidable from 'formidable';
 
 import { findUser } from './user';
 import { Prisma, handleNotFound } from '../services/prisma';
-import { ValidationError } from '../services/errors';
+import { InternError, ValidationError } from '../services/errors';
+import { mimeTypes, FileType, MimeType } from '../types/asset';
 
-// allowed asset file extensions
-// const validExtensions = [
-//     'jpg',
-//     'jpeg',
-//     'png',
-//     'svg',
-//     'mp3'
-// ];
+// check asset directory exists and is writable
+const assetDir = process.env.ASSET_DIR;
+if (assetDir) {
+    try {
+        Fs.accessSync(assetDir, Fs.constants.F_OK);
+        Fs.accessSync(assetDir, Fs.constants.W_OK);
+    } catch (err) {
+        throw new InternError(`Asset directory ${assetDir} does not exist or is not writable`);
+    }
+} else {
+    throw new InternError('No asset directory provided');
+}
+
+// controls form's file mimetype and extension
+// returns file type (image or audio)
+const controlFileType = (file: Formidable.File): FileType => {
+    const { mimetype, originalFilename } = file;
+    const ext = originalFilename?.split('.').pop() ?? '';
+    if (mimetype) {
+        if (mimeTypes[mimetype as MimeType]) {
+            const { extensions, type } = mimeTypes[mimetype as MimeType];
+            if (extensions.includes(ext)) {
+                return type as FileType;
+            }
+            throw new ValidationError(`File extension ${ext} does not match mimetype ${mimetype}`);
+        }
+        throw new ValidationError(`File mimetype ${mimetype} is not allowed`);
+    }
+    throw new ValidationError('Could not get file mimetype');
+};
 
 const assetRouter = Router();
 
@@ -46,7 +70,7 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
         await findUser(userId);
         // initialize formidable
         const form = Formidable({
-            uploadDir: '',
+            uploadDir: assetDir,
             keepExtensions: true,
             maxFileSize: 20 * 1024 * 1024
         });
@@ -59,7 +83,21 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
             if (!files.asset) {
                 throw new ValidationError('Missing asset field in form data');
             }
-            // const file = files.asset;
+            // const {
+            //     filePath,
+            //     newFilename,
+            //     originalFilename,
+            //     mimetype
+            // } = files.asset;
+            const file = files.asset as Formidable.File;
+            controlFileType(file);
+            //
+            /*
+            filepath: '/tmp/ead03a4cf12edb253e0dc4700.png',
+            newFilename: 'ead03a4cf12edb253e0dc4700.png',
+            originalFilename: 'cthulhu.png',
+            mimetype: 'image/png',
+            */
             // const ext = file.type.split('/').pop();
             // if (!validExtensions.includes(ext)) {
             //     throw new ValidationError('Invalid file type');
