@@ -1,4 +1,5 @@
 import Fs from 'fs';
+import Path from 'path';
 import {
     Router,
     Request,
@@ -11,6 +12,12 @@ import { findUser } from './user';
 import { Prisma, handleNotFound } from '../services/prisma';
 import { InternError, ValidationError } from '../services/errors';
 import { mimeTypes, FileType, MimeType } from '../types/asset';
+
+// formidable initialization options
+const formidableOptions = {
+    keepExtensions: true,
+    maxFileSize: 20 * 1024 * 1024
+};
 
 // check asset directory exists and is writable
 const assetDir = process.env.ASSET_DIR;
@@ -43,6 +50,17 @@ const controlFileType = (file: Formidable.File): FileType => {
     throw new ValidationError('Could not get file mimetype');
 };
 
+// create user subdirectory in asset dir if not exist and return its path
+const controlUserDir = async (userId: string): Promise<string> => {
+    const userDir = Path.join(assetDir, userId);
+    try {
+        Fs.accessSync(userDir, Fs.constants.F_OK);
+    } catch (err) {
+        await Fs.promises.mkdir(userDir);
+    }
+    return userDir;
+};
+
 const assetRouter = Router();
 
 // get all assets of a user
@@ -68,48 +86,50 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
         // control userId
         const { userId } = req.params;
         await findUser(userId);
+        // create user subdirectory if not exist
+        const userDir = await controlUserDir(userId);
         // initialize formidable
-        const form = Formidable({
-            uploadDir: assetDir,
-            keepExtensions: true,
-            maxFileSize: 20 * 1024 * 1024
-        });
+        const form = Formidable(formidableOptions);
         // parse form data
         form.parse(req, async (err, fields, files) => {
-            // file controls
-            if (err) {
-                throw new ValidationError('Error while parsing file');
+            try {
+                // file controls
+                if (err) {
+                    throw new ValidationError('Error while parsing file');
+                }
+                if (!files.asset) {
+                    throw new ValidationError('Missing asset field in form data');
+                }
+                const file = files.asset as Formidable.File;
+                const type = controlFileType(file);
+                // build target upload file path
+                const {
+                    filepath: temporaryPath,
+                    originalFilename,
+                    newFilename
+                } = file;
+                const name = originalFilename ?? newFilename;
+                const path = Path.join(userId, newFilename);
+                const uploadPath = Path.join(userDir, newFilename);
+                // move temporary file to new file
+                await Fs.promises.rename(
+                    temporaryPath,
+                    uploadPath
+                );
+                // create asset database object
+                const asset = await Prisma.asset.create({
+                    data: {
+                        userId,
+                        type,
+                        name,
+                        path
+                    }
+                });
+                //
+                res.json(asset);
+            } catch (formErr: any) {
+                res.error(formErr);
             }
-            if (!files.asset) {
-                throw new ValidationError('Missing asset field in form data');
-            }
-            // const {
-            //     filePath,
-            //     newFilename,
-            //     originalFilename,
-            //     mimetype
-            // } = files.asset;
-            const file = files.asset as Formidable.File;
-            controlFileType(file);
-            //
-            /*
-            filepath: '/tmp/ead03a4cf12edb253e0dc4700.png',
-            newFilename: 'ead03a4cf12edb253e0dc4700.png',
-            originalFilename: 'cthulhu.png',
-            mimetype: 'image/png',
-            */
-            // const ext = file.type.split('/').pop();
-            // if (!validExtensions.includes(ext)) {
-            //     throw new ValidationError('Invalid file type');
-            // }
-            // TODO write file on disk
-            // const asset = await Prisma.asset.create({
-            //     data: {
-            //         type: '',
-            //         filename: ''
-            //     }
-            // });
-            // res.json(asset);
         });
     } catch (err: any) {
         res.error(err);
@@ -141,7 +161,7 @@ assetRouter.delete('/users/:userId/assets/:assetId', async ({ params }: Request,
     try {
         const { userId, assetId } = params;
         await findUser(userId);
-        await handleNotFound<Asset>(
+        const { path } = await handleNotFound<Asset>(
             'Asset', (
                 Prisma.asset.findUnique({
                     where: {
@@ -150,12 +170,16 @@ assetRouter.delete('/users/:userId/assets/:assetId', async ({ params }: Request,
                 })
             )
         );
-        // TODO delete file on disk
-        await Prisma.asset.delete({
-            where: {
-                id: assetId
-            }
-        });
+        await Promise.all([
+            Prisma.asset.delete({
+                where: {
+                    id: assetId
+                }
+            }),
+            Fs.promises.rm(
+                Path.join(assetDir, path)
+            )
+        ]);
         res.send({});
     } catch (err: any) {
         res.error(err);
