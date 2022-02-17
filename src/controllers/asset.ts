@@ -27,7 +27,7 @@ const getAssetDir = (): string => {
             Fs.accessSync(dir, Fs.constants.F_OK);
             Fs.accessSync(dir, Fs.constants.W_OK);
             return dir;
-        } catch (err) {
+        } catch {
             throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
         }
     } else {
@@ -59,8 +59,8 @@ const controlFileType = (file: Formidable.File): FileType => {
 const controlUserDir = async (userId: string): Promise<string> => {
     const userDir = Path.join(assetDir, userId);
     try {
-        Fs.accessSync(userDir, Fs.constants.F_OK);
-    } catch (err) {
+        await Fs.promises.access(userDir, Fs.constants.F_OK);
+    } catch {
         await Fs.promises.mkdir(userDir);
     }
     return userDir;

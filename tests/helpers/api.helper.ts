@@ -378,6 +378,14 @@ const Api = {
             expect(response).to.be.json;
             assertError(response.body);
         }
+    },
+
+    async testStaticFile(route: string): Promise<void> {
+        const response = await Api.request({
+            method: 'GET',
+            route
+        });
+        expect(response).to.have.status(200);
     }
 };
 

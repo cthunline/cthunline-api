@@ -1,0 +1,19 @@
+[{
+    "id": "61f537cc1790b30562a66d21",
+    "type": "image",
+    "name": "asset.png",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d21.png",
+    "userId": "61f537ca1790b30562a66d43"
+}, {
+    "id": "61f537cc1790b30562a66d22",
+    "type": "image",
+    "name": "asset.jpg",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d22.png",
+    "userId": "61f537ca1790b30562a66d43"
+}, {
+    "id": "61f537cc1790b30562a66d23",
+    "type": "audio",
+    "name": "asset.mp3",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d23.png",
+    "userId": "61f537ca1790b30562a66d43"
+}]

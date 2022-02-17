@@ -1,7 +1,9 @@
 import { expect } from 'chai';
+
 import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
 import { assertSession } from '../../helpers/assert.helper';
+
 import sessionsData from '../../data/sessions.json';
 
 describe('[API] Sessions', () => {

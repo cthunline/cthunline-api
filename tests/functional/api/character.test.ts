@@ -1,7 +1,9 @@
 import { expect } from 'chai';
+
 import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
 import { assertCharacter } from '../../helpers/assert.helper';
+
 import usersData from '../../data/users.json';
 import charactersData from '../../data/characters.json';
 

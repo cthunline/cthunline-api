@@ -28,9 +28,33 @@ export const assertUser = (
     expect(data.email).to.be.a('string');
     expect(data).to.not.have.property('password');
     if (expected) {
-        const expectedWithoutPassword = { ...expected };
-        delete expectedWithoutPassword.password;
+        const { password, ...expectedWithoutPassword } = expected;
         Object.keys(expectedWithoutPassword).forEach((key) => {
+            expect(data).to.have.property(key);
+            expect(data[key]).to.equal(expected[key]);
+        });
+    }
+};
+
+export const assertAsset = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('type');
+    expect(data.type).to.be.a('string');
+    expect(data).to.have.property('name');
+    expect(data.name).to.be.a('string');
+    expect(data).to.have.property('path');
+    expect(data.path).to.be.a('string');
+    expect(data).to.have.property('path');
+    expect(data.path).to.be.a('string');
+    expect(data).to.have.property('userId');
+    expect(data.userId).to.be.a('string');
+    if (expected) {
+        Object.keys(expected).forEach((key) => {
             expect(data).to.have.property(key);
             expect(data[key]).to.equal(expected[key]);
         });
