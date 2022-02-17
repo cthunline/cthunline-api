@@ -20,17 +20,22 @@ const formidableOptions = {
 };
 
 // check asset directory exists and is writable
-const assetDir = process.env.ASSET_DIR;
-if (assetDir) {
-    try {
-        Fs.accessSync(assetDir, Fs.constants.F_OK);
-        Fs.accessSync(assetDir, Fs.constants.W_OK);
-    } catch (err) {
-        throw new InternError(`Asset directory ${assetDir} does not exist or is not writable`);
+const getAssetDir = (): string => {
+    const dir = process.env.ASSET_DIR;
+    if (dir) {
+        try {
+            Fs.accessSync(dir, Fs.constants.F_OK);
+            Fs.accessSync(dir, Fs.constants.W_OK);
+            return dir;
+        } catch (err) {
+            throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
+        }
+    } else {
+        throw new InternError('No asset directory provided');
     }
-} else {
-    throw new InternError('No asset directory provided');
-}
+};
+
+export const assetDir = getAssetDir();
 
 // controls form's file mimetype and extension
 // returns file type (image or audio)
