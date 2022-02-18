@@ -1,5 +1,6 @@
 import Chai, { expect } from 'chai';
 import ChaiHttp from 'chai-http';
+
 import server from '../../src';
 import {
     assertError,
@@ -120,7 +121,7 @@ const Api = {
     async login(
         credentials?: CredentialOptions,
         expectSuccess: boolean = true
-    ): Promise<string | null> {
+    ): Promise<any> {
         const response = await Api.request({
             method: 'POST',
             route: '/auth',
@@ -132,7 +133,7 @@ const Api = {
             assertToken(body);
             Api.bearer = body.bearer;
             Api.userId = body.userId;
-            return body.bearer;
+            return body;
         }
         expect(response).to.have.status(401);
         expect(response).to.be.json;

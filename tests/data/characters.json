@@ -1,4 +1,228 @@
 [{
+    "id": "61f537ca1790b30562a66d92",
+    "userId": "61f537ca1790b30562a66d43",
+    "gameId": "callOfCthulhu",
+    "name": "Ada Hegerberg (soccer player)",
+    "data": {
+        "biography": {
+            "name": "Ada Hegerberg",
+            "birthPlace": "Molde, Norway",
+            "occupation": "Athlete",
+            "residence": "Lyon, France",
+            "age": 26
+        },
+        "characteristics": {
+            "strength": {
+                "regular": 75,
+                "half": 37,
+                "fifth": 15
+            },
+            "constitution": {
+                "regular": 55,
+                "half": 27,
+                "fifth": 11
+            },
+            "size": {
+                "regular": 65,
+                "half": 32,
+                "fifth": 13
+            },
+            "dexterity": {
+                "regular": 75,
+                "half": 37,
+                "fifth": 15
+            },
+            "appearance": {
+                "regular": 65,
+                "half": 32,
+                "fifth": 13
+            },
+            "education": {
+                "regular": 71,
+                "half": 35,
+                "fifth": 14
+            },
+            "intelligence": {
+                "regular": 50,
+                "half": 25,
+                "fifth": 10
+            },
+            "power": {
+                "regular": 25,
+                "half": 12,
+                "fifth": 5
+            },
+            "hitPoints": {
+                "current": 12,
+                "maximum": 12
+            },
+            "magicPoints": {
+                "current": 5,
+                "maximum": 5
+            },
+            "luck": {
+                "current": 15,
+                "starting": 15
+            },
+            "sanity": {
+                "starting": 25,
+                "current": 25,
+                "maximum": 99
+            }
+        },
+        "status": {
+            "temporaryInsanity": false,
+            "indefiniteInsanity": false,
+            "majorWound": false,
+            "unconscious": false,
+            "dying": false
+        },
+        "skills": [{
+            "name": "Charm",
+            "development": true,
+            "developed": true,
+            "base": "15%",
+            "regular": 35,
+            "half": 17,
+            "fifth": 7
+        }, {
+            "name": "Credit Rating",
+            "development": false,
+            "developed": false,
+            "base": "0%",
+            "regular": 32,
+            "half": 16,
+            "fifth": 6
+        }, {
+            "name": "Fighting: Brawl",
+            "development": true,
+            "developed": true,
+            "base": "25%",
+            "regular": 40,
+            "half": 20,
+            "fifth": 8
+        }, {
+            "name": "Firearms: Rifle/Shotgun",
+            "development": true,
+            "developed": true,
+            "base": "25%",
+            "regular": 50,
+            "half": 25,
+            "fifth": 10
+        }, {
+            "name": "First Aid",
+            "development": true,
+            "developed": true,
+            "base": "30%",
+            "regular": 50,
+            "half": 25,
+            "fifth": 10
+        }, {
+            "name": "Jump",
+            "development": true,
+            "developed": true,
+            "base": "20%",
+            "regular": 50,
+            "half": 25,
+            "fifth": 10
+        }, {
+            "name": "Language (Other): English",
+            "development": true,
+            "developed": true,
+            "base": "1%",
+            "regular": 70,
+            "half": 35,
+            "fifth": 14
+        }, {
+            "name": "Language (Own): Norwegian",
+            "development": true,
+            "developed": true,
+            "base": "EDU",
+            "regular": 80,
+            "half": 40,
+            "fifth": 16
+        }, {
+            "name": "Occult",
+            "development": true,
+            "developed": true,
+            "base": "5%",
+            "regular": 25,
+            "half": 12,
+            "fifth": 5
+        }, {
+            "name": "Sport: Soccer",
+            "development": true,
+            "developed": true,
+            "base": "0%",
+            "regular": 70,
+            "half": 35,
+            "fifth": 14
+        }, {
+            "name": "Spot Hidden",
+            "development": true,
+            "developed": true,
+            "base": "25%",
+            "regular": 40,
+            "half": 20,
+            "fifth": 8
+        }, {
+            "name": "Stealth",
+            "development": true,
+            "developed": true,
+            "base": "20%",
+            "regular": 40,
+            "half": 20,
+            "fifth": 8
+        }, {
+            "name": "Swim",
+            "development": true,
+            "developed": true,
+            "base": "20%",
+            "regular": 55,
+            "half": 27,
+            "fifth": 11
+        }, {
+            "name": "Throw",
+            "development": true,
+            "developed": true,
+            "base": "20%",
+            "regular": 55,
+            "half": 27,
+            "fifth": 11
+        }],
+        "combat": {
+            "move": 9,
+            "build": "+1",
+            "damageBonus": "+1D4"
+        },
+        "weapons": [{
+            "name": "Unarmed",
+            "base": "25%",
+            "damage": "1D3 + DB",
+            "attacks": "1",
+            "range": "",
+            "ammo": "",
+            "malfunction": 0
+        }],
+        "story": {
+            "story": "Ada Martine Stolsmo Hegerberg is a Norwegian professional footballer who plays as a striker for the Division 1 Féminine club Olympique Lyonnais.",
+            "personalDescription": "Ut voluptas voluptas et assumenda illo ad adipisci temporibus ut voluptates dignissimos et nulla impedit.",
+            "ideologyAndBeliefs": "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.",
+            "significantPeople": "Id accusantium dolore id ratione pariatur id quia ratione est velit facilis.",
+            "meaningfulLocations": "Et harum quidem rerum facilis est et expedita distinctio.",
+            "treasuredPossessions": "A ball and soccer shoes",
+            "traits": "Cupiditate officia",
+            "injuriesAndScars": "Sed nemo repellendus",
+            "phobiasAndManias": "Dolorem est obcaecati",
+            "arcaneTomesAndSpells": "Quis dicta et ipsa",
+            "encountersWithStrangeEntities": "Dignissimos modi quo molestiae alias",
+            "gearAndPossessions": "Numquam quo sunt aliquid",
+            "spendingLevel": "10$",
+            "cash": "64$",
+            "assets": "1600$"
+        }
+    }
+}, {
     "id": "61f537ca1790b30562a66d91",
     "userId": "61f537cc1790b30562a66d44",
     "gameId": "callOfCthulhu",
@@ -231,17 +455,17 @@
         }
     }
 }, {
-    "id": "61f537ca1790b30562a66d92",
+    "id": "61f537ca1790b30562a66d99",
     "userId": "61f537cd1790b30562a66d45",
     "gameId": "callOfCthulhu",
-    "name": "Ada Hegerberg (soccer player)",
+    "name": "Delphine Cascarino (soccer player)",
     "data": {
         "biography": {
-            "name": "Ada Hegerberg",
-            "birthPlace": "Molde, Norway",
+            "name": "Delphine Cascarino",
+            "birthPlace": "Saint-Priest, France",
             "occupation": "Athlete",
-            "residence": "Stavanger, Norway",
-            "age": 26
+            "residence": "Lyon, France",
+            "age": 25
         },
         "characteristics": {
             "strength": {
@@ -437,7 +661,7 @@
             "malfunction": 0
         }],
         "story": {
-            "story": "Ada Martine Stolsmo Hegerberg is a Norwegian professional footballer who plays as a striker for the Division 1 Féminine club Olympique Lyonnais.",
+            "story": "Delphine Cascarino is a French professional footballer who plays as a midfielder for Division 1 Féminine club Lyon and the France national team.",
             "personalDescription": "Ut voluptas voluptas et assumenda illo ad adipisci temporibus ut voluptates dignissimos et nulla impedit.",
             "ideologyAndBeliefs": "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.",
             "significantPeople": "Id accusantium dolore id ratione pariatur id quia ratione est velit facilis.",

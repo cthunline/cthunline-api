@@ -2,12 +2,12 @@ import { Socket, Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 
 import Log from '../services/log';
-import authMiddleware from './auth';
+import connectionMiddleware from './connect';
 import bindDice from './dice';
 
 const socketRouter = (httpServer: HttpServer) => {
     const io = new Server(httpServer);
-    io.use(authMiddleware);
+    io.use(connectionMiddleware);
     io.on('connection', (socket: Socket) => {
         const { userId, sessionId, isMaster } = socket.data;
         Log.info(`Socket connected (userId: ${userId}, sessionId: ${sessionId}, isMaster: ${isMaster})`);

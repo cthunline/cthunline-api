@@ -4,6 +4,8 @@ import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
 import Sockets from '../../helpers/sockets.helper';
 
+import charactersData from '../../data/characters.json';
+
 describe('[Sockets] Dice', () => {
     beforeEach(async () => {
         await Data.reset();
@@ -66,7 +68,7 @@ describe('[Sockets] Dice', () => {
 
     it('Should send dice roll result to all players in session', async () => {
         const sessionId = '51f537ca1790b30562a66d33';
-        const [masterBearer, player1Bearer, player2Bearer] = (
+        const [masterToken, player1Token, player2Token] = (
             await Promise.all(
                 ['am.jopek@test.com', 'd.cascarino@test.com', 'test@test.com'].map((email) => (
                     Api.login({
@@ -77,14 +79,21 @@ describe('[Sockets] Dice', () => {
             )
         );
         const [masterSocket, player1Socket, player2Socket] = (
-            await Promise.all(
-                [masterBearer, player1Bearer, player2Bearer].map((bearer) => (
+            await Promise.all([
+                Sockets.connect({
+                    bearer: masterToken.bearer ?? '',
+                    sessionId
+                }),
+                ...[player1Token, player2Token].map(({ bearer, userId }) => (
                     Sockets.connect({
                         bearer: bearer ?? '',
-                        sessionId
+                        sessionId,
+                        characterId: charactersData.find((character) => (
+                            character.userId === userId
+                        ))?.id
                     })
                 ))
-            )
+            ])
         );
         await Promise.all([
             ...[masterSocket, player1Socket, player2Socket].map((socket) => (
