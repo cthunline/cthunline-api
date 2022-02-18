@@ -18,10 +18,18 @@ type HttpUpperMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 type HttpLowerMethod = 'get' | 'post' | 'put' | 'delete';
 export type HttpMethod = HttpUpperMethod | HttpLowerMethod;
 
+export interface RequestFileOption {
+    field: string;
+    name: string;
+    buffer: Buffer;
+}
+
 export interface RequestOptions {
     method: HttpMethod;
     route: string;
     body?: Record<string, any>;
+    fields?: Record<string, any>;
+    files?: RequestFileOption[];
     auth?: boolean;
 }
 
@@ -171,6 +179,8 @@ const Api = {
             method,
             route,
             body,
+            fields,
+            files,
             auth
         } = options;
         const lowerMethod = method.toLowerCase() as HttpLowerMethod;
@@ -180,6 +190,17 @@ const Api = {
         }
         if (body) {
             request.send(body);
+        } else {
+            if (fields) {
+                Object.entries(fields).forEach(([key, value]) => {
+                    request.field(key, value);
+                });
+            }
+            if (files) {
+                files.forEach(({ field, buffer, name }) => {
+                    request.attach(field, buffer, name);
+                });
+            }
         }
         return request;
     },

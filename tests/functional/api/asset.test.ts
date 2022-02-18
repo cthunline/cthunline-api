@@ -1,9 +1,10 @@
-// import { expect } from 'chai';
+import { expect } from 'chai';
+import Fs from 'fs';
 import Path from 'path';
 
 import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
-import { assertAsset } from '../../helpers/assert.helper';
+import { assertAsset, assertError } from '../../helpers/assert.helper';
 
 import assetsData from '../../data/assets.json';
 
@@ -34,30 +35,68 @@ describe('[API] Assets', () => {
     });
 
     describe('POST /users/:id/assets', () => {
-        // TODO use FormDatas
-        // it('Should throw a validation error', async () => {
-        //     await Api.testValidationError({
-        //         route: `/users/${userId}/assets`,
-        //         data: [{
-        //             invalidProperty: 'Test'
-        //         }, {
-        //             invalidData: 'here'
-        //         }, {
-        //             invalidData: 'here'
-        //         }, {}]
-        //     });
-        // });
-        // it('Should create an asset', async () => {
-        //     await Api.testCreate({
-        //         route: `/users/${userId}/assets`,
-        //         data: {
-        //             name: 'Test',
-        //             email: 'bbb@test.com',
-        //             password: 'abc123'
-        //         },
-        //         assert: assertAsset
-        //     });
-        // });
+        it('Should throw a validation error', async () => {
+            await Promise.all(
+                ['asset.pdf', 'asset.ico'].map((name) => (
+                    (async () => {
+                        const localPath = Path.join(
+                            __dirname,
+                            '../../data/assets',
+                            name
+                        );
+                        const buffer = await Fs.promises.readFile(localPath);
+                        const response = await Api.request({
+                            method: 'POST',
+                            route: `/users/${userId}/assets`,
+                            files: [{
+                                field: 'asset',
+                                buffer,
+                                name
+                            }]
+                        });
+                        expect(response).to.have.status(400);
+                        expect(response).to.be.json;
+                        assertError(response.body);
+                    })()
+                ))
+            );
+        });
+        it('Should upload an asset', async () => {
+            const assetNames = [
+                'asset.mp3',
+                'asset.jpg',
+                'asset.png',
+                'asset.svg'
+            ];
+            for (const name of assetNames) {
+                const localPath = Path.join(
+                    __dirname,
+                    '../../data/assets',
+                    name
+                );
+                const buffer = await Fs.promises.readFile(localPath);
+                const response = await Api.request({
+                    method: 'POST',
+                    route: `/users/${userId}/assets`,
+                    files: [{
+                        field: 'asset',
+                        buffer,
+                        name
+                    }]
+                });
+                expect(response).to.have.status(200);
+                expect(response).to.be.json;
+                assertAsset(response.body, {
+                    type: name.endsWith('mp3') ? 'audio' : 'image',
+                    name,
+                    userId
+                });
+                const { path } = response.body;
+                await Api.testStaticFile(
+                    Path.join('/static', path)
+                );
+            }
+        });
     });
 
     describe('GET /users/:id/assets/:id', () => {
@@ -89,20 +128,10 @@ describe('[API] Assets', () => {
             });
         });
         it('Should delete an asset', async () => {
-            // TODO use FormData
-            // const response = await Api.request({
-            //     method: 'POST',
-            //     route: `/users/${userId}/assets`,
-            //     body: {
-            //         data: 'here'
-            //     }
-            // });
-            // expect(response).to.have.status(200);
-            // const { body: { id } } = response;
-            // await Api.testDelete({
-            //     route: `/users/${userId}/assets/${id}`,
-            //     testGet: true
-            // });
+            await Api.testDelete({
+                route: `/users/${userId}/assets/${assetsData[2].id}`,
+                testGet: true
+            });
         });
     });
 });
