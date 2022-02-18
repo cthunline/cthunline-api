@@ -9,7 +9,7 @@ import { findUser } from './user';
 import { Prisma, handleNotFound } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
-import { Games, GameId } from '../games';
+import { Games, GameId, isValidGameId } from '../games';
 
 import CharacterSchemas from './schemas/character.json';
 
@@ -51,7 +51,7 @@ characterRouter.post('/users/:userId/characters', async ({ body, params }: Reque
         await findUser(userId);
         validateCreate(body);
         const { gameId, name, data } = body;
-        if (!Object.keys(Games).includes(gameId)) {
+        if (!isValidGameId(gameId)) {
             throw new ValidationError(`Invalid gameId ${gameId}`);
         }
         Games[gameId as GameId].validator(data);

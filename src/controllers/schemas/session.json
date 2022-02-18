@@ -3,9 +3,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+            "gameId",
             "name"
         ],
         "properties": {
+            "gameId": {
+                "type": "string"
+            },
             "name": {
                 "type": "string"
             },

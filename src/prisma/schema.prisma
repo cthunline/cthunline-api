@@ -53,6 +53,7 @@ model Asset {
 
 model Session {
     id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    gameId String
     name String
     sketch Json
     createdAt DateTime @default(now())

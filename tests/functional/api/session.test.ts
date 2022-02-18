@@ -6,6 +6,8 @@ import { assertSession } from '../../helpers/assert.helper';
 
 import sessionsData from '../../data/sessions.json';
 
+const { gameId } = sessionsData[0];
+
 describe('[API] Sessions', () => {
     beforeEach(async () => {
         await Data.reset();
@@ -40,6 +42,7 @@ describe('[API] Sessions', () => {
             await Api.testCreate({
                 route: '/sessions',
                 data: {
+                    gameId,
                     name: 'Test'
                 },
                 assert: assertSession
@@ -48,6 +51,7 @@ describe('[API] Sessions', () => {
             await Api.testCreate({
                 route: '/sessions',
                 data: {
+                    gameId,
                     name: 'Test',
                     sketch
                 },
@@ -87,6 +91,7 @@ describe('[API] Sessions', () => {
                 method: 'POST',
                 route: '/sessions',
                 body: {
+                    gameId,
                     name: 'Test'
                 }
             });
@@ -108,6 +113,7 @@ describe('[API] Sessions', () => {
                 method: 'POST',
                 route: '/sessions',
                 body: {
+                    gameId,
                     name: 'Test'
                 }
             });
@@ -144,6 +150,7 @@ describe('[API] Sessions', () => {
                 method: 'POST',
                 route: '/sessions',
                 body: {
+                    gameId,
                     name: 'Test'
                 }
             });

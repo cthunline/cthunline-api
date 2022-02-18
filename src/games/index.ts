@@ -10,4 +10,8 @@ export const Games = {
     }
 };
 
+export const isValidGameId = (gameId: string) => (
+    Object.keys(Games).includes(gameId)
+);
+
 export type GameId = keyof typeof Games;

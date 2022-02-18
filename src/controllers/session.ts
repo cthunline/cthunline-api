@@ -10,6 +10,8 @@ import {
     handleNotFound
 } from '../services/prisma';
 import Validator from '../services/validator';
+import { isValidGameId } from '../games';
+import { ValidationError } from '../services/errors';
 
 import SessionSchemas from './schemas/session.json';
 
@@ -32,8 +34,12 @@ sessionRouter.get('/sessions', async (req: Request, res: Response): Promise<void
 sessionRouter.post('/sessions', async (req: Request, res: Response): Promise<void> => {
     try {
         const createData = req.body;
+        const { gameId, sketch } = createData;
         validateCreate(createData);
-        if (!createData.sketch) {
+        if (!isValidGameId(gameId)) {
+            throw new ValidationError(`Invalid gameId ${gameId}`);
+        }
+        if (!sketch) {
             createData.sketch = {};
         }
         const session = await Prisma.session.create({
