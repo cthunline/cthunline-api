@@ -7,6 +7,16 @@ import { assertCharacter } from '../../helpers/assert.helper';
 import usersData from '../../data/users.json';
 import charactersData from '../../data/characters.json';
 
+const findUserCharacter = (userId: string) => {
+    const character = charactersData.find((char) => (
+        char.userId === Api.userId
+    ));
+    if (character) {
+        return character;
+    }
+    throw new Error(`Could not find character for user ${userId}`);
+};
+
 describe('[API] Characters', () => {
     beforeEach(async () => {
         await Data.reset();
@@ -48,9 +58,7 @@ describe('[API] Characters', () => {
     });
 
     describe('POST /users/:id/characters', () => {
-        const { gameId, name, data } = charactersData.find(({ userId }) => (
-            userId === Api.userId
-        )) ?? charactersData[0];
+        const { gameId, name, data } = findUserCharacter(Api.userId);
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'POST',
@@ -144,9 +152,7 @@ describe('[API] Characters', () => {
     });
 
     describe('POST /users/:id/characters/:id', () => {
-        const { gameId, name, data } = charactersData.find(({ userId }) => (
-            userId === Api.userId
-        )) ?? charactersData[0];
+        const { gameId, name, data } = findUserCharacter(Api.userId);
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'POST',
@@ -241,9 +247,7 @@ describe('[API] Characters', () => {
     });
 
     describe('DELETE /users/:id/characters/:id', () => {
-        const { gameId, data } = charactersData.find(({ userId }) => (
-            userId === Api.userId
-        )) ?? charactersData[0];
+        const { gameId, data } = findUserCharacter(Api.userId);
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'DELETE',

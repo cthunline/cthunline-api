@@ -6,6 +6,7 @@ import Sockets from '../../helpers/sockets.helper';
 
 import charactersData from '../../data/characters.json';
 import sessionsData from '../../data/sessions.json';
+import usersData from '../../data/users.json';
 
 describe('[Sockets] Dice', () => {
     beforeEach(async () => {
@@ -68,11 +69,7 @@ describe('[Sockets] Dice', () => {
     });
 
     it('Should send dice roll result to all players in session', async () => {
-        const [masterEmail, player1Email, player2Email] = [
-            'am.jopek@test.com',
-            'd.cascarino@test.com',
-            'test@test.com'
-        ];
+        const [masterEmail, player1Email, player2Email] = usersData.map(({ email }) => email);
         const [masterToken, player1Token, player2Token] = (
             await Promise.all(
                 [masterEmail, player1Email, player2Email].map((email) => (
