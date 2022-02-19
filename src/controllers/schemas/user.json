@@ -17,6 +17,9 @@
             },
             "password": {
                 "type": "string"
+            },
+            "admin": {
+                "type": "boolean"
             }
         }
     },
@@ -34,6 +37,9 @@
             },
             "password": {
                 "type": "string"
+            },
+            "admin": {
+                "type": "boolean"
             }
         }
     }

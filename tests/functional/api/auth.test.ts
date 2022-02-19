@@ -2,7 +2,7 @@ import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
 
 describe('[API] Authentication', () => {
-    beforeEach(async () => {
+    before(async () => {
         await Data.reset();
     });
 
@@ -21,7 +21,7 @@ describe('[API] Authentication', () => {
             const invalidData = [{
                 invalidProperty: 'Test'
             }, {
-                email: 'test@test.com',
+                email: 'admin@test.com',
                 password: 'abc123',
                 invalidProperty: 'Test'
             }, {}];
@@ -35,7 +35,7 @@ describe('[API] Authentication', () => {
         });
         it('Should throw authentication error', async () => {
             const invalidCredentials = [{
-                email: 'test@test.com',
+                email: 'admin@test.com',
                 password: '654987azeaze'
             }, {
                 email: 'fake@fake.com',
@@ -55,6 +55,8 @@ describe('[API] Authentication', () => {
 
     describe('DELETE /auth', () => {
         it('Should throw authentication error', async () => {
+            await Api.login();
+            await Api.logout();
             await Api.logout(false);
         });
         it('Should check authentication successfully', async () => {

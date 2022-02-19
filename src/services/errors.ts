@@ -42,7 +42,7 @@ export class AuthenticationError extends CustomError {
     }
 }
 export class ForbiddenError extends CustomError {
-    constructor(message: string = 'Forbidden error', data?: any) {
+    constructor(message: string = 'Not allowed', data?: any) {
         super(message, 403, data);
     }
 }

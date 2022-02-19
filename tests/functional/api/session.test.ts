@@ -9,8 +9,10 @@ import sessionsData from '../../data/sessions.json';
 const { gameId } = sessionsData[0];
 
 describe('[API] Sessions', () => {
-    beforeEach(async () => {
+    before(async () => {
         await Data.reset();
+    });
+    beforeEach(async () => {
         await Api.login();
     });
 

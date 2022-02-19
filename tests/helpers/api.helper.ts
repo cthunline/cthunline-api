@@ -99,7 +99,7 @@ const Api = {
     userId: '',
     bearer: '',
     credentials: {
-        email: 'test@test.com',
+        email: 'admin@test.com',
         password: 'test'
     },
 

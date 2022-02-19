@@ -26,6 +26,8 @@ export const assertUser = (
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('email');
     expect(data.email).to.be.a('string');
+    expect(data).to.have.property('admin');
+    expect(data.admin).to.be.a('boolean');
     expect(data).to.not.have.property('password');
     if (expected) {
         const { password, ...expectedWithoutPassword } = expected;

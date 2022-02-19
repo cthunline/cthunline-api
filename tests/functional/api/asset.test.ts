@@ -12,8 +12,10 @@ import usersData from '../../data/users.json';
 const { userId } = assetsData[0];
 
 describe('[API] Assets', () => {
-    beforeEach(async () => {
+    before(async () => {
         await Data.reset();
+    });
+    beforeEach(async () => {
         await Api.login();
     });
 

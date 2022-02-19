@@ -10,7 +10,11 @@ import { Token } from '@prisma/client';
 
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
-import { AuthenticationError, ForbiddenError } from '../services/errors';
+import {
+    AuthenticationError,
+    ForbiddenError,
+    InternError
+} from '../services/errors';
 import { verifyPassword } from '../services/tools';
 
 import AuthSchemas from './schemas/auth.json';
@@ -69,7 +73,22 @@ export const authMiddleware = async (
 // if not throw forbidden error
 export const controlSelf = (token: Token, userId: string) => {
     if (userId !== token.userId) {
-        throw new ForbiddenError('Not allowed');
+        throw new ForbiddenError();
+    }
+};
+
+// check currently authenticated user is an admin
+export const controlSelfAdmin = async ({ userId }: Token) => {
+    const user = await Prisma.user.findUnique({
+        where: {
+            id: userId
+        }
+    });
+    if (!user) {
+        throw new InternError(`Authenticated user ${userId} not found`);
+    }
+    if (!user.admin) {
+        throw new ForbiddenError();
     }
 };
 

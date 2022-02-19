@@ -9,7 +9,7 @@ import {
     Prisma,
     handleNotFound
 } from '../services/prisma';
-import { controlSelf } from './auth';
+import { controlSelf, controlSelfAdmin } from './auth';
 import { hashPassword } from '../services/tools';
 import { ConflictError } from '../services/errors';
 import Validator from '../services/validator';
@@ -26,6 +26,7 @@ const userSelect = {
     id: true,
     name: true,
     email: true,
+    admin: true,
     createdAt: true,
     updatedAt: true
 };
@@ -60,8 +61,9 @@ userRouter.get('/users', async (req: Request, res: Response): Promise<void> => {
 });
 
 // create a user
-userRouter.post('/users', async ({ body }: Request, res: Response): Promise<void> => {
+userRouter.post('/users', async ({ body, token }: Request, res: Response): Promise<void> => {
     try {
+        await controlSelfAdmin(token);
         validateCreate(body);
         const checkEmail = await Prisma.user.findUnique({
             where: {
@@ -110,7 +112,15 @@ userRouter.post('/users/:userId', async ({ params, body, token }: Request, res: 
                 })
             )
         );
-        controlSelf(token, userId);
+        try {
+            await controlSelfAdmin(token);
+        } catch (err) {
+            // only admins can set the admin flag to true
+            if (body.admin === true) {
+                throw err;
+            }
+            controlSelf(token, userId);
+        }
         validateUpdate(body);
         const data = { ...body };
         if (body.password) {

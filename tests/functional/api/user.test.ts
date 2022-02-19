@@ -2,13 +2,15 @@ import { expect } from 'chai';
 
 import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
-import { assertUser, assertError } from '../../helpers/assert.helper';
+import { assertUser } from '../../helpers/assert.helper';
 
 import usersData from '../../data/users.json';
 
 describe('[API] Users', () => {
-    beforeEach(async () => {
+    before(async () => {
         await Data.reset();
+    });
+    beforeEach(async () => {
         await Api.login();
     });
 
@@ -45,6 +47,21 @@ describe('[API] Users', () => {
                 }, 400);
             }
         });
+        it('Should throw a forbidden error', async () => {
+            await Api.login({
+                email: usersData[0].email,
+                password: 'test'
+            });
+            await Api.testError({
+                method: 'POST',
+                route: '/users',
+                body: {
+                    name: 'NotCreatedByAnAdmin',
+                    email: 'notanadmin@test.com',
+                    password: 'abc456'
+                }
+            }, 403);
+        });
         it('Should throw a conflict error', async () => {
             const createResponse = await Api.request({
                 method: 'POST',
@@ -56,7 +73,7 @@ describe('[API] Users', () => {
                 }
             });
             expect(createResponse).to.have.status(200);
-            const duplicateResponse = await Api.request({
+            await Api.testError({
                 method: 'POST',
                 route: '/users',
                 body: {
@@ -64,10 +81,7 @@ describe('[API] Users', () => {
                     email: 'copycat@test.com',
                     password: 'abc456'
                 }
-            });
-            expect(duplicateResponse).to.have.status(409);
-            expect(duplicateResponse).to.be.json;
-            assertError(duplicateResponse.body);
+            }, 409);
         });
         it('Should create a user', async () => {
             await Api.testCreate({
@@ -133,18 +147,30 @@ describe('[API] Users', () => {
                 body: {
                     name: 'Test',
                     email: 'yyy@test.com',
-                    password: 'abc123'
+                    password: 'test'
                 }
             });
             expect(response).to.have.status(200);
             const { body: { id } } = response;
+            await Api.login({
+                email: 'yyy@test.com',
+                password: 'test'
+            });
             await Api.testError({
                 method: 'POST',
                 route: `/users/${id}`,
                 body: {
                     name: 'Test1',
                     email: 'zzz@test.com',
-                    password: 'def456'
+                    password: 'def456',
+                    admin: true
+                }
+            }, 403);
+            await Api.testError({
+                method: 'POST',
+                route: `/users/${usersData[0].id}`,
+                body: {
+                    name: 'Test1'
                 }
             }, 403);
         });
@@ -170,6 +196,17 @@ describe('[API] Users', () => {
                     name: 'Test1',
                     email: 'fff@test.com',
                     password: 'def456'
+                },
+                assert: assertUser
+            });
+            await Api.login();
+            await Api.testEdit({
+                route: `/users/${id}`,
+                data: {
+                    name: 'Test1',
+                    email: 'fff@test.com',
+                    password: 'def456',
+                    admin: true
                 },
                 assert: assertUser
             });
