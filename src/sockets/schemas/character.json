@@ -1,0 +1,14 @@
+{
+    "update": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "characterId"
+        ],
+        "properties": {
+            "characterId": {
+                "type": "string"
+            }
+        }
+    }
+}

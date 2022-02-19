@@ -26,7 +26,7 @@ const userSelect = {
     id: true,
     name: true,
     email: true,
-    admin: true,
+    isAdmin: true,
     createdAt: true,
     updatedAt: true
 };
@@ -116,7 +116,7 @@ userRouter.post('/users/:userId', async ({ params, body, token }: Request, res: 
             await controlSelfAdmin(token);
         } catch (err) {
             // only admins can set the admin flag to true
-            if (body.admin === true) {
+            if (body.isAdmin === true) {
                 throw err;
             }
             controlSelf(token, userId);

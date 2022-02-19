@@ -4,6 +4,8 @@ import { Server as HttpServer } from 'http';
 import Log from '../services/log';
 import connectionMiddleware from './connect';
 import bindDice from './dice';
+import bindCharacter from './character';
+import bindAudio from './audio';
 
 const socketRouter = (httpServer: HttpServer) => {
     const io = new Server(httpServer);
@@ -15,6 +17,8 @@ const socketRouter = (httpServer: HttpServer) => {
             Log.info(`Socket disconnected (${reason})`);
         });
         bindDice(io, socket);
+        bindCharacter(io, socket);
+        bindAudio(io, socket);
     });
 };
 

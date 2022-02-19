@@ -18,7 +18,7 @@
             "password": {
                 "type": "string"
             },
-            "admin": {
+            "isAdmin": {
                 "type": "boolean"
             }
         }
@@ -38,7 +38,7 @@
             "password": {
                 "type": "string"
             },
-            "admin": {
+            "isAdmin": {
                 "type": "boolean"
             }
         }

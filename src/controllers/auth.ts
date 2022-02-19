@@ -87,7 +87,7 @@ export const controlSelfAdmin = async ({ userId }: Token) => {
     if (!user) {
         throw new InternError(`Authenticated user ${userId} not found`);
     }
-    if (!user.admin) {
+    if (!user.isAdmin) {
         throw new ForbiddenError();
     }
 };

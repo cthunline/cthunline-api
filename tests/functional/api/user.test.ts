@@ -163,7 +163,7 @@ describe('[API] Users', () => {
                     name: 'Test1',
                     email: 'zzz@test.com',
                     password: 'def456',
-                    admin: true
+                    isAdmin: true
                 }
             }, 403);
             await Api.testError({
@@ -206,7 +206,7 @@ describe('[API] Users', () => {
                     name: 'Test1',
                     email: 'fff@test.com',
                     password: 'def456',
-                    admin: true
+                    isAdmin: true
                 },
                 assert: assertUser
             });

@@ -1,0 +1,17 @@
+{
+    "play": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "assetId"
+        ],
+        "properties": {
+            "assetId": {
+                "type": "string"
+            },
+            "time": {
+                "type": "number"
+            }
+        }
+    }
+}

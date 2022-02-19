@@ -3,11 +3,12 @@ import { Socket, Server } from 'socket.io';
 
 import { sum } from '../services/tools';
 import Validator from '../services/validator';
+import { ForbiddenError } from '../services/errors';
+import { DiceType } from '../types/dice';
 import {
-    DiceType,
-    DiceRequest,
-    DiceResult
-} from '../types/dice';
+    SocketDiceRequest,
+    SocketDiceResult
+} from '../types/socket';
 
 import DiceSchemas from './schemas/dice.json';
 
@@ -21,31 +22,29 @@ const rollDice = (diceType: DiceType): number => (
     Math.floor((Math.random() * getDiceMax(diceType)) + 1)
 );
 
-const getDiceResult = (request: DiceRequest, user: User): DiceResult => {
-    validateRequest(request);
-    return {
-        user,
-        request,
-        result: (
-            sum( // sum results of all dice types
-                Object.entries(request).map((
-                    [diceType, diceCount]
-                ) => (
-                    sum( // sum results of one dice type
-                        [...Array(diceCount)].map(() => (
-                            rollDice(diceType as DiceType)
-                        ))
-                    )
-                ))
-            )
+const getDiceResult = (request: SocketDiceRequest, user: User): SocketDiceResult => ({
+    user,
+    request,
+    result: (
+        sum( // sum results of all dice types
+            Object.entries(request).map((
+                [diceType, diceCount]
+            ) => (
+                sum( // sum results of one dice type
+                    [...Array(diceCount)].map(() => (
+                        rollDice(diceType as DiceType)
+                    ))
+                )
+            ))
         )
-    };
-};
+    )
+});
 
 const bindDice = (io: Server, socket: Socket) => {
     // dice roll request / result sent to every player in session
-    socket.on('diceRequest', (request: DiceRequest) => {
+    socket.on('diceRequest', async (request: SocketDiceRequest) => {
         try {
+            validateRequest(request);
             const { user, sessionId } = socket.data;
             io.sockets.to(sessionId).emit(
                 'diceResult',
@@ -56,12 +55,17 @@ const bindDice = (io: Server, socket: Socket) => {
         }
     });
 
-    // private dice roll request / result sent only to the user who requested it
-    socket.on('dicePrivateRequest', (request: DiceRequest) => {
+    // private dice roll request for game master
+    // result sent only to the user who requested it
+    socket.on('dicePrivateRequest', async (request: SocketDiceRequest) => {
         try {
-            const { user } = socket.data;
+            validateRequest(request);
+            const { user, isMaster } = socket.data;
+            if (!isMaster) {
+                throw new ForbiddenError();
+            }
             socket.emit(
-                'dicePrivateResult',
+                'diceResult',
                 getDiceResult(request, user)
             );
         } catch (err) {

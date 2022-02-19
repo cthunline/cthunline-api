@@ -15,7 +15,7 @@ export const initDb = async () => {
                 name: 'admin',
                 email: 'admin@admin.com',
                 password: await hashPassword('admin'),
-                admin: true
+                isAdmin: true
             }
         });
         Log.warn('Default user created (email: admin@admin.com / password: admin)');

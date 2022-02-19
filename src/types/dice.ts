@@ -1,5 +1,4 @@
-import { User } from '@prisma/client';
-
+// eslint-disable-next-line import/prefer-default-export
 export enum DiceType {
     d4 = 'd4',
     d6 = 'd6',
@@ -8,12 +7,4 @@ export enum DiceType {
     d12 = 'd12',
     d20 = 'd20',
     d100 = 'd100'
-}
-
-export type DiceRequest = Partial<Record<DiceType, number>>;
-
-export interface DiceResult {
-    user: User,
-    request: DiceRequest,
-    result: number
 }

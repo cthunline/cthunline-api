@@ -1,7 +1,11 @@
 import { expect } from 'chai';
 
+import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
 import Sockets from '../../helpers/sockets.helper';
+
+import sessionsData from '../../data/sessions.json';
+import charactersData from '../../data/characters.json';
 
 describe('[Sockets] Dice', () => {
     beforeEach(async () => {
@@ -36,7 +40,43 @@ describe('[Sockets] Dice', () => {
         }
     });
 
+    it('Should fail to request private dice roll because not game master', async () => {
+        const { bearer, userId } = await Api.login();
+        const sessionId = sessionsData.find(({ masterId }) => (
+            userId !== masterId
+        ))?.id;
+        const characterId = charactersData.find((char) => (
+            char.userId === Api.userId
+        ))?.id;
+        const socket = await Sockets.connect({
+            bearer,
+            sessionId,
+            characterId
+        });
+        await new Promise<void>((resolve, reject) => {
+            socket.on('diceResult', () => {
+                socket.disconnect();
+                reject(new Error('Should have throw a forbidden error'));
+            });
+            socket.on('error', ({ status }: any) => {
+                expect(status).to.equal(403);
+                socket.disconnect();
+                resolve();
+            });
+            socket.emit('dicePrivateRequest', {
+                d4: 2
+            });
+        });
+    });
+
     it('Should request dice rolls', async () => {
+        const { bearer, userId } = await Api.login();
+        const sessionId = sessionsData.find(({ masterId }) => (
+            userId === masterId
+        ))?.id;
+        const characterId = charactersData.find((char) => (
+            char.userId === Api.userId
+        ))?.id;
         const requestData = [{
             d4: 3
         }, {
@@ -48,18 +88,24 @@ describe('[Sockets] Dice', () => {
             d100: 3
         }];
         for (const data of requestData) {
-            const socket = await Sockets.connect();
-            await new Promise<void>((resolve, reject) => {
-                socket.on('diceResult', () => {
-                    socket.disconnect();
-                    resolve();
+            for (const event of ['diceRequest', 'dicePrivateRequest']) {
+                const socket = await Sockets.connect({
+                    bearer,
+                    sessionId,
+                    characterId
                 });
-                socket.on('error', (err: any) => {
-                    socket.disconnect();
-                    reject(err);
+                await new Promise<void>((resolve, reject) => {
+                    socket.on('diceResult', () => {
+                        socket.disconnect();
+                        resolve();
+                    });
+                    socket.on('error', ({ status }: any) => {
+                        socket.disconnect();
+                        reject(new Error(`${status} error`));
+                    });
+                    socket.emit(event, data);
                 });
-                socket.emit('diceRequest', data);
-            });
+            }
         }
     });
 
