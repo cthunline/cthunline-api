@@ -83,26 +83,11 @@ export interface DeleteOptions {
     testGet?: boolean;
 }
 
-export interface PutOptions {
-    route: string;
-    body?: Record<string, any>;
-    data: Record<string, any>;
-    assert: (
-        data: Record<string, any>,
-        expected?: Record<string, any>
-    ) => void;
-}
-
 export interface InvalidIdOptions {
     method: HttpMethod;
     route: string;
     body?: Record<string, any>;
     ids?: string[];
-}
-
-export interface ValidationOptions {
-    route: string;
-    data: Record<string, any>[];
 }
 
 export interface CredentialOptions {
@@ -204,6 +189,13 @@ const Api = {
             }
         }
         return request;
+    },
+
+    async testError(options: RequestOptions, expectedStatus: number): Promise<void> {
+        const response = await Api.request(options);
+        expect(response).to.have.status(expectedStatus);
+        expect(response).to.be.json;
+        assertError(response.body);
     },
 
     async testGetList(options: GetListOptions): Promise<void> {
@@ -336,25 +328,6 @@ const Api = {
         }
     },
 
-    async testPut(options: PutOptions): Promise<void> {
-        const {
-            route,
-            data,
-            assert,
-            body
-        } = options;
-        const response = await Api.request({
-            method: 'PUT',
-            route,
-            body
-        });
-        expect(response).to.have.status(200);
-        expect(response).to.be.json;
-        const { body: putBody } = response;
-        expect(putBody).to.be.an('object');
-        assert(putBody, data);
-    },
-
     async testInvalidIdError(options: InvalidIdOptions): Promise<void> {
         const {
             method,
@@ -380,23 +353,6 @@ const Api = {
                 body
             });
             expect(response).to.have.status(isInvalid ? 400 : 404);
-            expect(response).to.be.json;
-            assertError(response.body);
-        }
-    },
-
-    async testValidationError(options: ValidationOptions): Promise<void> {
-        const {
-            route,
-            data
-        } = options;
-        for (const body of data) {
-            const response = await Api.request({
-                method: 'POST',
-                route,
-                body
-            });
-            expect(response).to.have.status(400);
             expect(response).to.be.json;
             assertError(response.body);
         }

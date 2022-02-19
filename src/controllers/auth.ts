@@ -10,7 +10,7 @@ import { Token } from '@prisma/client';
 
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
-import { AuthenticationError } from '../services/errors';
+import { AuthenticationError, ForbiddenError } from '../services/errors';
 import { verifyPassword } from '../services/tools';
 
 import AuthSchemas from './schemas/auth.json';
@@ -62,6 +62,14 @@ export const authMiddleware = async (
         next();
     } catch (err: any) {
         res.error(err);
+    }
+};
+
+// control userId in params is same as authentified one
+// if not throw forbidden error
+export const controlSelf = (token: Token, userId: string) => {
+    if (userId !== token.userId) {
+        throw new ForbiddenError('Not allowed');
     }
 };
 

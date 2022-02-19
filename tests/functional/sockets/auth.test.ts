@@ -16,7 +16,7 @@ describe('[Sockets] Authentication', () => {
         const invalidHandshakes = [{
             auth: {},
             query: {
-                sessionId: sessionsData[0].id,
+                sessionId: sessionsData[1].id,
                 characterId: charactersData[0].id
             }
         }, {
@@ -29,7 +29,7 @@ describe('[Sockets] Authentication', () => {
                 token: Api.bearer
             },
             query: {
-                sessionId: sessionsData[0].id
+                sessionId: sessionsData[1].id
             }
         }, {
             auth: {
@@ -54,7 +54,7 @@ describe('[Sockets] Authentication', () => {
                     token: 'invalidToken'
                 },
                 query: {
-                    sessionId: sessionsData[0].id,
+                    sessionId: sessionsData[1].id,
                     characterId: charactersData[0].id
                 }
             },
@@ -69,7 +69,7 @@ describe('[Sockets] Authentication', () => {
             sessionId: 'invalid',
             characterId: charactersData[0].id
         }, {
-            sessionId: sessionsData[0].id,
+            sessionId: sessionsData[1].id,
             characterId: 'invalid'
         }];
         for (const query of invalidQueries) {
@@ -92,7 +92,7 @@ describe('[Sockets] Authentication', () => {
             sessionId: '1122334455667788aabbccdd',
             characterId: charactersData[0].id
         }, {
-            sessionId: sessionsData[0].id,
+            sessionId: sessionsData[1].id,
             characterId: '1122334455667788aabbccdd'
         }];
         for (const query of notFoundQueries) {
@@ -117,7 +117,7 @@ describe('[Sockets] Authentication', () => {
                     token: bearer
                 },
                 query: {
-                    sessionId: sessionsData[0].id,
+                    sessionId: sessionsData[1].id,
                     characterId: charactersData[1].id
                 }
             },

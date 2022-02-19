@@ -18,16 +18,20 @@ describe('[API] Authentication', () => {
 
     describe('POST /auth', () => {
         it('Should throw validation error', async () => {
-            await Api.testValidationError({
-                route: '/auth',
-                data: [{
-                    invalidProperty: 'Test'
-                }, {
-                    email: 'test@test.com',
-                    password: 'abc123',
-                    invalidProperty: 'Test'
-                }, {}]
-            });
+            const invalidData = [{
+                invalidProperty: 'Test'
+            }, {
+                email: 'test@test.com',
+                password: 'abc123',
+                invalidProperty: 'Test'
+            }, {}];
+            for (const body of invalidData) {
+                await Api.testError({
+                    method: 'POST',
+                    route: '/auth',
+                    body
+                }, 400);
+            }
         });
         it('Should throw authentication error', async () => {
             const invalidCredentials = [{

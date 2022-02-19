@@ -9,6 +9,7 @@ import {
     Prisma,
     handleNotFound
 } from '../services/prisma';
+import { controlSelf } from './auth';
 import { hashPassword } from '../services/tools';
 import { ConflictError } from '../services/errors';
 import Validator from '../services/validator';
@@ -97,7 +98,7 @@ userRouter.get('/users/:userId', async ({ params }: Request, res: Response): Pro
 });
 
 // edit user
-userRouter.post('/users/:userId', async ({ params, body }: Request, res: Response): Promise<void> => {
+userRouter.post('/users/:userId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         const user = await handleNotFound<User>(
@@ -109,6 +110,7 @@ userRouter.post('/users/:userId', async ({ params, body }: Request, res: Respons
                 })
             )
         );
+        controlSelf(token, userId);
         validateUpdate(body);
         const data = { ...body };
         if (body.password) {

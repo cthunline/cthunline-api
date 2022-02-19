@@ -25,21 +25,25 @@ describe('[API] Users', () => {
 
     describe('POST /users', () => {
         it('Should throw a validation error', async () => {
-            await Api.testValidationError({
-                route: '/users',
-                data: [{
-                    invalidProperty: 'Test'
-                }, {
-                    name: 'Test',
-                    email: 'aaa@test.com',
-                    password: 'abc123',
-                    invalidProperty: 'Test'
-                }, {
-                    name: 'Test',
-                    email: 'notAnEmail',
-                    password: 'abc123'
-                }, {}]
-            });
+            const invalidData = [{
+                invalidProperty: 'Test'
+            }, {
+                name: 'Test',
+                email: 'aaa@test.com',
+                password: 'abc123',
+                invalidProperty: 'Test'
+            }, {
+                name: 'Test',
+                email: 'notAnEmail',
+                password: 'abc123'
+            }, {}];
+            for (const body of invalidData) {
+                await Api.testError({
+                    method: 'POST',
+                    route: '/users',
+                    body
+                }, 400);
+            }
         });
         it('Should throw a conflict error', async () => {
             const createResponse = await Api.request({
@@ -105,29 +109,44 @@ describe('[API] Users', () => {
             });
         });
         it('Should throw a validation error', async () => {
+            const invalidData = [{
+                invalidProperty: 'Test'
+            }, {
+                name: 'Test',
+                email: 'tedddst@test.com',
+                invalidProperty: 'Test'
+            }, {
+                email: 'notAnEmail'
+            }, {}];
+            for (const body of invalidData) {
+                await Api.testError({
+                    method: 'POST',
+                    route: `/users/${Api.userId}`,
+                    body
+                }, 400);
+            }
+        });
+        it('Should throw a forbidden error', async () => {
             const response = await Api.request({
                 method: 'POST',
                 route: '/users',
                 body: {
                     name: 'Test',
-                    email: 'ccc@test.com',
+                    email: 'yyy@test.com',
                     password: 'abc123'
                 }
             });
             expect(response).to.have.status(200);
             const { body: { id } } = response;
-            await Api.testValidationError({
+            await Api.testError({
+                method: 'POST',
                 route: `/users/${id}`,
-                data: [{
-                    invalidProperty: 'Test'
-                }, {
-                    name: 'Test',
-                    email: 'tedddst@test.com',
-                    invalidProperty: 'Test'
-                }, {
-                    email: 'notAnEmail'
-                }, {}]
-            });
+                body: {
+                    name: 'Test1',
+                    email: 'zzz@test.com',
+                    password: 'def456'
+                }
+            }, 403);
         });
         it('Should edit a user', async () => {
             const response = await Api.request({
@@ -141,6 +160,10 @@ describe('[API] Users', () => {
             });
             expect(response).to.have.status(200);
             const { body: { id } } = response;
+            await Api.login({
+                email: 'eee@test.com',
+                password: 'abc123'
+            });
             await Api.testEdit({
                 route: `/users/${id}`,
                 data: {

@@ -48,8 +48,9 @@ describe('[API] Characters', () => {
     });
 
     describe('POST /users/:id/characters', () => {
-        const { id: userId } = usersData[0];
-        const { gameId, name, data } = charactersData[0];
+        const { gameId, name, data } = charactersData.find(({ userId }) => (
+            userId === Api.userId
+        )) ?? charactersData[0];
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'POST',
@@ -57,50 +58,64 @@ describe('[API] Characters', () => {
             });
         });
         it('Should throw a validation error', async () => {
-            await Api.testValidationError({
-                route: `/users/${userId}/characters`,
-                data: [{
+            const invalidData = [{
+                invalidProperty: 'Test'
+            }, {
+                gameId,
+                name,
+                data,
+                invalidProperty: 'Test'
+            }, {
+                gameId: 'invalidGame',
+                name,
+                data
+            }, {
+                name,
+                data
+            }, {
+                gameId,
+                name,
+                data: {
+                    ...data,
                     invalidProperty: 'Test'
-                }, {
-                    gameId,
-                    name,
-                    data,
-                    invalidProperty: 'Test'
-                }, {
-                    gameId: 'invalidGame',
-                    name,
-                    data
-                }, {
-                    name,
-                    data
-                }, {
-                    gameId,
-                    name,
-                    data: {
-                        ...data,
-                        invalidProperty: 'Test'
-                    }
-                }, {
-                    gameId,
-                    name,
-                    data: {
-                        ...data,
-                        characteristics: {
-                            ...data.characteristics,
-                            strength: {
-                                regular: 50,
-                                half: 25,
-                                fifth: 10,
-                                invalidProperty: 'Test'
-                            }
+                }
+            }, {
+                gameId,
+                name,
+                data: {
+                    ...data,
+                    characteristics: {
+                        ...data.characteristics,
+                        strength: {
+                            regular: 50,
+                            half: 25,
+                            fifth: 10,
+                            invalidProperty: 'Test'
                         }
                     }
-                }, {}]
-            });
+                }
+            }, {}];
+            for (const body of invalidData) {
+                await Api.testError({
+                    method: 'POST',
+                    route: `/users/${Api.userId}/characters`,
+                    body
+                }, 400);
+            }
+        });
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'POST',
+                route: `/users/${usersData[0].id}/characters`,
+                body: {
+                    gameId,
+                    name: 'Test'
+                }
+            }, 403);
         });
         it('Should create a character', async () => {
             await Api.testCreate({
-                route: `/users/${userId}/characters`,
+                route: `/users/${Api.userId}/characters`,
                 data: {
                     gameId,
                     name: 'Test',
@@ -129,12 +144,13 @@ describe('[API] Characters', () => {
     });
 
     describe('POST /users/:id/characters/:id', () => {
-        const { id: userId } = usersData[0];
-        const { gameId, name, data } = charactersData[0];
+        const { gameId, name, data } = charactersData.find(({ userId }) => (
+            userId === Api.userId
+        )) ?? charactersData[0];
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'POST',
-                route: `/users/${userId}/characters/:id`,
+                route: `/users/${Api.userId}/characters/:id`,
                 body: {
                     name: 'Test'
                 }
@@ -143,7 +159,7 @@ describe('[API] Characters', () => {
         it('Should throw a validation error', async () => {
             const response = await Api.request({
                 method: 'POST',
-                route: `/users/${userId}/characters`,
+                route: `/users/${Api.userId}/characters`,
                 body: {
                     gameId,
                     name: 'Test',
@@ -152,45 +168,58 @@ describe('[API] Characters', () => {
             });
             expect(response).to.have.status(200);
             const { body: { id } } = response;
-            await Api.testValidationError({
-                route: `/users/${userId}/characters/${id}`,
-                data: [{
+            const invalidData = [{
+                invalidProperty: 'Test'
+            }, {
+                name,
+                data,
+                invalidProperty: 'Test'
+            }, {
+                gameId,
+                name,
+                data
+            }, {
+                name,
+                data: {
+                    ...data,
                     invalidProperty: 'Test'
-                }, {
-                    name,
-                    data,
-                    invalidProperty: 'Test'
-                }, {
-                    gameId,
-                    name,
-                    data
-                }, {
-                    name,
-                    data: {
-                        ...data,
-                        invalidProperty: 'Test'
-                    }
-                }, {
-                    name,
-                    data: {
-                        ...data,
-                        characteristics: {
-                            ...data.characteristics,
-                            strength: {
-                                regular: 50,
-                                half: 25,
-                                fifth: 10,
-                                invalidProperty: 'Test'
-                            }
+                }
+            }, {
+                name,
+                data: {
+                    ...data,
+                    characteristics: {
+                        ...data.characteristics,
+                        strength: {
+                            regular: 50,
+                            half: 25,
+                            fifth: 10,
+                            invalidProperty: 'Test'
                         }
                     }
-                }, {}]
-            });
+                }
+            }, {}];
+            for (const body of invalidData) {
+                await Api.testError({
+                    method: 'POST',
+                    route: `/users/${Api.userId}/characters/${id}`,
+                    body
+                }, 400);
+            }
+        });
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'POST',
+                route: `/users/${usersData[0].id}/characters/${charactersData[1].id}`,
+                body: {
+                    name: 'Test'
+                }
+            }, 403);
         });
         it('Should edit a character', async () => {
             const response = await Api.request({
                 method: 'POST',
-                route: `/users/${userId}/characters`,
+                route: `/users/${Api.userId}/characters`,
                 body: {
                     gameId,
                     name: 'Test',
@@ -201,7 +230,7 @@ describe('[API] Characters', () => {
             const { body: { id } } = response;
             const { data: editData } = charactersData[1];
             await Api.testEdit({
-                route: `/users/${userId}/characters/${id}`,
+                route: `/users/${Api.userId}/characters/${id}`,
                 data: {
                     name: 'Test edit',
                     data: editData
@@ -212,18 +241,25 @@ describe('[API] Characters', () => {
     });
 
     describe('DELETE /users/:id/characters/:id', () => {
-        const { id: userId } = usersData[0];
-        const { gameId, data } = charactersData[0];
+        const { gameId, data } = charactersData.find(({ userId }) => (
+            userId === Api.userId
+        )) ?? charactersData[0];
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'DELETE',
-                route: `/users/${userId}/characters/:id`
+                route: `/users/${Api.userId}/characters/:id`
             });
+        });
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'DELETE',
+                route: `/users/${usersData[0].id}/characters/${charactersData[1].id}`
+            }, 403);
         });
         it('Should delete a character', async () => {
             const response = await Api.request({
                 method: 'POST',
-                route: `/users/${userId}/characters`,
+                route: `/users/${Api.userId}/characters`,
                 body: {
                     gameId,
                     name: 'Test',
@@ -233,7 +269,7 @@ describe('[API] Characters', () => {
             expect(response).to.have.status(200);
             const { body: { id } } = response;
             await Api.testDelete({
-                route: `/users/${userId}/characters/${id}`,
+                route: `/users/${Api.userId}/characters/${id}`,
                 testGet: true
             });
         });

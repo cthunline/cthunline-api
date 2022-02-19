@@ -4,9 +4,10 @@ import Path from 'path';
 
 import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
-import { assertAsset, assertError } from '../../helpers/assert.helper';
+import { assertAsset } from '../../helpers/assert.helper';
 
 import assetsData from '../../data/assets.json';
+import usersData from '../../data/users.json';
 
 const { userId } = assetsData[0];
 
@@ -17,6 +18,12 @@ describe('[API] Assets', () => {
     });
 
     describe('GET /users/:id/assets', () => {
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'GET',
+                route: `/users/${usersData[0].id}/assets`
+            }, 403);
+        });
         it('Should list all assets', async () => {
             await Api.testGetList({
                 route: `/users/${userId}/assets`,
@@ -45,7 +52,7 @@ describe('[API] Assets', () => {
                             name
                         );
                         const buffer = await Fs.promises.readFile(localPath);
-                        const response = await Api.request({
+                        await Api.testError({
                             method: 'POST',
                             route: `/users/${userId}/assets`,
                             files: [{
@@ -53,13 +60,21 @@ describe('[API] Assets', () => {
                                 buffer,
                                 name
                             }]
-                        });
-                        expect(response).to.have.status(400);
-                        expect(response).to.be.json;
-                        assertError(response.body);
+                        }, 400);
                     })()
                 ))
             );
+        });
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'POST',
+                route: `/users/${usersData[0].id}/assets`,
+                files: [{
+                    field: 'asset',
+                    buffer: Buffer.from(''),
+                    name: ''
+                }]
+            }, 403);
         });
         it('Should upload an asset', async () => {
             const assetNames = [
@@ -106,6 +121,12 @@ describe('[API] Assets', () => {
                 route: `/users/${userId}/assets/:id`
             });
         });
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'GET',
+                route: `/users/${usersData[0].id}/assets/${assetsData[0].id}`
+            }, 403);
+        });
         it('Should get an asset', async () => {
             await Promise.all([
                 Api.testGetOne({
@@ -126,6 +147,12 @@ describe('[API] Assets', () => {
                 method: 'DELETE',
                 route: `/users/${userId}/assets/:id`
             });
+        });
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'DELETE',
+                route: `/users/${usersData[0].id}/assets/${assetsData[0].id}`
+            }, 403);
         });
         it('Should delete an asset', async () => {
             await Api.testDelete({

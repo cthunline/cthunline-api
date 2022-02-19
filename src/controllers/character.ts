@@ -6,6 +6,7 @@ import {
 import { Character } from '@prisma/client';
 
 import { findUser } from './user';
+import { controlSelf } from './auth';
 import { Prisma, handleNotFound } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
@@ -45,10 +46,11 @@ characterRouter.get('/users/:userId/characters', async ({ params }: Request, res
 });
 
 // create a character for a user
-characterRouter.post('/users/:userId/characters', async ({ body, params }: Request, res: Response): Promise<void> => {
+characterRouter.post('/users/:userId/characters', async ({ body, params, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         await findUser(userId);
+        controlSelf(token, userId);
         validateCreate(body);
         const { gameId, name, data } = body;
         if (!isValidGameId(gameId)) {
@@ -90,10 +92,11 @@ characterRouter.get('/users/:userId/characters/:characterId', async ({ params }:
 });
 
 // edit a user's character
-characterRouter.post('/users/:userId/characters/:characterId', async ({ params, body }: Request, res: Response): Promise<void> => {
+characterRouter.post('/users/:userId/characters/:characterId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId, characterId } = params;
         await findUser(userId);
+        controlSelf(token, userId);
         const { gameId } = await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({
@@ -120,10 +123,11 @@ characterRouter.post('/users/:userId/characters/:characterId', async ({ params, 
 });
 
 // delete a user's character
-characterRouter.delete('/users/:userId/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
+characterRouter.delete('/users/:userId/characters/:characterId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId, characterId } = params;
         await findUser(userId);
+        controlSelf(token, userId);
         await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({

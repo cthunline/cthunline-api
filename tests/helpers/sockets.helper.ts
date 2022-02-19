@@ -26,7 +26,7 @@ const Sockets = {
             await Api.login();
             authToken = Api.bearer;
         }
-        const sessionId = connectionData?.sessionId ?? sessionsData[0].id;
+        const sessionId = connectionData?.sessionId ?? sessionsData[1].id;
         const characterId = connectionData?.characterId ?? charactersData[0].id;
         return new Promise((resolve, reject) => {
             const socket = io(Sockets.url, {

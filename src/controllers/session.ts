@@ -9,6 +9,7 @@ import {
     Prisma,
     handleNotFound
 } from '../services/prisma';
+import { controlSelf } from './auth';
 import Validator from '../services/validator';
 import { isValidGameId } from '../games';
 import { ValidationError } from '../services/errors';
@@ -74,7 +75,7 @@ sessionRouter.get('/sessions/:sessionId', async ({ params }: Request, res: Respo
 });
 
 // edit a session
-sessionRouter.post('/sessions/:sessionId', async ({ params, body }: Request, res: Response): Promise<void> => {
+sessionRouter.post('/sessions/:sessionId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
         const session = await handleNotFound<Session>(
@@ -86,6 +87,7 @@ sessionRouter.post('/sessions/:sessionId', async ({ params, body }: Request, res
                 })
             )
         );
+        controlSelf(token, session.masterId);
         validateUpdate(body);
         const updatedSession = await Prisma.session.update({
             data: body,
@@ -100,10 +102,10 @@ sessionRouter.post('/sessions/:sessionId', async ({ params, body }: Request, res
 });
 
 // delete a session
-sessionRouter.delete('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
+sessionRouter.delete('/sessions/:sessionId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
-        await handleNotFound<Session>(
+        const session = await handleNotFound<Session>(
             'Session', (
                 Prisma.session.findUnique({
                     where: {
@@ -112,6 +114,7 @@ sessionRouter.delete('/sessions/:sessionId', async ({ params }: Request, res: Re
                 })
             )
         );
+        controlSelf(token, session.masterId);
         await Prisma.session.delete({
             where: {
                 id: sessionId
