@@ -1,12 +1,7 @@
 import { expect } from 'chai';
 
-import Api from '../../helpers/api.helper';
 import Data from '../../helpers/data.helper';
 import Sockets from '../../helpers/sockets.helper';
-
-import charactersData from '../../data/characters.json';
-import sessionsData from '../../data/sessions.json';
-import usersData from '../../data/users.json';
 
 describe('[Sockets] Dice', () => {
     beforeEach(async () => {
@@ -69,37 +64,11 @@ describe('[Sockets] Dice', () => {
     });
 
     it('Should send dice roll result to all players in session', async () => {
-        const [masterEmail, player1Email, player2Email] = usersData.map(({ email }) => email);
-        const [masterToken, player1Token, player2Token] = (
-            await Promise.all(
-                [masterEmail, player1Email, player2Email].map((email) => (
-                    Api.login({
-                        email,
-                        password: 'test'
-                    })
-                ))
-            )
-        );
-        const sessionId = sessionsData.find(({ masterId }) => (
-            masterToken.userId === masterId
-        ))?.id;
-        const [masterSocket, player1Socket, player2Socket] = (
-            await Promise.all([
-                Sockets.connect({
-                    bearer: masterToken.bearer ?? '',
-                    sessionId
-                }),
-                ...[player1Token, player2Token].map(({ bearer, userId }) => (
-                    Sockets.connect({
-                        bearer: bearer ?? '',
-                        sessionId,
-                        characterId: charactersData.find((character) => (
-                            character.userId === userId
-                        ))?.id
-                    })
-                ))
-            ])
-        );
+        const [
+            masterSocket,
+            player1Socket,
+            player2Socket
+        ] = await Sockets.setupSession();
         await Promise.all([
             ...[masterSocket, player1Socket, player2Socket].map((socket) => (
                 new Promise<void>((resolve, reject) => {

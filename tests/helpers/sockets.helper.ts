@@ -5,6 +5,7 @@ import Api from './api.helper';
 
 import sessionsData from '../data/sessions.json';
 import charactersData from '../data/characters.json';
+import usersData from '../data/users.json';
 
 export interface FailSocketConnectionData {
     handshake: object;
@@ -58,7 +59,41 @@ const Sockets = {
                 resolve();
             });
         })
-    )
+    ),
+
+    // setup a session with a game master and 2 players
+    // returns array with master socket, player1 socker and player2 socket
+    setupSession: async (): Promise<Socket[]> => {
+        const [masterEmail, player1Email, player2Email] = usersData.map(({ email }) => email);
+        const [masterToken, player1Token, player2Token] = (
+            await Promise.all(
+                [masterEmail, player1Email, player2Email].map((email) => (
+                    Api.login({
+                        email,
+                        password: 'test'
+                    })
+                ))
+            )
+        );
+        const sessionId = sessionsData.find(({ masterId }) => (
+            masterToken.userId === masterId
+        ))?.id;
+        return Promise.all([
+            Sockets.connect({
+                bearer: masterToken.bearer ?? '',
+                sessionId
+            }),
+            ...[player1Token, player2Token].map(({ bearer, userId }) => (
+                Sockets.connect({
+                    bearer: bearer ?? '',
+                    sessionId,
+                    characterId: charactersData.find((character) => (
+                        character.userId === userId
+                    ))?.id
+                })
+            ))
+        ]);
+    }
 };
 
 export default Sockets;
