@@ -1,7 +1,7 @@
 import Chai, { expect } from 'chai';
 import ChaiHttp from 'chai-http';
 
-import server from '../../src';
+import server from '../../../src';
 import {
     assertError,
     assertToken

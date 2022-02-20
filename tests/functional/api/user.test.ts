@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 
-import Api from '../../helpers/api.helper';
-import Data from '../../helpers/data.helper';
-import { assertUser } from '../../helpers/assert.helper';
+import Api from '../helpers/api.helper';
+import Data from '../helpers/data.helper';
+import { assertUser } from '../helpers/assert.helper';
 
-import usersData from '../../data/users.json';
+import usersData from '../data/users.json';
 
 describe('[API] Users', () => {
     before(async () => {

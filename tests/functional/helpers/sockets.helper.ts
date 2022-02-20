@@ -48,6 +48,25 @@ const Sockets = {
         });
     },
 
+    connectRole: async (isMaster: boolean) => {
+        const { bearer, userId } = await Api.login();
+        const sessionId = sessionsData.find(({ masterId }) => (
+            isMaster ? (
+                userId === masterId
+            ) : (
+                userId !== masterId
+            )
+        ))?.id;
+        const characterId = charactersData.find((char) => (
+            char.userId === Api.userId
+        ))?.id;
+        return Sockets.connect({
+            bearer,
+            sessionId,
+            characterId
+        });
+    },
+
     failConnect: async ({ handshake, status }: FailSocketConnectionData): Promise<void> => (
         new Promise((resolve, reject) => {
             const socket = io(Sockets.url, handshake);
@@ -93,6 +112,31 @@ const Sockets = {
                 })
             ))
         ]);
+    },
+
+    testError: async (
+        emitEvent: string,
+        onEvent: string,
+        data: any,
+        expectedStatus: number,
+        isMaster: boolean = false
+    ) => {
+        const invalidData = Array.isArray(data) ? data : [data];
+        for (const emitData of invalidData) {
+            const socket = await Sockets.connectRole(isMaster);
+            await new Promise<void>((resolve, reject) => {
+                socket.on(onEvent, () => {
+                    socket.disconnect();
+                    reject(new Error(`Should have thrown a ${expectedStatus} error`));
+                });
+                socket.on('error', ({ status }: any) => {
+                    expect(status).to.equal(expectedStatus);
+                    socket.disconnect();
+                    resolve();
+                });
+                socket.emit(emitEvent, emitData);
+            });
+        }
     }
 };
 

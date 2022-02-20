@@ -7,7 +7,8 @@
         ],
         "properties": {
             "assetId": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^[a-f0-9]{24}$"
             },
             "time": {
                 "type": "number"

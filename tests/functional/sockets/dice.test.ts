@@ -1,11 +1,5 @@
-import { expect } from 'chai';
-
-import Api from '../../helpers/api.helper';
-import Data from '../../helpers/data.helper';
-import Sockets from '../../helpers/sockets.helper';
-
-import sessionsData from '../../data/sessions.json';
-import charactersData from '../../data/characters.json';
+import Data from '../helpers/data.helper';
+import Sockets from '../helpers/sockets.helper';
 
 describe('[Sockets] Dice', () => {
     beforeEach(async () => {
@@ -13,70 +7,32 @@ describe('[Sockets] Dice', () => {
     });
 
     it('Should fail to request dice because of invalid data', async () => {
-        const requestData = [{
-            d4: 2,
-            invalidKey: 3
-        }, {
-            d8: 2,
-            d12: 0
-        }, {
-            d20: 2,
-            d100: 'invalidValue'
-        }, {}, undefined];
-        for (const data of requestData) {
-            const socket = await Sockets.connect();
-            await new Promise<void>((resolve, reject) => {
-                socket.on('diceResult', () => {
-                    socket.disconnect();
-                    reject(new Error('Should have throw a validation error'));
-                });
-                socket.on('error', ({ status }: any) => {
-                    expect(status).to.equal(400);
-                    socket.disconnect();
-                    resolve();
-                });
-                socket.emit('diceRequest', data);
-            });
-        }
+        await Sockets.testError(
+            'diceRequest',
+            'diceResult',
+            [
+                {},
+                undefined,
+                { d4: 2, invalidKey: 3 },
+                { d8: 2, d12: 0 },
+                { d20: 2, d100: 'invalidValue' }
+            ],
+            400,
+            true
+        );
     });
 
     it('Should fail to request private dice roll because not game master', async () => {
-        const { bearer, userId } = await Api.login();
-        const sessionId = sessionsData.find(({ masterId }) => (
-            userId !== masterId
-        ))?.id;
-        const characterId = charactersData.find((char) => (
-            char.userId === Api.userId
-        ))?.id;
-        const socket = await Sockets.connect({
-            bearer,
-            sessionId,
-            characterId
-        });
-        await new Promise<void>((resolve, reject) => {
-            socket.on('diceResult', () => {
-                socket.disconnect();
-                reject(new Error('Should have throw a forbidden error'));
-            });
-            socket.on('error', ({ status }: any) => {
-                expect(status).to.equal(403);
-                socket.disconnect();
-                resolve();
-            });
-            socket.emit('dicePrivateRequest', {
-                d4: 2
-            });
-        });
+        await Sockets.testError(
+            'dicePrivateRequest',
+            'diceResult',
+            { d4: 2 },
+            403,
+            false
+        );
     });
 
     it('Should request dice rolls', async () => {
-        const { bearer, userId } = await Api.login();
-        const sessionId = sessionsData.find(({ masterId }) => (
-            userId === masterId
-        ))?.id;
-        const characterId = charactersData.find((char) => (
-            char.userId === Api.userId
-        ))?.id;
         const requestData = [{
             d4: 3
         }, {
@@ -89,11 +45,7 @@ describe('[Sockets] Dice', () => {
         }];
         for (const data of requestData) {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
-                const socket = await Sockets.connect({
-                    bearer,
-                    sessionId,
-                    characterId
-                });
+                const socket = await Sockets.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
                     socket.on('diceResult', () => {
                         socket.disconnect();

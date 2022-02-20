@@ -4,7 +4,7 @@ import { Socket, Server } from 'socket.io';
 import { Prisma, handleNotFound } from '../services/prisma';
 import Validator from '../services/validator';
 import { SocketAudioPlay } from '../types/socket';
-import { ForbiddenError } from '../services/errors';
+import { ForbiddenError, ValidationError } from '../services/errors';
 
 import AudioSchemas from './schemas/audio.json';
 
@@ -33,6 +33,9 @@ const bindAudio = (io: Server, socket: Socket) => {
                     })
                 )
             );
+            if (asset.type !== 'audio') {
+                throw new ValidationError('Asset type is not audio');
+            }
             socket.to(sessionId).emit('audioPlay', {
                 user,
                 asset,

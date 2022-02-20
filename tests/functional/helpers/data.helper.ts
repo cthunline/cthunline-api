@@ -1,12 +1,12 @@
 import Fs from 'fs';
 import Path from 'path';
 
-import { Prisma } from '../../src/services/prisma';
+import { Prisma } from '../../../src/services/prisma';
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
 import characters from '../data/characters.json';
 import assets from '../data/assets.json';
-import { assetDir } from '../../src/controllers/asset';
+import { assetDir } from '../../../src/controllers/asset';
 
 const Data = {
     async reset() {

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import Api, { HttpMethod } from '../../helpers/api.helper';
-import { assertError } from '../../helpers/assert.helper';
+import Api, { HttpMethod } from '../helpers/api.helper';
+import { assertError } from '../helpers/assert.helper';
 
 describe('[API] Global', () => {
     describe('Invalid route should throw not found error', async () => {

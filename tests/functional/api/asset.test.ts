@@ -2,12 +2,21 @@ import { expect } from 'chai';
 import Fs from 'fs';
 import Path from 'path';
 
-import Api from '../../helpers/api.helper';
-import Data from '../../helpers/data.helper';
-import { assertAsset } from '../../helpers/assert.helper';
+import Api from '../helpers/api.helper';
+import Data from '../helpers/data.helper';
+import { assertAsset } from '../helpers/assert.helper';
 
-import assetsData from '../../data/assets.json';
-import usersData from '../../data/users.json';
+import assetsData from '../data/assets.json';
+import usersData from '../data/users.json';
+
+const getAssetBuffer = async (assetName: string) => {
+    const localPath = Path.join(
+        __dirname,
+        '../data/assets',
+        assetName
+    );
+    return Fs.promises.readFile(localPath);
+};
 
 const { userId } = assetsData[0];
 
@@ -48,12 +57,7 @@ describe('[API] Assets', () => {
             await Promise.all(
                 ['asset.pdf', 'asset.ico'].map((name) => (
                     (async () => {
-                        const localPath = Path.join(
-                            __dirname,
-                            '../../data/assets',
-                            name
-                        );
-                        const buffer = await Fs.promises.readFile(localPath);
+                        const buffer = await getAssetBuffer(name);
                         await Api.testError({
                             method: 'POST',
                             route: `/users/${userId}/assets`,
@@ -86,12 +90,7 @@ describe('[API] Assets', () => {
                 'asset.svg'
             ];
             for (const name of assetNames) {
-                const localPath = Path.join(
-                    __dirname,
-                    '../../data/assets',
-                    name
-                );
-                const buffer = await Fs.promises.readFile(localPath);
+                const buffer = await getAssetBuffer(name);
                 const response = await Api.request({
                     method: 'POST',
                     route: `/users/${userId}/assets`,

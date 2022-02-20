@@ -1,10 +1,10 @@
-import Api from '../../helpers/api.helper';
-import Data from '../../helpers/data.helper';
-import Sockets from '../../helpers/sockets.helper';
+import Api from '../helpers/api.helper';
+import Data from '../helpers/data.helper';
+import Sockets from '../helpers/sockets.helper';
 
-import sessionsData from '../../data/sessions.json';
-import charactersData from '../../data/characters.json';
-import usersData from '../../data/users.json';
+import sessionsData from '../data/sessions.json';
+import charactersData from '../data/characters.json';
+import usersData from '../data/users.json';
 
 describe('[Sockets] Authentication', () => {
     beforeEach(async () => {
