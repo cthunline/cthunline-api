@@ -14,6 +14,7 @@ import {
     ValidationError,
     ForbiddenError
 } from '../services/errors';
+import { findUser } from '../controllers/user';
 
 // verify auth token
 const verifyBearer = async (socket: Socket): Promise<Token> => {
@@ -76,6 +77,7 @@ const verifyCharacter = async (socket: Socket, userId: string): Promise<Characte
 const connectionMiddleware = async (socket: Socket, next: Function) => {
     try {
         const token = await verifyBearer(socket);
+        const user = await findUser(token.userId);
         const session = await verifySession(socket);
         const isMaster = session.masterId === token.userId;
         const character = isMaster ? null : (
@@ -83,7 +85,7 @@ const connectionMiddleware = async (socket: Socket, next: Function) => {
         );
         // set data on socket
         socket.data = {
-            userId: token.userId,
+            user,
             characterId: character?.id,
             sessionId: session.id,
             isMaster

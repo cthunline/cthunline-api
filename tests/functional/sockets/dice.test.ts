@@ -1,5 +1,8 @@
+import { expect } from 'chai';
+
 import Data from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
+import { assertUser } from '../helpers/assert.helper';
 
 describe('[Sockets] Dice', () => {
     beforeEach(async () => {
@@ -47,7 +50,10 @@ describe('[Sockets] Dice', () => {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
                 const socket = await Sockets.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', () => {
+                    socket.on('diceResult', ({ user, request, result }) => {
+                        assertUser(user);
+                        expect(request).to.deep.equal(data);
+                        expect(result).to.be.a('number');
                         socket.disconnect();
                         resolve();
                     });

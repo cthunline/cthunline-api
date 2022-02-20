@@ -1,6 +1,7 @@
 import Data from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 
+import { assertUser, assertAsset } from '../helpers/assert.helper';
 import assetsData from '../data/assets.json';
 
 const audioAsset = assetsData.find(({ type }) => (
@@ -57,7 +58,11 @@ describe('[Sockets] Audio', () => {
             await Promise.all([
                 ...[player1Socket, player2Socket].map((socket) => (
                     new Promise<void>((resolve, reject) => {
-                        socket.on(event, () => {
+                        socket.on(event, ({ user, asset }) => {
+                            assertUser(user);
+                            if (event === 'audioPlay') {
+                                assertAsset(asset);
+                            }
                             socket.disconnect();
                             resolve();
                         });
