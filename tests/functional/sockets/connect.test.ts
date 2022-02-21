@@ -6,8 +6,8 @@ import sessionsData from '../data/sessions.json';
 import charactersData from '../data/characters.json';
 import usersData from '../data/users.json';
 
-describe('[Sockets] Authentication', () => {
-    beforeEach(async () => {
+describe('[Sockets] Connection', () => {
+    before(async () => {
         await Data.reset();
     });
 

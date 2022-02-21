@@ -13,7 +13,7 @@ const imageAsset = assetsData.find(({ type }) => (
 ));
 
 describe('[Sockets] Audio', () => {
-    beforeEach(async () => {
+    before(async () => {
         await Data.reset();
     });
 

@@ -5,7 +5,7 @@ import Sockets from '../helpers/sockets.helper';
 import { assertUser } from '../helpers/assert.helper';
 
 describe('[Sockets] Dice', () => {
-    beforeEach(async () => {
+    before(async () => {
         await Data.reset();
     });
 

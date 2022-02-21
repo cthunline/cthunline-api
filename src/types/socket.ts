@@ -10,10 +10,6 @@ export interface SocketDiceResult {
     result: number
 }
 
-export interface SocketCharacterUpdate {
-    characterId: string
-}
-
 export interface SocketAudioPlay {
     assetId: string
     time?: number;
