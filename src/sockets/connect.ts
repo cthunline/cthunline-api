@@ -1,4 +1,4 @@
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { ObjectId } from 'bson';
 import {
     Token,
@@ -74,7 +74,7 @@ const verifyCharacter = async (socket: Socket, userId: string): Promise<Characte
 };
 
 // handles socket connection
-const connectionMiddleware = async (socket: Socket, next: Function) => {
+export const connectionMiddleware = async (socket: Socket, next: Function) => {
     try {
         const token = await verifyBearer(socket);
         const user = await findUser(token.userId);
@@ -107,4 +107,15 @@ const connectionMiddleware = async (socket: Socket, next: Function) => {
     }
 };
 
-export default connectionMiddleware;
+// searches for other connected sockets with same userId and disconnect them
+export const disconnectCopycats = async (io: Server, socket: Socket) => {
+    const { id: socketId } = socket;
+    const userId = socket.data.user.id;
+    const allSockets = await io.fetchSockets();
+    const copycatSockets = allSockets.filter((otherSocket) => (
+        otherSocket.id !== socketId && otherSocket.data.user.id === userId
+    ));
+    copycatSockets.forEach((copycatSocket) => {
+        copycatSocket.disconnect();
+    });
+};

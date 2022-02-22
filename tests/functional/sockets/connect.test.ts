@@ -146,4 +146,32 @@ describe('[Sockets] Connection', () => {
             sessionId: sessionsData[1].id
         });
     });
+
+    it('Should disconnect copycat socket on connection', async () => {
+        await Api.login();
+        const { bearer } = Api;
+        const copycatSocket = await Sockets.connect({
+            bearer,
+            sessionId: sessionsData[1].id,
+            characterId: charactersData[0].id
+        });
+        await Promise.all([
+            new Promise<void>((resolve, reject) => {
+                copycatSocket.on('disconnect', () => {
+                    resolve();
+                });
+                copycatSocket.on('error', (err: any) => {
+                    copycatSocket.disconnect();
+                    reject(err);
+                });
+            }),
+            (async () => {
+                await Sockets.connect({
+                    bearer,
+                    sessionId: sessionsData[2].id,
+                    characterId: charactersData[0].id
+                });
+            })()
+        ]);
+    });
 });
