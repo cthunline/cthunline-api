@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Token {
-    id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     bearer String
     limit DateTime
 
@@ -21,7 +21,7 @@ model Token {
 }
 
 model User {
-    id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     email String
     password String
@@ -39,7 +39,7 @@ model User {
 }
 
 model Asset {
-    id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     type String
     name String
     path String
@@ -53,7 +53,7 @@ model Asset {
 }
 
 model Session {
-    id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     gameId String
     name String
     sketch Json
@@ -67,7 +67,7 @@ model Session {
 }
 
 model Character {
-    id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     gameId String
     name String
     data Json
