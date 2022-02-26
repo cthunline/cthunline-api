@@ -10,6 +10,16 @@ export const Games = {
     }
 };
 
+// games data without fields not needed for api endpoints
+export const GamesData = Object.fromEntries(
+    Object.entries(Games).map((
+        [id, { name }]
+    ) => (
+        [id, { id, name }]
+    ))
+);
+
+// check a gameId exists
 export const isValidGameId = (gameId: string) => (
     Object.keys(Games).includes(gameId)
 );
