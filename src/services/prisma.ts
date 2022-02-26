@@ -10,15 +10,21 @@ export const Prisma = new PrismaClient();
 export const initDb = async () => {
     const users = await Prisma.user.findMany();
     if (!users.length) {
+        const defaultUser = {
+            name: 'admin',
+            email: 'admin@admin.com',
+            password: 'cthunline',
+            isAdmin: true
+        };
         await Prisma.user.create({
             data: {
-                name: 'admin',
-                email: 'admin@admin.com',
-                password: await hashPassword('admin'),
-                isAdmin: true
+                ...defaultUser,
+                password: await hashPassword(defaultUser.password)
             }
         });
-        Log.warn('Default user created (email: admin@admin.com / password: admin)');
+        Log.warn(
+            `Default user created (email: ${defaultUser.email} / password: ${defaultUser.password})`
+        );
     }
 };
 
