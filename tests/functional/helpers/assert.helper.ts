@@ -30,7 +30,11 @@ export const assertUser = (
     expect(data.isAdmin).to.be.a('boolean');
     expect(data).to.not.have.property('password');
     if (expected) {
-        const { password, ...expectedWithoutPassword } = expected;
+        const {
+            password,
+            oldPassword,
+            ...expectedWithoutPassword
+        } = expected;
         Object.keys(expectedWithoutPassword).forEach((key) => {
             expect(data).to.have.property(key);
             expect(data[key]).to.equal(expected[key]);

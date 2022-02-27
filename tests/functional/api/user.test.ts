@@ -131,6 +131,11 @@ describe('[API] Users', () => {
                 invalidProperty: 'Test'
             }, {
                 email: 'notAnEmail'
+            }, {
+                password: 'missingOldPassword'
+            }, {
+                password: 'newPassword',
+                oldPassword: 'wrongOldPassword'
             }, {}];
             for (const body of invalidData) {
                 await Api.testError({
@@ -195,7 +200,8 @@ describe('[API] Users', () => {
                 data: {
                     name: 'Test1',
                     email: 'fff@test.com',
-                    password: 'def456'
+                    password: 'def456',
+                    oldPassword: 'abc123'
                 },
                 assert: assertUser
             });
@@ -205,7 +211,8 @@ describe('[API] Users', () => {
                 data: {
                     name: 'Test1',
                     email: 'fff@test.com',
-                    password: 'def456',
+                    password: 'oiu345',
+                    oldPassword: 'def456',
                     isAdmin: true
                 },
                 assert: assertUser

@@ -38,6 +38,9 @@
             "password": {
                 "type": "string"
             },
+            "oldPassword": {
+                "type": "string"
+            },
             "isAdmin": {
                 "type": "boolean"
             }

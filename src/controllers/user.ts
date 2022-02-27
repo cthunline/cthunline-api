@@ -10,8 +10,8 @@ import {
     handleNotFound
 } from '../services/prisma';
 import { controlSelf, controlSelfAdmin } from './auth';
-import { hashPassword } from '../services/tools';
-import { ConflictError } from '../services/errors';
+import { verifyPassword, hashPassword } from '../services/tools';
+import { ConflictError, ValidationError } from '../services/errors';
 import Validator from '../services/validator';
 
 import UserSchemas from './schemas/user.json';
@@ -124,7 +124,15 @@ userRouter.post('/users/:userId', async ({ params, body, token }: Request, res: 
         validateUpdate(body);
         const data = { ...body };
         if (body.password) {
+            if (!body.oldPassword) {
+                throw new ValidationError('Missing old password');
+            }
+            const verified = await verifyPassword(body.oldPassword, user.password);
+            if (!verified) {
+                throw new ValidationError('Old password is not valid');
+            }
             data.password = await hashPassword(body.password);
+            delete data.oldPassword;
         }
         const updatedUser = await Prisma.user.update({
             select: userSelect,
