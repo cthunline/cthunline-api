@@ -15,9 +15,17 @@ describe('[API] Users', () => {
     });
 
     describe('GET /users', () => {
-        it('Should list all users', async () => {
+        it('Should list users', async () => {
             await Api.testGetList({
                 route: '/users',
+                listKey: 'users',
+                data: usersData.filter(({ isDisabled }) => !isDisabled),
+                assert: assertUser
+            });
+        });
+        it('Should list all users including disabled ones', async () => {
+            await Api.testGetList({
+                route: '/users?disabled=true',
                 listKey: 'users',
                 data: usersData,
                 assert: assertUser
@@ -161,16 +169,18 @@ describe('[API] Users', () => {
                 email: 'yyy@test.com',
                 password: 'test'
             });
-            await Api.testError({
-                method: 'POST',
-                route: `/users/${id}`,
-                body: {
-                    name: 'Test1',
-                    email: 'zzz@test.com',
-                    password: 'def456',
-                    isAdmin: true
-                }
-            }, 403);
+            const bodies = [{
+                isAdmin: true
+            }, {
+                isDisabled: true
+            }];
+            for (const body of bodies) {
+                await Api.testError({
+                    method: 'POST',
+                    route: `/users/${id}`,
+                    body
+                }, 403);
+            }
             await Api.testError({
                 method: 'POST',
                 route: `/users/${usersData[0].id}`,

@@ -11,7 +11,11 @@ import {
 } from '../services/prisma';
 import { controlSelf, controlSelfAdmin } from './auth';
 import { verifyPassword, hashPassword } from '../services/tools';
-import { ConflictError, ValidationError } from '../services/errors';
+import {
+    ConflictError,
+    ValidationError,
+    ForbiddenError
+} from '../services/errors';
 import Validator from '../services/validator';
 
 import UserSchemas from './schemas/user.json';
@@ -27,6 +31,7 @@ const userSelect = {
     name: true,
     email: true,
     isAdmin: true,
+    isDisabled: true,
     createdAt: true,
     updatedAt: true
 };
@@ -46,13 +51,27 @@ export const findUser = async (userId: string): Promise<UserSelect> => (
     )
 );
 
+// throws forbidden error if any of the admin fields exists in the user edit body
+export const controlAdminFields = (body: object) => {
+    const adminFields = ['isAdmin', 'isDisabled'];
+    for (const field of adminFields) {
+        if (Object.hasOwnProperty.call(body, field)) {
+            throw new ForbiddenError();
+        }
+    }
+};
+
 const userRouter = Router();
 
 // get all users
-userRouter.get('/users', async (req: Request, res: Response): Promise<void> => {
+userRouter.get('/users', async ({ query }: Request, res: Response): Promise<void> => {
     try {
+        const getDisabled = query.disabled === 'true';
         const users = await Prisma.user.findMany({
-            select: userSelect
+            select: userSelect,
+            where: getDisabled ? {} : {
+                isDisabled: false
+            }
         });
         res.json({ users });
     } catch (err: any) {
@@ -115,11 +134,8 @@ userRouter.post('/users/:userId', async ({ params, body, token }: Request, res: 
         try {
             await controlSelfAdmin(token);
         } catch (err) {
-            // only admins can set the admin flag to true
-            if (body.isAdmin === true) {
-                throw err;
-            }
             controlSelf(token, userId);
+            controlAdminFields(body);
         }
         validateUpdate(body);
         const data = { ...body };

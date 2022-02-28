@@ -3,17 +3,27 @@
     "name": "Anna Maria Jopek",
     "email": "am.jopek@test.com",
     "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
-    "isAdmin": false
+    "isAdmin": false,
+    "isDisabled": false
 }, {
     "id": "61f537cd1790b30562a66d45",
     "name": "Delphine Cascarino",
     "email": "d.cascarino@test.com",
     "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
-    "isAdmin": false
+    "isAdmin": false,
+    "isDisabled": false
 }, {
     "id": "61f537ca1790b30562a66d43",
     "name": "Test",
     "email": "admin@test.com",
     "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
-    "isAdmin": true
+    "isAdmin": true,
+    "isDisabled": false
+}, {
+    "id": "61f537ca1790b30562a66d42",
+    "name": "IAmDisabled",
+    "email": "disabled@test.com",
+    "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
+    "isAdmin": true,
+    "isDisabled": true
 }]

@@ -43,6 +43,9 @@
             },
             "isAdmin": {
                 "type": "boolean"
+            },
+            "isDisabled": {
+                "type": "boolean"
             }
         }
     }
