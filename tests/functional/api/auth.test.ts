@@ -1,6 +1,8 @@
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 
+import usersData from '../data/users.json';
+
 describe('[API] Authentication', () => {
     before(async () => {
         await Data.reset();
@@ -46,6 +48,11 @@ describe('[API] Authentication', () => {
                     Api.login(credentials, false)
                 ))
             );
+            const disabledUser = usersData.find(({ isDisabled }) => isDisabled);
+            await Api.login({
+                email: disabledUser?.email ?? '',
+                password: 'test'
+            });
         });
         it('Should check authentication successfully', async () => {
             await Api.login();

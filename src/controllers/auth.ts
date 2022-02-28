@@ -109,7 +109,10 @@ authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void>
         validateLogin(body);
         const { email, password } = body;
         const user = await Prisma.user.findFirst({
-            where: { email }
+            where: {
+                email,
+                isDisabled: false
+            }
         });
         if (!user) {
             throw new AuthenticationError();
