@@ -19,7 +19,7 @@ describe('[API] Users', () => {
             await Api.testGetList({
                 route: '/users',
                 listKey: 'users',
-                data: usersData.filter(({ isDisabled }) => !isDisabled),
+                data: usersData.filter(({ isEnabled }) => isEnabled),
                 assert: assertUser
             });
         });
@@ -172,7 +172,7 @@ describe('[API] Users', () => {
             const bodies = [{
                 isAdmin: true
             }, {
-                isDisabled: true
+                isEnabled: true
             }];
             for (const body of bodies) {
                 await Api.testError({

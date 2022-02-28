@@ -111,7 +111,7 @@ authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void>
         const user = await Prisma.user.findFirst({
             where: {
                 email,
-                isDisabled: false
+                isEnabled: true
             }
         });
         if (!user) {

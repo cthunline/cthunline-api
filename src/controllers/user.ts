@@ -31,7 +31,7 @@ const userSelect = {
     name: true,
     email: true,
     isAdmin: true,
-    isDisabled: true,
+    isEnabled: true,
     createdAt: true,
     updatedAt: true
 };
@@ -53,7 +53,7 @@ export const findUser = async (userId: string): Promise<UserSelect> => (
 
 // throws forbidden error if any of the admin fields exists in the user edit body
 export const controlAdminFields = (body: object) => {
-    const adminFields = ['isAdmin', 'isDisabled'];
+    const adminFields = ['isAdmin', 'isEnabled'];
     for (const field of adminFields) {
         if (Object.hasOwnProperty.call(body, field)) {
             throw new ForbiddenError();
@@ -70,7 +70,7 @@ userRouter.get('/users', async ({ query }: Request, res: Response): Promise<void
         const users = await Prisma.user.findMany({
             select: userSelect,
             where: getDisabled ? {} : {
-                isDisabled: false
+                isEnabled: true
             }
         });
         res.json({ users });

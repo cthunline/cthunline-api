@@ -26,7 +26,7 @@ model User {
     email String
     password String
     isAdmin Boolean @default(false)
-    isDisabled Boolean @default(false)
+    isEnabled Boolean @default(true)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 

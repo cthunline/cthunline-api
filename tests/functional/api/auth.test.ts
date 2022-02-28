@@ -48,11 +48,11 @@ describe('[API] Authentication', () => {
                     Api.login(credentials, false)
                 ))
             );
-            const disabledUser = usersData.find(({ isDisabled }) => isDisabled);
+            const disabledUser = usersData.find(({ isEnabled }) => !isEnabled);
             await Api.login({
                 email: disabledUser?.email ?? '',
                 password: 'test'
-            });
+            }, false);
         });
         it('Should check authentication successfully', async () => {
             await Api.login();
