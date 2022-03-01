@@ -55,7 +55,7 @@ export const findUser = async (userId: string): Promise<UserSelect> => (
 export const controlAdminFields = (body: object) => {
     const adminFields = ['isAdmin', 'isEnabled'];
     for (const field of adminFields) {
-        if (Object.hasOwnProperty.call(body, field)) {
+        if (Object.hasOwn(body, field)) {
             throw new ForbiddenError();
         }
     }
