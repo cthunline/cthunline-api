@@ -51,7 +51,9 @@
                 "regular": 25,
                 "half": 12,
                 "fifth": 5
-            },
+            }
+        },
+        "points": {
             "hitPoints": {
                 "current": 12,
                 "maximum": 12
@@ -59,16 +61,16 @@
             "magicPoints": {
                 "current": 5,
                 "maximum": 5
-            },
-            "luck": {
-                "current": 15,
-                "starting": 15
-            },
-            "sanity": {
-                "starting": 25,
-                "current": 25,
-                "maximum": 99
             }
+        },
+        "luck": {
+            "current": 15,
+            "starting": 15
+        },
+        "sanity": {
+            "starting": 25,
+            "current": 25,
+            "maximum": 99
         },
         "status": {
             "temporaryInsanity": false,
@@ -275,7 +277,9 @@
                 "regular": 60,
                 "half": 30,
                 "fifth": 12
-            },
+            }
+        },
+        "points": {
             "hitPoints": {
                 "current": 5,
                 "maximum": 5
@@ -283,16 +287,16 @@
             "magicPoints": {
                 "current": 12,
                 "maximum": 12
-            },
-            "luck": {
-                "current": 30,
-                "starting": 30
-            },
-            "sanity": {
-                "starting": 60,
-                "current": 60,
-                "maximum": 99
             }
+        },
+        "luck": {
+            "current": 30,
+            "starting": 30
+        },
+        "sanity": {
+            "starting": 60,
+            "current": 60,
+            "maximum": 99
         },
         "status": {
             "temporaryInsanity": false,
@@ -507,7 +511,9 @@
                 "regular": 25,
                 "half": 12,
                 "fifth": 5
-            },
+            }
+        },
+        "points": {
             "hitPoints": {
                 "current": 12,
                 "maximum": 12
@@ -515,16 +521,16 @@
             "magicPoints": {
                 "current": 5,
                 "maximum": 5
-            },
-            "luck": {
-                "current": 15,
-                "starting": 15
-            },
-            "sanity": {
-                "starting": 25,
-                "current": 25,
-                "maximum": 99
             }
+        },
+        "luck": {
+            "current": 15,
+            "starting": 15
+        },
+        "sanity": {
+            "starting": 25,
+            "current": 25,
+            "maximum": 99
         },
         "status": {
             "temporaryInsanity": false,

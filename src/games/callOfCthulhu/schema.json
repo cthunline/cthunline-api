@@ -53,23 +53,11 @@
                 "education": {
                     "$ref": "#/definitions/CoCCharacteristic"
                 },
-                "hitPoints": {
-                    "$ref": "#/definitions/CoCPoints"
-                },
                 "intelligence": {
                     "$ref": "#/definitions/CoCCharacteristic"
                 },
-                "luck": {
-                    "$ref": "#/definitions/CoCLuck"
-                },
-                "magicPoints": {
-                    "$ref": "#/definitions/CoCPoints"
-                },
                 "power": {
                     "$ref": "#/definitions/CoCCharacteristic"
-                },
-                "sanity": {
-                    "$ref": "#/definitions/CoCSanity"
                 },
                 "size": {
                     "$ref": "#/definitions/CoCCharacteristic"
@@ -107,7 +95,7 @@
             },
             "type": "object"
         },
-        "CoCPoints": {
+        "CoCPoint": {
             "additionalProperties": false,
             "properties": {
                 "current": {
@@ -115,6 +103,18 @@
                 },
                 "maximum": {
                     "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "CoCPoints": {
+            "additionalProperties": false,
+            "properties": {
+                "hitPoints": {
+                    "$ref": "#/definitions/CoCPoint"
+                },
+                "magicPoints": {
+                    "$ref": "#/definitions/CoCPoint"
                 }
             },
             "type": "object"
@@ -274,6 +274,15 @@
         "combat": {
             "$ref": "#/definitions/CoCCombat"
         },
+        "luck": {
+            "$ref": "#/definitions/CoCLuck"
+        },
+        "points": {
+            "$ref": "#/definitions/CoCPoints"
+        },
+        "sanity": {
+            "$ref": "#/definitions/CoCSanity"
+        },
         "skills": {
             "items": {
                 "$ref": "#/definitions/CoCSkill"
@@ -295,3 +304,4 @@
     },
     "type": "object"
 }
+

@@ -1,6 +1,9 @@
 export interface CoCCharacter {
     biography: CoCBiography;
     characteristics: CoCCharacteristics;
+    points: CoCPoints;
+    luck: CoCLuck;
+    sanity: CoCSanity;
     status: CoCStatus;
     skills: CoCSkill[];
     combat: CoCCombat;
@@ -23,6 +26,11 @@ export interface CoCCharacteristic {
 }
 
 export interface CoCPoints {
+    hitPoints: CoCPoint;
+    magicPoints: CoCPoint;
+}
+
+export interface CoCPoint {
     maximum: number;
     current: number;
 }
@@ -47,10 +55,6 @@ export interface CoCCharacteristics {
     intelligence: CoCCharacteristic;
     power: CoCCharacteristic;
     education: CoCCharacteristic;
-    hitPoints: CoCPoints;
-    magicPoints: CoCPoints;
-    luck: CoCLuck;
-    sanity: CoCSanity;
 }
 
 export interface CoCStatus {
