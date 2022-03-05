@@ -71,11 +71,10 @@ characterRouter.post('/users/:userId/characters', async ({ body, params, token }
     }
 });
 
-// get a user's character
-characterRouter.get('/users/:userId/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
+// get a character
+characterRouter.get('/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const { userId, characterId } = params;
-        await findUser(userId);
+        const { characterId } = params;
         const character = await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({
@@ -91,13 +90,11 @@ characterRouter.get('/users/:userId/characters/:characterId', async ({ params }:
     }
 });
 
-// edit a user's character
-characterRouter.post('/users/:userId/characters/:characterId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+// edit a character
+characterRouter.post('/characters/:characterId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
-        const { userId, characterId } = params;
-        await findUser(userId);
-        controlSelf(token, userId);
-        const { gameId } = await handleNotFound<Character>(
+        const { characterId } = params;
+        const { gameId, userId } = await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({
                     where: {
@@ -106,6 +103,7 @@ characterRouter.post('/users/:userId/characters/:characterId', async ({ params, 
                 })
             )
         );
+        controlSelf(token, userId);
         validateUpdate(body);
         if (body.data) {
             Games[gameId as GameId].validator(body.data);
@@ -123,12 +121,10 @@ characterRouter.post('/users/:userId/characters/:characterId', async ({ params, 
 });
 
 // delete a user's character
-characterRouter.delete('/users/:userId/characters/:characterId', async ({ params, token }: Request, res: Response): Promise<void> => {
+characterRouter.delete('/characters/:characterId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
-        const { userId, characterId } = params;
-        await findUser(userId);
-        controlSelf(token, userId);
-        await handleNotFound<Character>(
+        const { characterId } = params;
+        const { userId } = await handleNotFound<Character>(
             'Character', (
                 Prisma.character.findUnique({
                     where: {
@@ -137,6 +133,7 @@ characterRouter.delete('/users/:userId/characters/:characterId', async ({ params
                 })
             )
         );
+        controlSelf(token, userId);
         await Prisma.character.delete({
             where: {
                 id: characterId

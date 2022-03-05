@@ -57,6 +57,7 @@ export interface CreateOptions {
     route: string;
     data: Record<string, any>;
     createdById?: number | null;
+    getRoute?: string;
     assert: (
         data: Record<string, any>,
         expected?: Record<string, any>
@@ -244,7 +245,8 @@ const Api = {
             route,
             data,
             assert,
-            createdById
+            createdById,
+            getRoute
         } = options;
         const createResponse = await Api.request({
             method: 'POST',
@@ -261,7 +263,11 @@ const Api = {
         assert(createBody, expected);
         const getResponse = await Api.request({
             method: 'GET',
-            route: `${route}/${createBody.id}`
+            route: getRoute ? (
+                getRoute.replace(':id', createBody.id)
+            ) : (
+                `${route}/${createBody.id}`
+            )
         });
         expect(getResponse).to.have.status(200);
         expect(getResponse).to.be.json;

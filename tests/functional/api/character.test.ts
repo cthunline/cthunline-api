@@ -133,33 +133,33 @@ describe('[API] Characters', () => {
                     name: 'Test',
                     data
                 },
-                assert: assertCharacter
+                assert: assertCharacter,
+                getRoute: '/characters/:id'
             });
         });
     });
 
-    describe('GET /users/:id/characters/:id', () => {
-        const { id: userId } = usersData[0];
+    describe('GET /characters/:id', () => {
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'GET',
-                route: `/users/${userId}/characters/:id`
+                route: '/characters/:id'
             });
         });
         it('Should get a character', async () => {
             await Api.testGetOne({
-                route: `/users/${userId}/characters/:id`,
+                route: '/characters/:id',
                 data: charactersData[0],
                 assert: assertCharacter
             });
         });
     });
 
-    describe('POST /users/:id/characters/:id', () => {
+    describe('POST /characters/:id', () => {
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'POST',
-                route: `/users/${Api.userId}/characters/:id`,
+                route: '/characters/:id',
                 body: {
                     name: 'Test'
                 }
@@ -212,7 +212,7 @@ describe('[API] Characters', () => {
             for (const body of invalidData) {
                 await Api.testError({
                     method: 'POST',
-                    route: `/users/${Api.userId}/characters/${id}`,
+                    route: `/characters/${id}`,
                     body
                 }, 400);
             }
@@ -220,7 +220,7 @@ describe('[API] Characters', () => {
         it('Should throw a forbidden error', async () => {
             await Api.testError({
                 method: 'POST',
-                route: `/users/${usersData[0].id}/characters/${charactersData[1].id}`,
+                route: `/characters/${charactersData[1].id}`,
                 body: {
                     name: 'Test'
                 }
@@ -241,7 +241,7 @@ describe('[API] Characters', () => {
             const { body: { id } } = response;
             const { data: editData } = charactersData[1];
             await Api.testEdit({
-                route: `/users/${Api.userId}/characters/${id}`,
+                route: `/characters/${id}`,
                 data: {
                     name: 'Test edit',
                     data: editData
@@ -255,13 +255,13 @@ describe('[API] Characters', () => {
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'DELETE',
-                route: `/users/${Api.userId}/characters/:id`
+                route: '/characters/:id'
             });
         });
         it('Should throw a forbidden error', async () => {
             await Api.testError({
                 method: 'DELETE',
-                route: `/users/${usersData[0].id}/characters/${charactersData[1].id}`
+                route: `/characters/${charactersData[1].id}`
             }, 403);
         });
         it('Should delete a character', async () => {
@@ -278,7 +278,7 @@ describe('[API] Characters', () => {
             expect(response).to.have.status(200);
             const { body: { id } } = response;
             await Api.testDelete({
-                route: `/users/${Api.userId}/characters/${id}`,
+                route: `/characters/${id}`,
                 testGet: true
             });
         });
