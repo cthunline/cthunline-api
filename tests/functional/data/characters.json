@@ -199,7 +199,6 @@
         },
         "weapons": [{
             "name": "Unarmed",
-            "base": "25%",
             "damage": "1D3 + DB",
             "attacks": "1",
             "range": "",
@@ -433,7 +432,6 @@
         },
         "weapons": [{
             "name": "Unarmed",
-            "base": "25%",
             "damage": "1D3 + DB",
             "attacks": "1",
             "range": "",
@@ -659,7 +657,6 @@
         },
         "weapons": [{
             "name": "Unarmed",
-            "base": "25%",
             "damage": "1D3 + DB",
             "attacks": "1",
             "range": "",

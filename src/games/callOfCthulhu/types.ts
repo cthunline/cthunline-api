@@ -83,7 +83,6 @@ export interface CoCCombat {
 
 export interface CoCWeapon {
     name: string;
-    base: string;
     damage: string;
     attacks: string;
     range: string;

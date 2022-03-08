@@ -245,9 +245,6 @@
                 "attacks": {
                     "type": "string"
                 },
-                "base": {
-                    "type": "string"
-                },
                 "damage": {
                     "type": "string"
                 },
