@@ -249,7 +249,7 @@
                     "type": "string"
                 },
                 "malfunction": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

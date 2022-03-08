@@ -203,7 +203,7 @@
             "attacks": "1",
             "range": "",
             "ammo": "",
-            "malfunction": 0
+            "malfunction": "0"
         }],
         "story": {
             "story": "Ada Martine Stolsmo Hegerberg is a Norwegian professional footballer who plays as a striker for the Division 1 Féminine club Olympique Lyonnais.",
@@ -436,7 +436,7 @@
             "attacks": "1",
             "range": "",
             "ammo": "",
-            "malfunction": 0
+            "malfunction": "0"
         }],
         "story": {
             "story": "Susanne Aartun Sundfor is a Norwegian singer-songwriter. Et iusto quia tempore minus eos itaque ullam sed iste error aut quos dolorem.",
@@ -661,7 +661,7 @@
             "attacks": "1",
             "range": "",
             "ammo": "",
-            "malfunction": 0
+            "malfunction": "0"
         }],
         "story": {
             "story": "Delphine Cascarino is a French professional footballer who plays as a midfielder for Division 1 Féminine club Lyon and the France national team.",
