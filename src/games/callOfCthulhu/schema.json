@@ -277,6 +277,9 @@
         "points": {
             "$ref": "#/definitions/CoCPoints"
         },
+        "portrait": {
+            "type": "string"
+        },
         "sanity": {
             "$ref": "#/definitions/CoCSanity"
         },

@@ -1,4 +1,5 @@
 export interface CoCCharacter {
+    portrait: string;
     biography: CoCBiography;
     characteristics: CoCCharacteristics;
     points: CoCPoints;

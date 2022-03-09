@@ -12,7 +12,27 @@ import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
 import { Games, GameId, isValidGameId } from '../games';
 
+import { isBase64 } from '../services/tools';
+import { mimeTypes } from '../types/asset';
 import CharacterSchemas from './schemas/character.json';
+
+const imageMimeTypes = Object.entries(mimeTypes).filter(
+    ([, { type }]) => type === 'image'
+).map(
+    ([mimeType]) => mimeType
+);
+
+const portraitLimitSizeInKb = 300;
+const controlPortrait = (base64: string) => {
+    if (!isBase64(base64, imageMimeTypes)) {
+        throw new ValidationError('Portrait is not a valid base64 string');
+    }
+    const buffer = Buffer.from(base64);
+    const sizeInKb = buffer.length / 1000;
+    if (sizeInKb > portraitLimitSizeInKb) {
+        throw new ValidationError(`Portrait is too big (max ${portraitLimitSizeInKb}Kb)`);
+    }
+};
 
 const validateCreate = Validator(CharacterSchemas.create);
 const validateUpdate = Validator(CharacterSchemas.update);
@@ -57,6 +77,9 @@ characterRouter.post('/users/:userId/characters', async ({ body, params, token }
             throw new ValidationError(`Invalid gameId ${gameId}`);
         }
         Games[gameId as GameId].validator(data);
+        if (data.portrait) {
+            controlPortrait(data.portrait);
+        }
         const character = await Prisma.character.create({
             data: {
                 userId,
@@ -107,6 +130,9 @@ characterRouter.post('/characters/:characterId', async ({ params, body, token }:
         validateUpdate(body);
         if (body.data) {
             Games[gameId as GameId].validator(body.data);
+            if (body.data.portrait) {
+                controlPortrait(body.data.portrait);
+            }
         }
         const character = await Prisma.character.update({
             data: body,

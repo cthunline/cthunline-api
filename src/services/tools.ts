@@ -23,6 +23,20 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
     return !!verify;
 };
 
+// check if string is valid base64
+export const isBase64 = (str: string, mimeTypes?: string | string[]): boolean => {
+    let mimeTypeRegex = '(?:[a-z]+)\\/(?:[a-z]+)';
+    if (mimeTypes) {
+        const properMimeTypes = Array.isArray(mimeTypes) ? mimeTypes : [mimeTypes];
+        const escapedMimeTypes = properMimeTypes.map((mime) => mime.replace('/', '\\/'));
+        mimeTypeRegex = `(?:${escapedMimeTypes.join('|')})`;
+    }
+    const base64Regex = new RegExp(
+        `^data:${mimeTypeRegex};base64,(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$`
+    );
+    return base64Regex.test(str);
+};
+
 // encode string to base64
 export const encodeBase64 = (str: string, keepTrailingEquals?: boolean): string => {
     const base64 = Buffer.from(str).toString('base64');
