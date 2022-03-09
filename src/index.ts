@@ -4,7 +4,10 @@ import { createServer } from 'http';
 import Helmet from 'helmet';
 import Cors from 'cors';
 
-import { errorMiddleware } from './services/errors';
+import {
+    errorMiddleware,
+    payloadTooLargeHandler
+} from './services/errors';
 import Log from './services/log';
 import { initDb } from './services/prisma';
 import apiRouter from './controllers';
@@ -18,10 +21,13 @@ const httpServer = createServer(app);
         Log.info('Setting middlewares');
         app.use(Cors());
         app.use(Helmet());
-        app.use(Express.json());
+        app.use(Express.json({
+            limit: '300kb'
+        }));
         app.use(Express.urlencoded({
             extended: false
         }));
+        app.use(payloadTooLargeHandler);
         app.use(errorMiddleware);
 
         Log.info('Initializing database');

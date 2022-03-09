@@ -17,7 +17,7 @@ import { mimeTypes, FileType, MimeType } from '../types/asset';
 // formidable initialization options
 const formidableOptions = {
     keepExtensions: true,
-    maxFileSize: 20 * 1024 * 1024
+    maxFileSize: 10 * 1024 * 1024
 };
 
 // check asset directory exists and is writable

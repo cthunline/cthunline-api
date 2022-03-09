@@ -3,7 +3,11 @@ import {
     PrismaClientValidationError,
     PrismaClientKnownRequestError
 } from '@prisma/client/runtime';
-import { Request, Response, NextFunction } from 'express';
+import {
+    Request,
+    Response,
+    NextFunction
+} from 'express';
 import Log from './log';
 
 // custom error class with additional http status and data
@@ -95,6 +99,22 @@ export const errorMiddleware = (req: Request, res: Response, next: NextFunction)
         res.status(statusCode).json(response);
     };
     return next();
+};
+
+// handles payload too large errors thrown by bordy parser middleware
+export const payloadTooLargeHandler = (
+    err: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    if (err.constructor.name === 'PayloadTooLargeError') {
+        res.status(413).json({
+            error: 'Payload is too large'
+        });
+    } else {
+        next();
+    }
 };
 
 /* eslint-enable max-classes-per-file */
