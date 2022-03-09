@@ -22,7 +22,7 @@ const httpServer = createServer(app);
         app.use(Cors());
         app.use(Helmet());
         app.use(Express.json({
-            limit: '300kb'
+            limit: '500kb'
         }));
         app.use(Express.urlencoded({
             extended: false
