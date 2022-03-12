@@ -19,7 +19,9 @@ const httpServer = createServer(app);
 (async () => {
     try {
         Log.info('Setting middlewares');
-        app.use(Cors());
+        app.use(Cors({
+            origin: process.env.CORS_ORIGIN
+        }));
         app.use(Helmet());
         app.use(Express.json({
             limit: '500kb'

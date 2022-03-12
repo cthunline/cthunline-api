@@ -11,7 +11,11 @@ import bindCharacter from './character';
 import bindAudio from './audio';
 
 const socketRouter = (httpServer: HttpServer) => {
-    const io = new Server(httpServer);
+    const io = new Server(httpServer, {
+        cors: {
+            origin: process.env.CORS_ORIGIN
+        }
+    });
     io.use(connectionMiddleware);
     io.on('connection', (socket: Socket) => {
         disconnectCopycats(io, socket);
