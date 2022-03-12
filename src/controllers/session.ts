@@ -19,12 +19,21 @@ import SessionSchemas from './schemas/session.json';
 const validateCreate = Validator(SessionSchemas.create);
 const validateUpdate = Validator(SessionSchemas.update);
 
+const getInclude = (include?: any) => (
+    include === 'true' ? {
+        master: true
+    } : {}
+);
+
 const sessionRouter = Router();
 
 // get all sessions
-sessionRouter.get('/sessions', async (req: Request, res: Response): Promise<void> => {
+sessionRouter.get('/sessions', async ({ query }: Request, res: Response): Promise<void> => {
     try {
-        const sessions = await Prisma.session.findMany();
+        const { include } = query;
+        const sessions = await Prisma.session.findMany({
+            include: getInclude(include)
+        });
         res.json({ sessions });
     } catch (err: any) {
         res.error(err);
