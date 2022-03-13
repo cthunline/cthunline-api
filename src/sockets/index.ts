@@ -1,7 +1,6 @@
 import { Socket, Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 
-import Log from '../services/log';
 import {
     connectionMiddleware,
     disconnectCopycats
@@ -19,10 +18,10 @@ const socketRouter = (httpServer: HttpServer) => {
     io.use(connectionMiddleware);
     io.on('connection', (socket: Socket) => {
         disconnectCopycats(io, socket);
-        const { userId, sessionId, isMaster } = socket.data;
-        Log.info(`Socket connected (userId: ${userId}, sessionId: ${sessionId}, isMaster: ${isMaster})`);
-        socket.on('disconnect', (reason: string) => {
-            Log.info(`Socket disconnected (${reason})`);
+        const { user, sessionId, isMaster } = socket.data;
+        socket.to(sessionId).emit('join', { user, isMaster });
+        socket.on('disconnect', (/* reason: string */) => {
+            socket.to(sessionId).emit('leave', { user, isMaster });
         });
         bindDice(io, socket);
         bindCharacter(io, socket);
