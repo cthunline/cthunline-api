@@ -38,6 +38,7 @@ const bindAudio = (io: Server, socket: Socket) => {
             }
             socket.to(sessionId).emit('audioPlay', {
                 user,
+                isMaster,
                 asset,
                 time
             });
@@ -58,7 +59,8 @@ const bindAudio = (io: Server, socket: Socket) => {
                 throw new ForbiddenError();
             }
             socket.to(sessionId).emit('audioStop', {
-                user
+                user,
+                isMaster
             });
         } catch (err) {
             socket.emit('error', err);

@@ -5,12 +5,14 @@ import { DiceType } from './dice';
 export type SocketDiceRequest = Partial<Record<DiceType, number>>;
 
 export interface SocketDiceResult {
-    user: User,
-    request: SocketDiceRequest,
-    result: number
+    user: User;
+    isMaster: boolean;
+    request: SocketDiceRequest;
+    result: number;
+    isPrivate: boolean;
 }
 
 export interface SocketAudioPlay {
-    assetId: string
+    assetId: string;
     time?: number;
 }

@@ -15,16 +15,23 @@ import DiceSchemas from './schemas/dice.json';
 const validateRequest = Validator(DiceSchemas.request);
 
 const getDiceMax = (diceType: DiceType): number => (
-    parseInt(diceType.replace('d', ''))
+    parseInt(diceType.replace('D', ''))
 );
 
 const rollDice = (diceType: DiceType): number => (
     Math.floor((Math.random() * getDiceMax(diceType)) + 1)
 );
 
-const getDiceResult = (request: SocketDiceRequest, user: User): SocketDiceResult => ({
+const getDiceResult = (
+    user: User,
+    isMaster: boolean,
+    request: SocketDiceRequest,
+    isPrivate: boolean = false
+): SocketDiceResult => ({
     user,
+    isMaster,
     request,
+    isPrivate,
     result: (
         sum( // sum results of all dice types
             Object.entries(request).map((
@@ -45,10 +52,10 @@ const bindDice = (io: Server, socket: Socket) => {
     socket.on('diceRequest', async (request: SocketDiceRequest) => {
         try {
             validateRequest(request);
-            const { user, sessionId } = socket.data;
+            const { user, isMaster, sessionId } = socket.data;
             io.sockets.to(sessionId).emit(
                 'diceResult',
-                getDiceResult(request, user)
+                getDiceResult(user, isMaster, request)
             );
         } catch (err) {
             socket.emit('error', err);
@@ -66,7 +73,7 @@ const bindDice = (io: Server, socket: Socket) => {
             }
             socket.emit(
                 'diceResult',
-                getDiceResult(request, user)
+                getDiceResult(user, isMaster, request, true)
             );
         } catch (err) {
             socket.emit('error', err);

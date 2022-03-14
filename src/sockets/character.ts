@@ -11,6 +11,7 @@ const bindCharacter = (io: Server, socket: Socket) => {
         try {
             const {
                 user,
+                isMaster,
                 sessionId,
                 characterId
             } = socket.data;
@@ -30,6 +31,7 @@ const bindCharacter = (io: Server, socket: Socket) => {
             if (masterSocket) {
                 masterSocket.emit('characterUpdate', {
                     user,
+                    isMaster,
                     character
                 });
             } else {
