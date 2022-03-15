@@ -119,3 +119,11 @@ export const disconnectCopycats = async (io: Server, socket: Socket) => {
         copycatSocket.disconnect();
     });
 };
+
+export const getSessionUsers = async (io: Server) => {
+    const allSockets = await io.fetchSockets();
+    return allSockets.map((socket) => ({
+        ...socket.data.user,
+        characterId: socket.data.characterId
+    }));
+};

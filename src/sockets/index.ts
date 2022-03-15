@@ -3,7 +3,8 @@ import { Server as HttpServer } from 'http';
 
 import {
     connectionMiddleware,
-    disconnectCopycats
+    disconnectCopycats,
+    getSessionUsers
 } from './connect';
 import bindDice from './dice';
 import bindCharacter from './character';
@@ -16,12 +17,22 @@ const socketRouter = (httpServer: HttpServer) => {
         }
     });
     io.use(connectionMiddleware);
-    io.on('connection', (socket: Socket) => {
+    io.on('connection', async (socket: Socket) => {
         disconnectCopycats(io, socket);
         const { user, sessionId, isMaster } = socket.data;
-        socket.to(sessionId).emit('join', { user, isMaster });
-        socket.on('disconnect', (/* reason: string */) => {
-            socket.to(sessionId).emit('leave', { user, isMaster });
+        const users = await getSessionUsers(io);
+        io.sockets.to(sessionId).emit('join', {
+            user,
+            users,
+            isMaster
+        });
+        socket.on('disconnect', async (/* reason: string */) => {
+            const sessionUsers = await getSessionUsers(io);
+            socket.to(sessionId).emit('leave', {
+                user,
+                users: sessionUsers,
+                isMaster
+            });
         });
         bindDice(io, socket);
         bindCharacter(io, socket);
