@@ -24,6 +24,7 @@ const bindCharacter = (io: Server, socket: Socket) => {
                     })
                 )
             );
+            socket.data.character = character;
             const sessionSockets = await io.in(sessionId).fetchSockets();
             const masterSocket = sessionSockets.find(({ data }) => (
                 data.isMaster

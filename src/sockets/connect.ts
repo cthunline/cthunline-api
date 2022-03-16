@@ -85,9 +85,12 @@ export const connectionMiddleware = async (socket: Socket, next: Function) => {
         );
         // set data on socket
         socket.data = {
+            userID: user.id,
             user,
             characterId: character?.id,
+            character,
             sessionId: session.id,
+            session,
             isMaster
         };
         // join session room
@@ -124,6 +127,7 @@ export const getSessionUsers = async (io: Server) => {
     const allSockets = await io.fetchSockets();
     return allSockets.map((socket) => ({
         ...socket.data.user,
-        characterId: socket.data.characterId
+        character: socket.data.character,
+        isMaster: socket.data.isMaster
     }));
 };
