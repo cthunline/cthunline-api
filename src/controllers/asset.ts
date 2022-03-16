@@ -17,7 +17,7 @@ import { mimeTypes, FileType, MimeType } from '../types/asset';
 // formidable initialization options
 const formidableOptions = {
     keepExtensions: true,
-    maxFileSize: 10 * 1024 * 1024
+    maxFileSize: 20 * 1024 * 1024
 };
 
 // check asset directory exists and is writable
@@ -70,14 +70,21 @@ const controlUserDir = async (userId: string): Promise<string> => {
 const assetRouter = Router();
 
 // get all assets of a user
-assetRouter.get('/users/:userId/assets', async ({ params, token }: Request, res: Response): Promise<void> => {
+assetRouter.get('/users/:userId/assets', async (
+    { params, query, token }: Request,
+    res: Response
+): Promise<void> => {
     try {
         const { userId } = params;
+        const { type } = query;
         await findUser(userId);
         controlSelf(token, userId);
         const assets = await Prisma.asset.findMany({
             where: {
-                userId
+                userId,
+                ...(type ? {
+                    type: String(type)
+                } : {})
             }
         });
         res.json({ assets });
