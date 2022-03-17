@@ -14,11 +14,21 @@ import { Prisma, handleNotFound } from '../services/prisma';
 import { InternError, ValidationError } from '../services/errors';
 import { mimeTypes, FileType, MimeType } from '../types/asset';
 
+interface TypedFile extends Formidable.File {
+    type: FileType;
+}
+
 // formidable initialization options
-const formidableOptions = {
+const formidableOptions: Formidable.Options = {
     keepExtensions: true,
-    maxFileSize: 20 * 1024 * 1024
+    maxFileSize: 100 * 1024 * 1024,
+    multiples: true
 };
+
+/* There's a bug in formidable@v2 where maxFileSize option is applied to
+all files and not each file so we have to control each file size ourself */
+const maxEachFileSizeInMb = 20;
+const maxEachFileSize = maxEachFileSizeInMb * 1024 * 1024;
 
 // check asset directory exists and is writable
 const getAssetDir = (): string => {
@@ -38,22 +48,27 @@ const getAssetDir = (): string => {
 
 export const assetDir = getAssetDir();
 
-// controls form's file mimetype and extension
+// controls form's file mimetype extension, and size
 // returns file type (image or audio)
-const controlFileType = (file: Formidable.File): FileType => {
+const controlFile = (file: Formidable.File): FileType => {
     const { mimetype, originalFilename } = file;
     const ext = originalFilename?.split('.').pop() ?? '';
-    if (mimetype) {
-        if (mimeTypes[mimetype as MimeType]) {
-            const { extensions, type } = mimeTypes[mimetype as MimeType];
-            if (extensions.includes(ext)) {
-                return type as FileType;
+    if (file.size <= maxEachFileSize) {
+        if (mimetype) {
+            if (mimeTypes[mimetype as MimeType]) {
+                const { extensions, type } = mimeTypes[mimetype as MimeType];
+                if (extensions.includes(ext)) {
+                    return type as FileType;
+                }
+                throw new ValidationError(
+                    `Extension of file ${originalFilename} ${ext} does not match mimetype ${mimetype}`
+                );
             }
-            throw new ValidationError(`File extension ${ext} does not match mimetype ${mimetype}`);
+            throw new ValidationError(`Mimetype of file ${originalFilename} ${mimetype} is not allowed`);
         }
-        throw new ValidationError(`File mimetype ${mimetype} is not allowed`);
+        throw new ValidationError(`Could not get mimetype of file ${originalFilename}`);
     }
-    throw new ValidationError('Could not get file mimetype');
+    throw new ValidationError(`Size of file ${originalFilename} is to big (max ${maxEachFileSizeInMb}Mb)`);
 };
 
 // create user subdirectory in asset dir if not exist and return its path
@@ -112,36 +127,49 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
                 if (err) {
                     throw new ValidationError('Error while parsing file');
                 }
-                if (!files.asset) {
-                    throw new ValidationError('Missing asset field in form data');
+                if (!files.assets) {
+                    throw new ValidationError('Missing assets field in form data');
                 }
-                const file = files.asset as Formidable.File;
-                const type = controlFileType(file);
-                // build target upload file path
-                const {
-                    filepath: temporaryPath,
-                    originalFilename,
-                    newFilename
-                } = file;
-                const name = originalFilename ?? newFilename;
-                const path = Path.join(userId, newFilename);
-                const uploadPath = Path.join(userDir, newFilename);
-                // move temporary file to new file
-                await Fs.promises.rename(
-                    temporaryPath,
-                    uploadPath
+                const assetFiles = (
+                    Array.isArray(files.assets) ? files.assets : [files.assets]
                 );
-                // create asset database object
-                const asset = await Prisma.asset.create({
-                    data: {
-                        userId,
-                        type,
-                        name,
-                        path
-                    }
-                });
+                const typedAssetFiles: TypedFile[] = (
+                    assetFiles.map((file) => ({
+                        ...file,
+                        type: controlFile(file)
+                    }))
+                );
+                const assets = await Promise.all(
+                    typedAssetFiles.map(({
+                        filepath: temporaryPath,
+                        originalFilename,
+                        newFilename,
+                        type
+                    }) => (
+                        (async () => {
+                            // build target upload file path
+                            const name = originalFilename ?? newFilename;
+                            const path = Path.join(userId, newFilename);
+                            const uploadPath = Path.join(userDir, newFilename);
+                            // move temporary file to new file
+                            await Fs.promises.rename(
+                                temporaryPath,
+                                uploadPath
+                            );
+                            // create asset database object
+                            return Prisma.asset.create({
+                                data: {
+                                    userId,
+                                    type,
+                                    name,
+                                    path
+                                }
+                            });
+                        })()
+                    ))
+                );
                 //
-                res.json(asset);
+                res.json({ assets });
             } catch (formErr: any) {
                 res.error(formErr);
             }
