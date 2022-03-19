@@ -95,21 +95,64 @@ describe('[API] Assets', () => {
                     method: 'POST',
                     route: `/users/${userId}/assets`,
                     files: [{
-                        field: 'asset',
+                        field: 'assets',
                         buffer,
                         name
                     }]
                 });
                 expect(response).to.have.status(200);
                 expect(response).to.be.json;
-                assertAsset(response.body, {
+                const { assets } = response.body;
+                expect(assets).to.be.an('array');
+                expect(assets).to.have.lengthOf(1);
+                assertAsset(assets[0], {
                     type: name.endsWith('mp3') ? 'audio' : 'image',
                     name,
                     userId
                 });
-                const { path } = response.body;
+                const { path } = assets[0];
                 await Api.testStaticFile(
                     Path.join('/static', path)
+                );
+            }
+        });
+        it('Should upload multiple assets', async () => {
+            const assetNames = [
+                'asset.mp3',
+                'asset.jpg',
+                'asset.png',
+                'asset.svg'
+            ];
+            const files = await Promise.all(
+                assetNames.map((name) => (
+                    (async () => ({
+                        field: 'assets',
+                        buffer: await getAssetBuffer(name),
+                        name
+                    }))()
+                ))
+            );
+            const response = await Api.request({
+                method: 'POST',
+                route: `/users/${userId}/assets`,
+                files
+            });
+            expect(response).to.have.status(200);
+            expect(response).to.be.json;
+            const { assets } = response.body;
+            expect(assets).to.be.an('array');
+            expect(assets).to.have.lengthOf(files.length);
+            for (const assetName of assetNames) {
+                const asset = assets.find(({ name }: any) => (
+                    name === assetName
+                ));
+                assertAsset(asset, {
+                    type: assetName.endsWith('mp3') ? 'audio' : 'image',
+                    name: assetName,
+                    userId
+                });
+                await Api.testStaticFile(
+                    Path.join('/static', asset.path)
                 );
             }
         });

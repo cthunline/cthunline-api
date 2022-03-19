@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import Express from 'express';
+import CookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import Helmet from 'helmet';
 import Cors from 'cors';
@@ -19,8 +20,12 @@ const httpServer = createServer(app);
 (async () => {
     try {
         Log.info('Setting middlewares');
+        app.use(CookieParser(
+            process.env.COOKIE_SECRET
+        ));
         app.use(Cors({
-            origin: process.env.CORS_ORIGIN
+            origin: process.env.CORS_ORIGIN,
+            credentials: true
         }));
         app.use(Helmet());
         app.use(Express.json({

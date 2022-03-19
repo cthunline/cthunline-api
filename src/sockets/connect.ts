@@ -18,9 +18,9 @@ import { findUser } from '../controllers/user';
 
 // verify auth token
 const verifyBearer = async (socket: Socket): Promise<Token> => {
-    const bearer = socket.handshake.auth.token as string;
+    const bearer = (socket.request as any).signedCookies.bearer as string;
     if (!bearer) {
-        throw new ValidationError('Missing bearer token in handshare auth');
+        throw new AuthenticationError('Missing authentication cookie');
     }
     const token = await Prisma.token.findFirst({
         where: {

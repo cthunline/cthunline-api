@@ -21,8 +21,8 @@ const validateUpdate = Validator(SessionSchemas.update);
 
 const getInclude = (include?: any) => (
     include === 'true' ? {
-        master: true
-    } : {}
+        include: { master: true }
+    } : undefined
 );
 
 const sessionRouter = Router();
@@ -32,7 +32,7 @@ sessionRouter.get('/sessions', async ({ query }: Request, res: Response): Promis
     try {
         const { include } = query;
         const sessions = await Prisma.session.findMany({
-            include: getInclude(include)
+            ...getInclude(include)
         });
         res.json({ sessions });
     } catch (err: any) {

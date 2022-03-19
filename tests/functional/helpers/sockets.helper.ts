@@ -13,7 +13,6 @@ export interface FailSocketConnectionData {
 }
 
 export interface SocketConnectionData {
-    bearer?: string;
     sessionId?: string;
     characterId?: string;
 }
@@ -22,22 +21,15 @@ const Sockets = {
     url: 'http://localhost:8080',
 
     connect: async (connectionData?: SocketConnectionData): Promise<Socket> => {
-        let authToken = connectionData?.bearer;
-        if (!authToken) {
-            await Api.login();
-            authToken = Api.bearer;
-        }
         const sessionId = connectionData?.sessionId ?? sessionsData[1].id;
         const characterId = connectionData?.characterId ?? charactersData[0].id;
         return new Promise((resolve, reject) => {
             const socket = io(Sockets.url, {
-                auth: {
-                    token: authToken
-                },
                 query: {
                     sessionId,
                     characterId
-                }
+                },
+                withCredentials: true
             });
             socket.on('connect', () => {
                 resolve(socket);
@@ -49,7 +41,7 @@ const Sockets = {
     },
 
     connectRole: async (isMaster: boolean) => {
-        const { bearer, userId } = await Api.login();
+        const { userId } = await Api.login();
         const sessionId = sessionsData.find(({ masterId }) => (
             isMaster ? (
                 userId === masterId
@@ -61,7 +53,6 @@ const Sockets = {
             char.userId === Api.userId
         ))?.id;
         return Sockets.connect({
-            bearer,
             sessionId,
             characterId
         });
@@ -99,12 +90,10 @@ const Sockets = {
         ))?.id;
         return Promise.all([
             Sockets.connect({
-                bearer: masterToken.bearer ?? '',
                 sessionId
             }),
-            ...[player1Token, player2Token].map(({ bearer, userId }) => (
+            ...[player1Token, player2Token].map(({ userId }) => (
                 Sockets.connect({
-                    bearer: bearer ?? '',
                     sessionId,
                     characterId: charactersData.find((character) => (
                         character.userId === userId

@@ -9,6 +9,8 @@ import {
 
 Chai.use(ChaiHttp);
 
+const chaiHttpAgent = Chai.request.agent(server);
+
 before((done) => {
     server.on('ready', () => {
         done();
@@ -99,7 +101,6 @@ export interface CredentialOptions {
 
 const Api = {
     userId: '',
-    bearer: '',
     credentials: {
         email: 'admin@test.com',
         password: 'test'
@@ -118,7 +119,6 @@ const Api = {
         if (expectSuccess) {
             expect(response).to.have.status(200);
             assertToken(body);
-            Api.bearer = body.bearer;
             Api.userId = body.userId;
             return body;
         }
@@ -137,7 +137,6 @@ const Api = {
             expect(response).to.have.status(200);
             expect(response).to.be.json;
             expect(response.body).to.be.an('object').and.be.empty;
-            Api.bearer = '';
             Api.userId = '';
         } else {
             expect(response).to.have.status(401);
@@ -168,14 +167,10 @@ const Api = {
             route,
             body,
             fields,
-            files,
-            auth
+            files
         } = options;
         const lowerMethod = method.toLowerCase() as HttpLowerMethod;
-        const request = Chai.request(server)[lowerMethod](route);
-        if (auth !== false && Api.bearer) {
-            request.set('Authorization', `Bearer ${Api.bearer}`);
-        }
+        const request = chaiHttpAgent[lowerMethod](route);
         if (body) {
             request.send(body);
         } else {

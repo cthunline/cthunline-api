@@ -14,27 +14,17 @@ describe('[Sockets] Connection', () => {
     it('Should fail to connect socket because of invalid handshake data', async () => {
         await Api.login();
         const invalidHandshakes = [{
-            auth: {},
             query: {
                 sessionId: sessionsData[1].id,
                 characterId: charactersData[0].id
             }
         }, {
-            auth: {
-                token: Api.bearer
-            },
             query: {}
         }, {
-            auth: {
-                token: Api.bearer
-            },
             query: {
                 sessionId: sessionsData[1].id
             }
         }, {
-            auth: {
-                token: Api.bearer
-            },
             query: {
                 characterId: charactersData[0].id
             }
@@ -64,7 +54,6 @@ describe('[Sockets] Connection', () => {
 
     it('Should fail to connect socket because of invalid sessionId or characterId', async () => {
         await Api.login();
-        const { bearer } = Api;
         const invalidQueries = [{
             sessionId: 'invalid',
             characterId: charactersData[0].id
@@ -75,9 +64,6 @@ describe('[Sockets] Connection', () => {
         for (const query of invalidQueries) {
             await Sockets.failConnect({
                 handshake: {
-                    auth: {
-                        token: bearer
-                    },
                     query
                 },
                 status: 400
@@ -87,7 +73,6 @@ describe('[Sockets] Connection', () => {
 
     it('Should fail to connect socket because of not found sessionId or characterId', async () => {
         await Api.login();
-        const { bearer } = Api;
         const notFoundQueries = [{
             sessionId: '1122334455667788aabbccdd',
             characterId: charactersData[0].id
@@ -98,9 +83,6 @@ describe('[Sockets] Connection', () => {
         for (const query of notFoundQueries) {
             await Sockets.failConnect({
                 handshake: {
-                    auth: {
-                        token: bearer
-                    },
                     query
                 },
                 status: 404
@@ -110,12 +92,8 @@ describe('[Sockets] Connection', () => {
 
     it('Should fail to connect socket because of forbidden characterId', async () => {
         await Api.login();
-        const { bearer } = Api;
         await Sockets.failConnect({
             handshake: {
-                auth: {
-                    token: bearer
-                },
                 query: {
                     sessionId: sessionsData[1].id,
                     characterId: charactersData[1].id
@@ -127,9 +105,7 @@ describe('[Sockets] Connection', () => {
 
     it('Should connect to socket', async () => {
         await Api.login();
-        const { bearer } = Api;
         await Sockets.connect({
-            bearer,
             sessionId: sessionsData[1].id,
             characterId: charactersData[0].id
         });
@@ -140,18 +116,14 @@ describe('[Sockets] Connection', () => {
             email: masterUser?.email ?? '',
             password: 'test'
         });
-        const { bearer: masterBearer } = Api;
         await Sockets.connect({
-            bearer: masterBearer,
             sessionId: sessionsData[1].id
         });
     });
 
     it('Should disconnect copycat socket on connection', async () => {
         await Api.login();
-        const { bearer } = Api;
         const copycatSocket = await Sockets.connect({
-            bearer,
             sessionId: sessionsData[1].id,
             characterId: charactersData[0].id
         });
@@ -167,7 +139,6 @@ describe('[Sockets] Connection', () => {
             }),
             (async () => {
                 await Sockets.connect({
-                    bearer,
                     sessionId: sessionsData[2].id,
                     characterId: charactersData[0].id
                 });

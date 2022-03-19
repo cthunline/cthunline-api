@@ -1,5 +1,6 @@
 import { Socket, Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
+import CookieParser from 'cookie-parser';
 
 import {
     connectionMiddleware,
@@ -10,12 +11,22 @@ import bindDice from './dice';
 import bindCharacter from './character';
 import bindAudio from './audio';
 
+const wrapExpressMiddleware = (middleware: Function) => (
+    (socket: Socket, next: Function) => (
+        middleware(socket.request, {}, next)
+    )
+);
+
 const socketRouter = (httpServer: HttpServer) => {
     const io = new Server(httpServer, {
         cors: {
-            origin: process.env.CORS_ORIGIN
+            origin: process.env.CORS_ORIGIN,
+            credentials: true
         }
     });
+    io.use(wrapExpressMiddleware(
+        CookieParser(process.env.COOKIE_SECRET)
+    ));
     io.use(connectionMiddleware);
     io.on('connection', async (socket: Socket) => {
         disconnectCopycats(io, socket);

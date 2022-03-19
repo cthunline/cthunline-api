@@ -29,15 +29,15 @@ declare global {
     }
 }
 
-// extract bearer token from http header
-const getBearer = (req: Request): string | null => {
-    const bearerPrefix = 'Bearer ';
-    const authHeader = req.get('Authorization');
-    if (authHeader && authHeader.startsWith(bearerPrefix)) {
-        return authHeader.replace(bearerPrefix, '');
-    }
-    return null;
-};
+// get new limit date for token
+const getTokenLimitDate = () => (
+    DaysJs().add(3, 'hour').toDate()
+);
+
+// get expire date for cookie
+const getCookieExpireDate = () => (
+    DaysJs().add(3, 'day').toDate()
+);
 
 // express middleware controling bearer token validity
 // injects token data in express request object
@@ -47,7 +47,7 @@ export const authMiddleware = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const bearer = getBearer(req);
+        const { bearer } = req.signedCookies;
         if (!bearer) {
             throw new AuthenticationError();
         }
@@ -62,6 +62,15 @@ export const authMiddleware = async (
         if (!token) {
             throw new AuthenticationError();
         }
+        // this is intentionally not awaited so auth middleware is not slowed down
+        Prisma.token.update({
+            data: {
+                limit: getTokenLimitDate()
+            },
+            where: {
+                id: token.id
+            }
+        });
         req.token = token;
         next();
     } catch (err: any) {
@@ -126,7 +135,7 @@ authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void>
             throw new AuthenticationError();
         }
         const bearer = nanoid(50);
-        const limit = DaysJs().add(3, 'hour').toDate();
+        const limit = getTokenLimitDate();
         const token = await Prisma.token.create({
             data: {
                 userId,
@@ -134,7 +143,12 @@ authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void>
                 limit
             }
         });
-        res.json(token);
+        res.cookie('bearer', token.bearer, {
+            httpOnly: true,
+            signed: true,
+            secure: process.env.COOKIE_SECURE === 'true',
+            expires: getCookieExpireDate()
+        }).json(token);
     } catch (err: any) {
         res.error(err);
     }
@@ -150,7 +164,7 @@ authRouter.delete('/auth', async (req: Request, res: Response): Promise<void> =>
                 bearer
             }
         });
-        res.send({});
+        res.clearCookie('bearer').send({});
     } catch (err: any) {
         res.error(err);
     }
