@@ -23,7 +23,10 @@ const bindAudio = (io: Server, socket: Socket) => {
             if (!isMaster) {
                 throw new ForbiddenError();
             }
-            const { assetId, time } = request;
+            const {
+                assetId,
+                time
+            } = request;
             const asset = await handleNotFound<Asset>(
                 'Asset', (
                     Prisma.asset.findUnique({

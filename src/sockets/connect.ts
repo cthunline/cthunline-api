@@ -128,6 +128,7 @@ export const getSessionUsers = async (io: Server) => {
     return allSockets.map((socket) => ({
         ...socket.data.user,
         character: socket.data.character,
-        isMaster: socket.data.isMaster
+        isMaster: socket.data.isMaster,
+        socketId: socket.id
     }));
 };
