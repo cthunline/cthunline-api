@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 import Data from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 
@@ -58,8 +60,13 @@ describe('[Sockets] Audio', () => {
             await Promise.all([
                 ...[player1Socket, player2Socket].map((socket) => (
                     new Promise<void>((resolve, reject) => {
-                        socket.on(event, ({ user, asset }) => {
+                        socket.on(event, ({
+                            user,
+                            isMaster,
+                            asset
+                        }: any) => {
                             assertUser(user);
+                            expect(isMaster).to.be.true;
                             if (event === 'audioPlay') {
                                 assertAsset(asset);
                             }

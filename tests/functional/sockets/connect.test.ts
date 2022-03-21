@@ -1,6 +1,9 @@
+import { expect } from 'chai';
+
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
+import { assertUser, assertCharacter } from '../helpers/assert.helper';
 
 import sessionsData from '../data/sessions.json';
 import charactersData from '../data/characters.json';
@@ -134,13 +137,104 @@ describe('[Sockets] Connection', () => {
                     reject(err);
                 });
             }),
-            (async () => {
-                await Sockets.connect({
-                    bearer,
-                    sessionId: sessionsData[2].id,
-                    characterId: charactersData[0].id
+            Sockets.connect({
+                bearer,
+                sessionId: sessionsData[2].id,
+                characterId: charactersData[0].id
+            })
+        ]);
+    });
+
+    it('Should emit join and leave events', async () => {
+        const [masterEmail, playerEmail] = usersData.map(({ email }) => email);
+        const [masterToken, playerToken] = (
+            await Promise.all(
+                [masterEmail, playerEmail].map((email) => (
+                    Api.login({
+                        email,
+                        password: 'test'
+                    })
+                ))
+            )
+        );
+        const sessionId = sessionsData.find(({ masterId }) => (
+            masterToken.userId === masterId
+        ))?.id;
+        const assertData = (
+            { user, isMaster, users }: Record<string, any>,
+            expectedIsMaster: boolean,
+            expectedUsersLength: number
+        ) => {
+            assertUser(user);
+            expect(isMaster).to.equal(expectedIsMaster);
+            expect(users).have.lengthOf(expectedUsersLength);
+            users.forEach((sessionUser: Record<string, any>) => {
+                const isSessionUserMaster = (
+                    sessionUser.id === masterToken.userId
+                );
+                assertUser(sessionUser);
+                if (isSessionUserMaster) {
+                    expect(sessionUser.character).to.be.null;
+                } else {
+                    assertCharacter(sessionUser.character);
+                }
+                expect(sessionUser.isMaster).to.be.equal(
+                    isSessionUserMaster
+                );
+            });
+        };
+        const masterSocket = await Sockets.connect({
+            bearer: masterToken.bearer,
+            sessionId
+        });
+        const removeListeners = () => {
+            masterSocket.off('join');
+            masterSocket.off('error');
+        };
+        await new Promise<void>((resolve, reject) => {
+            masterSocket.on('join', (data: any) => {
+                assertData(data, true, 1);
+                removeListeners();
+                resolve();
+            });
+            masterSocket.on('error', (err: any) => {
+                masterSocket.disconnect();
+                reject(err);
+            });
+        });
+        const [, playerSocket] = await Promise.all([
+            new Promise<void>((resolve, reject) => {
+                masterSocket.on('join', (data: any) => {
+                    assertData(data, false, 2);
+                    removeListeners();
+                    resolve();
                 });
-            })()
+                masterSocket.on('error', (err: any) => {
+                    masterSocket.disconnect();
+                    reject(err);
+                });
+            }),
+            Sockets.connect({
+                bearer: playerToken.bearer,
+                sessionId,
+                characterId: charactersData.find((character) => (
+                    character.userId === playerToken.userId
+                ))?.id
+            })
+        ]);
+        await Promise.all([
+            new Promise<void>((resolve, reject) => {
+                masterSocket.on('leave', (data: any) => {
+                    assertData(data, false, 1);
+                    removeListeners();
+                    resolve();
+                });
+                masterSocket.on('error', (err: any) => {
+                    masterSocket.disconnect();
+                    reject(err);
+                });
+                playerSocket.disconnect();
+            })
         ]);
     });
 });

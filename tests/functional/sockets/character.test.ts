@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 import Data from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 
@@ -15,8 +17,13 @@ describe('[Sockets] Character', () => {
         ] = await Sockets.setupSession();
         await Promise.all([
             new Promise<void>((resolve, reject) => {
-                masterSocket.on('characterUpdate', ({ user, character }) => {
+                masterSocket.on('characterUpdate', ({
+                    user,
+                    isMaster,
+                    character
+                }: any) => {
                     assertUser(user);
+                    expect(isMaster).to.be.false;
                     assertCharacter(character);
                     masterSocket.disconnect();
                     resolve();

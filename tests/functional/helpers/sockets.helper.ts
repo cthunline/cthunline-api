@@ -12,6 +12,17 @@ import sessionsData from '../data/sessions.json';
 import charactersData from '../data/characters.json';
 import usersData from '../data/users.json';
 
+interface SocketsHelper {
+    url: string;
+    connectedSockets: Socket[];
+    getSocketClient: Function;
+    connect: Function;
+    connectRole: Function;
+    failConnect: Function;
+    setupSession: Function;
+    testError: Function;
+}
+
 interface GetSocketClientData {
     bearer?: string;
     query?: object;
@@ -35,8 +46,9 @@ interface SocketClientConstructor {
 
 const SocketClient = Client as unknown as SocketClientConstructor;
 
-const Sockets = {
+const Sockets: SocketsHelper = {
     url: 'http://localhost:8080',
+    connectedSockets: [],
 
     getSocketClient: ({ bearer, query }: GetSocketClientData) => {
         const socketClient = new SocketClient(Sockets.url, {
@@ -70,9 +82,10 @@ const Sockets = {
             socket.on('connect', () => {
                 resolve(socket);
             });
-            socket.on('connect_error', (err) => {
+            socket.on('connect_error', (err: any) => {
                 reject(err);
             });
+            Sockets.connectedSockets.push(socket);
         });
     },
 
@@ -175,5 +188,11 @@ const Sockets = {
         }
     }
 };
+
+afterEach(() => {
+    Sockets.connectedSockets.forEach((socket) => {
+        socket.disconnect();
+    });
+});
 
 export default Sockets;

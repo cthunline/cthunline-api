@@ -50,9 +50,17 @@ describe('[Sockets] Dice', () => {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
                 const socket = await Sockets.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', ({ user, request, result }) => {
+                    socket.on('diceResult', ({
+                        user,
+                        isMaster,
+                        request,
+                        isPrivate,
+                        result
+                    }: any) => {
                         assertUser(user);
+                        expect(isMaster).to.be.true;
                         expect(request).to.deep.equal(data);
+                        expect(isPrivate).to.equal(event === 'dicePrivateRequest');
                         expect(result).to.be.a('number');
                         socket.disconnect();
                         resolve();
@@ -73,10 +81,24 @@ describe('[Sockets] Dice', () => {
             player1Socket,
             player2Socket
         ] = await Sockets.setupSession();
+        const diceRequest = {
+            D6: 3
+        };
         await Promise.all([
             ...[masterSocket, player1Socket, player2Socket].map((socket) => (
                 new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', () => {
+                    socket.on('diceResult', ({
+                        user,
+                        isMaster,
+                        request,
+                        isPrivate,
+                        result
+                    }: any) => {
+                        assertUser(user);
+                        expect(isMaster).to.be.false;
+                        expect(request).to.deep.equal(diceRequest);
+                        expect(isPrivate).to.equal(false);
+                        expect(result).to.be.a('number');
                         socket.disconnect();
                         resolve();
                     });
@@ -87,9 +109,7 @@ describe('[Sockets] Dice', () => {
                 })
             )),
             (async () => {
-                player1Socket.emit('diceRequest', {
-                    D6: 3
-                });
+                player1Socket.emit('diceRequest', diceRequest);
             })()
         ]);
     });
