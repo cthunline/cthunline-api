@@ -1,5 +1,10 @@
 import { expect } from 'chai';
-import { io, Socket } from 'socket.io-client';
+import Client, {
+    Socket,
+    ManagerOptions,
+    SocketOptions
+} from 'socket.io-client';
+import CookieSignature from 'cookie-signature';
 
 import Api from './api.helper';
 
@@ -7,30 +12,61 @@ import sessionsData from '../data/sessions.json';
 import charactersData from '../data/characters.json';
 import usersData from '../data/users.json';
 
+interface GetSocketClientData {
+    bearer?: string;
+    query?: object;
+}
+
 export interface FailSocketConnectionData {
-    handshake: object;
+    bearer?: string;
+    query?: object;
     status: number;
 }
 
 export interface SocketConnectionData {
+    bearer?: string;
     sessionId?: string;
     characterId?: string;
 }
 
+interface SocketClientConstructor {
+    new (uri: string, opts?: Partial<ManagerOptions & SocketOptions>): Socket;
+}
+
+const SocketClient = Client as unknown as SocketClientConstructor;
+
 const Sockets = {
     url: 'http://localhost:8080',
+
+    getSocketClient: ({ bearer, query }: GetSocketClientData) => {
+        const socketClient = new SocketClient(Sockets.url, {
+            query,
+            autoConnect: false
+        });
+        if (bearer) {
+            const signed = CookieSignature.sign(
+                bearer,
+                'cthunline'
+            );
+            socketClient.io.opts.extraHeaders = {
+                cookie: `bearer=s:${signed}`
+            };
+        }
+        return socketClient;
+    },
 
     connect: async (connectionData?: SocketConnectionData): Promise<Socket> => {
         const sessionId = connectionData?.sessionId ?? sessionsData[1].id;
         const characterId = connectionData?.characterId ?? charactersData[0].id;
         return new Promise((resolve, reject) => {
-            const socket = io(Sockets.url, {
+            const socket = Sockets.getSocketClient({
+                bearer: connectionData?.bearer,
                 query: {
                     sessionId,
                     characterId
-                },
-                withCredentials: true
+                }
             });
+            socket.connect();
             socket.on('connect', () => {
                 resolve(socket);
             });
@@ -41,7 +77,7 @@ const Sockets = {
     },
 
     connectRole: async (isMaster: boolean) => {
-        const { userId } = await Api.login();
+        const { userId, bearer } = await Api.login();
         const sessionId = sessionsData.find(({ masterId }) => (
             isMaster ? (
                 userId === masterId
@@ -53,14 +89,23 @@ const Sockets = {
             char.userId === Api.userId
         ))?.id;
         return Sockets.connect({
+            bearer,
             sessionId,
             characterId
         });
     },
 
-    failConnect: async ({ handshake, status }: FailSocketConnectionData): Promise<void> => (
+    failConnect: async ({
+        bearer,
+        query,
+        status
+    }: FailSocketConnectionData): Promise<void> => (
         new Promise((resolve, reject) => {
-            const socket = io(Sockets.url, handshake);
+            const socket = Sockets.getSocketClient({
+                bearer,
+                query
+            });
+            socket.connect();
             socket.on('connect', () => {
                 reject(new Error('Should have fail to connect'));
             });
@@ -90,10 +135,12 @@ const Sockets = {
         ))?.id;
         return Promise.all([
             Sockets.connect({
+                bearer: masterToken.bearer,
                 sessionId
             }),
-            ...[player1Token, player2Token].map(({ userId }) => (
+            ...[player1Token, player2Token].map(({ userId, bearer }) => (
                 Sockets.connect({
+                    bearer,
                     sessionId,
                     characterId: charactersData.find((character) => (
                         character.userId === userId

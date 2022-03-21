@@ -16,9 +16,9 @@ describe('[Sockets] Dice', () => {
             [
                 {},
                 undefined,
-                { d4: 2, invalidKey: 3 },
-                { d8: 2, d12: 0 },
-                { d20: 2, d100: 'invalidValue' }
+                { D4: 2, invalidKey: 3 },
+                { D8: 2, D12: 0 },
+                { D20: 2, D100: 'invalidValue' }
             ],
             400,
             true
@@ -29,7 +29,7 @@ describe('[Sockets] Dice', () => {
         await Sockets.testError(
             'dicePrivateRequest',
             'diceResult',
-            { d4: 2 },
+            { D4: 2 },
             403,
             false
         );
@@ -37,14 +37,14 @@ describe('[Sockets] Dice', () => {
 
     it('Should request dice rolls', async () => {
         const requestData = [{
-            d4: 3
+            D4: 3
         }, {
-            d6: 1,
-            d8: 2
+            D6: 1,
+            D8: 2
         }, {
-            d12: 3,
-            d20: 2,
-            d100: 3
+            D12: 3,
+            D20: 2,
+            D100: 3
         }];
         for (const data of requestData) {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
@@ -88,7 +88,7 @@ describe('[Sockets] Dice', () => {
             )),
             (async () => {
                 player1Socket.emit('diceRequest', {
-                    d6: 3
+                    D6: 3
                 });
             })()
         ]);
