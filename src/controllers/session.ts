@@ -13,15 +13,20 @@ import { controlSelf } from './auth';
 import Validator from '../services/validator';
 import { isValidGameId } from '../games';
 import { ValidationError } from '../services/errors';
+import { userSelect } from './user';
 
 import SessionSchemas from './schemas/session.json';
 
 const validateCreate = Validator(SessionSchemas.create);
 const validateUpdate = Validator(SessionSchemas.update);
 
-const getInclude = (include?: any) => (
-    include === 'true' ? {
-        include: { master: true }
+const getInclude = (includeMaster: boolean) => (
+    includeMaster ? {
+        include: {
+            master: {
+                select: userSelect
+            }
+        }
     } : undefined
 );
 
@@ -32,7 +37,7 @@ sessionRouter.get('/sessions', async ({ query }: Request, res: Response): Promis
     try {
         const { include } = query;
         const sessions = await Prisma.session.findMany({
-            ...getInclude(include)
+            ...getInclude(include === 'true')
         });
         res.json({ sessions });
     } catch (err: any) {

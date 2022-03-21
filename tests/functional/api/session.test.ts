@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
-import { assertSession } from '../helpers/assert.helper';
+import { assertSession, assertUser } from '../helpers/assert.helper';
 
 import sessionsData from '../data/sessions.json';
 
@@ -23,6 +23,17 @@ describe('[API] Sessions', () => {
                 listKey: 'sessions',
                 data: sessionsData,
                 assert: assertSession
+            });
+        });
+        it('Should list all sessions including master data', async () => {
+            await Api.testGetList({
+                route: '/sessions?include=true',
+                listKey: 'sessions',
+                data: sessionsData,
+                assert: (data: any) => {
+                    assertSession(data);
+                    assertUser(data.master);
+                }
             });
         });
     });

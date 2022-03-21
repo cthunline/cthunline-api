@@ -26,7 +26,7 @@ const validateUpdate = Validator(UserSchemas.update);
 export type UserSelect = Omit<User, 'password'>;
 
 // prisma select object to exclude password in returned data
-const userSelect = {
+export const userSelect = {
     id: true,
     name: true,
     email: true,
