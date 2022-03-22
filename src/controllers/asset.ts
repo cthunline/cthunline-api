@@ -139,35 +139,35 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
                         type: controlFile(file)
                     }))
                 );
+                // move temporary files to user's directory
                 const assets = await Promise.all(
                     typedAssetFiles.map(({
                         filepath: temporaryPath,
+                        newFilename
+                    }) => (
+                        Fs.promises.rename(
+                            temporaryPath,
+                            Path.join(userDir, newFilename)
+                        )
+                    ))
+                );
+                // save assets in database
+                await Prisma.asset.createMany({
+                    data: typedAssetFiles.map(({
                         originalFilename,
                         newFilename,
                         type
-                    }) => (
-                        (async () => {
-                            // build target upload file path
-                            const name = originalFilename ?? newFilename;
-                            const path = Path.join(userId, newFilename);
-                            const uploadPath = Path.join(userDir, newFilename);
-                            // move temporary file to new file
-                            await Fs.promises.rename(
-                                temporaryPath,
-                                uploadPath
-                            );
-                            // create asset database object
-                            return Prisma.asset.create({
-                                data: {
-                                    userId,
-                                    type,
-                                    name,
-                                    path
-                                }
-                            });
-                        })()
-                    ))
-                );
+                    }) => {
+                        const name = originalFilename ?? newFilename;
+                        const path = Path.join(userId, newFilename);
+                        return {
+                            userId,
+                            type,
+                            name,
+                            path
+                        };
+                    })
+                });
                 //
                 res.json({ assets });
             } catch (formErr: any) {
