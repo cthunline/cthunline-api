@@ -21,7 +21,7 @@ const httpServer = createServer(app);
     try {
         Log.info('Setting middlewares');
         app.use(CookieParser(
-            process.env.COOKIE_SECRET
+            process.env.COOKIE_SECRET ?? 'cthunline'
         ));
         app.use(Cors({
             origin: process.env.CORS_ORIGIN,
