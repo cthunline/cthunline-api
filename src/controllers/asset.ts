@@ -140,7 +140,7 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
                     }))
                 );
                 // move temporary files to user's directory
-                const assets = await Promise.all(
+                await Promise.all(
                     typedAssetFiles.map(({
                         filepath: temporaryPath,
                         newFilename
@@ -152,22 +152,24 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
                     ))
                 );
                 // save assets in database
-                await Prisma.asset.createMany({
-                    data: typedAssetFiles.map(({
+                const assets = await Prisma.$transaction(
+                    typedAssetFiles.map(({
                         originalFilename,
                         newFilename,
                         type
                     }) => {
                         const name = originalFilename ?? newFilename;
                         const path = Path.join(userId, newFilename);
-                        return {
-                            userId,
-                            type,
-                            name,
-                            path
-                        };
+                        return Prisma.asset.create({
+                            data: {
+                                userId,
+                                type,
+                                name,
+                                path
+                            }
+                        });
                     })
-                });
+                );
                 //
                 res.json({ assets });
             } catch (formErr: any) {

@@ -18,12 +18,7 @@ const wrapExpressMiddleware = (middleware: Function) => (
 );
 
 const socketRouter = (httpServer: HttpServer) => {
-    const io = new Server(httpServer, {
-        cors: {
-            origin: process.env.CORS_ORIGIN,
-            credentials: true
-        }
-    });
+    const io = new Server(httpServer);
     io.use(wrapExpressMiddleware(
         CookieParser(process.env.COOKIE_SECRET)
     ));

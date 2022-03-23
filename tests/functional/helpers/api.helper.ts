@@ -1,5 +1,6 @@
 import Chai, { expect } from 'chai';
 import ChaiHttp from 'chai-http';
+import Path from 'path';
 
 import server from '../../../src';
 import {
@@ -34,6 +35,7 @@ export interface RequestOptions {
     fields?: Record<string, any>;
     files?: RequestFileOption[];
     auth?: boolean;
+    apiPrefix?: boolean;
 }
 
 export interface GetListOptions {
@@ -161,16 +163,18 @@ const Api = {
         }
     },
 
-    async request(options: RequestOptions): Promise<ChaiHttp.Response> {
-        const {
-            method,
-            route,
-            body,
-            fields,
-            files
-        } = options;
+    async request({
+        method,
+        route,
+        body,
+        fields,
+        files,
+        apiPrefix = true
+    }: RequestOptions): Promise<ChaiHttp.Response> {
         const lowerMethod = method.toLowerCase() as HttpLowerMethod;
-        const request = chaiHttpAgent[lowerMethod](route);
+        const request = chaiHttpAgent[lowerMethod](
+            apiPrefix ? Path.join('/api', route) : route
+        );
         if (body) {
             request.send(body);
         } else {
@@ -365,6 +369,7 @@ const Api = {
 
     async testStaticFile(route: string): Promise<void> {
         const response = await Api.request({
+            apiPrefix: false,
             method: 'GET',
             route
         });

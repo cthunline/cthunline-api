@@ -18,7 +18,7 @@ const apiRouter = Router();
 // apply authentication middleware
 apiRouter.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if ((
-        req.method === 'POST' && req.path === '/auth' // exception for login route
+        req.method === 'POST' && req.path === '/api/auth' // exception for login route
     ) || (
         req.method === 'GET' && req.path.startsWith('/static/') // exception for static assets
     )) {
@@ -28,13 +28,13 @@ apiRouter.use(async (req: Request, res: Response, next: NextFunction): Promise<v
     }
 });
 
-// apply routers
-apiRouter.use(authRouter);
-apiRouter.use(userRouter);
-apiRouter.use(assetRouter);
-apiRouter.use(gameRouter);
-apiRouter.use(sessionRouter);
-apiRouter.use(characterRouter);
+// apply api routers
+apiRouter.use('/api', authRouter);
+apiRouter.use('/api', userRouter);
+apiRouter.use('/api', assetRouter);
+apiRouter.use('/api', gameRouter);
+apiRouter.use('/api', sessionRouter);
+apiRouter.use('/api', characterRouter);
 
 // serve static assets
 apiRouter.use('/static', Express.static(assetDir));

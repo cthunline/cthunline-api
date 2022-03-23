@@ -3,7 +3,6 @@ import Express from 'express';
 import CookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import Helmet from 'helmet';
-import Cors from 'cors';
 
 import {
     errorMiddleware,
@@ -23,10 +22,6 @@ const httpServer = createServer(app);
         app.use(CookieParser(
             process.env.COOKIE_SECRET ?? 'cthunline'
         ));
-        app.use(Cors({
-            origin: process.env.CORS_ORIGIN,
-            credentials: true
-        }));
         app.use(Helmet());
         app.use(Express.json({
             limit: '500kb'
