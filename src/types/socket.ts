@@ -16,3 +16,17 @@ export interface SocketAudioPlay {
     assetId: string;
     time?: number;
 }
+
+export interface SketchData {
+    displayed: boolean;
+    paths: string[];
+    images: SketchImageData[];
+}
+
+export interface SketchImageData {
+    url: string;
+    width: number;
+    height?: number;
+    x: number;
+    y: number;
+}

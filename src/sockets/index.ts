@@ -10,6 +10,7 @@ import {
 import bindDice from './dice';
 import bindCharacter from './character';
 import bindAudio from './audio';
+import bindSketch from './sketch';
 
 const wrapExpressMiddleware = (middleware: Function) => (
     (socket: Socket, next: Function) => (
@@ -43,6 +44,7 @@ const socketRouter = (httpServer: HttpServer) => {
         bindDice(io, socket);
         bindCharacter(io, socket);
         bindAudio(io, socket);
+        bindSketch(io, socket);
     });
 };
 
