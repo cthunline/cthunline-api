@@ -13,10 +13,7 @@
             "name": {
                 "type": "string"
             },
-            "sketch": {
-                "type": "object",
-                "additionalProperties": true
-            }
+            "sketch": {}
         }
     },
     "update": {
@@ -27,9 +24,57 @@
             "name": {
                 "type": "string"
             },
-            "sketch": {
-                "type": "object",
-                "additionalProperties": true
+            "sketch": {}
+        }
+    },
+    "sketch": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "displayed",
+            "paths",
+            "images"
+        ],
+        "properties": {
+            "displayed": {
+                "type": "boolean"
+            },
+            "paths": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "images": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "url",
+                        "width",
+                        "height",
+                        "x",
+                        "y"
+                    ],
+                    "properties": {
+                        "url": {
+                            "type": "string"
+                        },
+                        "width": {
+                            "type": "number"
+                        },
+                        "height": {
+                            "type": "number"
+                        },
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        }
+                    }
+                }
             }
         }
     }

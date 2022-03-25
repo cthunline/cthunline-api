@@ -6,11 +6,11 @@ import Validator from '../services/validator';
 import { SketchData } from '../types/socket';
 import { ForbiddenError } from '../services/errors';
 
-import SketchSchemas from './schemas/sketch.json';
+import SessionSchemas from '../controllers/schemas/session.json';
 
 type JsonObject = PrismaTypes.JsonObject;
 
-const validateUpdate = Validator(SketchSchemas.update);
+const validateUpdate = Validator(SessionSchemas.sketch);
 
 const bindSketch = (io: Server, socket: Socket) => {
     // notify session players that sketch has been updated by game master

@@ -17,8 +17,26 @@ import { userSelect } from './user';
 
 import SessionSchemas from './schemas/session.json';
 
-const validateCreate = Validator(SessionSchemas.create);
-const validateUpdate = Validator(SessionSchemas.update);
+const buildSessionSchema = (baseSchema: any) => ({
+    ...baseSchema,
+    properties: {
+        ...baseSchema.properties,
+        sketch: SessionSchemas.sketch
+    }
+});
+
+const validateCreate = Validator(
+    buildSessionSchema(SessionSchemas.create)
+);
+const validateUpdate = Validator(
+    buildSessionSchema(SessionSchemas.update)
+);
+
+const defaultSketchData = {
+    displayed: false,
+    paths: [],
+    images: []
+};
 
 const getInclude = (includeMaster: boolean) => (
     includeMaster ? {
@@ -55,7 +73,7 @@ sessionRouter.post('/sessions', async (req: Request, res: Response): Promise<voi
             throw new ValidationError(`Invalid gameId ${gameId}`);
         }
         if (!sketch) {
-            createData.sketch = {};
+            createData.sketch = defaultSketchData;
         }
         const session = await Prisma.session.create({
             data: {

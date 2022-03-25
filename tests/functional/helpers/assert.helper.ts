@@ -84,6 +84,42 @@ export const assertGame = (
     }
 };
 
+export const assertSketchImage = (data: Record<string, any>) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('url');
+    expect(data.url).to.be.a('string');
+    expect(data).to.have.property('width');
+    expect(data.width).to.be.a('number');
+    expect(data).have.property('height');
+    expect(data.height).to.be.a('number');
+    expect(data).to.have.property('x');
+    expect(data.x).to.be.a('number');
+    expect(data).to.have.property('y');
+    expect(data.y).to.be.a('number');
+};
+
+export const assertSketch = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('displayed');
+    expect(data.displayed).to.be.a('boolean');
+    expect(data).to.have.property('paths');
+    data.paths.forEach((path: any) => {
+        expect(path).to.be.a('string');
+    });
+    expect(data.paths).to.be.an('array');
+    expect(data).to.have.property('images');
+    expect(data.images).to.be.an('array');
+    data.images.forEach((image: any) => {
+        assertSketchImage(image);
+    });
+    if (expected) {
+        expect(data).to.deep.equalInAnyOrder(expected);
+    }
+};
+
 export const assertSession = (
     data: Record<string, any>,
     expected?: Record<string, any>
@@ -97,14 +133,13 @@ export const assertSession = (
     expect(data.sketch).to.be.an('object');
     if (expected) {
         Object.keys(expected).forEach((key) => {
-            if (key === 'sketch') {
-                expect(data[key]).to.deep.equalInAnyOrder(expected[key]);
-            } else {
+            if (key !== 'sketch') {
                 expect(data).to.have.property(key);
                 expect(data[key]).to.equal(expected[key]);
             }
         });
     }
+    assertSketch(data.sketch, expected?.sketch);
 };
 
 export const assertCharacter = (
