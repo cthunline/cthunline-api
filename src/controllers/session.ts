@@ -18,6 +18,7 @@ import { userSelect } from './user';
 import SessionSchemas from './schemas/session.json';
 
 const buildSessionSchema = (baseSchema: any) => ({
+    definitions: SessionSchemas.definitions,
     ...baseSchema,
     properties: {
         ...baseSchema.properties,
@@ -35,7 +36,8 @@ const validateUpdate = Validator(
 const defaultSketchData = {
     displayed: false,
     paths: [],
-    images: []
+    images: [],
+    events: []
 };
 
 const getInclude = (includeMaster: boolean) => (

@@ -21,6 +21,7 @@ export interface SketchData {
     displayed: boolean;
     paths: string[];
     images: SketchImageData[];
+    events: SketchEvent[];
 }
 
 export interface SketchImageData {
@@ -29,4 +30,10 @@ export interface SketchImageData {
     height: number;
     x: number;
     y: number;
+}
+
+export interface SketchEvent {
+    type: string;
+    imageIndex?: number;
+    imageData?: SketchImageData;
 }

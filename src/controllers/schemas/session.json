@@ -1,4 +1,34 @@
 {
+    "definitions": {
+        "imageData": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "url",
+                "width",
+                "height",
+                "x",
+                "y"
+            ],
+            "properties": {
+                "url": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "number"
+                },
+                "height": {
+                    "type": "number"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            }
+        }
+    },
     "create": {
         "type": "object",
         "additionalProperties": false,
@@ -48,30 +78,26 @@
             "images": {
                 "type": "array",
                 "items": {
+                    "$ref": "#/definitions/imageData"
+                }
+            },
+            "events": {
+                "type": "array",
+                "items": {
                     "type": "object",
                     "additionalProperties": false,
                     "required": [
-                        "url",
-                        "width",
-                        "height",
-                        "x",
-                        "y"
+                        "type"
                     ],
                     "properties": {
-                        "url": {
+                        "type": {
                             "type": "string"
                         },
-                        "width": {
+                        "imageIndex": {
                             "type": "number"
                         },
-                        "height": {
-                            "type": "number"
-                        },
-                        "x": {
-                            "type": "number"
-                        },
-                        "y": {
-                            "type": "number"
+                        "imageData": {
+                            "$ref": "#/definitions/imageData"
                         }
                     }
                 }

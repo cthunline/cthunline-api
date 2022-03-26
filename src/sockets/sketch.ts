@@ -10,7 +10,10 @@ import SessionSchemas from '../controllers/schemas/session.json';
 
 type JsonObject = PrismaTypes.JsonObject;
 
-const validateUpdate = Validator(SessionSchemas.sketch);
+const validateUpdate = Validator({
+    definitions: SessionSchemas.definitions,
+    ...SessionSchemas.sketch
+});
 
 const bindSketch = (io: Server, socket: Socket) => {
     // notify session players that sketch has been updated by game master

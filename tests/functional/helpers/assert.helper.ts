@@ -98,6 +98,20 @@ export const assertSketchImage = (data: Record<string, any>) => {
     expect(data.y).to.be.a('number');
 };
 
+export const assertSketchEvent = (data: Record<string, any>) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('type');
+    expect(data.type).to.be.a('string');
+    if (data.type.startsWith('image')) {
+        expect(data).to.have.property('imageIndex');
+        expect(data.imageIndex).to.be.a('number');
+        if (data.type !== 'imageAdd') {
+            expect(data).to.have.property('imageData');
+            assertSketchImage(data.imageData);
+        }
+    }
+};
+
 export const assertSketch = (
     data: Record<string, any>,
     expected?: Record<string, any>
@@ -114,6 +128,11 @@ export const assertSketch = (
     expect(data.images).to.be.an('array');
     data.images.forEach((image: any) => {
         assertSketchImage(image);
+    });
+    expect(data).to.have.property('events');
+    expect(data.events).to.be.an('array');
+    data.events.forEach((event: any) => {
+        assertSketchEvent(event);
     });
     if (expected) {
         expect(data).to.deep.equalInAnyOrder(expected);
