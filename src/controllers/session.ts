@@ -37,6 +37,7 @@ const defaultSketchData = {
     displayed: false,
     paths: [],
     images: [],
+    tokens: [],
     events: []
 };
 

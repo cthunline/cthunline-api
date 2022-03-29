@@ -27,6 +27,47 @@
                     "type": "number"
                 }
             }
+        },
+        "tokenData": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "color",
+                "user",
+                "x",
+                "y"
+            ],
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "user": {
+                    "oneOf": [{
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "id",
+                            "name"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    }, {
+                        "type": "null"
+                    }]
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            }
         }
     },
     "create": {
@@ -81,6 +122,12 @@
                     "$ref": "#/definitions/imageData"
                 }
             },
+            "tokens": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/tokenData"
+                }
+            },
             "events": {
                 "type": "array",
                 "items": {
@@ -98,6 +145,12 @@
                         },
                         "imageData": {
                             "$ref": "#/definitions/imageData"
+                        },
+                        "tokenIndex": {
+                            "type": "number"
+                        },
+                        "tokenData": {
+                            "$ref": "#/definitions/tokenData"
                         }
                     }
                 }
