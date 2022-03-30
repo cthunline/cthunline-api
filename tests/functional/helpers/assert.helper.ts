@@ -98,6 +98,23 @@ export const assertSketchImage = (data: Record<string, any>) => {
     expect(data.y).to.be.a('number');
 };
 
+export const assertSketchToken = (data: Record<string, any>) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('color');
+    expect(data.color).to.be.a('string');
+    expect(data).to.have.property('user');
+    if (data.user) {
+        expect(data.user).to.have.property('id');
+        expect(data.user.id).to.be.a('string');
+        expect(data.user).to.have.property('name');
+        expect(data.user.name).to.be.a('string');
+    }
+    expect(data).to.have.property('x');
+    expect(data.x).to.be.a('number');
+    expect(data).to.have.property('y');
+    expect(data.y).to.be.a('number');
+};
+
 export const assertSketchEvent = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('type');
@@ -108,6 +125,14 @@ export const assertSketchEvent = (data: Record<string, any>) => {
         if (data.type !== 'imageAdd') {
             expect(data).to.have.property('imageData');
             assertSketchImage(data.imageData);
+        }
+    }
+    if (data.type.startsWith('token')) {
+        expect(data).to.have.property('tokenIndex');
+        expect(data.tokenIndex).to.be.a('number');
+        if (data.type !== 'tokenAdd') {
+            expect(data).to.have.property('tokenData');
+            assertSketchToken(data.tokenData);
         }
     }
 };
@@ -128,6 +153,11 @@ export const assertSketch = (
     expect(data.images).to.be.an('array');
     data.images.forEach((image: any) => {
         assertSketchImage(image);
+    });
+    expect(data).to.have.property('tokens');
+    expect(data.tokens).to.be.an('array');
+    data.tokens.forEach((token: any) => {
+        assertSketchToken(token);
     });
     expect(data).to.have.property('events');
     expect(data.events).to.be.an('array');
