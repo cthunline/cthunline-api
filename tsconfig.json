@@ -1,13 +1,13 @@
 {
     "extends": "@tsconfig/recommended/tsconfig.json",
     "compilerOptions": {
-        "target": "es2022",
+        "target": "esnext",
         "outDir": "./build",
         "resolveJsonModule": true
     },
     "include": [
-        "src/**/*",
-        "tests/**/*"
+        "src",
+        "tests"
     ],
     "exclude": [
         "node_modules",
