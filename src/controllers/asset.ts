@@ -12,41 +12,17 @@ import { findUser } from './user';
 import { controlSelf } from './auth';
 import { Prisma, handleNotFound } from '../services/prisma';
 import { InternError, ValidationError } from '../services/errors';
+import Log from '../services/log';
 import { mimeTypes, FileType, MimeType } from '../types/asset';
 
 interface TypedFile extends Formidable.File {
     type: FileType;
 }
 
-// formidable initialization options
-const formidableOptions: Formidable.Options = {
-    keepExtensions: true,
-    maxFileSize: 100 * 1024 * 1024,
-    multiples: true
-};
-
 /* There's a bug in formidable@v2 where maxFileSize option is applied to
 all files and not each file so we have to control each file size ourself */
 const maxEachFileSizeInMb = 20;
 const maxEachFileSize = maxEachFileSizeInMb * 1024 * 1024;
-
-// check asset directory exists and is writable
-const getAssetDir = (): string => {
-    const dir = process.env.ASSET_DIR;
-    if (dir) {
-        try {
-            Fs.accessSync(dir, Fs.constants.F_OK);
-            Fs.accessSync(dir, Fs.constants.W_OK);
-            return dir;
-        } catch {
-            throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
-        }
-    } else {
-        throw new InternError('No asset directory provided');
-    }
-};
-
-export const assetDir = getAssetDir();
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
@@ -71,6 +47,37 @@ const controlFile = (file: Formidable.File): FileType => {
     throw new ValidationError(`Size of file ${originalFilename} is to big (max ${maxEachFileSizeInMb}Mb)`);
 };
 
+// check asset directory exists and is writable
+const getAssetDir = (): string => {
+    const dir = process.env.ASSET_DIR;
+    if (dir) {
+        try {
+            Fs.accessSync(dir, Fs.constants.F_OK);
+            Fs.accessSync(dir, Fs.constants.W_OK);
+            return dir;
+        } catch {
+            throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
+        }
+    } else {
+        throw new InternError('No asset directory provided');
+    }
+};
+
+export const assetDir = getAssetDir();
+export const assetTempDir = Path.join(assetDir, 'tmp');
+
+// create subdirectory for temporary uploads in asset dir if not exist and return its path
+(async () => {
+    const tempDir = assetTempDir;
+    try {
+        await Fs.promises.access(tempDir, Fs.constants.F_OK);
+    } catch {
+        Log.info(`Creating temporary upload directory ${tempDir}`);
+        await Fs.promises.mkdir(tempDir);
+    }
+    return tempDir;
+})();
+
 // create user subdirectory in asset dir if not exist and return its path
 const controlUserDir = async (userId: string): Promise<string> => {
     const userDir = Path.join(assetDir, userId);
@@ -80,6 +87,14 @@ const controlUserDir = async (userId: string): Promise<string> => {
         await Fs.promises.mkdir(userDir);
     }
     return userDir;
+};
+
+// formidable initialization options
+const formidableOptions: Formidable.Options = {
+    uploadDir: assetTempDir,
+    keepExtensions: false,
+    maxFileSize: 100 * 1024 * 1024,
+    multiples: true
 };
 
 const assetRouter = Router();

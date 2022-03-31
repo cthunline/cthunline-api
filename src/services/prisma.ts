@@ -10,21 +10,28 @@ export const Prisma = new PrismaClient();
 export const initDb = async () => {
     const users = await Prisma.user.findMany();
     if (!users.length) {
-        const defaultUser = {
-            name: 'admin',
-            email: 'admin@admin.com',
-            password: 'cthunline',
-            isAdmin: true
-        };
-        await Prisma.user.create({
-            data: {
-                ...defaultUser,
-                password: await hashPassword(defaultUser.password)
-            }
-        });
-        Log.warn(
-            `Default user created (email: ${defaultUser.email} / password: ${defaultUser.password})`
-        );
+        const name = process.env.DEFAULT_ADMIN_NAME;
+        const email = process.env.DEFAULT_ADMIN_EMAIL;
+        const password = process.env.DEFAULT_ADMIN_PASSWORD;
+        if (name && email && password) {
+            const defaultUser = {
+                name,
+                email,
+                password,
+                isAdmin: true
+            };
+            await Prisma.user.create({
+                data: {
+                    ...defaultUser,
+                    password: await hashPassword(defaultUser.password)
+                }
+            });
+            Log.warn(
+                `Default user created (email: ${defaultUser.email} / password: ${defaultUser.password})`
+            );
+        } else {
+            Log.error('Environment file is missing default admin information');
+        }
     }
 };
 
