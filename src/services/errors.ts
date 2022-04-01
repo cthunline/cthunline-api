@@ -85,13 +85,8 @@ export const errorMiddleware = (req: Request, res: Response, next: NextFunction)
         } else if (err instanceof PrismaClientKnownRequestError) {
             const { code } = err;
             response.error = message;
-            switch (code) {
-                case 'P2023':
-                    statusCode = 400;
-                    break;
-                default:
-                    statusCode = 500;
-                    break;
+            if (code === 'P2023') {
+                statusCode = 400;
             }
         } else {
             Log.error(stack);

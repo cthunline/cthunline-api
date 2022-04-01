@@ -10,7 +10,7 @@ import {
 } from './services/errors';
 import Log from './services/log';
 import { initDb } from './services/prisma';
-import apiRouter from './controllers';
+import apiController from './controllers';
 import socketRouter from './sockets';
 
 const app = Express();
@@ -36,7 +36,7 @@ const httpServer = createServer(app);
         await initDb();
 
         Log.info('Initializing API routes');
-        app.use(apiRouter);
+        app.use(apiController);
 
         Log.info('Initializing web sockets');
         socketRouter(httpServer);

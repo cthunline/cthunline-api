@@ -15,7 +15,7 @@ const validateUpdate = Validator({
     ...SessionSchemas.sketch
 });
 
-const bindSketch = (io: Server, socket: Socket) => {
+const sketchHandler = (io: Server, socket: Socket) => {
     // notify session players that sketch has been updated by game master
     socket.on('sketchUpdate', async (data: SketchData) => {
         try {
@@ -47,4 +47,4 @@ const bindSketch = (io: Server, socket: Socket) => {
     });
 };
 
-export default bindSketch;
+export default sketchHandler;

@@ -6,7 +6,7 @@ import users from '../data/users.json';
 import sessions from '../data/sessions.json';
 import characters from '../data/characters.json';
 import assets from '../data/assets.json';
-import { assetDir } from '../../../src/controllers/asset';
+import { assetDir } from '../../../src/controllers/assetController';
 
 const Data = {
     async reset() {

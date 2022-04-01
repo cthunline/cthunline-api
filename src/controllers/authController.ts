@@ -101,10 +101,10 @@ export const controlSelfAdmin = async ({ userId }: Token) => {
     }
 };
 
-const authRouter = Router();
+const authController = Router();
 
 // check authentication validity
-authRouter.get('/auth', async (req: Request, res: Response): Promise<void> => {
+authController.get('/auth', async (req: Request, res: Response): Promise<void> => {
     try {
         res.send(req.token);
     } catch (err: any) {
@@ -113,7 +113,7 @@ authRouter.get('/auth', async (req: Request, res: Response): Promise<void> => {
 });
 
 // login
-authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void> => {
+authController.post('/auth', async ({ body }: Request, res: Response): Promise<void> => {
     try {
         validateLogin(body);
         const { email, password } = body;
@@ -155,7 +155,7 @@ authRouter.post('/auth', async ({ body }: Request, res: Response): Promise<void>
 });
 
 // logout
-authRouter.delete('/auth', async (req: Request, res: Response): Promise<void> => {
+authController.delete('/auth', async (req: Request, res: Response): Promise<void> => {
     try {
         const { userId, bearer } = req.token;
         await Prisma.token.deleteMany({
@@ -170,4 +170,4 @@ authRouter.delete('/auth', async (req: Request, res: Response): Promise<void> =>
     }
 });
 
-export default authRouter;
+export default authController;

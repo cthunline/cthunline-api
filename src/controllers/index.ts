@@ -6,17 +6,17 @@ import Express, {
 } from 'express';
 
 import { NotFoundError } from '../services/errors';
-import authRouter, { authMiddleware } from './auth';
-import userRouter from './user';
-import assetRouter, { assetDir } from './asset';
-import gameRouter from './game';
-import sessionRouter from './session';
-import characterRouter from './character';
+import authController, { authMiddleware } from './authController';
+import userController from './userController';
+import assetController, { assetDir } from './assetController';
+import gameController from './gameController';
+import sessionController from './sessionController';
+import characterController from './characterController';
 
-const apiRouter = Router();
+const apiController = Router();
 
 // apply authentication middleware
-apiRouter.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+apiController.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if ((
         req.method === 'POST' && req.path === '/api/auth' // exception for login route
     ) || (
@@ -28,22 +28,22 @@ apiRouter.use(async (req: Request, res: Response, next: NextFunction): Promise<v
     }
 });
 
-// apply api routers
-apiRouter.use('/api', authRouter);
-apiRouter.use('/api', userRouter);
-apiRouter.use('/api', assetRouter);
-apiRouter.use('/api', gameRouter);
-apiRouter.use('/api', sessionRouter);
-apiRouter.use('/api', characterRouter);
+// apply api controllers
+apiController.use('/api', authController);
+apiController.use('/api', userController);
+apiController.use('/api', assetController);
+apiController.use('/api', gameController);
+apiController.use('/api', sessionController);
+apiController.use('/api', characterController);
 
 // serve static assets
-apiRouter.use('/static', Express.static(assetDir));
+apiController.use('/static', Express.static(assetDir));
 
 // throw 404 on unknown routes
-apiRouter.use('*', (req: Request, res: Response) => {
+apiController.use('*', (req: Request, res: Response) => {
     res.error(
         new NotFoundError('Route does not exist')
     );
 });
 
-export default apiRouter;
+export default apiController;

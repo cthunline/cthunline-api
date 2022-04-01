@@ -5,8 +5,8 @@ import {
 } from 'express';
 import { Character } from '@prisma/client';
 
-import { findUser } from './user';
-import { controlSelf } from './auth';
+import { findUser } from './userController';
+import { controlSelf } from './authController';
 import { Prisma, handleNotFound } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
@@ -37,10 +37,10 @@ const controlPortrait = (base64: string) => {
 const validateCreate = Validator(CharacterSchemas.create);
 const validateUpdate = Validator(CharacterSchemas.update);
 
-const characterRouter = Router();
+const characterController = Router();
 
 // get all characters
-characterRouter.get('/characters', async (req: Request, res: Response): Promise<void> => {
+characterController.get('/characters', async (req: Request, res: Response): Promise<void> => {
     try {
         const characters = await Prisma.character.findMany();
         res.json({ characters });
@@ -50,7 +50,7 @@ characterRouter.get('/characters', async (req: Request, res: Response): Promise<
 });
 
 // get all characters of a user
-characterRouter.get('/users/:userId/characters', async ({ params }: Request, res: Response): Promise<void> => {
+characterController.get('/users/:userId/characters', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         await findUser(userId);
@@ -66,7 +66,7 @@ characterRouter.get('/users/:userId/characters', async ({ params }: Request, res
 });
 
 // create a character for a user
-characterRouter.post('/users/:userId/characters', async ({ body, params, token }: Request, res: Response): Promise<void> => {
+characterController.post('/users/:userId/characters', async ({ body, params, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         await findUser(userId);
@@ -95,7 +95,7 @@ characterRouter.post('/users/:userId/characters', async ({ body, params, token }
 });
 
 // get a character
-characterRouter.get('/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
+characterController.get('/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { characterId } = params;
         const character = await handleNotFound<Character>(
@@ -114,7 +114,7 @@ characterRouter.get('/characters/:characterId', async ({ params }: Request, res:
 });
 
 // edit a character
-characterRouter.post('/characters/:characterId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+characterController.post('/characters/:characterId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { characterId } = params;
         const { gameId, userId } = await handleNotFound<Character>(
@@ -147,7 +147,7 @@ characterRouter.post('/characters/:characterId', async ({ params, body, token }:
 });
 
 // delete a user's character
-characterRouter.delete('/characters/:characterId', async ({ params, token }: Request, res: Response): Promise<void> => {
+characterController.delete('/characters/:characterId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { characterId } = params;
         const { userId } = await handleNotFound<Character>(
@@ -171,4 +171,4 @@ characterRouter.delete('/characters/:characterId', async ({ params, token }: Req
     }
 });
 
-export default characterRouter;
+export default characterController;

@@ -7,10 +7,10 @@ import {
 import { NotFoundError } from '../services/errors';
 import { GamesData, isValidGameId } from '../games';
 
-const gameRouter = Router();
+const gameController = Router();
 
 // get all games
-gameRouter.get('/games', async (req: Request, res: Response): Promise<void> => {
+gameController.get('/games', async (req: Request, res: Response): Promise<void> => {
     try {
         const games = Object.values(GamesData);
         res.json({
@@ -22,7 +22,7 @@ gameRouter.get('/games', async (req: Request, res: Response): Promise<void> => {
 });
 
 // get a game
-gameRouter.get('/games/:gameId', async ({ params }: Request, res: Response): Promise<void> => {
+gameController.get('/games/:gameId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { gameId } = params;
         if (!isValidGameId(gameId)) {
@@ -34,4 +34,4 @@ gameRouter.get('/games/:gameId', async ({ params }: Request, res: Response): Pro
     }
 });
 
-export default gameRouter;
+export default gameController;

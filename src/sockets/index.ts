@@ -6,11 +6,11 @@ import {
     connectionMiddleware,
     disconnectCopycats,
     getSessionUsers
-} from './connect';
-import bindDice from './dice';
-import bindCharacter from './character';
-import bindAudio from './audio';
-import bindSketch from './sketch';
+} from './connectionHandler';
+import diceHandler from './diceHandler';
+import characterHandler from './characterHandler';
+import audioHandler from './audioHandler';
+import sketchHandler from './sketchHandler';
 
 const wrapExpressMiddleware = (middleware: Function) => (
     (socket: Socket, next: Function) => (
@@ -41,10 +41,10 @@ const socketRouter = (httpServer: HttpServer) => {
                 isMaster
             });
         });
-        bindDice(io, socket);
-        bindCharacter(io, socket);
-        bindAudio(io, socket);
-        bindSketch(io, socket);
+        diceHandler(io, socket);
+        characterHandler(io, socket);
+        audioHandler(io, socket);
+        sketchHandler(io, socket);
     });
 };
 

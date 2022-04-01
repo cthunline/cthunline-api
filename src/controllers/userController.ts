@@ -9,7 +9,7 @@ import {
     Prisma,
     handleNotFound
 } from '../services/prisma';
-import { controlSelf, controlSelfAdmin } from './auth';
+import { controlSelf, controlSelfAdmin } from './authController';
 import { verifyPassword, hashPassword } from '../services/tools';
 import {
     ConflictError,
@@ -61,10 +61,10 @@ export const controlAdminFields = (body: object) => {
     }
 };
 
-const userRouter = Router();
+const userController = Router();
 
 // get all users
-userRouter.get('/users', async ({ query }: Request, res: Response): Promise<void> => {
+userController.get('/users', async ({ query }: Request, res: Response): Promise<void> => {
     try {
         const getDisabled = query.disabled === 'true';
         const users = await Prisma.user.findMany({
@@ -80,7 +80,7 @@ userRouter.get('/users', async ({ query }: Request, res: Response): Promise<void
 });
 
 // create a user
-userRouter.post('/users', async ({ body, token }: Request, res: Response): Promise<void> => {
+userController.post('/users', async ({ body, token }: Request, res: Response): Promise<void> => {
     try {
         await controlSelfAdmin(token);
         validateCreate(body);
@@ -108,7 +108,7 @@ userRouter.post('/users', async ({ body, token }: Request, res: Response): Promi
 });
 
 // get a user
-userRouter.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
+userController.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         const user = await findUser(userId);
@@ -119,7 +119,7 @@ userRouter.get('/users/:userId', async ({ params }: Request, res: Response): Pro
 });
 
 // edit user
-userRouter.post('/users/:userId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+userController.post('/users/:userId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
         const user = await handleNotFound<User>(
@@ -163,4 +163,4 @@ userRouter.post('/users/:userId', async ({ params, body, token }: Request, res: 
     }
 });
 
-export default userRouter;
+export default userController;

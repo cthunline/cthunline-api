@@ -1,5 +1,6 @@
 import { User } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
+import { randomInt } from 'crypto';
 
 import { sum } from '../services/tools';
 import Validator from '../services/validator';
@@ -19,7 +20,7 @@ const getDiceMax = (diceType: DiceType): number => (
 );
 
 const rollDice = (diceType: DiceType): number => (
-    Math.floor((Math.random() * getDiceMax(diceType)) + 1)
+    randomInt(getDiceMax(diceType)) + 1
 );
 
 const getDiceResult = (
@@ -47,7 +48,7 @@ const getDiceResult = (
     )
 });
 
-const bindDice = (io: Server, socket: Socket) => {
+const diceHandler = (io: Server, socket: Socket) => {
     // dice roll request / result sent to every player in session
     socket.on('diceRequest', async (request: SocketDiceRequest) => {
         try {
@@ -81,4 +82,4 @@ const bindDice = (io: Server, socket: Socket) => {
     });
 };
 
-export default bindDice;
+export default diceHandler;

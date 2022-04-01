@@ -9,11 +9,11 @@ import {
     Prisma,
     handleNotFound
 } from '../services/prisma';
-import { controlSelf } from './auth';
+import { controlSelf } from './authController';
+import { userSelect } from './userController';
 import Validator from '../services/validator';
 import { isValidGameId } from '../games';
 import { ValidationError } from '../services/errors';
-import { userSelect } from './user';
 
 import SessionSchemas from './schemas/session.json';
 
@@ -51,10 +51,10 @@ const getInclude = (includeMaster: boolean) => (
     } : undefined
 );
 
-const sessionRouter = Router();
+const sessionController = Router();
 
 // get all sessions
-sessionRouter.get('/sessions', async ({ query }: Request, res: Response): Promise<void> => {
+sessionController.get('/sessions', async ({ query }: Request, res: Response): Promise<void> => {
     try {
         const { include } = query;
         const sessions = await Prisma.session.findMany({
@@ -67,7 +67,7 @@ sessionRouter.get('/sessions', async ({ query }: Request, res: Response): Promis
 });
 
 // create a session
-sessionRouter.post('/sessions', async (req: Request, res: Response): Promise<void> => {
+sessionController.post('/sessions', async (req: Request, res: Response): Promise<void> => {
     try {
         const createData = req.body;
         const { gameId, sketch } = createData;
@@ -91,7 +91,7 @@ sessionRouter.post('/sessions', async (req: Request, res: Response): Promise<voi
 });
 
 // get a session
-sessionRouter.get('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
+sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
         const session = await handleNotFound<Session>(
@@ -110,7 +110,7 @@ sessionRouter.get('/sessions/:sessionId', async ({ params }: Request, res: Respo
 });
 
 // edit a session
-sessionRouter.post('/sessions/:sessionId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+sessionController.post('/sessions/:sessionId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
         const session = await handleNotFound<Session>(
@@ -137,7 +137,7 @@ sessionRouter.post('/sessions/:sessionId', async ({ params, body, token }: Reque
 });
 
 // delete a session
-sessionRouter.delete('/sessions/:sessionId', async ({ params, token }: Request, res: Response): Promise<void> => {
+sessionController.delete('/sessions/:sessionId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
         const session = await handleNotFound<Session>(
@@ -161,4 +161,4 @@ sessionRouter.delete('/sessions/:sessionId', async ({ params, token }: Request, 
     }
 });
 
-export default sessionRouter;
+export default sessionController;

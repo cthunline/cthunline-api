@@ -8,8 +8,8 @@ import {
 import { Asset } from '@prisma/client';
 import Formidable from 'formidable';
 
-import { findUser } from './user';
-import { controlSelf } from './auth';
+import { findUser } from './userController';
+import { controlSelf } from './authController';
 import { Prisma, handleNotFound } from '../services/prisma';
 import { InternError, ValidationError } from '../services/errors';
 import Log from '../services/log';
@@ -97,10 +97,10 @@ const formidableOptions: Formidable.Options = {
     multiples: true
 };
 
-const assetRouter = Router();
+const assetController = Router();
 
 // get all assets of a user
-assetRouter.get('/users/:userId/assets', async (
+assetController.get('/users/:userId/assets', async (
     { params, query, token }: Request,
     res: Response
 ): Promise<void> => {
@@ -125,7 +125,7 @@ assetRouter.get('/users/:userId/assets', async (
 
 // upload an asset for a user
 // this endpoint expect multipart/form-data
-assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): Promise<void> => {
+assetController.post('/users/:userId/assets', async (req: Request, res: Response): Promise<void> => {
     try {
         // control userId
         const { userId } = req.params;
@@ -197,7 +197,7 @@ assetRouter.post('/users/:userId/assets', async (req: Request, res: Response): P
 });
 
 // get a user's asset
-assetRouter.get('/users/:userId/assets/:assetId', async ({ params, token }: Request, res: Response): Promise<void> => {
+assetController.get('/users/:userId/assets/:assetId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId, assetId } = params;
         await findUser(userId);
@@ -218,7 +218,7 @@ assetRouter.get('/users/:userId/assets/:assetId', async ({ params, token }: Requ
 });
 
 // delete a user's asset
-assetRouter.delete('/users/:userId/assets/:assetId', async ({ params, token }: Request, res: Response): Promise<void> => {
+assetController.delete('/users/:userId/assets/:assetId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId, assetId } = params;
         await findUser(userId);
@@ -248,4 +248,4 @@ assetRouter.delete('/users/:userId/assets/:assetId', async ({ params, token }: R
     }
 });
 
-export default assetRouter;
+export default assetController;

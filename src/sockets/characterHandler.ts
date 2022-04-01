@@ -4,7 +4,7 @@ import { InternError } from '../services/errors';
 
 import { Prisma, handleNotFound } from '../services/prisma';
 
-const bindCharacter = (io: Server, socket: Socket) => {
+const characterHandler = (io: Server, socket: Socket) => {
     // notify game master when any character is updated during game
     // send character data to game master
     socket.on('characterUpdate', async () => {
@@ -44,4 +44,4 @@ const bindCharacter = (io: Server, socket: Socket) => {
     });
 };
 
-export default bindCharacter;
+export default characterHandler;

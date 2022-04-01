@@ -14,7 +14,7 @@ import {
     ValidationError,
     ForbiddenError
 } from '../services/errors';
-import { findUser } from '../controllers/user';
+import { findUser } from '../controllers/userController';
 
 // verify auth token
 const verifyBearer = async (socket: Socket): Promise<Token> => {

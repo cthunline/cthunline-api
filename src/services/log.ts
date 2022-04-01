@@ -64,9 +64,9 @@ const Log = isLogEnabled ? (
         exitOnError: false
     })
 ) : {
-    info: () => {},
-    warn: () => {},
-    error: () => {}
+    info: () => { /* silent log */ },
+    warn: () => { /* silent log */ },
+    error: () => { /* silent log */ }
 };
 
 if (fileTransportError) {

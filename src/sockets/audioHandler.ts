@@ -10,7 +10,7 @@ import AudioSchemas from './schemas/audio.json';
 
 const validatePlay = Validator(AudioSchemas.play);
 
-const bindAudio = (io: Server, socket: Socket) => {
+const audioHandler = (io: Server, socket: Socket) => {
     // notify session players that game master started playing audio asset
     socket.on('audioPlay', async (request: SocketAudioPlay) => {
         try {
@@ -71,4 +71,4 @@ const bindAudio = (io: Server, socket: Socket) => {
     });
 };
 
-export default bindAudio;
+export default audioHandler;
