@@ -4,7 +4,6 @@ import { Socket, Server } from 'socket.io';
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { SketchData } from '../types/socket';
-// import { ForbiddenError } from '../services/errors';
 
 import SessionSchemas from '../controllers/schemas/session.json';
 
@@ -25,9 +24,6 @@ const sketchHandler = (io: Server, socket: Socket) => {
                 sessionId,
                 isMaster
             } = socket.data;
-            // if (!isMaster) {
-            //     throw new ForbiddenError();
-            // }
             socket.to(sessionId).emit('sketchUpdate', {
                 user,
                 isMaster,
