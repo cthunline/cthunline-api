@@ -1,5 +1,6 @@
 import Validator from '../services/validator';
 import CoCCharacterSchema from './callOfCthulhu/schema.json';
+import SWD6CharacterSchema from './starWarsD6/schema.json';
 
 // list of available games
 export const Games = {
@@ -7,6 +8,11 @@ export const Games = {
         name: 'Call of Cthulhu',
         schema: CoCCharacterSchema,
         validator: Validator(CoCCharacterSchema)
+    },
+    starWarsD6: {
+        name: 'Star Wars D6',
+        schema: SWD6CharacterSchema,
+        validator: Validator(SWD6CharacterSchema)
     }
 };
 
