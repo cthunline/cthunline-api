@@ -48,16 +48,6 @@ describe('[Sockets] Sketch', () => {
         );
     });
 
-    it('Should fail to update sketch because not game master', async () => {
-        await Sockets.testError(
-            'sketchUpdate',
-            'sketchUpdate',
-            sketchData,
-            403,
-            false
-        );
-    });
-
     it('Should update sketch', async () => {
         const [
             masterSocket,
