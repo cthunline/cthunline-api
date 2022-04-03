@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 
-import Data from '../helpers/data.helper';
+import Data, { sessionsData } from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 
 import { assertUser, assertSketch } from '../helpers/assert.helper';
-import sessionsData from '../data/sessions.json';
 
 const sketchData = sessionsData[0].sketch;
 

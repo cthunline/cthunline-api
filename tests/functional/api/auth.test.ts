@@ -1,7 +1,5 @@
 import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
-
-import usersData from '../data/users.json';
+import Data, { usersData } from '../helpers/data.helper';
 
 describe('[API] Authentication', () => {
     before(async () => {

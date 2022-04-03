@@ -2,11 +2,20 @@ import Fs from 'fs';
 import Path from 'path';
 
 import { Prisma } from '../../../src/services/prisma';
+import { assetDir } from '../../../src/controllers/assetController';
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
-import characters from '../data/characters.json';
 import assets from '../data/assets.json';
-import { assetDir } from '../../../src/controllers/assetController';
+import cocCharacters from '../data/cocCharacters.json';
+import swd6Characters from '../data/swd6Characters.json';
+
+export const usersData = users;
+export const sessionsData = sessions;
+export const assetsData = assets;
+export const charactersData = [
+    ...cocCharacters,
+    ...swd6Characters
+];
 
 const Data = {
     async reset() {
@@ -24,19 +33,19 @@ const Data = {
     },
 
     async insertAll() {
-        await Promise.all(users.map((data) => (
+        await Promise.all(usersData.map((data) => (
             Prisma.user.create({ data })
         )));
         await Promise.all([
-            ...assets.map((data) => (
+            ...assetsData.map((data) => (
                 Prisma.asset.create({ data })
             )),
             Data.copyAssetFiles()
         ]);
-        await Promise.all(sessions.map((data) => (
+        await Promise.all(sessionsData.map((data) => (
             Prisma.session.create({ data })
         )));
-        await Promise.all(characters.map((data) => (
+        await Promise.all(charactersData.map((data) => (
             Prisma.character.create({ data })
         )));
     },

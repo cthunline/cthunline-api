@@ -7,10 +7,11 @@ import Client, {
 import CookieSignature from 'cookie-signature';
 
 import Api from './api.helper';
-
-import sessionsData from '../data/sessions.json';
-import charactersData from '../data/characters.json';
-import usersData from '../data/users.json';
+import {
+    sessionsData,
+    charactersData,
+    usersData
+} from './data.helper';
 
 interface SocketsHelper {
     url: string;

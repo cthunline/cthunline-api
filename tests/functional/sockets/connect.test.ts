@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 
 import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
+import Data, {
+    sessionsData,
+    charactersData,
+    usersData
+} from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 import { assertUser, assertCharacter } from '../helpers/assert.helper';
-
-import sessionsData from '../data/sessions.json';
-import charactersData from '../data/characters.json';
-import usersData from '../data/users.json';
 
 describe('[Sockets] Connection', () => {
     before(async () => {

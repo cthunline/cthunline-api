@@ -3,11 +3,11 @@ import Fs from 'fs';
 import Path from 'path';
 
 import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
+import Data, {
+    assetsData,
+    usersData
+} from '../helpers/data.helper';
 import { assertAsset } from '../helpers/assert.helper';
-
-import assetsData from '../data/assets.json';
-import usersData from '../data/users.json';
 
 const getAssetBuffer = async (assetName: string) => {
     const localPath = Path.join(
