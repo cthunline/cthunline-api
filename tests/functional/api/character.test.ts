@@ -7,12 +7,12 @@ import Data, {
 } from '../helpers/data.helper';
 import { assertCharacter } from '../helpers/assert.helper';
 
-const findUserCharacter = (userId: string) => {
+const findCharacter = (userId: string, gameId: string) => {
     const character = charactersData.find((char) => (
-        char.userId === Api.userId
+        char.userId === Api.userId && char.gameId === gameId
     ));
     if (character) {
-        return character;
+        return character as any;
     }
     throw new Error(`Could not find character for user ${userId}`);
 };
@@ -67,7 +67,7 @@ describe('[API] Characters', () => {
             });
         });
         it('Should throw a validation error', async () => {
-            const { gameId, name, data } = findUserCharacter(Api.userId);
+            const { gameId, name, data } = findCharacter(Api.userId, 'callOfCthulhu');
             const invalidData = [{
                 invalidProperty: 'Test'
             }, {
@@ -114,7 +114,7 @@ describe('[API] Characters', () => {
             }
         });
         it('Should throw a forbidden error', async () => {
-            const { gameId } = findUserCharacter(Api.userId);
+            const { gameId } = findCharacter(Api.userId, 'callOfCthulhu');
             await Api.testError({
                 method: 'POST',
                 route: `/users/${usersData[0].id}/characters`,
@@ -125,17 +125,20 @@ describe('[API] Characters', () => {
             }, 403);
         });
         it('Should create a character', async () => {
-            const { gameId, data } = findUserCharacter(Api.userId);
-            await Api.testCreate({
-                route: `/users/${Api.userId}/characters`,
-                data: {
-                    gameId,
-                    name: 'Test',
-                    data
-                },
-                assert: assertCharacter,
-                getRoute: '/characters/:id'
-            });
+            const gameIds = ['callOfCthulhu', 'starWarsD6'];
+            for (const gameId of gameIds) {
+                const { data } = findCharacter(Api.userId, gameId);
+                await Api.testCreate({
+                    route: `/users/${Api.userId}/characters`,
+                    data: {
+                        gameId,
+                        name: `Test ${gameId}`,
+                        data
+                    },
+                    assert: assertCharacter,
+                    getRoute: '/characters/:id'
+                });
+            }
         });
     });
 
@@ -166,7 +169,7 @@ describe('[API] Characters', () => {
             });
         });
         it('Should throw a validation error', async () => {
-            const { gameId, name, data } = findUserCharacter(Api.userId);
+            const { gameId, name, data } = findCharacter(Api.userId, 'callOfCthulhu');
             const response = await Api.request({
                 method: 'POST',
                 route: `/users/${Api.userId}/characters`,
@@ -227,7 +230,11 @@ describe('[API] Characters', () => {
             }, 403);
         });
         it('Should edit a character', async () => {
-            const { gameId, data } = findUserCharacter(Api.userId);
+            const {
+                id,
+                gameId,
+                data
+            } = findCharacter(Api.userId, 'callOfCthulhu');
             const response = await Api.request({
                 method: 'POST',
                 route: `/users/${Api.userId}/characters`,
@@ -238,16 +245,25 @@ describe('[API] Characters', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id } } = response;
-            const { data: editData } = charactersData[1];
-            await Api.testEdit({
-                route: `/characters/${id}`,
-                data: {
-                    name: 'Test edit',
-                    data: editData
-                },
-                assert: assertCharacter
-            });
+            const { body: { id: createdId } } = response;
+            const editChar = charactersData.find(({
+                id: charId,
+                gameId: charGameId
+            }) => (
+                charGameId === gameId && charId !== id
+            ));
+            if (editChar) {
+                await Api.testEdit({
+                    route: `/characters/${createdId}`,
+                    data: {
+                        name: 'Test edit',
+                        data: editChar.data
+                    },
+                    assert: assertCharacter
+                });
+            } else {
+                throw new Error('Could not find edit data for character');
+            }
         });
     });
 
@@ -265,7 +281,7 @@ describe('[API] Characters', () => {
             }, 403);
         });
         it('Should delete a character', async () => {
-            const { gameId, data } = findUserCharacter(Api.userId);
+            const { gameId, data } = findCharacter(Api.userId, 'callOfCthulhu');
             const response = await Api.request({
                 method: 'POST',
                 route: `/users/${Api.userId}/characters`,

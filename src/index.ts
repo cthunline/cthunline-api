@@ -24,7 +24,7 @@ const httpServer = createServer(app);
         ));
         app.use(Helmet());
         app.use(Express.json({
-            limit: '500kb'
+            limit: '1mb'
         }));
         app.use(Express.urlencoded({
             extended: false

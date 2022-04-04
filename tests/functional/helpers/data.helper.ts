@@ -6,8 +6,8 @@ import { assetDir } from '../../../src/controllers/assetController';
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
 import assets from '../data/assets.json';
-import cocCharacters from '../data/cocCharacters.json';
-import swd6Characters from '../data/swd6Characters.json';
+import cocCharacters from '../data/characters/cocCharacters.json';
+import swd6Characters from '../data/characters/swd6Characters.json';
 
 export const usersData = users;
 export const sessionsData = sessions;

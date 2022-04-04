@@ -22,7 +22,7 @@ const imageMimeTypes = Object.entries(mimeTypes).filter(
     ([mimeType]) => mimeType
 );
 
-const portraitLimitSizeInKb = 250;
+const portraitLimitSizeInKb = 500;
 const controlPortrait = (base64: string) => {
     if (!isBase64(base64, imageMimeTypes)) {
         throw new ValidationError('Portrait is not a valid base64 string');
