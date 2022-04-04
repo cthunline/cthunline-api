@@ -49,7 +49,7 @@ export interface SWD6Statistics {
 export interface SWD6WoundStatus {
     stunned: boolean;
     wounded: boolean;
-    doubleWounded: boolean;
+    doublyWounded: boolean;
     incapacitated: boolean;
     mortallyWounded: boolean;
 }

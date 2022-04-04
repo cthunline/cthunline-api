@@ -143,7 +143,7 @@
         },
         "SWD6WoundStatus": {
             "properties": {
-                "doubleWounded": {
+                "doublyWounded": {
                     "type": "boolean"
                 },
                 "incapacitated": {
