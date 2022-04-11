@@ -191,6 +191,27 @@ export const assertSession = (
     assertSketch(data.sketch, expected?.sketch);
 };
 
+export const assertNotes = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('text');
+    expect(data.text).to.be.a('string');
+    expect(data).to.have.property('sessionId');
+    expect(data.sessionId).to.be.a('string');
+    expect(data).to.have.property('userId');
+    expect(data.userId).to.be.a('string');
+    if (expected) {
+        Object.keys(expected).forEach((key) => {
+            expect(data).to.have.property(key);
+            expect(data[key]).to.equal(expected[key]);
+        });
+    }
+};
+
 export const assertCharacter = (
     data: Record<string, any>,
     expected?: Record<string, any>

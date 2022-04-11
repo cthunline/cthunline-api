@@ -20,8 +20,8 @@ import Validator from '../services/validator';
 
 import UserSchemas from './schemas/user.json';
 
-const validateCreate = Validator(UserSchemas.create);
-const validateUpdate = Validator(UserSchemas.update);
+const validateCreateUser = Validator(UserSchemas.create);
+const validateUpdateUser = Validator(UserSchemas.update);
 
 export type UserSelect = Omit<User, 'password'>;
 
@@ -38,7 +38,7 @@ export const userSelect = {
 
 // check a user exists and return it
 // returned user data will not contain password
-export const findUser = async (userId: string): Promise<UserSelect> => (
+export const getUser = async (userId: string): Promise<UserSelect> => (
     handleNotFound<UserSelect>(
         'User', (
             Prisma.user.findUnique({
@@ -83,7 +83,7 @@ userController.get('/users', async ({ query }: Request, res: Response): Promise<
 userController.post('/users', async ({ body, token }: Request, res: Response): Promise<void> => {
     try {
         await controlSelfAdmin(token);
-        validateCreate(body);
+        validateCreateUser(body);
         const checkEmail = await Prisma.user.findUnique({
             where: {
                 email: body.email
@@ -111,7 +111,7 @@ userController.post('/users', async ({ body, token }: Request, res: Response): P
 userController.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
-        const user = await findUser(userId);
+        const user = await getUser(userId);
         res.json(user);
     } catch (err: any) {
         res.error(err);
@@ -137,7 +137,7 @@ userController.post('/users/:userId', async ({ params, body, token }: Request, r
             controlSelf(token, userId);
             controlAdminFields(body);
         }
-        validateUpdate(body);
+        validateUpdateUser(body);
         const data = { ...body };
         if (body.password) {
             if (!body.oldPassword) {

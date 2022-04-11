@@ -1,10 +1,24 @@
 import { expect } from 'chai';
 
 import Api from '../helpers/api.helper';
-import Data, { sessionsData } from '../helpers/data.helper';
-import { assertSession, assertUser } from '../helpers/assert.helper';
+import Data, { sessionsData, notesData } from '../helpers/data.helper';
+import {
+    assertSession,
+    assertUser,
+    assertNotes
+} from '../helpers/assert.helper';
 
 const { gameId } = sessionsData[0];
+
+const getUserNotes = (userId: string) => {
+    const notes = notesData.find(({ userId: notesUserId }) => (
+        notesUserId === userId
+    ));
+    if (notes) {
+        return notes;
+    }
+    throw new Error('Could not find user notes');
+};
 
 describe('[API] Sessions', () => {
     before(async () => {
@@ -194,6 +208,69 @@ describe('[API] Sessions', () => {
                 route: `/sessions/${id}`,
                 testGet: true
             });
+        });
+    });
+
+    describe('GET /sessions/:id/notes', () => {
+        it('Should throw error because of invalid ID', async () => {
+            await Api.testInvalidIdError({
+                method: 'GET',
+                route: '/sessions/:id/notes'
+            });
+        });
+        it('Should get notes a user', async () => {
+            const notes = getUserNotes(Api.userId);
+            const response = await Api.request({
+                method: 'GET',
+                route: `/sessions/${notes?.sessionId}/notes`
+            });
+            expect(response).to.have.status(200);
+            expect(response).to.be.json;
+            const { body } = response;
+            assertNotes(body, notes);
+        });
+    });
+
+    describe('POST /sessions/:id/notes', () => {
+        it('Should throw error because of invalid ID', async () => {
+            await Api.testInvalidIdError({
+                method: 'POST',
+                route: '/sessions/:id/notes',
+                body: {
+                    text: 'Test'
+                }
+            });
+        });
+        it('Should throw a validation error', async () => {
+            const invalidData = [{
+                invalidProperty: 'Test'
+            }, {
+                text: 'Test',
+                invalidProperty: 'Test'
+            }, {}];
+            for (const body of invalidData) {
+                await Api.testError({
+                    method: 'POST',
+                    route: `/sessions/${sessionsData[0].id}/notes`,
+                    body
+                }, 400);
+            }
+        });
+        it('Should edit the notes of a user', async () => {
+            const editData = [{
+                text: 'Test1'
+            }, {
+                text: 'Test2'
+            }, {
+                text: 'Test3'
+            }];
+            for (const body of editData) {
+                await Api.testEdit({
+                    route: `/sessions/${sessionsData[1].id}/notes`,
+                    data: body,
+                    assert: assertNotes
+                });
+            }
         });
     });
 });

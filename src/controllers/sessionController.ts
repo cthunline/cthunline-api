@@ -3,7 +3,7 @@ import {
     Request,
     Response
 } from 'express';
-import { Session } from '@prisma/client';
+import { Session, Note } from '@prisma/client';
 
 import {
     Prisma,
@@ -26,12 +26,13 @@ const buildSessionSchema = (baseSchema: any) => ({
     }
 });
 
-const validateCreate = Validator(
+const validateCreateSession = Validator(
     buildSessionSchema(SessionSchemas.create)
 );
-const validateUpdate = Validator(
+const validateUpdateSession = Validator(
     buildSessionSchema(SessionSchemas.update)
 );
+const validateNotes = Validator(SessionSchemas.notes);
 
 const defaultSketchData = {
     displayed: false,
@@ -50,6 +51,38 @@ const getInclude = (includeMaster: boolean) => (
         }
     } : undefined
 );
+
+const getSession = async (sessionId: string): Promise<Session> => (
+    handleNotFound<Session>(
+        'Session', (
+            Prisma.session.findUnique({
+                where: {
+                    id: sessionId
+                }
+            })
+        )
+    )
+);
+
+// get notes of a user for a session / create default notes if not exist
+const getNotes = async (sessionId: string, userId: string): Promise<Note> => {
+    const notes = await Prisma.note.findFirst({
+        where: {
+            sessionId,
+            userId
+        }
+    });
+    if (!notes) {
+        return Prisma.note.create({
+            data: {
+                text: '',
+                sessionId,
+                userId
+            }
+        });
+    }
+    return notes;
+};
 
 const sessionController = Router();
 
@@ -71,7 +104,7 @@ sessionController.post('/sessions', async (req: Request, res: Response): Promise
     try {
         const createData = req.body;
         const { gameId, sketch } = createData;
-        validateCreate(createData);
+        validateCreateSession(createData);
         if (!isValidGameId(gameId)) {
             throw new ValidationError(`Invalid gameId ${gameId}`);
         }
@@ -94,15 +127,7 @@ sessionController.post('/sessions', async (req: Request, res: Response): Promise
 sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
-        const session = await handleNotFound<Session>(
-            'Session', (
-                Prisma.session.findUnique({
-                    where: {
-                        id: sessionId
-                    }
-                })
-            )
-        );
+        const session = await getSession(sessionId);
         res.json(session);
     } catch (err: any) {
         res.error(err);
@@ -113,17 +138,9 @@ sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: R
 sessionController.post('/sessions/:sessionId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
-        const session = await handleNotFound<Session>(
-            'Session', (
-                Prisma.session.findUnique({
-                    where: {
-                        id: sessionId
-                    }
-                })
-            )
-        );
+        const session = await getSession(sessionId);
         controlSelf(token, session.masterId);
-        validateUpdate(body);
+        validateUpdateSession(body);
         const updatedSession = await Prisma.session.update({
             data: body,
             where: {
@@ -140,15 +157,7 @@ sessionController.post('/sessions/:sessionId', async ({ params, body, token }: R
 sessionController.delete('/sessions/:sessionId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
-        const session = await handleNotFound<Session>(
-            'Session', (
-                Prisma.session.findUnique({
-                    where: {
-                        id: sessionId
-                    }
-                })
-            )
-        );
+        const session = await getSession(sessionId);
         controlSelf(token, session.masterId);
         await Prisma.session.delete({
             where: {
@@ -156,6 +165,39 @@ sessionController.delete('/sessions/:sessionId', async ({ params, token }: Reque
             }
         });
         res.send({});
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+// get current user notes in a session
+sessionController.get('/sessions/:sessionId/notes', async ({ params, token }: Request, res: Response): Promise<void> => {
+    try {
+        const { sessionId } = params;
+        const { userId } = token;
+        await getSession(sessionId);
+        const notes = await getNotes(sessionId, userId);
+        res.json(notes);
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+// set current user notes in a session
+sessionController.post('/sessions/:sessionId/notes', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+    try {
+        const { sessionId } = params;
+        const { userId } = token;
+        await getSession(sessionId);
+        validateNotes(body);
+        const notes = await getNotes(sessionId, userId);
+        const updatedNotes = await Prisma.note.update({
+            data: body,
+            where: {
+                id: notes.id
+            }
+        });
+        res.json(updatedNotes);
     } catch (err: any) {
         res.error(err);
     }

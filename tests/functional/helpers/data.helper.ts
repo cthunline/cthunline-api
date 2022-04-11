@@ -6,11 +6,13 @@ import { assetDir } from '../../../src/controllers/assetController';
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
 import assets from '../data/assets.json';
+import notes from '../data/notes.json';
 import cocCharacters from '../data/characters/cocCharacters.json';
 import swd6Characters from '../data/characters/swd6Characters.json';
 
 export const usersData = users;
 export const sessionsData = sessions;
+export const notesData = notes;
 export const assetsData = assets;
 export const charactersData = [
     ...cocCharacters,
@@ -26,6 +28,7 @@ const Data = {
     async deleteAll() {
         await Prisma.token.deleteMany();
         await Prisma.character.deleteMany();
+        await Prisma.note.deleteMany();
         await Prisma.session.deleteMany();
         await Data.deleteAssetFiles();
         await Prisma.asset.deleteMany();
@@ -44,6 +47,9 @@ const Data = {
         ]);
         await Promise.all(sessionsData.map((data) => (
             Prisma.session.create({ data })
+        )));
+        await Promise.all(notesData.map((data) => (
+            Prisma.note.create({ data })
         )));
         await Promise.all(charactersData.map((data) => (
             Prisma.character.create({ data })

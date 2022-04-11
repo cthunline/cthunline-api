@@ -156,5 +156,15 @@
                 }
             }
         }
+    },
+    "notes": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+            "text": {
+                "type": "string"
+            }
+        }
     }
 }

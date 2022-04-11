@@ -5,7 +5,7 @@ import {
 } from 'express';
 import { Character } from '@prisma/client';
 
-import { findUser } from './userController';
+import { getUser } from './userController';
 import { controlSelf } from './authController';
 import { Prisma, handleNotFound } from '../services/prisma';
 import Validator from '../services/validator';
@@ -34,8 +34,20 @@ const controlPortrait = (base64: string) => {
     }
 };
 
-const validateCreate = Validator(CharacterSchemas.create);
-const validateUpdate = Validator(CharacterSchemas.update);
+const validateCreateCharacter = Validator(CharacterSchemas.create);
+const validateUpdateCharacter = Validator(CharacterSchemas.update);
+
+const getCharacter = async (characterId: string): Promise<Character> => (
+    handleNotFound<Character>(
+        'Character', (
+            Prisma.character.findUnique({
+                where: {
+                    id: characterId
+                }
+            })
+        )
+    )
+);
 
 const characterController = Router();
 
@@ -53,7 +65,7 @@ characterController.get('/characters', async (req: Request, res: Response): Prom
 characterController.get('/users/:userId/characters', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
-        await findUser(userId);
+        await getUser(userId);
         const characters = await Prisma.character.findMany({
             where: {
                 userId
@@ -69,9 +81,9 @@ characterController.get('/users/:userId/characters', async ({ params }: Request,
 characterController.post('/users/:userId/characters', async ({ body, params, token }: Request, res: Response): Promise<void> => {
     try {
         const { userId } = params;
-        await findUser(userId);
+        await getUser(userId);
         controlSelf(token, userId);
-        validateCreate(body);
+        validateCreateCharacter(body);
         const { gameId, name, data } = body;
         if (!isValidGameId(gameId)) {
             throw new ValidationError(`Invalid gameId ${gameId}`);
@@ -98,15 +110,7 @@ characterController.post('/users/:userId/characters', async ({ body, params, tok
 characterController.get('/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
         const { characterId } = params;
-        const character = await handleNotFound<Character>(
-            'Character', (
-                Prisma.character.findUnique({
-                    where: {
-                        id: characterId
-                    }
-                })
-            )
-        );
+        const character = await getCharacter(characterId);
         res.json(character);
     } catch (err: any) {
         res.error(err);
@@ -117,17 +121,9 @@ characterController.get('/characters/:characterId', async ({ params }: Request, 
 characterController.post('/characters/:characterId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
     try {
         const { characterId } = params;
-        const { gameId, userId } = await handleNotFound<Character>(
-            'Character', (
-                Prisma.character.findUnique({
-                    where: {
-                        id: characterId
-                    }
-                })
-            )
-        );
+        const { gameId, userId } = await getCharacter(characterId);
         controlSelf(token, userId);
-        validateUpdate(body);
+        validateUpdateCharacter(body);
         if (body.data) {
             Games[gameId as GameId].validator(body.data);
             if (body.data.portrait) {
@@ -150,15 +146,7 @@ characterController.post('/characters/:characterId', async ({ params, body, toke
 characterController.delete('/characters/:characterId', async ({ params, token }: Request, res: Response): Promise<void> => {
     try {
         const { characterId } = params;
-        const { userId } = await handleNotFound<Character>(
-            'Character', (
-                Prisma.character.findUnique({
-                    where: {
-                        id: characterId
-                    }
-                })
-            )
-        );
+        const { userId } = await getCharacter(characterId);
         controlSelf(token, userId);
         await Prisma.character.delete({
             where: {
