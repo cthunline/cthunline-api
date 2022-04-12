@@ -1,5 +1,8 @@
 {
     "extends": "@tsconfig/recommended/tsconfig.json",
+    "ts-node": {
+        "files": true
+    },
     "compilerOptions": {
         "target": "esnext",
         "outDir": "./build",
@@ -12,5 +15,8 @@
     "exclude": [
         "node_modules",
         "build"
+    ],
+    "files": [
+        "src/types/index.d.ts"
     ]
 }

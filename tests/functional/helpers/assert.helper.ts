@@ -237,25 +237,6 @@ export const assertCharacter = (
     }
 };
 
-export const assertToken = (
-    data: Record<string, any>,
-    expected?: Record<string, any>
-) => {
-    expect(data).to.be.an('object');
-    expect(data).to.have.property('userId');
-    expect(data.userId).to.be.a('string');
-    expect(data).to.have.property('bearer');
-    expect(data.bearer).to.be.a('string');
-    expect(data).to.have.property('limit');
-    expect(data.limit).to.be.a.dateString();
-    if (expected) {
-        Object.keys(expected).forEach((key) => {
-            expect(data).to.have.property(key);
-            expect(data[key]).to.equal(expected[key]);
-        });
-    }
-};
-
 export const assertError = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('error');

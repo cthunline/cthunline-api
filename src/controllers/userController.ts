@@ -9,8 +9,12 @@ import {
     Prisma,
     handleNotFound
 } from '../services/prisma';
-import { controlSelf, controlSelfAdmin } from './authController';
-import { verifyPassword, hashPassword } from '../services/tools';
+import {
+    controlSelf,
+    controlSelfAdmin,
+    verifyPassword,
+    hashPassword
+} from '../services/auth';
 import {
     ConflictError,
     ValidationError,
@@ -80,9 +84,10 @@ userController.get('/users', async ({ query }: Request, res: Response): Promise<
 });
 
 // create a user
-userController.post('/users', async ({ body, token }: Request, res: Response): Promise<void> => {
+userController.post('/users', async (req: Request, res: Response): Promise<void> => {
     try {
-        await controlSelfAdmin(token);
+        const { body } = req;
+        await controlSelfAdmin(req);
         validateCreateUser(body);
         const checkEmail = await Prisma.user.findUnique({
             where: {
@@ -119,8 +124,9 @@ userController.get('/users/:userId', async ({ params }: Request, res: Response):
 });
 
 // edit user
-userController.post('/users/:userId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+userController.post('/users/:userId', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { params, body } = req;
         const { userId } = params;
         const user = await handleNotFound<User>(
             'User', (
@@ -132,9 +138,9 @@ userController.post('/users/:userId', async ({ params, body, token }: Request, r
             )
         );
         try {
-            await controlSelfAdmin(token);
+            await controlSelfAdmin(req);
         } catch (err) {
-            controlSelf(token, userId);
+            controlSelf(req, userId);
             controlAdminFields(body);
         }
         validateUpdateUser(body);

@@ -9,7 +9,7 @@ import { Asset } from '@prisma/client';
 import Formidable from 'formidable';
 
 import { getUser } from './userController';
-import { controlSelf } from './authController';
+import { controlSelf } from '../services/auth';
 import { Prisma, handleNotFound } from '../services/prisma';
 import { InternError, ValidationError } from '../services/errors';
 import Log from '../services/log';
@@ -112,15 +112,13 @@ const getAsset = async (assetId: string): Promise<Asset> => (
 const assetController = Router();
 
 // get all assets of a user
-assetController.get('/users/:userId/assets', async (
-    { params, query, token }: Request,
-    res: Response
-): Promise<void> => {
+assetController.get('/users/:userId/assets', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { params, query } = req;
         const { userId } = params;
         const { type } = query;
         await getUser(userId);
-        controlSelf(token, userId);
+        controlSelf(req, userId);
         const assets = await Prisma.asset.findMany({
             where: {
                 userId,
@@ -142,7 +140,7 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
         // control userId
         const { userId } = req.params;
         await getUser(userId);
-        controlSelf(req.token, userId);
+        controlSelf(req, userId);
         // create user subdirectory if not exist
         const userDir = await controlUserDir(userId);
         // initialize formidable
@@ -209,11 +207,12 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
 });
 
 // get a user's asset
-assetController.get('/users/:userId/assets/:assetId', async ({ params, token }: Request, res: Response): Promise<void> => {
+assetController.get('/users/:userId/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { params } = req;
         const { userId, assetId } = params;
         await getUser(userId);
-        controlSelf(token, userId);
+        controlSelf(req, userId);
         const asset = await getAsset(assetId);
         res.json(asset);
     } catch (err: any) {
@@ -222,11 +221,12 @@ assetController.get('/users/:userId/assets/:assetId', async ({ params, token }: 
 });
 
 // delete a user's asset
-assetController.delete('/users/:userId/assets/:assetId', async ({ params, token }: Request, res: Response): Promise<void> => {
+assetController.delete('/users/:userId/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { params } = req;
         const { userId, assetId } = params;
         await getUser(userId);
-        controlSelf(token, userId);
+        controlSelf(req, userId);
         const { path } = await getAsset(assetId);
         await Promise.all([
             Prisma.asset.delete({

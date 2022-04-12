@@ -15,24 +15,24 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of invalid handshake data', async () => {
-        const { bearer } = await Api.login();
+        const { token } = await Api.login();
         const invalidData = [{
-            bearer,
+            token,
             query: {}
         }, {
-            bearer,
+            token,
             query: {
                 sessionId: sessionsData[1].id
             }
         }, {
-            bearer,
+            token,
             query: {
                 characterId: charactersData[0].id
             }
         }];
         for (const data of invalidData) {
             await Sockets.failConnect({
-                bearer: data.bearer,
+                token: data.token,
                 query: data.query,
                 status: 400
             });
@@ -41,7 +41,7 @@ describe('[Sockets] Connection', () => {
 
     it('Should fail to connect socket because of invalid authentication token', async () => {
         await Sockets.failConnect({
-            bearer: 'invalidToken',
+            token: 'invalidToken',
             query: {
                 sessionId: sessionsData[1].id,
                 characterId: charactersData[0].id
@@ -51,7 +51,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of invalid sessionId or characterId', async () => {
-        const { bearer } = await Api.login();
+        const { token } = await Api.login();
         const invalidQueries = [{
             sessionId: 'invalid',
             characterId: charactersData[0].id
@@ -61,7 +61,7 @@ describe('[Sockets] Connection', () => {
         }];
         for (const query of invalidQueries) {
             await Sockets.failConnect({
-                bearer,
+                token,
                 query,
                 status: 400
             });
@@ -69,7 +69,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of not found sessionId or characterId', async () => {
-        const { bearer } = await Api.login();
+        const { token } = await Api.login();
         const notFoundQueries = [{
             sessionId: '1122334455667788aabbccdd',
             characterId: charactersData[0].id
@@ -79,7 +79,7 @@ describe('[Sockets] Connection', () => {
         }];
         for (const query of notFoundQueries) {
             await Sockets.failConnect({
-                bearer,
+                token,
                 query,
                 status: 404
             });
@@ -87,9 +87,9 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of forbidden characterId', async () => {
-        const { bearer } = await Api.login();
+        const { token } = await Api.login();
         await Sockets.failConnect({
-            bearer,
+            token,
             query: {
                 sessionId: sessionsData[1].id,
                 characterId: charactersData[1].id
@@ -99,9 +99,9 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should connect to socket', async () => {
-        const { bearer } = await Api.login();
+        const { token } = await Api.login();
         await Sockets.connect({
-            bearer,
+            token,
             sessionId: sessionsData[1].id,
             characterId: charactersData[0].id
         });
@@ -109,21 +109,21 @@ describe('[Sockets] Connection', () => {
             id === sessionsData[1].masterId
         ));
         const {
-            bearer: masterBearer
+            token: masterToken
         } = await Api.login({
             email: masterUser?.email ?? '',
             password: 'test'
         });
         await Sockets.connect({
-            bearer: masterBearer,
+            token: masterToken,
             sessionId: sessionsData[1].id
         });
     });
 
     it('Should disconnect copycat socket on connection', async () => {
-        const { bearer } = await Api.login();
+        const { token } = await Api.login();
         const copycatSocket = await Sockets.connect({
-            bearer,
+            token,
             sessionId: sessionsData[1].id,
             characterId: charactersData[0].id
         });
@@ -138,7 +138,7 @@ describe('[Sockets] Connection', () => {
                 });
             }),
             Sockets.connect({
-                bearer,
+                token,
                 sessionId: sessionsData[2].id,
                 characterId: charactersData[0].id
             })
@@ -147,7 +147,7 @@ describe('[Sockets] Connection', () => {
 
     it('Should emit join and leave events', async () => {
         const [masterEmail, playerEmail] = usersData.map(({ email }) => email);
-        const [masterToken, playerToken] = (
+        const [masterAuthUser, playerAuthUser] = (
             await Promise.all(
                 [masterEmail, playerEmail].map((email) => (
                     Api.login({
@@ -158,7 +158,7 @@ describe('[Sockets] Connection', () => {
             )
         );
         const sessionId = sessionsData.find(({ masterId }) => (
-            masterToken.userId === masterId
+            masterAuthUser.id === masterId
         ))?.id;
         const assertData = (
             { user, isMaster, users }: Record<string, any>,
@@ -170,7 +170,7 @@ describe('[Sockets] Connection', () => {
             expect(users).have.lengthOf(expectedUsersLength);
             users.forEach((sessionUser: Record<string, any>) => {
                 const isSessionUserMaster = (
-                    sessionUser.id === masterToken.userId
+                    sessionUser.id === masterAuthUser.id
                 );
                 assertUser(sessionUser);
                 if (isSessionUserMaster) {
@@ -184,7 +184,7 @@ describe('[Sockets] Connection', () => {
             });
         };
         const masterSocket = await Sockets.connect({
-            bearer: masterToken.bearer,
+            token: masterAuthUser.token,
             sessionId
         });
         const removeListeners = () => {
@@ -215,10 +215,10 @@ describe('[Sockets] Connection', () => {
                 });
             }),
             Sockets.connect({
-                bearer: playerToken.bearer,
+                token: playerAuthUser.token,
                 sessionId,
                 characterId: charactersData.find((character) => (
-                    character.userId === playerToken.userId
+                    character.userId === playerAuthUser.id
                 ))?.id
             })
         ]);

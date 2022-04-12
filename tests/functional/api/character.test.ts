@@ -24,6 +24,9 @@ describe('[API] Characters', () => {
     beforeEach(async () => {
         await Api.login();
     });
+    afterEach(async () => {
+        await Api.logout();
+    });
 
     describe('GET /characters', () => {
         it('Should list all characters', async () => {

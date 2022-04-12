@@ -25,18 +25,18 @@ interface SocketsHelper {
 }
 
 interface GetSocketClientData {
-    bearer?: string;
+    token?: string;
     query?: object;
 }
 
 export interface FailSocketConnectionData {
-    bearer?: string;
+    token?: string;
     query?: object;
     status: number;
 }
 
 export interface SocketConnectionData {
-    bearer?: string;
+    token?: string;
     sessionId?: string;
     characterId?: string;
 }
@@ -51,18 +51,18 @@ const Sockets: SocketsHelper = {
     url: 'http://localhost:8080',
     connectedSockets: [],
 
-    getSocketClient: ({ bearer, query }: GetSocketClientData) => {
+    getSocketClient: ({ token, query }: GetSocketClientData) => {
         const socketClient = new SocketClient(Sockets.url, {
             query,
             autoConnect: false
         });
-        if (bearer) {
+        if (token) {
             const signed = CookieSignature.sign(
-                bearer,
-                'cthunline'
+                token,
+                process.env.COOKIE_SECRET ?? ''
             );
             socketClient.io.opts.extraHeaders = {
-                cookie: `bearer=s:${signed}`
+                cookie: `token=s:${signed}`
             };
         }
         return socketClient;
@@ -73,7 +73,7 @@ const Sockets: SocketsHelper = {
         const characterId = connectionData?.characterId ?? charactersData[0].id;
         return new Promise((resolve, reject) => {
             const socket = Sockets.getSocketClient({
-                bearer: connectionData?.bearer,
+                token: connectionData?.token,
                 query: {
                     sessionId,
                     characterId
@@ -91,32 +91,28 @@ const Sockets: SocketsHelper = {
     },
 
     connectRole: async (isMaster: boolean) => {
-        const { userId, bearer } = await Api.login();
+        const { id, token } = await Api.login();
         const sessionId = sessionsData.find(({ masterId }) => (
-            isMaster ? (
-                userId === masterId
-            ) : (
-                userId !== masterId
-            )
+            isMaster ? id === masterId : id !== masterId
         ))?.id;
         const characterId = charactersData.find((char) => (
             char.userId === Api.userId
         ))?.id;
         return Sockets.connect({
-            bearer,
+            token,
             sessionId,
             characterId
         });
     },
 
     failConnect: async ({
-        bearer,
+        token,
         query,
         status
     }: FailSocketConnectionData): Promise<void> => (
         new Promise((resolve, reject) => {
             const socket = Sockets.getSocketClient({
-                bearer,
+                token,
                 query
             });
             socket.connect();
@@ -134,7 +130,7 @@ const Sockets: SocketsHelper = {
     // returns array with master socket, player1 socker and player2 socket
     setupSession: async (): Promise<Socket[]> => {
         const [masterEmail, player1Email, player2Email] = usersData.map(({ email }) => email);
-        const [masterToken, player1Token, player2Token] = (
+        const [masterTokenUser, player1TokenUser, player2TokenUser] = (
             await Promise.all(
                 [masterEmail, player1Email, player2Email].map((email) => (
                     Api.login({
@@ -145,19 +141,19 @@ const Sockets: SocketsHelper = {
             )
         );
         const sessionId = sessionsData.find(({ masterId }) => (
-            masterToken.userId === masterId
+            masterTokenUser.id === masterId
         ))?.id;
         return Promise.all([
             Sockets.connect({
-                bearer: masterToken.bearer,
+                token: masterTokenUser.token,
                 sessionId
             }),
-            ...[player1Token, player2Token].map(({ userId, bearer }) => (
+            ...[player1TokenUser, player2TokenUser].map(({ id, token }) => (
                 Sockets.connect({
-                    bearer,
+                    token,
                     sessionId,
                     characterId: charactersData.find((character) => (
-                        character.userId === userId
+                        character.userId === id
                     ))?.id
                 })
             ))

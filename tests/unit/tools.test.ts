@@ -1,10 +1,12 @@
 import { expect } from 'chai';
 import {
-    trimChar,
-    encodeBase64,
-    decodeBase64,
     hashPassword,
     verifyPassword
+} from '../../src/services/auth';
+import {
+    trimChar,
+    encodeBase64,
+    decodeBase64
 } from '../../src/services/tools';
 
 describe('[Unit] Tools', () => {

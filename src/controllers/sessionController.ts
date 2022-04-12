@@ -9,7 +9,7 @@ import {
     Prisma,
     handleNotFound
 } from '../services/prisma';
-import { controlSelf } from './authController';
+import { controlSelf } from '../services/auth';
 import { userSelect } from './userController';
 import Validator from '../services/validator';
 import { isValidGameId } from '../games';
@@ -114,7 +114,7 @@ sessionController.post('/sessions', async (req: Request, res: Response): Promise
         const session = await Prisma.session.create({
             data: {
                 ...createData,
-                masterId: req.token.userId
+                masterId: req.user.id
             }
         });
         res.json(session);
@@ -135,11 +135,12 @@ sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: R
 });
 
 // edit a session
-sessionController.post('/sessions/:sessionId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+sessionController.post('/sessions/:sessionId', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { body, params } = req;
         const { sessionId } = params;
         const session = await getSession(sessionId);
-        controlSelf(token, session.masterId);
+        controlSelf(req, session.masterId);
         validateUpdateSession(body);
         const updatedSession = await Prisma.session.update({
             data: body,
@@ -154,11 +155,12 @@ sessionController.post('/sessions/:sessionId', async ({ params, body, token }: R
 });
 
 // delete a session
-sessionController.delete('/sessions/:sessionId', async ({ params, token }: Request, res: Response): Promise<void> => {
+sessionController.delete('/sessions/:sessionId', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { params } = req;
         const { sessionId } = params;
         const session = await getSession(sessionId);
-        controlSelf(token, session.masterId);
+        controlSelf(req, session.masterId);
         await Prisma.session.delete({
             where: {
                 id: sessionId
@@ -171,12 +173,11 @@ sessionController.delete('/sessions/:sessionId', async ({ params, token }: Reque
 });
 
 // get current user notes in a session
-sessionController.get('/sessions/:sessionId/notes', async ({ params, token }: Request, res: Response): Promise<void> => {
+sessionController.get('/sessions/:sessionId/notes', async ({ params, user }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
-        const { userId } = token;
         await getSession(sessionId);
-        const notes = await getNotes(sessionId, userId);
+        const notes = await getNotes(sessionId, user.id);
         res.json(notes);
     } catch (err: any) {
         res.error(err);
@@ -184,13 +185,12 @@ sessionController.get('/sessions/:sessionId/notes', async ({ params, token }: Re
 });
 
 // set current user notes in a session
-sessionController.post('/sessions/:sessionId/notes', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+sessionController.post('/sessions/:sessionId/notes', async ({ body, params, user }: Request, res: Response): Promise<void> => {
     try {
         const { sessionId } = params;
-        const { userId } = token;
         await getSession(sessionId);
         validateNotes(body);
-        const notes = await getNotes(sessionId, userId);
+        const notes = await getNotes(sessionId, user.id);
         const updatedNotes = await Prisma.note.update({
             data: body,
             where: {

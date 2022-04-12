@@ -27,6 +27,9 @@ describe('[API] Sessions', () => {
     beforeEach(async () => {
         await Api.login();
     });
+    afterEach(async () => {
+        await Api.logout();
+    });
 
     describe('GET /sessions', () => {
         it('Should list all sessions', async () => {

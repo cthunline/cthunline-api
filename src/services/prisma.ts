@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+
 import Log from './log';
-import { hashPassword } from './tools';
+import { hashPassword } from './auth';
 import { NotFoundError } from './errors';
 
 export const Prisma = new PrismaClient();

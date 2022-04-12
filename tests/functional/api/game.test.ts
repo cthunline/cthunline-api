@@ -13,6 +13,9 @@ describe('[API] Games', () => {
     beforeEach(async () => {
         await Api.login();
     });
+    afterEach(async () => {
+        await Api.logout();
+    });
 
     describe('GET /games', () => {
         it('Should list all games', async () => {

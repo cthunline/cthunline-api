@@ -27,6 +27,9 @@ describe('[API] Assets', () => {
     beforeEach(async () => {
         await Api.login();
     });
+    afterEach(async () => {
+        await Api.logout();
+    });
 
     describe('GET /users/:id/assets', () => {
         it('Should throw a forbidden error', async () => {

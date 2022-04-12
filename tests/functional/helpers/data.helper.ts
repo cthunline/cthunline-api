@@ -26,7 +26,6 @@ const Data = {
     },
 
     async deleteAll() {
-        await Prisma.token.deleteMany();
         await Prisma.character.deleteMany();
         await Prisma.note.deleteMany();
         await Prisma.session.deleteMany();

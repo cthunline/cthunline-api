@@ -1,12 +1,10 @@
 import { Socket, Server } from 'socket.io';
 import { ObjectId } from 'bson';
-import {
-    Token,
-    Session,
-    Character
-} from '@prisma/client';
+import { Session, Character } from '@prisma/client';
 
 import { Prisma } from '../services/prisma';
+import { UserSelect } from '../controllers/userController';
+import { verifyJwt } from '../services/auth';
 import {
     CustomError,
     AuthenticationError,
@@ -14,26 +12,14 @@ import {
     ValidationError,
     ForbiddenError
 } from '../services/errors';
-import { getUser } from '../controllers/userController';
 
 // verify auth token
-const verifyBearer = async (socket: Socket): Promise<Token> => {
-    const bearer = (socket.request as any).signedCookies.bearer as string;
-    if (!bearer) {
+const verifyToken = async (socket: Socket): Promise<UserSelect> => {
+    const token = (socket.request as any).signedCookies.token as string;
+    if (!token) {
         throw new AuthenticationError('Missing authentication cookie');
     }
-    const token = await Prisma.token.findFirst({
-        where: {
-            bearer,
-            limit: {
-                gt: new Date()
-            }
-        }
-    });
-    if (!token) {
-        throw new AuthenticationError('Invalid authentication token');
-    }
-    return token;
+    return verifyJwt<UserSelect>(token);
 };
 
 // verify session
@@ -76,16 +62,14 @@ const verifyCharacter = async (socket: Socket, userId: string): Promise<Characte
 // handles socket connection
 export const connectionMiddleware = async (socket: Socket, next: Function) => {
     try {
-        const token = await verifyBearer(socket);
-        const user = await getUser(token.userId);
+        const user = await verifyToken(socket);
         const session = await verifySession(socket);
-        const isMaster = session.masterId === token.userId;
+        const isMaster = session.masterId === user.id;
         const character = isMaster ? null : (
-            await verifyCharacter(socket, token.userId)
+            await verifyCharacter(socket, user.id)
         );
         // set data on socket
         socket.data = {
-            userID: user.id,
             user,
             characterId: character?.id,
             character,

@@ -1,5 +1,3 @@
-const Bcrypt = require('bcrypt');
-
 // trim chars on a string (at begining and end)
 export const trimChar = (str: string, char: string): string => {
     let string = str;
@@ -10,17 +8,6 @@ export const trimChar = (str: string, char: string): string => {
         string = string.substring(0, string.length - 1);
     }
     return string;
-};
-
-// hash a string
-export const hashPassword = async (password: string): Promise<string> => (
-    Bcrypt.hash(password, 10)
-);
-
-// validate hash against string
-export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
-    const verify = await Bcrypt.compare(password, hash);
-    return !!verify;
 };
 
 // check if string is valid base64

@@ -11,6 +11,9 @@ describe('[API] Users', () => {
     beforeEach(async () => {
         await Api.login();
     });
+    afterEach(async () => {
+        await Api.logout();
+    });
 
     describe('GET /users', () => {
         it('Should list users', async () => {

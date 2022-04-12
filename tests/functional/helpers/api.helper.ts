@@ -3,10 +3,7 @@ import ChaiHttp from 'chai-http';
 import Path from 'path';
 
 import server from '../../../src';
-import {
-    assertError,
-    assertToken
-} from './assert.helper';
+import { assertError, assertUser } from './assert.helper';
 
 Chai.use(ChaiHttp);
 
@@ -16,6 +13,10 @@ before((done) => {
     server.on('ready', () => {
         done();
     });
+});
+
+after(() => {
+    chaiHttpAgent.close();
 });
 
 type HttpUpperMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -120,8 +121,8 @@ const Api = {
         const { body } = response;
         if (expectSuccess) {
             expect(response).to.have.status(200);
-            assertToken(body);
-            Api.userId = body.userId;
+            assertUser(body);
+            Api.userId = body.id;
             return body;
         }
         expect(response).to.have.status(401);
@@ -155,7 +156,7 @@ const Api = {
         if (expectSuccess) {
             expect(response).to.have.status(200);
             expect(response).to.be.json;
-            assertToken(response.body);
+            assertUser(response.body);
         } else {
             expect(response).to.have.status(401);
             expect(response).to.be.json;

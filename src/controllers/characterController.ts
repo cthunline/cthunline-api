@@ -6,7 +6,7 @@ import {
 import { Character } from '@prisma/client';
 
 import { getUser } from './userController';
-import { controlSelf } from './authController';
+import { controlSelf } from '../services/auth';
 import { Prisma, handleNotFound } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
@@ -78,11 +78,12 @@ characterController.get('/users/:userId/characters', async ({ params }: Request,
 });
 
 // create a character for a user
-characterController.post('/users/:userId/characters', async ({ body, params, token }: Request, res: Response): Promise<void> => {
+characterController.post('/users/:userId/characters', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { body, params } = req;
         const { userId } = params;
         await getUser(userId);
-        controlSelf(token, userId);
+        controlSelf(req, userId);
         validateCreateCharacter(body);
         const { gameId, name, data } = body;
         if (!isValidGameId(gameId)) {
@@ -118,11 +119,12 @@ characterController.get('/characters/:characterId', async ({ params }: Request, 
 });
 
 // edit a character
-characterController.post('/characters/:characterId', async ({ params, body, token }: Request, res: Response): Promise<void> => {
+characterController.post('/characters/:characterId', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { body, params } = req;
         const { characterId } = params;
         const { gameId, userId } = await getCharacter(characterId);
-        controlSelf(token, userId);
+        controlSelf(req, userId);
         validateUpdateCharacter(body);
         if (body.data) {
             Games[gameId as GameId].validator(body.data);
@@ -143,11 +145,12 @@ characterController.post('/characters/:characterId', async ({ params, body, toke
 });
 
 // delete a user's character
-characterController.delete('/characters/:characterId', async ({ params, token }: Request, res: Response): Promise<void> => {
+characterController.delete('/characters/:characterId', async (req: Request, res: Response): Promise<void> => {
     try {
+        const { params } = req;
         const { characterId } = params;
         const { userId } = await getCharacter(characterId);
-        controlSelf(token, userId);
+        controlSelf(req, userId);
         await Prisma.character.delete({
             where: {
                 id: characterId
