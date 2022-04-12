@@ -31,7 +31,7 @@ declare global {
 
 // get new limit date for token
 const getTokenLimitDate = () => (
-    DaysJs().add(3, 'hour').toDate()
+    DaysJs().add(6, 'hour').toDate()
 );
 
 // get expire date for cookie
@@ -63,14 +63,16 @@ export const authMiddleware = async (
             throw new AuthenticationError();
         }
         // this is intentionally not awaited so auth middleware is not slowed down
-        Prisma.token.update({
-            data: {
-                limit: getTokenLimitDate()
-            },
-            where: {
-                id: token.id
-            }
-        });
+        (async () => {
+            await Prisma.token.update({
+                data: {
+                    limit: getTokenLimitDate()
+                },
+                where: {
+                    id: token.id
+                }
+            });
+        })();
         req.token = token;
         next();
     } catch (err: any) {
@@ -143,6 +145,17 @@ authController.post('/auth', async ({ body }: Request, res: Response): Promise<v
                 limit
             }
         });
+        // clean expired tokens in database
+        // this is intentionally not awaited so auth middleware is not slowed down
+        (async () => {
+            await Prisma.token.deleteMany({
+                where: {
+                    limit: {
+                        lt: DaysJs().toDate()
+                    }
+                }
+            });
+        })();
         res.cookie('bearer', token.bearer, {
             httpOnly: true,
             signed: true,
