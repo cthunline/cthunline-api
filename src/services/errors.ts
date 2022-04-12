@@ -69,6 +69,7 @@ declare global {
 export const errorMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     res.error = (err: Error): void => {
         const { message, stack } = err;
+        const invalidDataMessage = 'Invalid data provided';
         let statusCode = 500;
         const response: Record<string, any> = {
             error: 'Intern error'
@@ -81,12 +82,13 @@ export const errorMiddleware = (req: Request, res: Response, next: NextFunction)
             }
         } else if (err instanceof PrismaClientValidationError) {
             statusCode = 400;
-            response.error = message;
+            response.error = invalidDataMessage;
         } else if (err instanceof PrismaClientKnownRequestError) {
             const { code } = err;
             response.error = message;
             if (code === 'P2023') {
                 statusCode = 400;
+                response.error = invalidDataMessage;
             }
         } else {
             Log.error(stack);
