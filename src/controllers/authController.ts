@@ -62,17 +62,14 @@ export const authMiddleware = async (
         if (!token) {
             throw new AuthenticationError();
         }
-        // this is intentionally not awaited so auth middleware is not slowed down
-        (async () => {
-            await Prisma.token.update({
-                data: {
-                    limit: getTokenLimitDate()
-                },
-                where: {
-                    id: token.id
-                }
-            });
-        })();
+        await Prisma.token.update({
+            data: {
+                limit: getTokenLimitDate()
+            },
+            where: {
+                id: token.id
+            }
+        });
         req.token = token;
         next();
     } catch (err: any) {
