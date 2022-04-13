@@ -87,7 +87,7 @@ userController.get('/users', async ({ query }: Request, res: Response): Promise<
 userController.post('/users', async (req: Request, res: Response): Promise<void> => {
     try {
         const { body } = req;
-        await controlSelfAdmin(req);
+        controlSelfAdmin(req);
         validateCreateUser(body);
         const checkEmail = await Prisma.user.findUnique({
             where: {
@@ -138,7 +138,7 @@ userController.post('/users/:userId', async (req: Request, res: Response): Promi
             )
         );
         try {
-            await controlSelfAdmin(req);
+            controlSelfAdmin(req);
         } catch (err) {
             controlSelf(req, userId);
             controlAdminFields(body);

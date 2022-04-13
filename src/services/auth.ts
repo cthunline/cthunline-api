@@ -52,7 +52,7 @@ export const controlSelf = (req: Request, userId: string) => {
 };
 
 // check currently authenticated user is an admin
-export const controlSelfAdmin = async ({ user }: Request) => {
+export const controlSelfAdmin = ({ user }: Request) => {
     if (!user.isAdmin) {
         throw new ForbiddenError();
     }

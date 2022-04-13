@@ -7,8 +7,7 @@ import {
     ConfigurationKey,
     ConfigurationSchema,
     ConfigurationValueType,
-    configurationSchema,
-    defaultConfiguration
+    configurationSchema
 } from '../types/configuration';
 
 export const parseConfigurationValue = (
@@ -16,11 +15,12 @@ export const parseConfigurationValue = (
     value: string,
     type: ConfigurationValueType
 ): any => {
+    const numberRegex = /^\d+$/;
     switch (type) {
         case 'string':
             return String(value);
         case 'number':
-            if (Number.isNaN(value)) {
+            if (!numberRegex.test(value)) {
                 throw new Error(`${key} should be a number`);
             }
             return Number(value);
@@ -33,21 +33,18 @@ export const parseConfigurationValue = (
     }
 };
 
-export const controlConfiguration = (
+export const parseConfiguration = (
     data: Record<string, string>,
-    schema: ConfigurationSchema,
-    throwError: boolean
+    schema: ConfigurationSchema
 ): Configuration => {
-    const conf: Configuration = { ...defaultConfiguration };
+    const conf: Partial<Record<ConfigurationKey, any>> = {};
     const errors: string[] = [];
     const keys = Object.keys(schema) as ConfigurationKey[];
     keys.forEach((key) => {
         try {
             const type = schema[key];
             if (data[key]) {
-                (conf as Record<ConfigurationKey, any>)[key] = (
-                    parseConfigurationValue(key, data[key], type)
-                );
+                conf[key] = parseConfigurationValue(key, data[key], type);
             } else {
                 throw new Error(`missing or empty ${key} in configuration`);
             }
@@ -55,14 +52,13 @@ export const controlConfiguration = (
             errors.push(err.message);
         }
     });
-    if (throwError && errors.length) {
+    if (errors.length) {
         throw new Error(`Invalid configuration: ${errors.join(' ; ')}`);
     }
-    return conf;
+    return conf as Configuration;
 };
 
-export const configuration = controlConfiguration(
+export const configuration = parseConfiguration(
     process.env as Record<string, string>,
-    configurationSchema,
-    true
+    configurationSchema
 );

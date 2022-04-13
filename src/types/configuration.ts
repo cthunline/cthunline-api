@@ -33,18 +33,3 @@ export const configurationSchema: ConfigurationSchema = {
     MONGO_URL: 'string',
     ASSET_DIR: 'string'
 };
-
-export const defaultConfiguration: Configuration = {
-    DEFAULT_ADMIN_NAME: '',
-    DEFAULT_ADMIN_EMAIL: '',
-    DEFAULT_ADMIN_PASSWORD: '',
-    PORT: 8080,
-    JWT_SECRET: '',
-    COOKIE_SECRET: '',
-    COOKIE_SECURE: true,
-    LOG_ENABLED: true,
-    LOG_DIR: '',
-    CHECKPOINT_DISABLE: true,
-    MONGO_URL: '',
-    ASSET_DIR: ''
-};
