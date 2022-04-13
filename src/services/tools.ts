@@ -39,12 +39,3 @@ export const decodeBase64 = (base64: string): string => (
 export const sum = (numbers: number[]): number => (
     numbers.reduce((i, j) => i + j, 0)
 );
-
-// parse an environment variable into a boolean
-export const booleanEnv = (
-    envVar: string | undefined,
-    defaultBoolean: boolean = false
-) => {
-    const defaultString = defaultBoolean ? '1' : '0';
-    return !!parseInt(envVar ?? defaultString);
-};

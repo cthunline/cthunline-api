@@ -10,18 +10,19 @@ import {
 } from './services/errors';
 import Log from './services/log';
 import { initDb } from './services/prisma';
+import { configuration } from './services/configuration';
 import apiController from './controllers';
 import socketRouter from './sockets';
 
 const app = Express();
 const httpServer = createServer(app);
 
+const { COOKIE_SECRET, PORT } = configuration;
+
 (async () => {
     try {
         Log.info('Setting middlewares');
-        app.use(CookieParser(
-            process.env.COOKIE_SECRET ?? 'cthunline'
-        ));
+        app.use(CookieParser(COOKIE_SECRET));
         app.use(Helmet());
         app.use(Express.json({
             limit: '1mb'
@@ -41,9 +42,8 @@ const httpServer = createServer(app);
         Log.info('Initializing web sockets');
         socketRouter(httpServer);
 
-        const port = process.env.PORT ?? 8080;
-        httpServer.listen(port, () => {
-            Log.info(`Listening on port ${port}`);
+        httpServer.listen(PORT, () => {
+            Log.info(`Listening on port ${PORT}`);
             app.emit('ready');
         });
     } catch (err: any) {

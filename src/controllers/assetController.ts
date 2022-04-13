@@ -9,11 +9,14 @@ import { Asset } from '@prisma/client';
 import Formidable from 'formidable';
 
 import { getUser } from './userController';
+import { configuration } from '../services/configuration';
 import { controlSelf } from '../services/auth';
 import { Prisma, handleNotFound } from '../services/prisma';
 import { InternError, ValidationError } from '../services/errors';
 import Log from '../services/log';
 import { mimeTypes, FileType, MimeType } from '../types/asset';
+
+const { ASSET_DIR } = configuration;
 
 interface TypedFile extends Formidable.File {
     type: FileType;
@@ -49,17 +52,13 @@ const controlFile = (file: Formidable.File): FileType => {
 
 // check asset directory exists and is writable
 const getAssetDir = (): string => {
-    const dir = process.env.ASSET_DIR;
-    if (dir) {
-        try {
-            Fs.accessSync(dir, Fs.constants.F_OK);
-            Fs.accessSync(dir, Fs.constants.W_OK);
-            return dir;
-        } catch {
-            throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
-        }
-    } else {
-        throw new InternError('No asset directory provided');
+    const dir = ASSET_DIR;
+    try {
+        Fs.accessSync(dir, Fs.constants.F_OK);
+        Fs.accessSync(dir, Fs.constants.W_OK);
+        return dir;
+    } catch {
+        throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
     }
 };
 

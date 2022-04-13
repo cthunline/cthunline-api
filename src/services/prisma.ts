@@ -1,8 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
+import { configuration } from './configuration';
 import Log from './log';
 import { hashPassword } from './auth';
 import { NotFoundError } from './errors';
+
+const {
+    DEFAULT_ADMIN_NAME,
+    DEFAULT_ADMIN_EMAIL,
+    DEFAULT_ADMIN_PASSWORD
+} = configuration;
 
 export const Prisma = new PrismaClient();
 
@@ -11,9 +18,9 @@ export const Prisma = new PrismaClient();
 export const initDb = async () => {
     const users = await Prisma.user.findMany();
     if (!users.length) {
-        const name = process.env.DEFAULT_ADMIN_NAME;
-        const email = process.env.DEFAULT_ADMIN_EMAIL;
-        const password = process.env.DEFAULT_ADMIN_PASSWORD;
+        const name = DEFAULT_ADMIN_NAME;
+        const email = DEFAULT_ADMIN_EMAIL;
+        const password = DEFAULT_ADMIN_PASSWORD;
         if (name && email && password) {
             const defaultUser = {
                 name,

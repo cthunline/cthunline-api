@@ -2,10 +2,12 @@ import Path from 'path';
 import Fs from 'fs';
 import Winston, { format } from 'winston';
 
-import { booleanEnv } from './tools';
+import { configuration } from './configuration';
 
-const isLogEnabled = booleanEnv(process.env.LOG_ENABLED, true);
-const logDir = process.env.LOG_DIR;
+const { LOG_ENABLED, LOG_DIR } = configuration;
+
+const isLogEnabled = LOG_ENABLED;
+const logDir = LOG_DIR;
 
 const printf = (i: Winston.Logform.TransformableInfo) => (
     `${i.timestamp} [${i.level}] ${i.message}`

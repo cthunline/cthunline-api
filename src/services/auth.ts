@@ -2,12 +2,15 @@ import { Request } from 'express';
 import Jwt from 'jsonwebtoken';
 import DaysJs from 'dayjs';
 
+import { configuration } from './configuration';
 import {
     AuthenticationError,
     ForbiddenError
 } from './errors';
 
 const Bcrypt = require('bcrypt');
+
+const { JWT_SECRET, COOKIE_SECURE } = configuration;
 
 // hash a string
 export const hashPassword = async (password: string): Promise<string> => (
@@ -21,16 +24,12 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
 };
 
 export const generateJwt = <DataType extends object>(user: DataType) => (
-    Jwt.sign(
-        user,
-        process.env.JWT_SECRET ?? '',
-        { expiresIn: '12h' }
-    )
+    Jwt.sign(user, JWT_SECRET ?? '', { expiresIn: '12h' })
 );
 
 export const verifyJwt = <DataType extends object>(token: string): DataType => {
     try {
-        return Jwt.verify(token, process.env.JWT_SECRET ?? '') as DataType;
+        return Jwt.verify(token, JWT_SECRET ?? '') as DataType;
     } catch {
         throw new AuthenticationError();
     }
@@ -40,7 +39,7 @@ export const verifyJwt = <DataType extends object>(token: string): DataType => {
 export const getCookieOptions = () => ({
     httpOnly: true,
     signed: true,
-    secure: process.env.COOKIE_SECURE === 'true',
+    secure: COOKIE_SECURE,
     expires: DaysJs().add(12, 'hours').toDate()
 });
 

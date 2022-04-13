@@ -2,6 +2,7 @@ import { Socket, Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import CookieParser from 'cookie-parser';
 
+import { configuration } from '../services/configuration';
 import {
     connectionMiddleware,
     disconnectCopycats,
@@ -12,6 +13,8 @@ import characterHandler from './characterHandler';
 import audioHandler from './audioHandler';
 import sketchHandler from './sketchHandler';
 
+const { COOKIE_SECRET } = configuration;
+
 const wrapExpressMiddleware = (middleware: Function) => (
     (socket: Socket, next: Function) => (
         middleware(socket.request, {}, next)
@@ -21,7 +24,7 @@ const wrapExpressMiddleware = (middleware: Function) => (
 const socketRouter = (httpServer: HttpServer) => {
     const io = new Server(httpServer);
     io.use(wrapExpressMiddleware(
-        CookieParser(process.env.COOKIE_SECRET)
+        CookieParser(COOKIE_SECRET)
     ));
     io.use(connectionMiddleware);
     io.on('connection', async (socket: Socket) => {
