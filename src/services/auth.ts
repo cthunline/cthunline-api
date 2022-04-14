@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { Request, CookieOptions } from 'express';
 import Jwt from 'jsonwebtoken';
 import DaysJs from 'dayjs';
 
@@ -36,10 +36,11 @@ export const verifyJwt = <DataType extends object>(token: string): DataType => {
 };
 
 // returns options object for cookies
-export const getCookieOptions = () => ({
+export const getCookieOptions = (): CookieOptions => ({
     httpOnly: true,
     signed: true,
     secure: COOKIE_SECURE,
+    sameSite: true,
     expires: DaysJs().add(12, 'hours').toDate()
 });
 
