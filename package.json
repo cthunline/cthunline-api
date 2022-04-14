@@ -34,7 +34,7 @@
     "devDependencies": {
         "@tsconfig/recommended": "^1.0.1",
         "@types/bcrypt": "^5.0.0",
-        "@types/chai": "^4.3.0",
+        "@types/chai": "^4.3.1",
         "@types/cookie-parser": "^1.4.2",
         "@types/cookie-signature": "^1.0.4",
         "@types/cors": "^2.8.12",
@@ -44,7 +44,7 @@
         "@types/formidable": "^2.0.4",
         "@types/jsonwebtoken": "^8.5.8",
         "@types/mocha": "^9.1.0",
-        "@types/node": "^17.0.23",
+        "@types/node": "^17.0.24",
         "@types/validator": "^13.7.2",
         "@typescript-eslint/eslint-plugin": "^5.19.0",
         "@typescript-eslint/parser": "^5.19.0",
