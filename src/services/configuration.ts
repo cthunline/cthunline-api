@@ -4,14 +4,13 @@ since it is used in a lot of files in the code base
 */
 import {
     Configuration,
-    ConfigurationKey,
     ConfigurationSchema,
     ConfigurationValueType,
     configurationSchema
 } from '../types/configuration';
 
-export const parseConfigurationValue = (
-    key: ConfigurationKey,
+export const parseConfigurationValue = <ConfigurationDataType>(
+    key: keyof ConfigurationDataType,
     value: string,
     type: ConfigurationValueType
 ): any => {
@@ -33,13 +32,13 @@ export const parseConfigurationValue = (
     }
 };
 
-export const parseConfiguration = (
+export const parseConfiguration = <ConfigurationDataType>(
     data: Record<string, string>,
-    schema: ConfigurationSchema
-): Configuration => {
-    const conf: Partial<Record<ConfigurationKey, any>> = {};
+    schema: ConfigurationSchema<ConfigurationDataType>
+): ConfigurationDataType => {
+    const conf: Partial<Record<keyof ConfigurationDataType, any>> = {};
     const errors: string[] = [];
-    const keys = Object.keys(schema) as ConfigurationKey[];
+    const keys = Object.keys(schema) as (keyof ConfigurationDataType)[];
     keys.forEach((key) => {
         try {
             const {
@@ -47,10 +46,10 @@ export const parseConfiguration = (
                 required,
                 filter
             } = schema[key];
-            if (data[key]) {
-                const value = parseConfigurationValue(
+            if (data[String(key)]) {
+                const value = parseConfigurationValue<ConfigurationDataType>(
                     key,
-                    data[key],
+                    data[String(key)],
                     type
                 );
                 if (filter && !filter.includes(value)) {
@@ -67,10 +66,10 @@ export const parseConfiguration = (
     if (errors.length) {
         throw new Error(`Invalid configuration: ${errors.join(' ; ')}`);
     }
-    return conf as Configuration;
+    return conf as ConfigurationDataType;
 };
 
-export const configuration = parseConfiguration(
+export const configuration = parseConfiguration<Configuration>(
     process.env as Record<string, string>,
     configurationSchema
 );

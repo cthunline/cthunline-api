@@ -1,60 +1,95 @@
 import { expect } from 'chai';
 
 import { parseConfiguration } from '../../src/services/configuration';
-import { configurationSchema } from '../../src/types/configuration';
+import { ConfigurationSchema } from '../../src/types/configuration';
+
+interface ConfType {
+    STRING: string;
+    NUMBER: number;
+    BOOLEAN: boolean;
+    OPTIONAL: string;
+    ENUM: string;
+}
+
+const schema: ConfigurationSchema<ConfType> = {
+    STRING: {
+        type: 'string',
+        required: true
+    },
+    NUMBER: {
+        type: 'number',
+        required: true
+    },
+    BOOLEAN: {
+        type: 'boolean',
+        required: true
+    },
+    OPTIONAL: {
+        type: 'string',
+        required: false
+    },
+    ENUM: {
+        type: 'string',
+        required: false,
+        filter: ['value1', 'value2']
+    }
+};
 
 const validConf: Record<string, string> = {
-    DEFAULT_ADMIN_NAME: 'test',
-    DEFAULT_ADMIN_EMAIL: 'test@ŧest.com',
-    DEFAULT_ADMIN_PASSWORD: 'test',
-    PORT: '8080',
-    JWT_SECRET: 'test',
-    COOKIE_SECRET: 'test',
-    COOKIE_SECURE: '0',
-    LOG_ENABLED: '1',
-    LOG_DIR: '/path/to/test',
-    CHECKPOINT_DISABLE: '1',
-    MONGO_URL: 'mongo://test',
-    ASSET_DIR: '/path/to/test'
+    STRING: 'test',
+    NUMBER: '123',
+    BOOLEAN: '1',
+    OPTIONAL: 'test',
+    ENUM: 'value1'
 };
 
 describe('[Unit] Configuration', () => {
     describe('parseConfiguration', () => {
         it('Should control and parse configuration', async () => {
-            const { PORT, ...incompleteConf } = validConf;
+            const { OPTIONAL, ...validPartialConf } = validConf;
+            const { STRING, ...invalidPartialConf } = validConf;
             const data = [{
                 conf: validConf,
                 shouldSucceed: true
             }, {
-                conf: incompleteConf,
+                conf: validPartialConf,
+                shouldSucceed: true
+            }, {
+                conf: invalidPartialConf,
                 shouldSucceed: false
             }, {
                 conf: {
                     ...validConf,
-                    DEFAULT_ADMIN_NAME: ''
+                    STRING: ''
                 },
                 shouldSucceed: false
             }, {
                 conf: {
                     ...validConf,
-                    PORT: 'invalid'
+                    NUMBER: 'invalid'
                 },
                 shouldSucceed: false
             }, {
                 conf: {
                     ...validConf,
-                    COOKIE_SECURE: 'invalid'
+                    BOOLEAN: 'invalid'
+                },
+                shouldSucceed: false
+            }, {
+                conf: {
+                    ...validConf,
+                    ENUM: 'value3'
                 },
                 shouldSucceed: false
             }];
             data.forEach(({ conf, shouldSucceed }) => {
                 if (shouldSucceed) {
                     expect(() => (
-                        parseConfiguration(conf, configurationSchema)
+                        parseConfiguration(conf, schema)
                     )).to.not.throw();
                 } else {
                     expect(() => (
-                        parseConfiguration(conf, configurationSchema)
+                        parseConfiguration(conf, schema)
                     )).to.throw(Error);
                 }
             });

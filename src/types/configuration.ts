@@ -14,8 +14,6 @@ export interface Configuration {
     ASSET_DIR: string;
 }
 
-export type ConfigurationKey = keyof Configuration;
-
 export type ConfigurationValueType = 'string' | 'number' | 'boolean' | 'path';
 
 export interface ConfigurationValueData {
@@ -24,9 +22,11 @@ export interface ConfigurationValueData {
     filter?: any[];
 }
 
-export type ConfigurationSchema = Record<ConfigurationKey, ConfigurationValueData>;
+export type ConfigurationSchema<ConfigurationDataType> = (
+    Record<keyof ConfigurationDataType, ConfigurationValueData>
+);
 
-export const configurationSchema: ConfigurationSchema = {
+export const configurationSchema: ConfigurationSchema<Configuration> = {
     DEFAULT_ADMIN_NAME: {
         type: 'string',
         required: true
