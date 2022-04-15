@@ -11,7 +11,7 @@ import {
 import Log from './services/log';
 import { initDb } from './services/prisma';
 import { configuration } from './services/configuration';
-import apiController from './controllers';
+import mainController from './controllers';
 import socketRouter from './sockets';
 
 const app = Express();
@@ -36,8 +36,8 @@ const { COOKIE_SECRET, PORT } = configuration;
         Log.info('Initializing database');
         await initDb();
 
-        Log.info('Initializing API routes');
-        app.use(apiController);
+        Log.info('Initializing routes');
+        app.use(mainController);
 
         Log.info('Initializing web sockets');
         socketRouter(httpServer);

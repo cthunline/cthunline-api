@@ -42,9 +42,21 @@ export const parseConfiguration = (
     const keys = Object.keys(schema) as ConfigurationKey[];
     keys.forEach((key) => {
         try {
-            const { type, required } = schema[key];
+            const {
+                type,
+                required,
+                filter
+            } = schema[key];
             if (data[key]) {
-                conf[key] = parseConfigurationValue(key, data[key], type);
+                const value = parseConfigurationValue(
+                    key,
+                    data[key],
+                    type
+                );
+                if (filter && !filter.includes(value)) {
+                    throw new Error(`invalid ${key} value (expected ${filter.join(' or ')})`);
+                }
+                conf[key] = value;
             } else if (required) {
                 throw new Error(`missing or empty ${key} in configuration`);
             }

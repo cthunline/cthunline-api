@@ -5,8 +5,7 @@
         "schema": "src/prisma/schema.prisma"
     },
     "scripts": {
-        "prod": "cross-env NODE_ENV=prod node build/index.js",
-        "dev": "cross-env NODE_ENV=dev nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node src/index.ts\"",
+        "dev": "cross-env nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node src/index.ts\"",
         "build": "tsc --build --clean tsconfig.build.json && tsc --project tsconfig.build.json",
         "prepare": "[ -d '.husky' ] && husky install || true",
         "lint": "npx eslint . --ext=.ts --max-warnings=0 && markdownlint **/*.md",

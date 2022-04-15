@@ -2,6 +2,7 @@ export interface Configuration {
     DEFAULT_ADMIN_NAME: string;
     DEFAULT_ADMIN_EMAIL: string;
     DEFAULT_ADMIN_PASSWORD: string;
+    ENVIRONMENT: string;
     PORT: number;
     JWT_SECRET: string;
     COOKIE_SECRET: string;
@@ -19,7 +20,8 @@ export type ConfigurationValueType = 'string' | 'number' | 'boolean' | 'path';
 
 export interface ConfigurationValueData {
     type: ConfigurationValueType;
-    required?: boolean;
+    required: boolean;
+    filter?: any[];
 }
 
 export type ConfigurationSchema = Record<ConfigurationKey, ConfigurationValueData>;
@@ -36,6 +38,11 @@ export const configurationSchema: ConfigurationSchema = {
     DEFAULT_ADMIN_PASSWORD: {
         type: 'string',
         required: true
+    },
+    ENVIRONMENT: {
+        type: 'string',
+        required: true,
+        filter: ['dev', 'prod']
     },
     PORT: {
         type: 'number',
