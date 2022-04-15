@@ -42,10 +42,10 @@ export const parseConfiguration = (
     const keys = Object.keys(schema) as ConfigurationKey[];
     keys.forEach((key) => {
         try {
-            const type = schema[key];
+            const { type, required } = schema[key];
             if (data[key]) {
                 conf[key] = parseConfigurationValue(key, data[key], type);
-            } else {
+            } else if (required) {
                 throw new Error(`missing or empty ${key} in configuration`);
             }
         } catch (err: any) {
