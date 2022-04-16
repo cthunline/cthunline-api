@@ -1,0 +1,34 @@
+[{
+    "id": "61f537cc1790b30562a11a91",
+    "name": "Directory 1",
+    "userId": "61f537ca1790b30562a66d43"
+}, {
+    "id": "61f537cc1790b30562a11a92",
+    "name": "Directory 2",
+    "userId": "61f537ca1790b30562a66d43"
+}, {
+    "id": "61f537cc1790b30562a11a93",
+    "name": "Directory 1-1",
+    "userId": "61f537ca1790b30562a66d43",
+    "parentId": "61f537cc1790b30562a11a91"
+}, {
+    "id": "61f537cc1790b30562a11a94",
+    "name": "Directory 1-2",
+    "userId": "61f537ca1790b30562a66d43",
+    "parentId": "61f537cc1790b30562a11a91"
+}, {
+    "id": "61f537cc1790b30562a11a95",
+    "name": "Directory 2-1",
+    "userId": "61f537ca1790b30562a66d43",
+    "parentId": "61f537cc1790b30562a11a92"
+}, {
+    "id": "61f537cc1790b30562a11a96",
+    "name": "Directory 1-1-1",
+    "userId": "61f537ca1790b30562a66d43",
+    "parentId": "61f537cc1790b30562a11a93"
+}, {
+    "id": "61f537cc1790b30562a11a97",
+    "name": "Directory 1-1-2",
+    "userId": "61f537ca1790b30562a66d43",
+    "parentId": "61f537cc1790b30562a11a93"
+}]

@@ -18,6 +18,7 @@ model User {
     updatedAt DateTime @updatedAt
 
     assets Asset[]
+    directories Directory[]
     sessions Session[]
     characters Character[]
     notes Note[]
@@ -37,7 +38,28 @@ model Asset {
     userId String @db.ObjectId
     user User @relation(fields: [userId], references: [id])
 
+    directoryId String? @db.ObjectId
+    directory Directory? @relation(fields: [directoryId], references: [id])
+
     @@map("assets")
+}
+
+model Directory {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId String @db.ObjectId
+    user User @relation(fields: [userId], references: [id])
+
+    parentId String? @db.ObjectId
+    parent Directory? @relation("structure", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    children Directory[] @relation("structure")
+
+    assets Asset[]
+
+    @@map("directories")
 }
 
 model Session {
@@ -64,6 +86,7 @@ model Note {
 
     userId String @db.ObjectId
     user User @relation(fields: [userId], references: [id])
+
     sessionId String @db.ObjectId
     session Session @relation(fields: [sessionId], references: [id])
 

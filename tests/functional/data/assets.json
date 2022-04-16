@@ -1,19 +1,43 @@
 [{
-    "id": "61f537cc1790b30562a66d21",
+    "id": "51f537cc1790b30562a66d21",
     "type": "image",
     "name": "asset.png",
     "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d21.png",
+    "directoryId": null,
     "userId": "61f537ca1790b30562a66d43"
 }, {
-    "id": "61f537cc1790b30562a66d22",
+    "id": "51f537cc1790b30562a66d22",
     "type": "image",
     "name": "asset.jpg",
-    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d22.png",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d22.jpg",
+    "directoryId": null,
     "userId": "61f537ca1790b30562a66d43"
 }, {
-    "id": "61f537cc1790b30562a66d23",
+    "id": "51f537cc1790b30562a66d23",
     "type": "audio",
     "name": "asset.mp3",
-    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d23.png",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d23.mp3",
+    "directoryId": null,
+    "userId": "61f537ca1790b30562a66d43"
+}, {
+    "id": "51f537cc1790b30562a66d24",
+    "type": "audio",
+    "name": "asset.mp3",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d24.mp3",
+    "directoryId": "61f537cc1790b30562a11a91",
+    "userId": "61f537ca1790b30562a66d43"
+}, {
+    "id": "51f537cc1790b30562a66d25",
+    "type": "audio",
+    "name": "asset.mp3",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d25.mp3",
+    "directoryId": "61f537cc1790b30562a11a93",
+    "userId": "61f537ca1790b30562a66d43"
+}, {
+    "id": "51f537cc1790b30562a66d26",
+    "type": "audio",
+    "name": "asset.mp3",
+    "path": "61f537ca1790b30562a66d43/cc1561f53762a6790b306d26.mp3",
+    "directoryId": "61f537cc1790b30562a11a96",
     "userId": "61f537ca1790b30562a66d43"
 }]

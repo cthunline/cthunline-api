@@ -5,65 +5,32 @@ import {
     Request,
     Response
 } from 'express';
-import { Asset } from '@prisma/client';
 import Formidable from 'formidable';
 
-import { getUser } from './userController';
-import { configuration } from '../services/configuration';
+import { getUser } from '../services/user';
 import { controlSelf } from '../services/auth';
-import { Prisma, handleNotFound } from '../services/prisma';
-import { InternError, ValidationError } from '../services/errors';
+import { Prisma } from '../services/prisma';
+import { ValidationError } from '../services/errors';
 import Log from '../services/log';
-import { mimeTypes, FileType, MimeType } from '../types/asset';
+import { TypedFile } from '../types/asset';
+import Validator from '../services/validator';
+import {
+    controlFile,
+    assetDir,
+    assetTempDir,
+    controlUserDir,
+    formidableOptions,
+    getAsset,
+    getDirectories,
+    getDirectory,
+    getChildrenDirectories
+} from '../services/asset';
 
-const { ASSET_DIR } = configuration;
+import AssetSchemas from './schemas/asset.json';
 
-interface TypedFile extends Formidable.File {
-    type: FileType;
-}
-
-/* There's a bug in formidable@v2 where maxFileSize option is applied to
-all files and not each file so we have to control each file size ourself */
-const maxEachFileSizeInMb = 20;
-const maxEachFileSize = maxEachFileSizeInMb * 1024 * 1024;
-
-// controls form's file mimetype extension, and size
-// returns file type (image or audio)
-const controlFile = (file: Formidable.File): FileType => {
-    const { mimetype, originalFilename } = file;
-    const ext = originalFilename?.split('.').pop() ?? '';
-    if (file.size <= maxEachFileSize) {
-        if (mimetype) {
-            if (mimeTypes[mimetype as MimeType]) {
-                const { extensions, type } = mimeTypes[mimetype as MimeType];
-                if (extensions.includes(ext)) {
-                    return type as FileType;
-                }
-                throw new ValidationError(
-                    `Extension of file ${originalFilename} ${ext} does not match mimetype ${mimetype}`
-                );
-            }
-            throw new ValidationError(`Mimetype of file ${originalFilename} ${mimetype} is not allowed`);
-        }
-        throw new ValidationError(`Could not get mimetype of file ${originalFilename}`);
-    }
-    throw new ValidationError(`Size of file ${originalFilename} is to big (max ${maxEachFileSizeInMb}Mb)`);
-};
-
-// check asset directory exists and is writable
-const getAssetDir = (): string => {
-    const dir = ASSET_DIR;
-    try {
-        Fs.accessSync(dir, Fs.constants.F_OK);
-        Fs.accessSync(dir, Fs.constants.W_OK);
-        return dir;
-    } catch {
-        throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
-    }
-};
-
-export const assetDir = getAssetDir();
-export const assetTempDir = Path.join(assetDir, 'tmp');
+const validateUploadAssets = Validator(AssetSchemas.uploadAssets);
+const validateCreateDirectory = Validator(AssetSchemas.createDirectory);
+const validateUpdateDirectory = Validator(AssetSchemas.updateDirectory);
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {
@@ -76,37 +43,6 @@ export const assetTempDir = Path.join(assetDir, 'tmp');
     }
     return tempDir;
 })();
-
-// create user subdirectory in asset dir if not exist and return its path
-const controlUserDir = async (userId: string): Promise<string> => {
-    const userDir = Path.join(assetDir, userId);
-    try {
-        await Fs.promises.access(userDir, Fs.constants.F_OK);
-    } catch {
-        await Fs.promises.mkdir(userDir);
-    }
-    return userDir;
-};
-
-// formidable initialization options
-const formidableOptions: Formidable.Options = {
-    uploadDir: assetTempDir,
-    keepExtensions: false,
-    maxFileSize: 100 * 1024 * 1024,
-    multiples: true
-};
-
-const getAsset = async (assetId: string): Promise<Asset> => (
-    handleNotFound<Asset>(
-        'Asset', (
-            Prisma.asset.findUnique({
-                where: {
-                    id: assetId
-                }
-            })
-        )
-    )
-);
 
 const assetController = Router();
 
@@ -151,9 +87,17 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
                 if (err) {
                     throw new ValidationError('Error while parsing file');
                 }
-                if (!files.assets) {
-                    throw new ValidationError('Missing assets field in form data');
+                // validates body
+                validateUploadAssets({
+                    ...fields,
+                    ...files
+                });
+                // control directoryId
+                const directoryId = fields.directoryId ? String(fields.directoryId) : null;
+                if (directoryId !== null) {
+                    await getDirectory(userId, directoryId);
                 }
+                // get files data
                 const assetFiles = (
                     Array.isArray(files.assets) ? files.assets : [files.assets]
                 );
@@ -187,6 +131,7 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
                         return Prisma.asset.create({
                             data: {
                                 userId,
+                                directoryId,
                                 type,
                                 name,
                                 path
@@ -212,7 +157,7 @@ assetController.get('/users/:userId/assets/:assetId', async (req: Request, res: 
         const { userId, assetId } = params;
         await getUser(userId);
         controlSelf(req, userId);
-        const asset = await getAsset(assetId);
+        const asset = await getAsset(userId, assetId);
         res.json(asset);
     } catch (err: any) {
         res.error(err);
@@ -226,7 +171,7 @@ assetController.delete('/users/:userId/assets/:assetId', async (req: Request, re
         const { userId, assetId } = params;
         await getUser(userId);
         controlSelf(req, userId);
-        const { path } = await getAsset(assetId);
+        const { path } = await getAsset(userId, assetId);
         await Promise.all([
             Prisma.asset.delete({
                 where: {
@@ -237,6 +182,130 @@ assetController.delete('/users/:userId/assets/:assetId', async (req: Request, re
                 Path.join(assetDir, path)
             )
         ]);
+        res.send({});
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+// get all directories of a user
+assetController.get('/users/:userId/directories', async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { params } = req;
+        const { userId } = params;
+        await getUser(userId);
+        controlSelf(req, userId);
+        const directories = await getDirectories(userId);
+        res.json({ directories });
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+// create directory for a user
+assetController.post('/users/:userId/directories', async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { params } = req;
+        const { userId } = params;
+        await getUser(userId);
+        controlSelf(req, userId);
+        const { parentId } = req.body;
+        validateCreateDirectory(req.body);
+        if (parentId) {
+            await getDirectory(userId, parentId);
+        }
+        const directory = await Prisma.directory.create({
+            data: {
+                ...req.body,
+                userId
+            }
+        });
+        res.json(directory);
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+// get a user's directory
+assetController.get('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { params } = req;
+        const { userId, directoryId } = params;
+        await getUser(userId);
+        controlSelf(req, userId);
+        const directory = await getDirectory(userId, directoryId);
+        res.json(directory);
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+// update a user's directory
+assetController.post('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { params } = req;
+        const { userId, directoryId } = params;
+        await getUser(userId);
+        controlSelf(req, userId);
+        await getDirectory(userId, directoryId);
+        validateUpdateDirectory(req.body);
+        const directory = await Prisma.directory.update({
+            data: req.body,
+            where: {
+                id: directoryId
+            }
+        });
+        res.json(directory);
+    } catch (err: any) {
+        res.error(err);
+    }
+});
+
+// delete a user's directory
+assetController.delete('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { params } = req;
+        const { userId, directoryId } = params;
+        await getUser(userId);
+        controlSelf(req, userId);
+        await getDirectory(userId, directoryId);
+        // get all directories
+        const directories = await getDirectories(userId);
+        // get all children directories
+        const childrenDirectories = getChildrenDirectories(directoryId, directories);
+        const childrenDirectoryIds = childrenDirectories.map(({ id }) => id);
+        // get assets within all children directories
+        const assets = await Prisma.asset.findMany({
+            where: {
+                userId,
+                directoryId: {
+                    in: childrenDirectoryIds
+                }
+            }
+        });
+        // delete all children assets
+        await Promise.all([
+            Prisma.$transaction(
+                assets.map(({ id }) => (
+                    Prisma.asset.delete({
+                        where: { id }
+                    })
+                ))
+            ),
+            ...assets.map(({ path }) => (
+                Fs.promises.rm(
+                    Path.join(assetDir, path)
+                )
+            ))
+        ]);
+        // delete directory and all children directories
+        await Prisma.$transaction(
+            [directoryId, ...childrenDirectoryIds].map((id) => (
+                Prisma.directory.delete({
+                    where: { id }
+                })
+            ))
+        );
         res.send({});
     } catch (err: any) {
         res.error(err);

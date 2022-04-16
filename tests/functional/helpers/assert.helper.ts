@@ -15,6 +15,16 @@ declare global {
     }
 }
 
+const compareDataWithExpected = (
+    data: Record<string, any>,
+    expected: Record<string, any>
+) => {
+    Object.keys(expected).forEach((key) => {
+        expect(data).to.have.property(key);
+        expect(data[key]).to.equal(expected[key]);
+    });
+};
+
 export const assertUser = (
     data: Record<string, any>,
     expected?: Record<string, any>
@@ -35,10 +45,7 @@ export const assertUser = (
             oldPassword,
             ...expectedWithoutPassword
         } = expected;
-        Object.keys(expectedWithoutPassword).forEach((key) => {
-            expect(data).to.have.property(key);
-            expect(data[key]).to.equal(expected[key]);
-        });
+        compareDataWithExpected(data, expectedWithoutPassword);
     }
 };
 
@@ -55,15 +62,36 @@ export const assertAsset = (
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('path');
     expect(data.path).to.be.a('string');
-    expect(data).to.have.property('path');
-    expect(data.path).to.be.a('string');
     expect(data).to.have.property('userId');
     expect(data.userId).to.be.a('string');
+    if (data.directoryId) {
+        expect(data.directoryId).to.satisfy((id: any) => (
+            id === null || typeof id === 'string'
+        ));
+    }
     if (expected) {
-        Object.keys(expected).forEach((key) => {
-            expect(data).to.have.property(key);
-            expect(data[key]).to.equal(expected[key]);
-        });
+        compareDataWithExpected(data, expected);
+    }
+};
+
+export const assertDirectory = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('name');
+    expect(data.name).to.be.a('string');
+    expect(data).to.have.property('userId');
+    expect(data.userId).to.be.a('string');
+    if (data.parentId) {
+        expect(data.parentId).to.satisfy((id: any) => (
+            id === null || typeof id === 'string'
+        ));
+    }
+    if (expected) {
+        compareDataWithExpected(data, expected);
     }
 };
 
@@ -77,10 +105,7 @@ export const assertGame = (
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
     if (expected) {
-        Object.keys(expected).forEach((key) => {
-            expect(data).to.have.property(key);
-            expect(data[key]).to.equal(expected[key]);
-        });
+        compareDataWithExpected(data, expected);
     }
 };
 
@@ -205,10 +230,7 @@ export const assertNotes = (
     expect(data).to.have.property('userId');
     expect(data.userId).to.be.a('string');
     if (expected) {
-        Object.keys(expected).forEach((key) => {
-            expect(data).to.have.property(key);
-            expect(data[key]).to.equal(expected[key]);
-        });
+        compareDataWithExpected(data, expected);
     }
 };
 

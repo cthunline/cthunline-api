@@ -2,10 +2,11 @@ import Fs from 'fs';
 import Path from 'path';
 
 import { Prisma } from '../../../src/services/prisma';
-import { assetDir } from '../../../src/controllers/assetController';
+import { assetDir } from '../../../src/services/asset';
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
 import assets from '../data/assets.json';
+import directories from '../data/directories.json';
 import notes from '../data/notes.json';
 import cocCharacters from '../data/characters/cocCharacters.json';
 import swd6Characters from '../data/characters/swd6Characters.json';
@@ -14,6 +15,7 @@ export const usersData = users;
 export const sessionsData = sessions;
 export const notesData = notes;
 export const assetsData = assets;
+export const directoriesData = directories;
 export const charactersData = [
     ...cocCharacters,
     ...swd6Characters
@@ -31,12 +33,16 @@ const Data = {
         await Prisma.session.deleteMany();
         await Data.deleteAssetFiles();
         await Prisma.asset.deleteMany();
+        await Prisma.directory.deleteMany();
         await Prisma.user.deleteMany();
     },
 
     async insertAll() {
         await Promise.all(usersData.map((data) => (
             Prisma.user.create({ data })
+        )));
+        await Promise.all(directoriesData.map((data) => (
+            Prisma.directory.create({ data })
         )));
         await Promise.all([
             ...assetsData.map((data) => (

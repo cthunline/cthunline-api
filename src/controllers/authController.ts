@@ -8,7 +8,7 @@ import {
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { AuthenticationError } from '../services/errors';
-import { UserSelect } from './userController';
+import { UserSelect } from '../types/user';
 import {
     verifyPassword,
     generateJwt,

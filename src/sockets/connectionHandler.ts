@@ -2,8 +2,8 @@ import { Socket, Server } from 'socket.io';
 import { ObjectId } from 'bson';
 import { Session, Character } from '@prisma/client';
 
+import { UserSelect } from '../types/user';
 import { Prisma } from '../services/prisma';
-import { UserSelect } from '../controllers/userController';
 import { verifyJwt } from '../services/auth';
 import {
     CustomError,

@@ -3,51 +3,19 @@ import {
     Request,
     Response
 } from 'express';
-import { Character } from '@prisma/client';
 
-import { getUser } from './userController';
+import { getUser } from '../services/user';
 import { controlSelf } from '../services/auth';
-import { Prisma, handleNotFound } from '../services/prisma';
+import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
 import { Games, GameId, isValidGameId } from '../games';
+import { controlPortrait, getCharacter } from '../services/character';
 
-import { isBase64 } from '../services/tools';
-import { mimeTypes } from '../types/asset';
 import CharacterSchemas from './schemas/character.json';
-
-const imageMimeTypes = Object.entries(mimeTypes).filter(
-    ([, { type }]) => type === 'image'
-).map(
-    ([mimeType]) => mimeType
-);
-
-const portraitLimitSizeInKb = 500;
-const controlPortrait = (base64: string) => {
-    if (!isBase64(base64, imageMimeTypes)) {
-        throw new ValidationError('Portrait is not a valid base64 string');
-    }
-    const buffer = Buffer.from(base64);
-    const sizeInKb = buffer.length / 1000;
-    if (sizeInKb > portraitLimitSizeInKb) {
-        throw new ValidationError(`Portrait is too big (max ${portraitLimitSizeInKb}Kb)`);
-    }
-};
 
 const validateCreateCharacter = Validator(CharacterSchemas.create);
 const validateUpdateCharacter = Validator(CharacterSchemas.update);
-
-const getCharacter = async (characterId: string): Promise<Character> => (
-    handleNotFound<Character>(
-        'Character', (
-            Prisma.character.findUnique({
-                where: {
-                    id: characterId
-                }
-            })
-        )
-    )
-);
 
 const characterController = Router();
 

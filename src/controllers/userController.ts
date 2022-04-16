@@ -15,55 +15,18 @@ import {
     verifyPassword,
     hashPassword
 } from '../services/auth';
-import {
-    ConflictError,
-    ValidationError,
-    ForbiddenError
-} from '../services/errors';
+import { ConflictError, ValidationError } from '../services/errors';
 import Validator from '../services/validator';
+import {
+    userSelect,
+    getUser,
+    controlAdminFields
+} from '../services/user';
 
 import UserSchemas from './schemas/user.json';
 
 const validateCreateUser = Validator(UserSchemas.create);
 const validateUpdateUser = Validator(UserSchemas.update);
-
-export type UserSelect = Omit<User, 'password'>;
-
-// prisma select object to exclude password in returned data
-export const userSelect = {
-    id: true,
-    name: true,
-    email: true,
-    isAdmin: true,
-    isEnabled: true,
-    createdAt: true,
-    updatedAt: true
-};
-
-// check a user exists and return it
-// returned user data will not contain password
-export const getUser = async (userId: string): Promise<UserSelect> => (
-    handleNotFound<UserSelect>(
-        'User', (
-            Prisma.user.findUnique({
-                select: userSelect,
-                where: {
-                    id: userId
-                }
-            })
-        )
-    )
-);
-
-// throws forbidden error if any of the admin fields exists in the user edit body
-export const controlAdminFields = (body: object) => {
-    const adminFields = ['isAdmin', 'isEnabled'];
-    for (const field of adminFields) {
-        if (Object.hasOwn(body, field)) {
-            throw new ForbiddenError();
-        }
-    }
-};
 
 const userController = Router();
 

@@ -1,0 +1,40 @@
+{
+    "uploadAssets": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "assets"
+        ],
+        "properties": {
+            "assets": {},
+            "directoryId": {
+                "type": "string"
+            }
+        }
+    },
+    "createDirectory": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "name"
+        ],
+        "properties": {
+            "name": {
+                "type": "string"
+            },
+            "parentId": {
+                "type": "string"
+            }
+        }
+    },
+    "updateDirectory": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+            "name": {
+                "type": "string"
+            }
+        }
+    }
+}

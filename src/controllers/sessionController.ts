@@ -3,86 +3,29 @@ import {
     Request,
     Response
 } from 'express';
-import { Session, Note } from '@prisma/client';
 
-import {
-    Prisma,
-    handleNotFound
-} from '../services/prisma';
+import { Prisma } from '../services/prisma';
 import { controlSelf } from '../services/auth';
-import { userSelect } from './userController';
 import Validator from '../services/validator';
 import { isValidGameId } from '../games';
 import { ValidationError } from '../services/errors';
+import {
+    defaultSketchData,
+    getInclude,
+    getSession,
+    getNotes,
+    buildSessionSchema
+} from '../services/session';
 
 import SessionSchemas from './schemas/session.json';
 
-const buildSessionSchema = (baseSchema: any) => ({
-    definitions: SessionSchemas.definitions,
-    ...baseSchema,
-    properties: {
-        ...baseSchema.properties,
-        sketch: SessionSchemas.sketch
-    }
-});
-
 const validateCreateSession = Validator(
-    buildSessionSchema(SessionSchemas.create)
+    buildSessionSchema(SessionSchemas.create, SessionSchemas)
 );
 const validateUpdateSession = Validator(
-    buildSessionSchema(SessionSchemas.update)
+    buildSessionSchema(SessionSchemas.update, SessionSchemas)
 );
 const validateNotes = Validator(SessionSchemas.notes);
-
-const defaultSketchData = {
-    displayed: false,
-    paths: [],
-    images: [],
-    tokens: [],
-    events: []
-};
-
-const getInclude = (includeMaster: boolean) => (
-    includeMaster ? {
-        include: {
-            master: {
-                select: userSelect
-            }
-        }
-    } : undefined
-);
-
-const getSession = async (sessionId: string): Promise<Session> => (
-    handleNotFound<Session>(
-        'Session', (
-            Prisma.session.findUnique({
-                where: {
-                    id: sessionId
-                }
-            })
-        )
-    )
-);
-
-// get notes of a user for a session / create default notes if not exist
-const getNotes = async (sessionId: string, userId: string): Promise<Note> => {
-    const notes = await Prisma.note.findFirst({
-        where: {
-            sessionId,
-            userId
-        }
-    });
-    if (!notes) {
-        return Prisma.note.create({
-            data: {
-                text: '',
-                sessionId,
-                userId
-            }
-        });
-    }
-    return notes;
-};
 
 const sessionController = Router();
 
