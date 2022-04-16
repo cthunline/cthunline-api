@@ -24,9 +24,9 @@ const mainController = Router();
 mainController.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (req.method === 'POST' && req.path === '/api/auth') { // api login route is public
         next();
-    } else if (req.path.startsWith('/api')) { // any other api route is protected
+    } else if (req.path.startsWith('/api') || req.path.startsWith('/static')) { // api routes and static ressource are protected
         await authMiddleware(req, res, next);
-    } else { // any other route is public (static ressources / client build)
+    } else { // any other route is for client build
         next();
     }
 });
@@ -39,7 +39,7 @@ mainController.use('/api', gameController);
 mainController.use('/api', sessionController);
 mainController.use('/api', characterController);
 
-// throw 404 on unknown routes
+// throw 404 on unknown api routes
 mainController.use('/api/*', (req: Request, res: Response) => {
     res.error(
         new NotFoundError('Route does not exist')
@@ -60,11 +60,10 @@ if (ENVIRONMENT === 'prod') {
             root: Path.join(__dirname, '../client')
         });
     });
+} else { // any other request falls in 404 if in dev mode
+    mainController.use('*', (req: Request, res: Response) => {
+        res.error(new NotFoundError());
+    });
 }
-
-// any other request
-mainController.use('*', (req: Request, res: Response) => {
-    res.error(new NotFoundError());
-});
 
 export default mainController;
