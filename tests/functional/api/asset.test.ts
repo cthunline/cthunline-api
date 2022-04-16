@@ -54,6 +54,21 @@ describe('[API] Assets', () => {
                 ))
             );
         });
+        it('Should list all assets including directory data', async () => {
+            await Api.testGetList({
+                route: `/users/${userId}/assets?include=true`,
+                listKey: 'assets',
+                data: assetsData,
+                assert: (data: any) => {
+                    assertAsset(data);
+                    if (data.directoryId) {
+                        assertDirectory(data.directory);
+                    } else {
+                        expect(data.directory).to.be.null;
+                    }
+                }
+            });
+        });
     });
 
     describe('POST /users/:id/assets', () => {

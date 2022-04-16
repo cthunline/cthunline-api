@@ -51,7 +51,7 @@ assetController.get('/users/:userId/assets', async (req: Request, res: Response)
     try {
         const { params, query } = req;
         const { userId } = params;
-        const { type } = query;
+        const { type, include } = query;
         await getUser(userId);
         controlSelf(req, userId);
         const assets = await Prisma.asset.findMany({
@@ -60,6 +60,9 @@ assetController.get('/users/:userId/assets', async (req: Request, res: Response)
                 ...(type ? {
                     type: String(type)
                 } : {})
+            },
+            include: {
+                directory: include === 'true'
             }
         });
         res.json({ assets });
