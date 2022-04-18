@@ -15,7 +15,7 @@ declare global {
     }
 }
 
-const compareDataWithExpected = (
+export const compareDataWithExpected = (
     data: Record<string, any>,
     expected: Record<string, any>
 ) => {

@@ -17,6 +17,7 @@ import assetController from './assetController';
 import gameController from './gameController';
 import sessionController from './sessionController';
 import characterController from './characterController';
+import configurationController from './configurationController';
 
 const { ENVIRONMENT } = configuration;
 
@@ -24,9 +25,13 @@ const mainController = Router();
 
 // apply authentication middleware
 mainController.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    if (req.method === 'POST' && req.path === '/api/auth') { // api login route is public
-        next();
-    } else if (req.method === 'POST' && req.path === '/api/register') { // registration route is public
+    if ((
+        req.method === 'GET' && req.path === '/api/configuration' // public configuration route
+    ) || (
+        req.method === 'POST' && req.path === '/api/auth' // api login route is public
+    ) || (
+        req.method === 'POST' && req.path === '/api/register' // registration route is public
+    )) {
         next();
     } else if (req.path.startsWith('/api') || req.path.startsWith('/static')) { // api routes and static ressource are protected
         await authMiddleware(req, res, next);
@@ -43,6 +48,7 @@ mainController.use('/api', assetController);
 mainController.use('/api', gameController);
 mainController.use('/api', sessionController);
 mainController.use('/api', characterController);
+mainController.use('/api', configurationController);
 
 // throw 404 on unknown api routes
 mainController.use('/api/*', (req: Request, res: Response) => {
