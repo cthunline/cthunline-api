@@ -89,13 +89,13 @@ registrationController.post('/invitation', async (req: Request, res: Response): 
         if (!isInvitationEnabled()) {
             throw new ForbiddenError('Invitation codes are disabled');
         }
-        const invitation = await Prisma.invitation.create({
+        const { code } = await Prisma.invitation.create({
             data: {
                 code: generateCode(),
                 isUsed: false
             }
         });
-        res.json(invitation);
+        res.json({ code });
     } catch (err: any) {
         res.error(err);
     }

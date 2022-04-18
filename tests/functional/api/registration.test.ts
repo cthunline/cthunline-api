@@ -25,11 +25,9 @@ const generateInvitation = async () => {
     });
     expect(response).to.have.status(200);
     expect(response).to.be.json;
-    const { body: { code, isUsed } } = response;
+    const { body: { code } } = response;
     expect(code).to.be.a('string');
     expect(code).to.have.lengthOf(16);
-    expect(isUsed).to.be.a('boolean');
-    expect(isUsed).to.be.false;
     return code;
 };
 
