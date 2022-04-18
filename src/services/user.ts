@@ -2,7 +2,7 @@ import {
     Prisma,
     handleNotFound
 } from './prisma';
-import { ForbiddenError } from './errors';
+import { ForbiddenError, ConflictError } from './errors';
 import { UserSelect } from '../types/user';
 
 // prisma select object to exclude password in returned data
@@ -38,5 +38,17 @@ export const controlAdminFields = (body: object) => {
         if (Object.hasOwn(body, field)) {
             throw new ForbiddenError();
         }
+    }
+};
+
+// check user email is unique
+export const controlUniqueEmail = async (email: string) => {
+    const checkEmail = await Prisma.user.findUnique({
+        where: {
+            email
+        }
+    });
+    if (checkEmail) {
+        throw new ConflictError(`Email ${email} already taken`);
     }
 };

@@ -12,6 +12,7 @@ import { configuration } from '../services/configuration';
 import { assetDir } from '../services/asset';
 import authController, { authMiddleware } from './authController';
 import userController from './userController';
+import registrationController from './registrationController';
 import assetController from './assetController';
 import gameController from './gameController';
 import sessionController from './sessionController';
@@ -25,6 +26,8 @@ const mainController = Router();
 mainController.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (req.method === 'POST' && req.path === '/api/auth') { // api login route is public
         next();
+    } else if (req.method === 'POST' && req.path === '/api/register') { // registration route is public
+        next();
     } else if (req.path.startsWith('/api') || req.path.startsWith('/static')) { // api routes and static ressource are protected
         await authMiddleware(req, res, next);
     } else { // any other route is for client build
@@ -35,6 +38,7 @@ mainController.use(async (req: Request, res: Response, next: NextFunction): Prom
 // apply api controllers
 mainController.use('/api', authController);
 mainController.use('/api', userController);
+mainController.use('/api', registrationController);
 mainController.use('/api', assetController);
 mainController.use('/api', gameController);
 mainController.use('/api', sessionController);

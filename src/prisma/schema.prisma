@@ -27,6 +27,15 @@ model User {
     @@map("users")
 }
 
+model Invitation {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    code String
+    isUsed Boolean
+
+    @@unique(code)
+    @@map("invitation")
+}
+
 model Asset {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     type String

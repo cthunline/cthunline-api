@@ -73,3 +73,25 @@ export const configuration = parseConfiguration<Configuration>(
     process.env as Record<string, string>,
     configurationSchema
 );
+
+// utility to mock configuration env vars
+const mockedConf: Partial<Configuration> = {};
+export const setConfMock = (key: keyof Configuration, value: any) => {
+    if (configuration.ENVIRONMENT === 'dev') {
+        mockedConf[key] = value;
+    }
+};
+
+// utility functions to allow mocking registration configuration
+export const isRegistrationEnabled = (): boolean => {
+    if (configuration.ENVIRONMENT === 'dev' && Object.hasOwn(mockedConf, 'REGISTRATION_ENABLED')) {
+        return !!mockedConf.REGISTRATION_ENABLED;
+    }
+    return configuration.REGISTRATION_ENABLED;
+};
+export const isInvitationEnabled = (): boolean => {
+    if (configuration.ENVIRONMENT === 'dev' && Object.hasOwn(mockedConf, 'INVITATION_ENABLED')) {
+        return !!mockedConf.INVITATION_ENABLED;
+    }
+    return configuration.INVITATION_ENABLED;
+};

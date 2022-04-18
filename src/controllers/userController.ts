@@ -15,12 +15,13 @@ import {
     verifyPassword,
     hashPassword
 } from '../services/auth';
-import { ConflictError, ValidationError } from '../services/errors';
+import { ValidationError } from '../services/errors';
 import Validator from '../services/validator';
 import {
     userSelect,
     getUser,
-    controlAdminFields
+    controlAdminFields,
+    controlUniqueEmail
 } from '../services/user';
 
 import UserSchemas from './schemas/user.json';
@@ -52,22 +53,15 @@ userController.post('/users', async (req: Request, res: Response): Promise<void>
         const { body } = req;
         controlSelfAdmin(req);
         validateCreateUser(body);
-        const checkEmail = await Prisma.user.findUnique({
-            where: {
-                email: body.email
-            }
-        });
-        if (checkEmail) {
-            throw new ConflictError(`Email ${body.email} already taken`);
-        }
-        const password = await hashPassword(body.password);
-        const data = {
-            ...body,
-            password
-        };
+        await controlUniqueEmail(body.email);
+        const hashedPassword = await hashPassword(body.password);
+        const { password, ...cleanBody } = body;
         const user = await Prisma.user.create({
             select: userSelect,
-            data
+            data: {
+                ...cleanBody,
+                password: hashedPassword
+            }
         });
         res.json(user);
     } catch (err: any) {

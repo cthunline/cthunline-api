@@ -2,6 +2,8 @@ export interface Configuration {
     DEFAULT_ADMIN_NAME: string;
     DEFAULT_ADMIN_EMAIL: string;
     DEFAULT_ADMIN_PASSWORD: string;
+    REGISTRATION_ENABLED: boolean;
+    INVITATION_ENABLED: boolean;
     ENVIRONMENT: string;
     PORT: number;
     JWT_SECRET: string;
@@ -38,6 +40,14 @@ export const configurationSchema: ConfigurationSchema<Configuration> = {
     DEFAULT_ADMIN_PASSWORD: {
         type: 'string',
         required: true
+    },
+    REGISTRATION_ENABLED: {
+        type: 'boolean',
+        required: true
+    },
+    INVITATION_ENABLED: {
+        type: 'boolean',
+        required: false
     },
     ENVIRONMENT: {
         type: 'string',
