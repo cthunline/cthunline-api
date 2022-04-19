@@ -4,7 +4,7 @@ import { Session, Character } from '@prisma/client';
 
 import { UserSelect } from '../types/user';
 import { Prisma } from '../services/prisma';
-import { verifyJwt } from '../services/auth';
+import { verifyJwt } from '../services/controllerServices/auth';
 import {
     CustomError,
     AuthenticationError,

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { parseConfiguration } from '../../src/services/configuration';
+import { parseConfiguration } from '../../src/services/controllerServices/configuration';
 import { ConfigurationSchema } from '../../src/types/configuration';
 
 interface ConfType {

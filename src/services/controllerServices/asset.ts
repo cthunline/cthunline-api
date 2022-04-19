@@ -3,10 +3,10 @@ import Path from 'path';
 import { Asset, Directory } from '@prisma/client';
 import Formidable from 'formidable';
 
-import { Prisma, handleNotFound } from './prisma';
+import { Prisma, handleNotFound } from '../prisma';
 import { configuration } from './configuration';
-import { InternError, ValidationError } from './errors';
-import { mimeTypes, FileType, MimeType } from '../types/asset';
+import { InternError, ValidationError } from '../errors';
+import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
 const { ASSET_DIR } = configuration;
 

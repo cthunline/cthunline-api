@@ -14,7 +14,7 @@ import {
     generateJwt,
     verifyJwt,
     getCookieOptions
-} from '../services/auth';
+} from '../services/controllerServices/auth';
 
 import AuthSchemas from './schemas/auth.json';
 

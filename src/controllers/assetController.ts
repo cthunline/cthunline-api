@@ -7,8 +7,8 @@ import {
 } from 'express';
 import Formidable from 'formidable';
 
-import { getUser } from '../services/user';
-import { controlSelf } from '../services/auth';
+import { getUser } from '../services/controllerServices/user';
+import { controlSelf } from '../services/controllerServices/auth';
 import { Prisma } from '../services/prisma';
 import { ValidationError } from '../services/errors';
 import Log from '../services/log';
@@ -24,7 +24,7 @@ import {
     getDirectories,
     getDirectory,
     getChildrenDirectories
-} from '../services/asset';
+} from '../services/controllerServices/asset';
 
 import AssetSchemas from './schemas/asset.json';
 

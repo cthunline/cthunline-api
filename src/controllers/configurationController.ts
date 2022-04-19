@@ -7,7 +7,7 @@ import {
 import {
     isRegistrationEnabled,
     isInvitationEnabled
-} from '../services/configuration';
+} from '../services/controllerServices/configuration';
 
 const configurationController = Router();
 

@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
-import { configuration } from './configuration';
+import { configuration } from './controllerServices/configuration';
 import Log from './log';
-import { hashPassword } from './auth';
+import { hashPassword } from './controllerServices/auth';
 import { NotFoundError } from './errors';
 
 const {

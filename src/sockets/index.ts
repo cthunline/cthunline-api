@@ -2,7 +2,7 @@ import { Socket, Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import CookieParser from 'cookie-parser';
 
-import { configuration } from '../services/configuration';
+import { configuration } from '../services/controllerServices/configuration';
 import {
     connectionMiddleware,
     disconnectCopycats,

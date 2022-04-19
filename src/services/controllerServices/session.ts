@@ -3,7 +3,7 @@ import { Session, Note } from '@prisma/client';
 import {
     Prisma,
     handleNotFound
-} from './prisma';
+} from '../prisma';
 import { userSelect } from './user';
 
 export const buildSessionSchema = (baseSchema: any, schemas: any) => ({

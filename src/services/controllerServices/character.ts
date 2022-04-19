@@ -1,10 +1,10 @@
 import { Character } from '@prisma/client';
 
-import { Prisma, handleNotFound } from './prisma';
-import { ValidationError } from './errors';
+import { Prisma, handleNotFound } from '../prisma';
+import { ValidationError } from '../errors';
 
-import { isBase64 } from './tools';
-import { mimeTypes } from '../types/asset';
+import { isBase64 } from '../tools';
+import { mimeTypes } from '../../types/asset';
 
 export const imageMimeTypes = Object.entries(mimeTypes).filter(
     ([, { type }]) => type === 'image'

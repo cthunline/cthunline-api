@@ -2,7 +2,7 @@ import Path from 'path';
 import Fs from 'fs';
 import Winston, { format } from 'winston';
 
-import { configuration } from './configuration';
+import { configuration } from './controllerServices/configuration';
 
 const { LOG_ENABLED, LOG_DIR } = configuration;
 

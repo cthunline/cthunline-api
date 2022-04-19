@@ -30,6 +30,7 @@ model User {
 model Invitation {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     code String
+    expire DateTime
     isUsed Boolean
 
     @@unique(code)

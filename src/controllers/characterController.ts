@@ -4,13 +4,13 @@ import {
     Response
 } from 'express';
 
-import { getUser } from '../services/user';
-import { controlSelf } from '../services/auth';
+import { getUser } from '../services/controllerServices/user';
+import { controlSelf } from '../services/controllerServices/auth';
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
 import { Games, GameId, isValidGameId } from '../games';
-import { controlPortrait, getCharacter } from '../services/character';
+import { controlPortrait, getCharacter } from '../services/controllerServices/character';
 
 import CharacterSchemas from './schemas/character.json';
 

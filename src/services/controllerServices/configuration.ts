@@ -7,7 +7,7 @@ import {
     ConfigurationSchema,
     ConfigurationValueType,
     configurationSchema
-} from '../types/configuration';
+} from '../../types/configuration';
 
 export const parseConfigurationValue = <ConfigurationDataType>(
     key: keyof ConfigurationDataType,

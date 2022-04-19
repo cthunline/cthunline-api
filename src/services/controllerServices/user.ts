@@ -1,9 +1,9 @@
 import {
     Prisma,
     handleNotFound
-} from './prisma';
-import { ForbiddenError, ConflictError } from './errors';
-import { UserSelect } from '../types/user';
+} from '../prisma';
+import { ForbiddenError, ConflictError } from '../errors';
+import { UserSelect } from '../../types/user';
 
 // prisma select object to exclude password in returned data
 export const userSelect = {

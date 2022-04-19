@@ -8,7 +8,7 @@ import {
     verifyJwt,
     controlSelf,
     controlSelfAdmin
-} from '../../src/services/auth';
+} from '../../src/services/controllerServices/auth';
 import {
     AuthenticationError,
     ForbiddenError

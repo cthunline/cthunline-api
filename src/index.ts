@@ -10,7 +10,7 @@ import {
 } from './services/errors';
 import Log from './services/log';
 import { initDb } from './services/prisma';
-import { configuration } from './services/configuration';
+import { configuration } from './services/controllerServices/configuration';
 import mainController from './controllers';
 import socketRouter from './sockets';
 

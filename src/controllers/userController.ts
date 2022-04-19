@@ -14,7 +14,7 @@ import {
     controlSelfAdmin,
     verifyPassword,
     hashPassword
-} from '../services/auth';
+} from '../services/controllerServices/auth';
 import { ValidationError } from '../services/errors';
 import Validator from '../services/validator';
 import {
@@ -22,7 +22,7 @@ import {
     getUser,
     controlAdminFields,
     controlUniqueEmail
-} from '../services/user';
+} from '../services/controllerServices/user';
 
 import UserSchemas from './schemas/user.json';
 

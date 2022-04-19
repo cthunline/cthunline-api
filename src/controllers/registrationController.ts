@@ -3,26 +3,27 @@ import {
     Request,
     Response
 } from 'express';
-import { customAlphabet } from 'nanoid';
 
 import { Prisma } from '../services/prisma';
-import { hashPassword } from '../services/auth';
+import { hashPassword } from '../services/controllerServices/auth';
 import { ForbiddenError } from '../services/errors';
 import Validator from '../services/validator';
 import {
     isRegistrationEnabled,
     isInvitationEnabled
-} from '../services/configuration';
+} from '../services/controllerServices/configuration';
 import {
     userSelect,
     controlUniqueEmail
-} from '../services/user';
+} from '../services/controllerServices/user';
+import {
+    controlInvitationCode,
+    generateInvitationCode
+} from '../services/controllerServices/registration';
 
 import UserSchemas from './schemas/user.json';
 
 const validateRegisterUser = Validator(UserSchemas.register);
-
-const generateCode = customAlphabet('1234567890abcdef', 16);
 
 const registrationController = Router();
 
@@ -35,20 +36,7 @@ registrationController.post('/register', async (req: Request, res: Response): Pr
         }
         validateRegisterUser(body);
         if (isInvitationEnabled()) {
-            if (!body.invitationCode) {
-                throw new ForbiddenError('Missing invitation code');
-            }
-            const invitation = await Prisma.invitation.findUnique({
-                where: {
-                    code: body.invitationCode
-                }
-            });
-            if (!invitation) {
-                throw new ForbiddenError('Invalid invitation code');
-            }
-            if (invitation.isUsed) {
-                throw new ForbiddenError('Invitation code has already been used');
-            }
+            await controlInvitationCode(body.invitationCode, true);
         }
         await controlUniqueEmail(body.email);
         const hashedPassword = await hashPassword(body.password);
@@ -57,16 +45,6 @@ registrationController.post('/register', async (req: Request, res: Response): Pr
             invitationCode,
             ...cleanBody
         } = body;
-        if (invitationCode) {
-            await Prisma.invitation.update({
-                where: {
-                    code: invitationCode
-                },
-                data: {
-                    isUsed: true
-                }
-            });
-        }
         const user = await Prisma.user.create({
             select: userSelect,
             data: {
@@ -90,10 +68,7 @@ registrationController.post('/invitation', async (req: Request, res: Response): 
             throw new ForbiddenError('Invitation codes are disabled');
         }
         const { code } = await Prisma.invitation.create({
-            data: {
-                code: generateCode(),
-                isUsed: false
-            }
+            data: generateInvitationCode()
         });
         res.json({ code });
     } catch (err: any) {

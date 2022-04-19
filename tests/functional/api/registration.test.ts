@@ -1,9 +1,11 @@
 import { expect } from 'chai';
+import MockDate from 'mockdate';
+import DayJs from 'dayjs';
 
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import { assertUser } from '../helpers/assert.helper';
-import { setConfMock } from '../../../src/services/configuration';
+import { setConfMock } from '../../../src/services/controllerServices/configuration';
 
 const registerUser = async (data: any) => {
     const { invitationCode, ...expected } = data;
@@ -92,6 +94,25 @@ describe('[API] Registration', () => {
                 body: {
                     name: 'Test',
                     email: 'sss@test.com',
+                    password: 'abc123',
+                    invitationCode: code
+                }
+            }, 403);
+        });
+        it('Should throw a forbidden error because invitation code is expired', async () => {
+            await Api.login();
+            MockDate.set(DayJs().subtract(25, 'hours').toDate());
+            const code = await generateInvitation();
+            MockDate.reset();
+            await Api.logout();
+            setConfMock('REGISTRATION_ENABLED', true);
+            setConfMock('INVITATION_ENABLED', true);
+            await Api.testError({
+                method: 'POST',
+                route: '/register',
+                body: {
+                    name: 'Test',
+                    email: 'uuu@test.com',
                     password: 'abc123',
                     invitationCode: code
                 }

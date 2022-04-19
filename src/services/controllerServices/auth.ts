@@ -6,7 +6,7 @@ import { configuration } from './configuration';
 import {
     AuthenticationError,
     ForbiddenError
-} from './errors';
+} from '../errors';
 
 const Bcrypt = require('bcrypt');
 
