@@ -1,6 +1,5 @@
 import { Character } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
-import { InternError } from '../services/errors';
 
 import { Prisma, handleNotFound } from '../services/prisma';
 
@@ -35,8 +34,6 @@ const characterHandler = (io: Server, socket: Socket) => {
                     isMaster,
                     character
                 });
-            } else {
-                throw new InternError('Could not get game master socket');
             }
         } catch (err) {
             socket.emit('error', err);
