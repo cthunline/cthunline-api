@@ -1,6 +1,8 @@
 import Chai, { expect } from 'chai';
 import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
 
+import { locales } from '../../../src/types/configuration';
+
 Chai.use(DeepEqualInAnyOrder);
 
 const ChaiDateString = require('chai-date-string');
@@ -36,6 +38,10 @@ export const assertUser = (
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('email');
     expect(data.email).to.be.a('string');
+    expect(data).to.have.property('theme');
+    expect(data.theme).to.be.oneOf(['dark', 'light']);
+    expect(data).to.have.property('locale');
+    expect(data.locale).to.be.oneOf(locales);
     expect(data).to.have.property('isAdmin');
     expect(data.isAdmin).to.be.a('boolean');
     expect(data).to.not.have.property('password');

@@ -3,6 +3,8 @@
     "name": "Anna Maria Jopek",
     "email": "am.jopek@test.com",
     "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
+    "theme": "dark",
+    "locale": "en",
     "isAdmin": false,
     "isEnabled": true
 }, {
@@ -10,6 +12,8 @@
     "name": "Delphine Cascarino",
     "email": "d.cascarino@test.com",
     "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
+    "theme": "light",
+    "locale": "en",
     "isAdmin": false,
     "isEnabled": true
 }, {
@@ -17,6 +21,8 @@
     "name": "Test",
     "email": "admin@test.com",
     "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
+    "theme": "dark",
+    "locale": "fr",
     "isAdmin": true,
     "isEnabled": true
 }, {
@@ -24,6 +30,8 @@
     "name": "IAmDisabled",
     "email": "disabled@test.com",
     "password": "$2b$10$xGldK.NZjcGdnG7zYOuUu.OxSwgPCwB.x2h.vaa2961IH3UJZ1bXm",
+    "theme": "light",
+    "locale": "fr",
     "isAdmin": true,
     "isEnabled": false
 }]

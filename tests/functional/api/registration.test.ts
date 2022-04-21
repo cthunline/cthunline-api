@@ -5,7 +5,7 @@ import DayJs from 'dayjs';
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import { assertUser } from '../helpers/assert.helper';
-import { setConfMock } from '../../../src/services/controllerServices/configuration';
+import { setConfMock } from '../../../src/services/configuration';
 
 const registerUser = async (data: any) => {
     const { invitationCode, ...expected } = data;

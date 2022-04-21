@@ -47,6 +47,16 @@ describe('[API] Users', () => {
                 name: 'Test',
                 email: 'notAnEmail',
                 password: 'abc123'
+            }, {
+                name: 'Test',
+                email: 'test@test.com',
+                password: 'abc123',
+                theme: 'invalidTheme'
+            }, {
+                name: 'Test',
+                email: 'test@test.com',
+                password: 'abc123',
+                locale: 'invalidLocale'
             }, {}];
             for (const body of invalidData) {
                 await Api.testError({
@@ -93,15 +103,34 @@ describe('[API] Users', () => {
             }, 409);
         });
         it('Should create a user', async () => {
-            await Api.testCreate({
-                route: '/users',
-                data: {
-                    name: 'Test',
-                    email: 'bbb@test.com',
-                    password: 'abc123'
-                },
-                assert: assertUser
-            });
+            const createData = [{
+                name: 'Test1',
+                email: 'uuu@test.com',
+                password: 'abc123'
+            }, {
+                name: 'Test2',
+                email: 'iii@test.com',
+                password: 'abc123',
+                theme: 'dark'
+            }, {
+                name: 'Test3',
+                email: 'ooo@test.com',
+                password: 'abc123',
+                locale: 'en'
+            }, {
+                name: 'Test4',
+                email: 'ppp@test.com',
+                password: 'abc123',
+                theme: 'light',
+                locale: 'fr'
+            }];
+            for (const data of createData) {
+                await Api.testCreate({
+                    route: '/users',
+                    data,
+                    assert: assertUser
+                });
+            }
         });
     });
 
@@ -145,6 +174,10 @@ describe('[API] Users', () => {
             }, {
                 password: 'newPassword',
                 oldPassword: 'wrongOldPassword'
+            }, {
+                theme: 'invalidTheme'
+            }, {
+                locale: 'invalidLocale'
             }, {}];
             for (const body of invalidData) {
                 await Api.testError({
@@ -212,22 +245,30 @@ describe('[API] Users', () => {
                     name: 'Test1',
                     email: 'fff@test.com',
                     password: 'def456',
-                    oldPassword: 'abc123'
+                    oldPassword: 'abc123',
+                    theme: 'dark',
+                    locale: 'en'
                 },
                 assert: assertUser
             });
             await Api.login();
-            await Api.testEdit({
-                route: `/users/${id}`,
-                data: {
-                    name: 'Test1',
-                    email: 'fff@test.com',
-                    password: 'oiu345',
-                    oldPassword: 'def456',
-                    isAdmin: true
-                },
-                assert: assertUser
-            });
+            const editData = [{
+                name: 'Test1',
+                email: 'fff@test.com',
+                password: 'oiu345',
+                oldPassword: 'def456',
+                isAdmin: true
+            }, {
+                theme: 'light',
+                locale: 'fr'
+            }];
+            for (const data of editData) {
+                await Api.testEdit({
+                    route: `/users/${id}`,
+                    data,
+                    assert: assertUser
+                });
+            }
         });
     });
 });

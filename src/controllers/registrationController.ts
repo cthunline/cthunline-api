@@ -11,10 +11,11 @@ import Validator from '../services/validator';
 import {
     isRegistrationEnabled,
     isInvitationEnabled
-} from '../services/controllerServices/configuration';
+} from '../services/configuration';
 import {
     userSelect,
-    controlUniqueEmail
+    controlUniqueEmail,
+    defaultUserData
 } from '../services/controllerServices/user';
 import {
     controlInvitationCode,
@@ -48,6 +49,7 @@ registrationController.post('/register', async (req: Request, res: Response): Pr
         const user = await Prisma.user.create({
             select: userSelect,
             data: {
+                ...defaultUserData,
                 ...cleanBody,
                 password: hashedPassword
             }

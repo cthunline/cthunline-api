@@ -1,9 +1,16 @@
+export const locales = [
+    'fr',
+    'en'
+];
+
 export interface Configuration {
     DEFAULT_ADMIN_NAME: string;
     DEFAULT_ADMIN_EMAIL: string;
     DEFAULT_ADMIN_PASSWORD: string;
     REGISTRATION_ENABLED: boolean;
     INVITATION_ENABLED: boolean;
+    DEFAULT_THEME: string;
+    DEFAULT_LOCALE: string;
     ENVIRONMENT: string;
     PORT: number;
     JWT_SECRET: string;
@@ -48,6 +55,16 @@ export const configurationSchema: ConfigurationSchema<Configuration> = {
     INVITATION_ENABLED: {
         type: 'boolean',
         required: false
+    },
+    DEFAULT_THEME: {
+        type: 'string',
+        required: false,
+        filter: ['dark', 'light']
+    },
+    DEFAULT_LOCALE: {
+        type: 'string',
+        required: false,
+        filter: locales
     },
     ENVIRONMENT: {
         type: 'string',

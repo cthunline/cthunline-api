@@ -4,7 +4,7 @@ import { Asset, Directory } from '@prisma/client';
 import Formidable from 'formidable';
 
 import { Prisma, handleNotFound } from '../prisma';
-import { configuration } from './configuration';
+import { configuration } from '../configuration';
 import { InternError, ValidationError } from '../errors';
 import { mimeTypes, FileType, MimeType } from '../../types/asset';
 

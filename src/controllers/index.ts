@@ -8,7 +8,7 @@ import Path from 'path';
 
 import { NotFoundError } from '../services/errors';
 import Log from '../services/log';
-import { configuration } from '../services/controllerServices/configuration';
+import { configuration } from '../services/configuration';
 import { assetDir } from '../services/controllerServices/asset';
 import authController, { authMiddleware } from './authController';
 import userController from './userController';

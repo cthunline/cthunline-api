@@ -2,14 +2,31 @@ import {
     Prisma,
     handleNotFound
 } from '../prisma';
-import { ForbiddenError, ConflictError } from '../errors';
+import {
+    ForbiddenError,
+    ConflictError,
+    ValidationError
+} from '../errors';
 import { UserSelect } from '../../types/user';
+import { configuration } from '../configuration';
+import { locales } from '../../types/configuration';
+
+const { DEFAULT_THEME, DEFAULT_LOCALE } = configuration;
+
+// default optional fields for a new user
+export const defaultUserData: Partial<UserSelect> = {
+    theme: DEFAULT_THEME,
+    locale: DEFAULT_LOCALE,
+    isAdmin: false
+};
 
 // prisma select object to exclude password in returned data
 export const userSelect = {
     id: true,
     name: true,
     email: true,
+    theme: true,
+    locale: true,
     isAdmin: true,
     isEnabled: true,
     createdAt: true,
@@ -50,5 +67,12 @@ export const controlUniqueEmail = async (email: string) => {
     });
     if (checkEmail) {
         throw new ConflictError(`Email ${email} already taken`);
+    }
+};
+
+// check locale is valid
+export const controlLocale = (locale: string) => {
+    if (!locales.includes(locale)) {
+        throw new ValidationError(`Invalid locale ${locale}`);
     }
 };

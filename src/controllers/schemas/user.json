@@ -18,6 +18,13 @@
             "password": {
                 "type": "string"
             },
+            "theme": {
+                "type": "string",
+                "enum": ["dark", "light"]
+            },
+            "locale": {
+                "type": "string"
+            },
             "isAdmin": {
                 "type": "boolean"
             }
@@ -39,6 +46,13 @@
                 "type": "string"
             },
             "oldPassword": {
+                "type": "string"
+            },
+            "theme": {
+                "type": "string",
+                "enum": ["dark", "light"]
+            },
+            "locale": {
                 "type": "string"
             },
             "isAdmin": {

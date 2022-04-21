@@ -6,8 +6,14 @@ import {
 
 import {
     isRegistrationEnabled,
-    isInvitationEnabled
-} from '../services/controllerServices/configuration';
+    isInvitationEnabled,
+    configuration
+} from '../services/configuration';
+
+const {
+    DEFAULT_THEME,
+    DEFAULT_LOCALE
+} = configuration;
 
 const configurationController = Router();
 
@@ -16,7 +22,9 @@ configurationController.get('/configuration', async (req: Request, res: Response
     try {
         res.json({
             registrationEnabled: isRegistrationEnabled(),
-            invitationEnabled: isInvitationEnabled()
+            invitationEnabled: isInvitationEnabled(),
+            defaultTheme: DEFAULT_THEME,
+            defaultLocale: DEFAULT_LOCALE
         });
     } catch (err: any) {
         res.error(err);

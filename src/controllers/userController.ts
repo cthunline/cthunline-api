@@ -21,7 +21,9 @@ import {
     userSelect,
     getUser,
     controlAdminFields,
-    controlUniqueEmail
+    controlUniqueEmail,
+    controlLocale,
+    defaultUserData
 } from '../services/controllerServices/user';
 
 import UserSchemas from './schemas/user.json';
@@ -54,11 +56,15 @@ userController.post('/users', async (req: Request, res: Response): Promise<void>
         controlSelfAdmin(req);
         validateCreateUser(body);
         await controlUniqueEmail(body.email);
+        if (body.locale) {
+            controlLocale(body.locale);
+        }
         const hashedPassword = await hashPassword(body.password);
         const { password, ...cleanBody } = body;
         const user = await Prisma.user.create({
             select: userSelect,
             data: {
+                ...defaultUserData,
                 ...cleanBody,
                 password: hashedPassword
             }
@@ -101,6 +107,9 @@ userController.post('/users/:userId', async (req: Request, res: Response): Promi
             controlAdminFields(body);
         }
         validateUpdateUser(body);
+        if (body.locale) {
+            controlLocale(body.locale);
+        }
         const data = { ...body };
         if (body.password) {
             if (!body.oldPassword) {

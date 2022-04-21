@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { configuration } from './controllerServices/configuration';
+import { configuration } from './configuration';
 import Log from './log';
 import { hashPassword } from './controllerServices/auth';
 import { NotFoundError } from './errors';
@@ -8,7 +8,9 @@ import { NotFoundError } from './errors';
 const {
     DEFAULT_ADMIN_NAME,
     DEFAULT_ADMIN_EMAIL,
-    DEFAULT_ADMIN_PASSWORD
+    DEFAULT_ADMIN_PASSWORD,
+    DEFAULT_THEME,
+    DEFAULT_LOCALE
 } = configuration;
 
 export const Prisma = new PrismaClient();
@@ -21,22 +23,24 @@ export const initDb = async () => {
         const name = DEFAULT_ADMIN_NAME;
         const email = DEFAULT_ADMIN_EMAIL;
         const password = DEFAULT_ADMIN_PASSWORD;
+        const theme = DEFAULT_THEME;
+        const locale = DEFAULT_LOCALE;
         if (name && email && password) {
-            const defaultUser = {
+            const defaultAdminUser = {
                 name,
                 email,
                 password,
+                theme,
+                locale,
                 isAdmin: true
             };
             await Prisma.user.create({
                 data: {
-                    ...defaultUser,
-                    password: await hashPassword(defaultUser.password)
+                    ...defaultAdminUser,
+                    password: await hashPassword(defaultAdminUser.password)
                 }
             });
-            Log.warn(
-                `Default user created (email: ${defaultUser.email} / password: ${defaultUser.password})`
-            );
+            Log.warn(`Default user created (email: ${email} / password: ${password})`);
         } else {
             Log.error('Environment file is missing default admin information');
         }

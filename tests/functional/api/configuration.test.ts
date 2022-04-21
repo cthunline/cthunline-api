@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import { compareDataWithExpected } from '../helpers/assert.helper';
-import { setConfMock } from '../../../src/services/controllerServices/configuration';
+import { setConfMock } from '../../../src/services/configuration';
 
 const getConfiguration = async (expected: any) => {
     const response = await Api.request({
@@ -30,7 +30,9 @@ describe('[API] Configuration', () => {
                 setConfMock('INVITATION_ENABLED', value);
                 await getConfiguration({
                     registrationEnabled: value,
-                    invitationEnabled: value
+                    invitationEnabled: value,
+                    defaultTheme: 'dark',
+                    defaultLocale: 'en'
                 });
             }
         });

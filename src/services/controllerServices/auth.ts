@@ -2,7 +2,7 @@ import { Request, CookieOptions } from 'express';
 import Jwt from 'jsonwebtoken';
 import DaysJs from 'dayjs';
 
-import { configuration } from './configuration';
+import { configuration } from '../configuration';
 import {
     AuthenticationError,
     ForbiddenError
