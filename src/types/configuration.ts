@@ -58,12 +58,12 @@ export const configurationSchema: ConfigurationSchema<Configuration> = {
     },
     DEFAULT_THEME: {
         type: 'string',
-        required: false,
+        required: true,
         filter: ['dark', 'light']
     },
     DEFAULT_LOCALE: {
         type: 'string',
-        required: false,
+        required: true,
         filter: locales
     },
     ENVIRONMENT: {
