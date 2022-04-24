@@ -66,6 +66,15 @@
                 },
                 "y": {
                     "type": "number"
+                },
+                "tooltipPlacement": {
+                    "type": "string",
+                    "enum": [
+                        "top",
+                        "left",
+                        "bottom",
+                        "right"
+                    ]
                 }
             }
         }
