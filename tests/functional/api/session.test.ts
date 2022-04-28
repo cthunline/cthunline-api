@@ -10,7 +10,7 @@ import {
 
 const { gameId } = sessionsData[0];
 
-const getUserNotes = (userId: string) => {
+const getUserNotes = (userId: number) => {
     const notes = notesData.find(({ userId: notesUserId }) => (
         notesUserId === userId
     ));
@@ -62,13 +62,15 @@ describe('[API] Sessions', () => {
                 sketch: {},
                 invalidProperty: 'Test'
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: '/sessions',
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: '/sessions',
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should create a session', async () => {
             await Api.testCreate({
@@ -136,13 +138,15 @@ describe('[API] Sessions', () => {
                 sketch: {},
                 invalidProperty: 'Test'
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: `/sessions/${id}`,
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: `/sessions/${id}`,
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should throw a forbidden error', async () => {
             await Api.testError({
@@ -251,13 +255,15 @@ describe('[API] Sessions', () => {
                 text: 'Test',
                 invalidProperty: 'Test'
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: `/sessions/${sessionsData[0].id}/notes`,
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: `/sessions/${sessionsData[0].id}/notes`,
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should edit the notes of a user', async () => {
             const editData = [{

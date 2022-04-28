@@ -32,7 +32,7 @@ characterController.get('/characters', async (req: Request, res: Response): Prom
 // get all characters of a user
 characterController.get('/users/:userId/characters', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const { userId } = params;
+        const userId = Number(params.userId);
         await getUser(userId);
         const characters = await Prisma.character.findMany({
             where: {
@@ -49,7 +49,7 @@ characterController.get('/users/:userId/characters', async ({ params }: Request,
 characterController.post('/users/:userId/characters', async (req: Request, res: Response): Promise<void> => {
     try {
         const { body, params } = req;
-        const { userId } = params;
+        const userId = Number(params.userId);
         await getUser(userId);
         controlSelf(req, userId);
         validateCreateCharacter(body);
@@ -78,7 +78,7 @@ characterController.post('/users/:userId/characters', async (req: Request, res: 
 // get a character
 characterController.get('/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const { characterId } = params;
+        const characterId = Number(params.characterId);
         const character = await getCharacter(characterId);
         res.json(character);
     } catch (err: any) {
@@ -90,7 +90,7 @@ characterController.get('/characters/:characterId', async ({ params }: Request, 
 characterController.post('/characters/:characterId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { body, params } = req;
-        const { characterId } = params;
+        const characterId = Number(params.characterId);
         const { gameId, userId } = await getCharacter(characterId);
         controlSelf(req, userId);
         validateUpdateCharacter(body);
@@ -115,8 +115,7 @@ characterController.post('/characters/:characterId', async (req: Request, res: R
 // delete a user's character
 characterController.delete('/characters/:characterId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { characterId } = params;
+        const characterId = Number(req.params.characterId);
         const { userId } = await getCharacter(characterId);
         controlSelf(req, userId);
         await Prisma.character.delete({

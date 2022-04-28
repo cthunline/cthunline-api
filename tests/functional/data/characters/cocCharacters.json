@@ -1,6 +1,6 @@
 [{
-    "id": "61f537ca1790b30562a66d92",
-    "userId": "61f537ca1790b30562a66d43",
+    "id": 1,
+    "userId": 3,
     "gameId": "callOfCthulhu",
     "name": "Ada Hegerberg (soccer player)",
     "data": {
@@ -225,8 +225,8 @@
         }
     }
 }, {
-    "id": "61f537ca1790b30562a66d91",
-    "userId": "61f537cc1790b30562a66d44",
+    "id": 2,
+    "userId": 1,
     "gameId": "callOfCthulhu",
     "name": "Susanne Sundfor (singer)",
     "data": {
@@ -459,8 +459,8 @@
         }
     }
 }, {
-    "id": "61f537ca1790b30562a66d99",
-    "userId": "61f537cd1790b30562a66d45",
+    "id": 3,
+    "userId": 2,
     "gameId": "callOfCthulhu",
     "name": "Delphine Cascarino (soccer player)",
     "data": {

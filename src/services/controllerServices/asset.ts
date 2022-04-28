@@ -54,8 +54,8 @@ export const assetDir = getAssetDir();
 export const assetTempDir = Path.join(assetDir, 'tmp');
 
 // create user subdirectory in asset dir if not exist and return its path
-export const controlUserDir = async (userId: string): Promise<string> => {
-    const userDir = Path.join(assetDir, userId);
+export const controlUserDir = async (userId: number): Promise<string> => {
+    const userDir = Path.join(assetDir, userId.toString());
     try {
         await Fs.promises.access(userDir, Fs.constants.F_OK);
     } catch {
@@ -72,7 +72,7 @@ export const formidableOptions: Formidable.Options = {
     multiples: true
 };
 
-export const getAsset = async (userId: string, assetId: string): Promise<Asset> => (
+export const getAsset = async (userId: number, assetId: number): Promise<Asset> => (
     handleNotFound<Asset>(
         'Asset', (
             Prisma.asset.findFirst({
@@ -85,7 +85,7 @@ export const getAsset = async (userId: string, assetId: string): Promise<Asset> 
     )
 );
 
-export const getDirectories = async (userId: string): Promise<Directory[]> => (
+export const getDirectories = async (userId: number): Promise<Directory[]> => (
     Prisma.directory.findMany({
         where: {
             userId
@@ -94,8 +94,8 @@ export const getDirectories = async (userId: string): Promise<Directory[]> => (
 );
 
 export const getDirectory = async (
-    userId: string,
-    directoryId: string
+    userId: number,
+    directoryId: number
 ): Promise<Directory> => (
     handleNotFound<Directory>(
         'Directory', (
@@ -111,7 +111,7 @@ export const getDirectory = async (
 
 // recursivly searches all children directories of a given directoryId
 export const getChildrenDirectories = (
-    directoryId: string,
+    directoryId: number,
     directories: Directory[]
 ): Directory[] => {
     const childrenDirs: Directory[] = [];

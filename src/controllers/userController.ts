@@ -78,7 +78,7 @@ userController.post('/users', async (req: Request, res: Response): Promise<void>
 // get a user
 userController.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const { userId } = params;
+        const userId = Number(params.userId);
         const user = await getUser(userId);
         res.json(user);
     } catch (err: any) {
@@ -90,7 +90,7 @@ userController.get('/users/:userId', async ({ params }: Request, res: Response):
 userController.post('/users/:userId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { params, body } = req;
-        const { userId } = params;
+        const userId = Number(params.userId);
         const user = await handleNotFound<User>(
             'User', (
                 Prisma.user.findUnique({

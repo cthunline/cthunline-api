@@ -7,7 +7,7 @@ import Data, {
 } from '../helpers/data.helper';
 import { assertCharacter } from '../helpers/assert.helper';
 
-const findCharacter = (userId: string, gameId: string) => {
+const findCharacter = (userId: number, gameId: string) => {
     const character = charactersData.find((char) => (
         char.userId === Api.userId && char.gameId === gameId
     ));
@@ -108,13 +108,15 @@ describe('[API] Characters', () => {
                     }
                 }
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: `/users/${Api.userId}/characters`,
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: `/users/${Api.userId}/characters`,
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should throw a forbidden error', async () => {
             const { gameId } = findCharacter(Api.userId, 'callOfCthulhu');
@@ -129,19 +131,23 @@ describe('[API] Characters', () => {
         });
         it('Should create a character', async () => {
             const gameIds = ['callOfCthulhu', 'starWarsD6'];
-            for (const gameId of gameIds) {
-                const { data } = findCharacter(Api.userId, gameId);
-                await Api.testCreate({
-                    route: `/users/${Api.userId}/characters`,
-                    data: {
-                        gameId,
-                        name: `Test ${gameId}`,
-                        data
-                    },
-                    assert: assertCharacter,
-                    getRoute: '/characters/:id'
-                });
-            }
+            await Promise.all(
+                gameIds.map((gameId) => (
+                    (async () => {
+                        const { data } = findCharacter(Api.userId, gameId);
+                        await Api.testCreate({
+                            route: `/users/${Api.userId}/characters`,
+                            data: {
+                                gameId,
+                                name: `Test ${gameId}`,
+                                data
+                            },
+                            assert: assertCharacter,
+                            getRoute: '/characters/:id'
+                        });
+                    })()
+                ))
+            );
         });
     });
 
@@ -215,13 +221,15 @@ describe('[API] Characters', () => {
                     }
                 }
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: `/characters/${id}`,
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: `/characters/${id}`,
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should throw a forbidden error', async () => {
             await Api.testError({

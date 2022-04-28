@@ -1,5 +1,4 @@
 import { Socket, Server } from 'socket.io';
-import { ObjectId } from 'bson';
 import { Session, Character } from '@prisma/client';
 
 import { UserSelect } from '../types/user';
@@ -24,8 +23,8 @@ const verifyToken = async (socket: Socket): Promise<UserSelect> => {
 
 // verify session
 const verifySession = async (socket: Socket): Promise<Session> => {
-    const sessionId = socket.handshake.query.sessionId as string;
-    if (!sessionId || !ObjectId.isValid(sessionId)) {
+    const sessionId = Number(socket.handshake.query.sessionId);
+    if (!sessionId) {
         throw new ValidationError('Missing sessionId in handshare query');
     }
     const session = await Prisma.session.findUnique({
@@ -40,9 +39,9 @@ const verifySession = async (socket: Socket): Promise<Session> => {
 };
 
 // verify character
-const verifyCharacter = async (socket: Socket, userId: string): Promise<Character> => {
-    const characterId = socket.handshake.query.characterId as string;
-    if (!characterId || !ObjectId.isValid(characterId)) {
+const verifyCharacter = async (socket: Socket, userId: number): Promise<Character> => {
+    const characterId = Number(socket.handshake.query.characterId);
+    if (!characterId) {
         throw new ValidationError('Missing characterId in handshare query');
     }
     const character = await Prisma.character.findUnique({
@@ -78,7 +77,7 @@ export const connectionMiddleware = async (socket: Socket, next: Function) => {
             isMaster
         };
         // join session room
-        socket.join(session.id);
+        socket.join(session.id.toString());
         //
         next();
     } catch (err: any) {

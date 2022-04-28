@@ -35,7 +35,7 @@ export const userSelect = {
 
 // check a user exists and return it
 // returned user data will not contain password
-export const getUser = async (userId: string): Promise<UserSelect> => (
+export const getUser = async (userId: number): Promise<UserSelect> => (
     handleNotFound<UserSelect>(
         'User', (
             Prisma.user.findUnique({

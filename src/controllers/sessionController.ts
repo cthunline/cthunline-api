@@ -69,7 +69,7 @@ sessionController.post('/sessions', async (req: Request, res: Response): Promise
 // get a session
 sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const { sessionId } = params;
+        const sessionId = Number(params.sessionId);
         const session = await getSession(sessionId);
         res.json(session);
     } catch (err: any) {
@@ -81,7 +81,7 @@ sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: R
 sessionController.post('/sessions/:sessionId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { body, params } = req;
-        const { sessionId } = params;
+        const sessionId = Number(params.sessionId);
         const session = await getSession(sessionId);
         controlSelf(req, session.masterId);
         validateUpdateSession(body);
@@ -100,8 +100,7 @@ sessionController.post('/sessions/:sessionId', async (req: Request, res: Respons
 // delete a session
 sessionController.delete('/sessions/:sessionId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { sessionId } = params;
+        const sessionId = Number(req.params.sessionId);
         const session = await getSession(sessionId);
         controlSelf(req, session.masterId);
         await Prisma.session.delete({
@@ -118,7 +117,7 @@ sessionController.delete('/sessions/:sessionId', async (req: Request, res: Respo
 // get current user notes in a session
 sessionController.get('/sessions/:sessionId/notes', async ({ params, user }: Request, res: Response): Promise<void> => {
     try {
-        const { sessionId } = params;
+        const sessionId = Number(params.sessionId);
         await getSession(sessionId);
         const notes = await getNotes(sessionId, user.id);
         res.json(notes);
@@ -130,7 +129,7 @@ sessionController.get('/sessions/:sessionId/notes', async ({ params, user }: Req
 // set current user notes in a session
 sessionController.post('/sessions/:sessionId/notes', async ({ body, params, user }: Request, res: Response): Promise<void> => {
     try {
-        const { sessionId } = params;
+        const sessionId = Number(params.sessionId);
         await getSession(sessionId);
         validateNotes(body);
         const notes = await getNotes(sessionId, user.id);

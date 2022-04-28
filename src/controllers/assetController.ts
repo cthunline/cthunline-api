@@ -50,7 +50,7 @@ const assetController = Router();
 assetController.get('/users/:userId/assets', async (req: Request, res: Response): Promise<void> => {
     try {
         const { params, query } = req;
-        const { userId } = params;
+        const userId = Number(params.userId);
         const { type, include } = query;
         await getUser(userId);
         controlSelf(req, userId);
@@ -76,7 +76,7 @@ assetController.get('/users/:userId/assets', async (req: Request, res: Response)
 assetController.post('/users/:userId/assets', async (req: Request, res: Response): Promise<void> => {
     try {
         // control userId
-        const { userId } = req.params;
+        const userId = Number(req.params.userId);
         await getUser(userId);
         controlSelf(req, userId);
         // create user subdirectory if not exist
@@ -96,7 +96,7 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
                     ...files
                 });
                 // control directoryId
-                const directoryId = fields.directoryId ? String(fields.directoryId) : null;
+                const directoryId = fields.directoryId ? Number(fields.directoryId) : null;
                 if (directoryId !== null) {
                     await getDirectory(userId, directoryId);
                 }
@@ -130,7 +130,7 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
                         type
                     }) => {
                         const name = originalFilename ?? newFilename;
-                        const path = Path.join(userId, newFilename);
+                        const path = Path.join(userId.toString(), newFilename);
                         return Prisma.asset.create({
                             data: {
                                 userId,
@@ -156,8 +156,8 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
 // get a user's asset
 assetController.get('/users/:userId/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { userId, assetId } = params;
+        const userId = Number(req.params.userId);
+        const assetId = Number(req.params.assetId);
         await getUser(userId);
         controlSelf(req, userId);
         const asset = await getAsset(userId, assetId);
@@ -170,8 +170,8 @@ assetController.get('/users/:userId/assets/:assetId', async (req: Request, res: 
 // delete a user's asset
 assetController.delete('/users/:userId/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { userId, assetId } = params;
+        const userId = Number(req.params.userId);
+        const assetId = Number(req.params.assetId);
         await getUser(userId);
         controlSelf(req, userId);
         const { path } = await getAsset(userId, assetId);
@@ -194,8 +194,7 @@ assetController.delete('/users/:userId/assets/:assetId', async (req: Request, re
 // get all directories of a user
 assetController.get('/users/:userId/directories', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { userId } = params;
+        const userId = Number(req.params.userId);
         await getUser(userId);
         controlSelf(req, userId);
         const directories = await getDirectories(userId);
@@ -208,8 +207,7 @@ assetController.get('/users/:userId/directories', async (req: Request, res: Resp
 // create directory for a user
 assetController.post('/users/:userId/directories', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { userId } = params;
+        const userId = Number(req.params.userId);
         await getUser(userId);
         controlSelf(req, userId);
         const { parentId } = req.body;
@@ -232,8 +230,8 @@ assetController.post('/users/:userId/directories', async (req: Request, res: Res
 // get a user's directory
 assetController.get('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { userId, directoryId } = params;
+        const userId = Number(req.params.userId);
+        const directoryId = Number(req.params.directoryId);
         await getUser(userId);
         controlSelf(req, userId);
         const directory = await getDirectory(userId, directoryId);
@@ -246,8 +244,8 @@ assetController.get('/users/:userId/directories/:directoryId', async (req: Reque
 // update a user's directory
 assetController.post('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { userId, directoryId } = params;
+        const userId = Number(req.params.userId);
+        const directoryId = Number(req.params.directoryId);
         await getUser(userId);
         controlSelf(req, userId);
         await getDirectory(userId, directoryId);
@@ -267,8 +265,8 @@ assetController.post('/users/:userId/directories/:directoryId', async (req: Requ
 // delete a user's directory
 assetController.delete('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params } = req;
-        const { userId, directoryId } = params;
+        const userId = Number(req.params.userId);
+        const directoryId = Number(req.params.directoryId);
         await getUser(userId);
         controlSelf(req, userId);
         await getDirectory(userId, directoryId);
@@ -301,14 +299,12 @@ assetController.delete('/users/:userId/directories/:directoryId', async (req: Re
                 )
             ))
         ]);
-        // delete directory and all children directories
-        await Prisma.$transaction(
-            [directoryId, ...childrenDirectoryIds].map((id) => (
-                Prisma.directory.delete({
-                    where: { id }
-                })
-            ))
-        );
+        // delete directory (children directories will cascade-deleted)
+        await Prisma.directory.delete({
+            where: {
+                id: directoryId
+            }
+        });
         res.send({});
     } catch (err: any) {
         res.error(err);

@@ -24,7 +24,7 @@ const sketchHandler = (io: Server, socket: Socket) => {
                 sessionId,
                 isMaster
             } = socket.data;
-            socket.to(sessionId).emit('sketchUpdate', {
+            socket.to(String(sessionId)).emit('sketchUpdate', {
                 user,
                 isMaster,
                 sketch: data

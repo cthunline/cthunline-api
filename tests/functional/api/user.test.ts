@@ -58,13 +58,15 @@ describe('[API] Users', () => {
                 password: 'abc123',
                 locale: 'invalidLocale'
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: '/users',
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: '/users',
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should throw a forbidden error', async () => {
             await Api.login({
@@ -124,13 +126,15 @@ describe('[API] Users', () => {
                 theme: 'light',
                 locale: 'fr'
             }];
-            for (const data of createData) {
-                await Api.testCreate({
-                    route: '/users',
-                    data,
-                    assert: assertUser
-                });
-            }
+            await Promise.all(
+                createData.map((data) => (
+                    Api.testCreate({
+                        route: '/users',
+                        data,
+                        assert: assertUser
+                    })
+                ))
+            );
         });
     });
 
@@ -179,13 +183,15 @@ describe('[API] Users', () => {
             }, {
                 locale: 'invalidLocale'
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: `/users/${Api.userId}`,
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: `/users/${Api.userId}`,
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should throw a forbidden error', async () => {
             const response = await Api.request({
@@ -208,13 +214,15 @@ describe('[API] Users', () => {
             }, {
                 isEnabled: true
             }];
-            for (const body of bodies) {
-                await Api.testError({
-                    method: 'POST',
-                    route: `/users/${id}`,
-                    body
-                }, 403);
-            }
+            await Promise.all(
+                bodies.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: `/users/${id}`,
+                        body
+                    }, 403)
+                ))
+            );
             await Api.testError({
                 method: 'POST',
                 route: `/users/${usersData[0].id}`,
@@ -262,13 +270,15 @@ describe('[API] Users', () => {
                 theme: 'light',
                 locale: 'fr'
             }];
-            for (const data of editData) {
-                await Api.testEdit({
-                    route: `/users/${id}`,
-                    data,
-                    assert: assertUser
-                });
-            }
+            await Promise.all(
+                editData.map((data) => (
+                    Api.testEdit({
+                        route: `/users/${id}`,
+                        data,
+                        assert: assertUser
+                    })
+                ))
+            );
         });
     });
 });

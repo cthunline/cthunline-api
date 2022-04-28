@@ -37,8 +37,8 @@ export interface FailSocketConnectionData {
 
 export interface SocketConnectionData {
     token?: string;
-    sessionId?: string;
-    characterId?: string;
+    sessionId?: number;
+    characterId?: number;
 }
 
 interface SocketClientConstructor {

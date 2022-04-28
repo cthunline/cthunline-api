@@ -24,7 +24,7 @@ export const controlPortrait = (base64: string) => {
     }
 };
 
-export const getCharacter = async (characterId: string): Promise<Character> => (
+export const getCharacter = async (characterId: number): Promise<Character> => (
     handleNotFound<Character>(
         'Character', (
             Prisma.character.findUnique({

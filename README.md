@@ -7,7 +7,7 @@
 ## Requirements
 
 * NodeJS >= 16
-* MongoDB >= 5
+* MySQL / MariaDB
 
 ## Configuration
 

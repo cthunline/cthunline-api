@@ -41,9 +41,10 @@ const Data = {
         await Promise.all(usersData.map((data) => (
             Prisma.user.create({ data })
         )));
-        await Promise.all(directoriesData.map((data) => (
-            Prisma.directory.create({ data })
-        )));
+        // must not be inserted simultaneously because of relation id constraint
+        for (const data of directoriesData) {
+            await Prisma.directory.create({ data });
+        }
         await Promise.all([
             ...assetsData.map((data) => (
                 Prisma.asset.create({ data })
@@ -67,7 +68,7 @@ const Data = {
                 assets.map(({ userId }) => userId)
             )].map((userId) => (
                 (async () => {
-                    const userDir = Path.join(assetDir, userId);
+                    const userDir = Path.join(assetDir, userId.toString());
                     try {
                         await Fs.promises.access(userDir, Fs.constants.F_OK);
                     } catch {

@@ -68,13 +68,15 @@ describe('[API] Registration', () => {
                 password: 'abc123',
                 invitationCode: 'invalidCode'
             }];
-            for (const data of registerData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: '/register',
-                    body: data
-                }, 403);
-            }
+            await Promise.all(
+                registerData.map((data) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: '/register',
+                        body: data
+                    }, 403)
+                ))
+            );
         });
         it('Should throw a forbidden error because invitation code is already used', async () => {
             await Api.login();

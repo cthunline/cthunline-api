@@ -31,7 +31,7 @@ const audioHandler = (io: Server, socket: Socket) => {
                 'Asset', (
                     Prisma.asset.findUnique({
                         where: {
-                            id: assetId
+                            id: Number(assetId)
                         }
                     })
                 )
@@ -39,7 +39,7 @@ const audioHandler = (io: Server, socket: Socket) => {
             if (asset.type !== 'audio') {
                 throw new ValidationError('Asset type is not audio');
             }
-            socket.to(sessionId).emit('audioPlay', {
+            socket.to(String(sessionId)).emit('audioPlay', {
                 user,
                 isMaster,
                 asset,
@@ -61,7 +61,7 @@ const audioHandler = (io: Server, socket: Socket) => {
             if (!isMaster) {
                 throw new ForbiddenError();
             }
-            socket.to(sessionId).emit('audioStop', {
+            socket.to(String(sessionId)).emit('audioStop', {
                 user,
                 isMaster
             });

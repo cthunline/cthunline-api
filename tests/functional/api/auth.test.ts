@@ -25,13 +25,15 @@ describe('[API] Authentication', () => {
                 password: 'abc123',
                 invalidProperty: 'Test'
             }, {}];
-            for (const body of invalidData) {
-                await Api.testError({
-                    method: 'POST',
-                    route: '/auth',
-                    body
-                }, 400);
-            }
+            await Promise.all(
+                invalidData.map((body) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: '/auth',
+                        body
+                    }, 400)
+                ))
+            );
         });
         it('Should throw authentication error', async () => {
             const invalidCredentials = [{

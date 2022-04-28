@@ -57,13 +57,13 @@ describe('[Unit] Auth', () => {
 
     describe('controlSelf', () => {
         it('Should control request user match userId', async () => {
-            const id = 'abc123';
+            const id = 123;
             const req = { user: { id } };
             expect(() => (
                 controlSelf(req as Request, id)
             )).to.not.throw();
             expect(() => (
-                controlSelf(req as Request, 'anotherId')
+                controlSelf(req as Request, 999)
             )).to.throw(
                 ForbiddenError
             );

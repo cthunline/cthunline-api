@@ -33,7 +33,7 @@ export const getInclude = (includeMaster: boolean) => (
     } : undefined
 );
 
-export const getSession = async (sessionId: string): Promise<Session> => (
+export const getSession = async (sessionId: number): Promise<Session> => (
     handleNotFound<Session>(
         'Session', (
             Prisma.session.findUnique({
@@ -46,7 +46,7 @@ export const getSession = async (sessionId: string): Promise<Session> => (
 );
 
 // get notes of a user for a session / create default notes if not exist
-export const getNotes = async (sessionId: string, userId: string): Promise<Note> => {
+export const getNotes = async (sessionId: number, userId: number): Promise<Note> => {
     const notes = await Prisma.note.findFirst({
         where: {
             sessionId,

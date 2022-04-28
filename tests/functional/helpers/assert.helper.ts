@@ -33,7 +33,7 @@ export const assertUser = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
-    expect(data.id).to.be.a('string');
+    expect(data.id).to.be.a('number');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('email');
@@ -61,7 +61,7 @@ export const assertAsset = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
-    expect(data.id).to.be.a('string');
+    expect(data.id).to.be.a('number');
     expect(data).to.have.property('type');
     expect(data.type).to.be.a('string');
     expect(data).to.have.property('name');
@@ -69,10 +69,10 @@ export const assertAsset = (
     expect(data).to.have.property('path');
     expect(data.path).to.be.a('string');
     expect(data).to.have.property('userId');
-    expect(data.userId).to.be.a('string');
+    expect(data.userId).to.be.a('number');
     if (data.directoryId) {
         expect(data.directoryId).to.satisfy((id: any) => (
-            id === null || typeof id === 'string'
+            id === null || typeof id === 'number'
         ));
     }
     if (expected) {
@@ -86,14 +86,14 @@ export const assertDirectory = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
-    expect(data.id).to.be.a('string');
+    expect(data.id).to.be.a('number');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('userId');
-    expect(data.userId).to.be.a('string');
+    expect(data.userId).to.be.a('number');
     if (data.parentId) {
         expect(data.parentId).to.satisfy((id: any) => (
-            id === null || typeof id === 'string'
+            id === null || typeof id === 'number'
         ));
     }
     if (expected) {
@@ -136,7 +136,7 @@ export const assertSketchToken = (data: Record<string, any>) => {
     expect(data).to.have.property('user');
     if (data.user) {
         expect(data.user).to.have.property('id');
-        expect(data.user.id).to.be.a('string');
+        expect(data.user.id).to.be.a('number');
         expect(data.user).to.have.property('name');
         expect(data.user.name).to.be.a('string');
     }
@@ -206,7 +206,7 @@ export const assertSession = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
-    expect(data.id).to.be.a('string');
+    expect(data.id).to.be.a('number');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('sketch');
@@ -228,13 +228,13 @@ export const assertNotes = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
-    expect(data.id).to.be.a('string');
+    expect(data.id).to.be.a('number');
     expect(data).to.have.property('text');
     expect(data.text).to.be.a('string');
     expect(data).to.have.property('sessionId');
-    expect(data.sessionId).to.be.a('string');
+    expect(data.sessionId).to.be.a('number');
     expect(data).to.have.property('userId');
-    expect(data.userId).to.be.a('string');
+    expect(data.userId).to.be.a('number');
     if (expected) {
         compareDataWithExpected(data, expected);
     }
@@ -246,13 +246,13 @@ export const assertCharacter = (
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
-    expect(data.id).to.be.a('string');
+    expect(data.id).to.be.a('number');
     expect(data).to.have.property('userId');
-    expect(data.id).to.be.a('string');
+    expect(data.userId).to.be.a('number');
     expect(data).to.have.property('gameId');
-    expect(data.id).to.be.a('string');
+    expect(data.gameId).to.be.a('string');
     expect(data).to.have.property('name');
-    expect(data.id).to.be.a('string');
+    expect(data.name).to.be.a('string');
     if (expected) {
         Object.keys(expected).forEach((key) => {
             if (key === 'data') {

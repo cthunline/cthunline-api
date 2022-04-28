@@ -103,7 +103,7 @@ export interface CredentialOptions {
 }
 
 const Api = {
-    userId: '',
+    userId: 0,
     credentials: {
         email: 'admin@test.com',
         password: 'test'
@@ -140,7 +140,7 @@ const Api = {
             expect(response).to.have.status(200);
             expect(response).to.be.json;
             expect(response.body).to.be.an('object').and.be.empty;
-            Api.userId = '';
+            Api.userId = 0;
         } else {
             expect(response).to.have.status(401);
             expect(response).to.be.json;
@@ -353,19 +353,23 @@ const Api = {
             '61f5655bb7c63e78815de1c7',
             '61f5655cb7c63e78815de1c8'
         ];
-        for (const id of invalidIds) {
-            const isInvalid = !/^[0-9a-f]{24}$/.test(id);
-            const response = await Api.request({
-                method,
-                route: route.split(':id').join(id),
-                body
-            });
-            expect(response).to.have.status(
-                isInvalid && isObjectId ? 400 : 404
-            );
-            expect(response).to.be.json;
-            assertError(response.body);
-        }
+        await Promise.all(
+            invalidIds.map((id) => (
+                (async () => {
+                    const isInvalid = !/^[0-9]+$/.test(id);
+                    const response = await Api.request({
+                        method,
+                        route: route.split(':id').join(id),
+                        body
+                    });
+                    expect(response).to.have.status(
+                        isInvalid && isObjectId ? 400 : 404
+                    );
+                    expect(response).to.be.json;
+                    assertError(response.body);
+                })()
+            ))
+        );
     },
 
     async testStaticFile(route: string): Promise<void> {

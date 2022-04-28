@@ -1,6 +1,6 @@
 [{
-    "id": "61f537ca1790b30562a66e10",
-    "userId": "61f537cc1790b30562a66d44",
+    "id": 4,
+    "userId": 1,
     "gameId": "starWarsD6",
     "name": "Emma Nostaw (Bounty hunter)",
     "data": {
@@ -196,8 +196,8 @@
         }
     }
 }, {
-    "id": "61f537ca1790b30562a66e11",
-    "userId": "61f537ca1790b30562a66d43",
+    "id": 5,
+    "userId": 3,
     "gameId": "starWarsD6",
     "name": "Selma Ahcab (Rebel pilot)",
     "data": {

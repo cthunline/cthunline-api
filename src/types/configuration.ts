@@ -19,7 +19,7 @@ export interface Configuration {
     LOG_ENABLED: boolean;
     LOG_DIR: string;
     CHECKPOINT_DISABLE: boolean;
-    MONGO_URL: string;
+    DATABASE_URL: string;
     ASSET_DIR: string;
 }
 
@@ -99,7 +99,7 @@ export const configurationSchema: ConfigurationSchema<Configuration> = {
         type: 'boolean',
         required: false
     },
-    MONGO_URL: {
+    DATABASE_URL: {
         type: 'string',
         required: true
     },

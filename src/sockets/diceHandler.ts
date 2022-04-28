@@ -54,7 +54,7 @@ const diceHandler = (io: Server, socket: Socket) => {
         try {
             validateRequest(request);
             const { user, isMaster, sessionId } = socket.data;
-            io.sockets.to(sessionId).emit(
+            io.sockets.to(String(sessionId)).emit(
                 'diceResult',
                 getDiceResult(user, isMaster, request)
             );

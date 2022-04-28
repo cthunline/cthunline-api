@@ -46,7 +46,7 @@ export const getCookieOptions = (): CookieOptions => ({
 
 // control userId in params is same as authentified one
 // if not throw forbidden error
-export const controlSelf = (req: Request, userId: string) => {
+export const controlSelf = (req: Request, userId: number) => {
     if (userId !== req.user.id) {
         throw new ForbiddenError();
     }

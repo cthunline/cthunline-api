@@ -71,11 +71,11 @@ describe('[Sockets] Connection', () => {
     it('Should fail to connect socket because of not found sessionId or characterId', async () => {
         const { token } = await Api.login();
         const notFoundQueries = [{
-            sessionId: '1122334455667788aabbccdd',
+            sessionId: 999,
             characterId: charactersData[0].id
         }, {
             sessionId: sessionsData[1].id,
-            characterId: '1122334455667788aabbccdd'
+            characterId: 999
         }];
         for (const query of notFoundQueries) {
             await Sockets.failConnect({

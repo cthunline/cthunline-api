@@ -31,14 +31,14 @@ const socketRouter = (httpServer: HttpServer) => {
         disconnectCopycats(io, socket);
         const { user, sessionId, isMaster } = socket.data;
         const users = await getSessionUsers(io);
-        io.sockets.to(sessionId).emit('join', {
+        io.sockets.to(String(sessionId)).emit('join', {
             user,
             users,
             isMaster
         });
         socket.on('disconnect', async (/* reason: string */) => {
             const sessionUsers = await getSessionUsers(io);
-            socket.to(sessionId).emit('leave', {
+            socket.to(String(sessionId)).emit('leave', {
                 user,
                 users: sessionUsers,
                 isMaster

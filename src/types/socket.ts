@@ -13,7 +13,7 @@ export interface SocketDiceResult {
 }
 
 export interface SocketAudioPlay {
-    assetId: string;
+    assetId: number;
     time?: number;
 }
 
