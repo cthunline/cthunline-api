@@ -5,7 +5,7 @@ import Formidable from 'formidable';
 
 import { Prisma, handleNotFound } from '../prisma';
 import { configuration } from '../configuration';
-import { InternError, ValidationError } from '../errors';
+import { ForbiddenError, InternError, ValidationError } from '../errors';
 import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
 const { ASSET_DIR } = configuration;
@@ -72,18 +72,21 @@ export const formidableOptions: Formidable.Options = {
     multiples: true
 };
 
-export const getAsset = async (userId: number, assetId: number): Promise<Asset> => (
-    handleNotFound<Asset>(
+export const getAsset = async (userId: number, assetId: number): Promise<Asset> => {
+    const asset = await handleNotFound<Asset>(
         'Asset', (
             Prisma.asset.findFirst({
                 where: {
-                    userId,
                     id: assetId
                 }
             })
         )
-    )
-);
+    );
+    if (asset.userId !== userId) {
+        throw new ForbiddenError('Asset does not belong to you');
+    }
+    return asset;
+};
 
 export const getDirectories = async (userId: number): Promise<Directory[]> => (
     Prisma.directory.findMany({
@@ -96,18 +99,21 @@ export const getDirectories = async (userId: number): Promise<Directory[]> => (
 export const getDirectory = async (
     userId: number,
     directoryId: number
-): Promise<Directory> => (
-    handleNotFound<Directory>(
+): Promise<Directory> => {
+    const directory = await handleNotFound<Directory>(
         'Directory', (
             Prisma.directory.findFirst({
                 where: {
-                    userId,
                     id: directoryId
                 }
             })
         )
-    )
-);
+    );
+    if (directory.userId !== userId) {
+        throw new ForbiddenError('Directory does not belong to you');
+    }
+    return directory;
+};
 
 // recursivly searches all children directories of a given directoryId
 export const getChildrenDirectories = (

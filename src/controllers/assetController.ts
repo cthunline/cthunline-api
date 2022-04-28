@@ -7,8 +7,6 @@ import {
 } from 'express';
 import Formidable from 'formidable';
 
-import { getUser } from '../services/controllerServices/user';
-import { controlSelf } from '../services/controllerServices/auth';
 import { Prisma } from '../services/prisma';
 import { ValidationError } from '../services/errors';
 import Log from '../services/log';
@@ -46,14 +44,11 @@ const validateUpdateDirectory = Validator(AssetSchemas.updateDirectory);
 
 const assetController = Router();
 
-// get all assets of a user
-assetController.get('/users/:userId/assets', async (req: Request, res: Response): Promise<void> => {
+// get all assets of the authenticated user
+assetController.get('/assets', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { params, query } = req;
-        const userId = Number(params.userId);
-        const { type, include } = query;
-        await getUser(userId);
-        controlSelf(req, userId);
+        const userId = req.user.id;
+        const { type, include } = req.query;
         const assets = await Prisma.asset.findMany({
             where: {
                 userId,
@@ -71,14 +66,11 @@ assetController.get('/users/:userId/assets', async (req: Request, res: Response)
     }
 });
 
-// upload an asset for a user
+// upload an asset for the authenticated user
 // this endpoint expect multipart/form-data
-assetController.post('/users/:userId/assets', async (req: Request, res: Response): Promise<void> => {
+assetController.post('/assets', async (req: Request, res: Response): Promise<void> => {
     try {
-        // control userId
-        const userId = Number(req.params.userId);
-        await getUser(userId);
-        controlSelf(req, userId);
+        const userId = req.user.id;
         // create user subdirectory if not exist
         const userDir = await controlUserDir(userId);
         // initialize formidable
@@ -153,13 +145,11 @@ assetController.post('/users/:userId/assets', async (req: Request, res: Response
     }
 });
 
-// get a user's asset
-assetController.get('/users/:userId/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
+// get an asset belonging to the athenticated user
+assetController.get('/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(req.params.userId);
+        const userId = req.user.id;
         const assetId = Number(req.params.assetId);
-        await getUser(userId);
-        controlSelf(req, userId);
         const asset = await getAsset(userId, assetId);
         res.json(asset);
     } catch (err: any) {
@@ -167,13 +157,11 @@ assetController.get('/users/:userId/assets/:assetId', async (req: Request, res: 
     }
 });
 
-// delete a user's asset
-assetController.delete('/users/:userId/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
+// delete an asset belonging to the authenticated user
+assetController.delete('/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(req.params.userId);
+        const userId = req.user.id;
         const assetId = Number(req.params.assetId);
-        await getUser(userId);
-        controlSelf(req, userId);
         const { path } = await getAsset(userId, assetId);
         await Promise.all([
             Prisma.asset.delete({
@@ -191,12 +179,10 @@ assetController.delete('/users/:userId/assets/:assetId', async (req: Request, re
     }
 });
 
-// get all directories of a user
-assetController.get('/users/:userId/directories', async (req: Request, res: Response): Promise<void> => {
+// get all directories of the authenticated user
+assetController.get('/directories', async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(req.params.userId);
-        await getUser(userId);
-        controlSelf(req, userId);
+        const userId = req.user.id;
         const directories = await getDirectories(userId);
         res.json({ directories });
     } catch (err: any) {
@@ -204,12 +190,10 @@ assetController.get('/users/:userId/directories', async (req: Request, res: Resp
     }
 });
 
-// create directory for a user
-assetController.post('/users/:userId/directories', async (req: Request, res: Response): Promise<void> => {
+// create directory for the authenticated user
+assetController.post('/directories', async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(req.params.userId);
-        await getUser(userId);
-        controlSelf(req, userId);
+        const userId = req.user.id;
         const { parentId } = req.body;
         validateCreateDirectory(req.body);
         if (parentId) {
@@ -227,13 +211,11 @@ assetController.post('/users/:userId/directories', async (req: Request, res: Res
     }
 });
 
-// get a user's directory
-assetController.get('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
+// get a directory belonging to the authenticated user
+assetController.get('/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(req.params.userId);
+        const userId = req.user.id;
         const directoryId = Number(req.params.directoryId);
-        await getUser(userId);
-        controlSelf(req, userId);
         const directory = await getDirectory(userId, directoryId);
         res.json(directory);
     } catch (err: any) {
@@ -241,13 +223,11 @@ assetController.get('/users/:userId/directories/:directoryId', async (req: Reque
     }
 });
 
-// update a user's directory
-assetController.post('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
+// update a directory belonging to the authenticated user
+assetController.post('/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(req.params.userId);
+        const userId = req.user.id;
         const directoryId = Number(req.params.directoryId);
-        await getUser(userId);
-        controlSelf(req, userId);
         await getDirectory(userId, directoryId);
         validateUpdateDirectory(req.body);
         const directory = await Prisma.directory.update({
@@ -262,15 +242,13 @@ assetController.post('/users/:userId/directories/:directoryId', async (req: Requ
     }
 });
 
-// delete a user's directory
-assetController.delete('/users/:userId/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
+// delete a directory belonging to the authenticated user
+assetController.delete('/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(req.params.userId);
+        const userId = req.user.id;
         const directoryId = Number(req.params.directoryId);
-        await getUser(userId);
-        controlSelf(req, userId);
         await getDirectory(userId, directoryId);
-        // get all directories
+        // get all directories of the user
         const directories = await getDirectories(userId);
         // get all children directories
         const childrenDirectories = getChildrenDirectories(directoryId, directories);

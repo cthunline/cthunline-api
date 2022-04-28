@@ -40,4 +40,11 @@
     "path": "3/cc1561f53762a6790b306d26.mp3",
     "directoryId": 6,
     "userId": 3
+}, {
+    "id": 7,
+    "type": "audio",
+    "name": "asset.mp3",
+    "path": "2/cc1561f53762a6790b306999.mp3",
+    "directoryId": 8,
+    "userId": 2
 }]

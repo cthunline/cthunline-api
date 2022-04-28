@@ -31,4 +31,8 @@
     "name": "Directory 1-1-2",
     "userId": 3,
     "parentId": 3
+}, {
+    "id": 8,
+    "name": "Some directory",
+    "userId": 2
 }]
