@@ -356,7 +356,7 @@ const Api = {
         await Promise.all(
             invalidIds.map((id) => (
                 (async () => {
-                    const isInvalid = !/^[0-9]+$/.test(id);
+                    const isInvalid = !/^\d+$/.test(id);
                     const response = await Api.request({
                         method,
                         route: route.split(':id').join(id),
