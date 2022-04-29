@@ -11,8 +11,7 @@
         "lint": "npx eslint . --ext=.ts --max-warnings=0 && markdownlint **/*.md",
         "pretest": "dotenv -e .env.test -- npx prisma db push",
         "test": "nyc dotenv -e .env.test -- mocha --exit",
-        "migrate": "npx prisma migrate deploy",
-        "prod": "npm run migrate && node index.js"
+        "prod": "npx prisma migrate deploy --schema prisma/schema.prisma && node index.js"
     },
     "dependencies": {
         "@prisma/client": "^3.13.0",
