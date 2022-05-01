@@ -18,6 +18,9 @@ export interface Configuration {
     COOKIE_SECURE: boolean;
     LOG_ENABLED: boolean;
     LOG_DIR: string;
+    REVERSE_PROXY: boolean;
+    RL_WINDOW_DURATION: number;
+    RL_MAX_REQUESTS: number;
     CHECKPOINT_DISABLE: boolean;
     DATABASE_URL: string;
     ASSET_DIR: string;
@@ -94,6 +97,18 @@ export const configurationSchema: ConfigurationSchema<Configuration> = {
     LOG_DIR: {
         type: 'string',
         required: false
+    },
+    REVERSE_PROXY: {
+        type: 'boolean',
+        required: true
+    },
+    RL_WINDOW_DURATION: {
+        type: 'number',
+        required: true
+    },
+    RL_MAX_REQUESTS: {
+        type: 'number',
+        required: true
     },
     CHECKPOINT_DISABLE: {
         type: 'boolean',

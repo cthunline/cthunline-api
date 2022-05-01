@@ -17,10 +17,19 @@ import socketRouter from './sockets';
 const app = Express();
 const httpServer = createServer(app);
 
-const { COOKIE_SECRET, PORT } = configuration;
+const {
+    REVERSE_PROXY,
+    COOKIE_SECRET,
+    PORT
+} = configuration;
 
 (async () => {
     try {
+        if (REVERSE_PROXY) {
+            Log.info('Set Express app trust proxy');
+            app.set('trust proxy', true);
+        }
+
         Log.info('Setting middlewares');
         app.use(CookieParser(COOKIE_SECRET));
         app.use(Helmet());

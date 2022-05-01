@@ -9,6 +9,7 @@ import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { AuthenticationError } from '../services/errors';
 import { UserSelect } from '../types/user';
+import rateLimiter from '../services/rateLimiter';
 import {
     verifyPassword,
     generateJwt,
@@ -52,7 +53,7 @@ authController.get('/auth', async (req: Request, res: Response): Promise<void> =
 });
 
 // login
-authController.post('/auth', async ({ body }: Request, res: Response): Promise<void> => {
+authController.post('/auth', rateLimiter, async ({ body }: Request, res: Response): Promise<void> => {
     try {
         validateLogin(body);
         const { email, password } = body;

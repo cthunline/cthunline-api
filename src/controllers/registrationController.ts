@@ -8,6 +8,7 @@ import { Prisma } from '../services/prisma';
 import { hashPassword } from '../services/controllerServices/auth';
 import { ForbiddenError } from '../services/errors';
 import Validator from '../services/validator';
+import rateLimiter from '../services/rateLimiter';
 import {
     isRegistrationEnabled,
     isInvitationEnabled
@@ -29,7 +30,7 @@ const validateRegisterUser = Validator(UserSchemas.register);
 const registrationController = Router();
 
 // register a new user
-registrationController.post('/register', async (req: Request, res: Response): Promise<void> => {
+registrationController.post('/register', rateLimiter, async (req: Request, res: Response): Promise<void> => {
     try {
         const { body } = req;
         if (!isRegistrationEnabled()) {
