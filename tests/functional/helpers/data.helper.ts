@@ -22,9 +22,11 @@ export const charactersData = [
 ];
 
 const Data = {
-    async reset() {
+    async reset(insertData: boolean = true) {
         await Data.deleteAll();
-        await Data.insertAll();
+        if (insertData) {
+            await Data.insertAll();
+        }
     },
 
     async deleteAll() {

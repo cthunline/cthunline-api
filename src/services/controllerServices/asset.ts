@@ -8,12 +8,15 @@ import { configuration } from '../configuration';
 import { ForbiddenError, InternError, ValidationError } from '../errors';
 import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
-const { ASSET_DIR } = configuration;
+const {
+    ASSET_DIR,
+    ASSET_MAX_SIZE_MB,
+    ASSET_MAX_SIZE_MB_PER_FILE
+} = configuration;
 
 /* There's a bug in formidable@v2 where maxFileSize option is applied to
 all files and not each file so we have to control each file size ourself */
-export const maxEachFileSizeInMb = 20;
-export const maxEachFileSize = maxEachFileSizeInMb * 1024 * 1024;
+export const maxEachFileSize = ASSET_MAX_SIZE_MB_PER_FILE * 1024 * 1024;
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
@@ -35,7 +38,7 @@ export const controlFile = (file: Formidable.File): FileType => {
         }
         throw new ValidationError(`Could not get mimetype of file ${originalFilename}`);
     }
-    throw new ValidationError(`Size of file ${originalFilename} is to big (max ${maxEachFileSizeInMb}Mb)`);
+    throw new ValidationError(`Size of file ${originalFilename} is to big (max ${ASSET_MAX_SIZE_MB_PER_FILE}Mb)`);
 };
 
 // check asset directory exists and is writable
@@ -68,7 +71,7 @@ export const controlUserDir = async (userId: number): Promise<string> => {
 export const formidableOptions: Formidable.Options = {
     uploadDir: assetTempDir,
     keepExtensions: false,
-    maxFileSize: 100 * 1024 * 1024,
+    maxFileSize: ASSET_MAX_SIZE_MB * 1024 * 1024,
     multiples: true
 };
 

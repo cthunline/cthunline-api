@@ -24,6 +24,8 @@ export interface Configuration {
     CHECKPOINT_DISABLE: boolean;
     DATABASE_URL: string;
     ASSET_DIR: string;
+    ASSET_MAX_SIZE_MB: number;
+    ASSET_MAX_SIZE_MB_PER_FILE: number;
 }
 
 export type ConfigurationValueType = 'string' | 'number' | 'boolean' | 'path';
@@ -120,6 +122,14 @@ export const configurationSchema: ConfigurationSchema<Configuration> = {
     },
     ASSET_DIR: {
         type: 'string',
+        required: true
+    },
+    ASSET_MAX_SIZE_MB: {
+        type: 'number',
+        required: true
+    },
+    ASSET_MAX_SIZE_MB_PER_FILE: {
+        type: 'number',
         required: true
     }
 };

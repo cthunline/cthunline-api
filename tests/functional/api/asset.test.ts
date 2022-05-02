@@ -74,7 +74,7 @@ describe('[API] Assets', () => {
     });
 
     describe('POST /assets', () => {
-        it('Should throw a validation error', async () => {
+        it('Should throw a validation error because of wrong file type', async () => {
             await Promise.all(
                 ['asset.pdf', 'asset.ico'].map((name) => (
                     (async () => {
@@ -83,7 +83,7 @@ describe('[API] Assets', () => {
                             method: 'POST',
                             route: '/assets',
                             files: [{
-                                field: 'asset',
+                                field: 'assets',
                                 buffer,
                                 name
                             }]
@@ -91,6 +91,36 @@ describe('[API] Assets', () => {
                     })()
                 ))
             );
+        });
+        it('Should throw a validation error because uploaded file is too big', async () => {
+            const name = 'too-big.png';
+            const buffer = await getAssetBuffer(name);
+            await Api.testError({
+                method: 'POST',
+                route: '/assets',
+                files: [{
+                    field: 'assets',
+                    buffer,
+                    name
+                }]
+            }, 400);
+        });
+        it('Should throw a validation error because payload is too big', async () => {
+            const name = 'big.jpg';
+            const buffer = await getAssetBuffer(name);
+            const files = [];
+            for (let i = 0; i < 10; i += 1) {
+                files.push({
+                    field: 'assets',
+                    buffer,
+                    name: `${name}-${i}`
+                });
+            }
+            await Api.testError({
+                method: 'POST',
+                route: '/assets',
+                files
+            }, 400);
         });
         it('Should upload an asset', async () => {
             const uploadData = [{
