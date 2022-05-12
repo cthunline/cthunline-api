@@ -1,9 +1,11 @@
 {
     "definitions": {
-        "imageData": {
+        "image": {
             "type": "object",
             "additionalProperties": false,
             "required": [
+                "id",
+                "index",
                 "url",
                 "width",
                 "height",
@@ -11,6 +13,12 @@
                 "y"
             ],
             "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "number"
+                },
                 "url": {
                     "type": "string"
                 },
@@ -28,16 +36,24 @@
                 }
             }
         },
-        "tokenData": {
+        "token": {
             "type": "object",
             "additionalProperties": false,
             "required": [
+                "id",
+                "index",
                 "color",
                 "user",
                 "x",
                 "y"
             ],
             "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "number"
+                },
                 "color": {
                     "type": "string"
                 },
@@ -128,40 +144,13 @@
             "images": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/definitions/imageData"
+                    "$ref": "#/definitions/image"
                 }
             },
             "tokens": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/definitions/tokenData"
-                }
-            },
-            "events": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                        "type"
-                    ],
-                    "properties": {
-                        "type": {
-                            "type": "string"
-                        },
-                        "imageIndex": {
-                            "type": "number"
-                        },
-                        "imageData": {
-                            "$ref": "#/definitions/imageData"
-                        },
-                        "tokenIndex": {
-                            "type": "number"
-                        },
-                        "tokenData": {
-                            "$ref": "#/definitions/tokenData"
-                        }
-                    }
+                    "$ref": "#/definitions/token"
                 }
             }
         }

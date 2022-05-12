@@ -4,6 +4,7 @@ import { Session, Character } from '@prisma/client';
 import { UserSelect } from '../types/user';
 import { Prisma } from '../services/prisma';
 import { verifyJwt } from '../services/controllerServices/auth';
+import { cacheGet, cacheSet } from '../services/cache';
 import {
     CustomError,
     AuthenticationError,
@@ -76,6 +77,11 @@ export const connectionMiddleware = async (socket: Socket, next: Function) => {
             session,
             isMaster
         };
+        // stores sketch data in cache if not set already
+        const cacheId = `sketch-${session.id}`;
+        if (!cacheGet(cacheId)) {
+            cacheSet(cacheId, () => session.sketch);
+        }
         // join session room
         socket.join(session.id.toString());
         //

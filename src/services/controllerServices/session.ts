@@ -19,8 +19,7 @@ export const defaultSketchData = {
     displayed: false,
     paths: [],
     images: [],
-    tokens: [],
-    events: []
+    tokens: []
 };
 
 export const getInclude = (includeMaster: boolean) => (

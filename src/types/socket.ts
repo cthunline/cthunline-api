@@ -21,10 +21,12 @@ export interface SketchData {
     displayed: boolean;
     paths: string[];
     images: SketchImageData[];
-    events: SketchEvent[];
+    tokens: SketchTokenData[];
 }
 
 export interface SketchImageData {
+    id: string;
+    index: number;
     url: string;
     width: number;
     height: number;
@@ -32,8 +34,12 @@ export interface SketchImageData {
     y: number;
 }
 
-export interface SketchEvent {
-    type: string;
-    imageIndex?: number;
-    imageData?: SketchImageData;
+export interface SketchTokenData {
+    id: string;
+    index: number;
+    color: string;
+    user: { id: number; name: string; } | null;
+    x: number;
+    y: number;
+    tooltipPlacement: string;
 }

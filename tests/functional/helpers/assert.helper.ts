@@ -146,28 +146,6 @@ export const assertSketchToken = (data: Record<string, any>) => {
     expect(data.y).to.be.a('number');
 };
 
-export const assertSketchEvent = (data: Record<string, any>) => {
-    expect(data).to.be.an('object');
-    expect(data).to.have.property('type');
-    expect(data.type).to.be.a('string');
-    if (data.type.startsWith('image')) {
-        expect(data).to.have.property('imageIndex');
-        expect(data.imageIndex).to.be.a('number');
-        if (data.type !== 'imageAdd') {
-            expect(data).to.have.property('imageData');
-            assertSketchImage(data.imageData);
-        }
-    }
-    if (data.type.startsWith('token')) {
-        expect(data).to.have.property('tokenIndex');
-        expect(data.tokenIndex).to.be.a('number');
-        if (data.type !== 'tokenAdd') {
-            expect(data).to.have.property('tokenData');
-            assertSketchToken(data.tokenData);
-        }
-    }
-};
-
 export const assertSketch = (
     data: Record<string, any>,
     expected?: Record<string, any>
@@ -189,11 +167,6 @@ export const assertSketch = (
     expect(data.tokens).to.be.an('array');
     data.tokens.forEach((token: any) => {
         assertSketchToken(token);
-    });
-    expect(data).to.have.property('events');
-    expect(data.events).to.be.an('array');
-    data.events.forEach((event: any) => {
-        assertSketchEvent(event);
     });
     if (expected) {
         expect(data).to.deep.equalInAnyOrder(expected);

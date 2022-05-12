@@ -3,39 +3,96 @@ import { Socket, Server } from 'socket.io';
 
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
-import { SketchData } from '../types/socket';
+import { ForbiddenError } from '../services/errors';
+import {
+    SketchData,
+    SketchTokenData
+} from '../types/socket';
+import {
+    cacheGet,
+    cacheSave,
+    cacheSet
+} from '../services/cache';
 
 import SessionSchemas from '../controllers/schemas/session.json';
 
 type JsonObject = PrismaTypes.JsonObject;
 
-const validateUpdate = Validator({
+const validateSketchUpdate = Validator({
     definitions: SessionSchemas.definitions,
     ...SessionSchemas.sketch
 });
 
+const validateSketchToken = Validator(
+    SessionSchemas.definitions.token
+);
+
+const sketchCacheSaver = (sessionId: number) => (
+    (data: SketchData) => (
+        Prisma.session.update({
+            where: {
+                id: sessionId
+            },
+            data: {
+                sketch: data as unknown as JsonObject
+            }
+        })
+    )
+);
+
 const sketchHandler = (io: Server, socket: Socket) => {
-    // notify session players that sketch has been updated by game master
-    socket.on('sketchUpdate', async (data: SketchData) => {
+    // updates sketch data (for game master only)
+    // notifies other users in the room of the sketch update
+    socket.on('sketchUpdate', async (sketch: SketchData) => {
         try {
-            validateUpdate(data);
+            validateSketchUpdate(sketch);
             const {
                 user,
                 sessionId,
                 isMaster
             } = socket.data;
+            if (!isMaster) {
+                throw new ForbiddenError();
+            }
+            const cacheId = `sketch-${sessionId}`;
+            cacheGet(cacheId, true);
+            cacheSet(cacheId, () => sketch);
+            const saver = sketchCacheSaver(sessionId);
+            cacheSave(cacheId, saver, 1000);
             socket.to(String(sessionId)).emit('sketchUpdate', {
                 user,
                 isMaster,
-                sketch: data
+                sketch
             });
-            await Prisma.session.update({
-                where: {
-                    id: sessionId
-                },
-                data: {
-                    sketch: data as unknown as JsonObject
-                }
+        } catch (err) {
+            socket.emit('error', err);
+        }
+    });
+
+    // updates a sketch token
+    // notifies other users in the room of the sketch update
+    socket.on('tokenUpdate', async (token: SketchTokenData) => {
+        try {
+            validateSketchToken(token);
+            const {
+                user,
+                sessionId,
+                isMaster
+            } = socket.data;
+            const cacheId = `sketch-${sessionId}`;
+            cacheGet(cacheId, true);
+            const sketch = cacheSet(cacheId, (previous) => ({
+                ...previous,
+                tokens: previous.tokens.map((tok: SketchTokenData) => (
+                    tok.id === token.id ? token : tok
+                ))
+            }));
+            const saver = sketchCacheSaver(sessionId);
+            cacheSave(cacheId, saver, 1000);
+            socket.to(String(sessionId)).emit('sketchUpdate', {
+                user,
+                isMaster,
+                sketch
             });
         } catch (err) {
             socket.emit('error', err);
