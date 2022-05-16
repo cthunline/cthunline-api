@@ -6,15 +6,6 @@ import {
 } from '../prisma';
 import { userSelect } from './user';
 
-export const buildSessionSchema = (baseSchema: any, schemas: any) => ({
-    definitions: schemas.definitions,
-    ...baseSchema,
-    properties: {
-        ...baseSchema.properties,
-        sketch: schemas.sketch
-    }
-});
-
 export const defaultSketchData = {
     displayed: false,
     paths: [],

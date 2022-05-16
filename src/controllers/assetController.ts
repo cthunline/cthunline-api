@@ -24,11 +24,11 @@ import {
     getChildrenDirectories
 } from '../services/controllerServices/asset';
 
-import AssetSchemas from './schemas/asset.json';
+import assetSchemas from './schemas/asset.json';
 
-const validateUploadAssets = Validator(AssetSchemas.uploadAssets);
-const validateCreateDirectory = Validator(AssetSchemas.createDirectory);
-const validateUpdateDirectory = Validator(AssetSchemas.updateDirectory);
+const validateUploadAssets = Validator(assetSchemas.uploadAssets);
+const validateCreateDirectory = Validator(assetSchemas.createDirectory);
+const validateUpdateDirectory = Validator(assetSchemas.updateDirectory);
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {

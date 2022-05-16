@@ -13,10 +13,10 @@ import { ValidationError } from '../services/errors';
 import { Games, GameId, isValidGameId } from '../games';
 import { controlPortrait, getCharacter } from '../services/controllerServices/character';
 
-import CharacterSchemas from './schemas/character.json';
+import characterSchemas from './schemas/character.json';
 
-const validateCreateCharacter = Validator(CharacterSchemas.create);
-const validateUpdateCharacter = Validator(CharacterSchemas.update);
+const validateCreateCharacter = Validator(characterSchemas.create);
+const validateUpdateCharacter = Validator(characterSchemas.update);
 
 const characterController = Router();
 

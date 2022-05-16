@@ -5,6 +5,7 @@ import { Prisma } from '../../../src/services/prisma';
 import { assetDir } from '../../../src/services/controllerServices/asset';
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
+import sketchs from '../data/sketchs.json';
 import assets from '../data/assets.json';
 import directories from '../data/directories.json';
 import notes from '../data/notes.json';
@@ -13,6 +14,7 @@ import swd6Characters from '../data/characters/swd6Characters.json';
 
 export const usersData = users;
 export const sessionsData = sessions;
+export const sketchsData = sketchs;
 export const notesData = notes;
 export const assetsData = assets;
 export const directoriesData = directories;
@@ -33,6 +35,7 @@ const Data = {
         await Prisma.character.deleteMany();
         await Prisma.note.deleteMany();
         await Prisma.session.deleteMany();
+        await Prisma.sketch.deleteMany();
         await Data.deleteAssetFiles();
         await Prisma.asset.deleteMany();
         await Prisma.directory.deleteMany();
@@ -55,6 +58,9 @@ const Data = {
         ]);
         await Promise.all(sessionsData.map((data) => (
             Prisma.session.create({ data })
+        )));
+        await Promise.all(sketchsData.map((data) => (
+            Prisma.sketch.create({ data })
         )));
         await Promise.all(notesData.map((data) => (
             Prisma.note.create({ data })

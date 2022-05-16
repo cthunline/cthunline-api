@@ -1,0 +1,18 @@
+{
+    "create": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "name",
+            "sketch"
+        ],
+        "properties": {
+            "name": {
+                "type": "string"
+            },
+            "sketch": {
+                "$ref": "#/definitions/sketch"
+            }
+        }
+    }
+}

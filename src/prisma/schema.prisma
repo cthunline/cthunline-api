@@ -23,6 +23,7 @@ model User {
     directories Directory[]
     sessions Session[]
     characters Character[]
+    sketchs Sketch[]
     notes Note[]
 
     @@unique(email)
@@ -88,6 +89,19 @@ model Session {
     notes Note[]
 
     @@map("sessions")
+}
+
+model Sketch {
+    id Int @id @default(autoincrement())
+    name String
+    sketch Json
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId Int
+    user User @relation(fields: [userId], references: [id])
+
+    @@map("sketchs")
 }
 
 model Note {

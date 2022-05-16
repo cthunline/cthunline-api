@@ -16,6 +16,7 @@ import registrationController from './registrationController';
 import assetController from './assetController';
 import gameController from './gameController';
 import sessionController from './sessionController';
+import sketchController from './sketchController';
 import characterController from './characterController';
 import configurationController from './configurationController';
 
@@ -47,6 +48,7 @@ mainController.use('/api', registrationController);
 mainController.use('/api', assetController);
 mainController.use('/api', gameController);
 mainController.use('/api', sessionController);
+mainController.use('/api', sketchController);
 mainController.use('/api', characterController);
 mainController.use('/api', configurationController);
 

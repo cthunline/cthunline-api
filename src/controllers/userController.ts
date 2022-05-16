@@ -26,10 +26,10 @@ import {
     defaultUserData
 } from '../services/controllerServices/user';
 
-import UserSchemas from './schemas/user.json';
+import userSchemas from './schemas/user.json';
 
-const validateCreateUser = Validator(UserSchemas.create);
-const validateUpdateUser = Validator(UserSchemas.update);
+const validateCreateUser = Validator(userSchemas.create);
+const validateUpdateUser = Validator(userSchemas.update);
 
 const userController = Router();
 

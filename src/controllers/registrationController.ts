@@ -23,9 +23,9 @@ import {
     generateInvitationCode
 } from '../services/controllerServices/registration';
 
-import UserSchemas from './schemas/user.json';
+import userSchemas from './schemas/user.json';
 
-const validateRegisterUser = Validator(UserSchemas.register);
+const validateRegisterUser = Validator(userSchemas.register);
 
 const registrationController = Router();
 

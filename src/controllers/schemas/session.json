@@ -1,100 +1,4 @@
 {
-    "definitions": {
-        "image": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "id",
-                "index",
-                "url",
-                "width",
-                "height",
-                "x",
-                "y"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "index": {
-                    "type": "number"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "width": {
-                    "type": "number"
-                },
-                "height": {
-                    "type": "number"
-                },
-                "x": {
-                    "type": "number"
-                },
-                "y": {
-                    "type": "number"
-                }
-            }
-        },
-        "token": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "id",
-                "index",
-                "color",
-                "user",
-                "x",
-                "y"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "index": {
-                    "type": "number"
-                },
-                "color": {
-                    "type": "string"
-                },
-                "user": {
-                    "oneOf": [{
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                            "id",
-                            "name"
-                        ],
-                        "properties": {
-                            "id": {
-                                "type": "number"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        }
-                    }, {
-                        "type": "null"
-                    }]
-                },
-                "x": {
-                    "type": "number"
-                },
-                "y": {
-                    "type": "number"
-                },
-                "tooltipPlacement": {
-                    "type": "string",
-                    "enum": [
-                        "top",
-                        "left",
-                        "bottom",
-                        "right"
-                    ]
-                }
-            }
-        }
-    },
     "create": {
         "type": "object",
         "additionalProperties": false,
@@ -109,7 +13,9 @@
             "name": {
                 "type": "string"
             },
-            "sketch": {}
+            "sketch": {
+                "$ref": "#/definitions/sketch"
+            }
         }
     },
     "update": {
@@ -120,38 +26,8 @@
             "name": {
                 "type": "string"
             },
-            "sketch": {}
-        }
-    },
-    "sketch": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-            "displayed",
-            "paths",
-            "images"
-        ],
-        "properties": {
-            "displayed": {
-                "type": "boolean"
-            },
-            "paths": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "images": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/definitions/image"
-                }
-            },
-            "tokens": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/definitions/token"
-                }
+            "sketch": {
+                "$ref": "#/definitions/sketch"
             }
         }
     },

@@ -11,9 +11,9 @@ import {
     SocketDiceResult
 } from '../types/socket';
 
-import DiceSchemas from './schemas/dice.json';
+import diceSchemas from './schemas/dice.json';
 
-const validateRequest = Validator(DiceSchemas.request);
+const validateRequest = Validator(diceSchemas.request);
 
 const getDiceMax = (diceType: DiceType): number => (
     parseInt(diceType.replace('D', ''))

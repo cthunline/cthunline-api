@@ -14,18 +14,18 @@ import {
     cacheSet
 } from '../services/cache';
 
-import SessionSchemas from '../controllers/schemas/session.json';
+import { definitions } from '../controllers/schemas/definitions.json';
 
 type JsonObject = PrismaTypes.JsonObject;
 
 const validateSketchUpdate = Validator({
-    definitions: SessionSchemas.definitions,
-    ...SessionSchemas.sketch
+    ...definitions.sketch,
+    definitions
 });
-
-const validateSketchToken = Validator(
-    SessionSchemas.definitions.token
-);
+const validateSketchToken = Validator({
+    ...definitions.token,
+    definitions
+});
 
 const sketchCacheSaver = (sessionId: number) => (
     (data: SketchData) => (

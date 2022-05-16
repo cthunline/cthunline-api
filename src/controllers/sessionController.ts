@@ -13,19 +13,21 @@ import {
     defaultSketchData,
     getInclude,
     getSession,
-    getNotes,
-    buildSessionSchema
+    getNotes
 } from '../services/controllerServices/session';
 
-import SessionSchemas from './schemas/session.json';
+import definitions from './schemas/definitions.json';
+import sessionSchemas from './schemas/session.json';
 
-const validateCreateSession = Validator(
-    buildSessionSchema(SessionSchemas.create, SessionSchemas)
-);
-const validateUpdateSession = Validator(
-    buildSessionSchema(SessionSchemas.update, SessionSchemas)
-);
-const validateNotes = Validator(SessionSchemas.notes);
+const validateCreateSession = Validator({
+    ...sessionSchemas.create,
+    ...definitions
+});
+const validateUpdateSession = Validator({
+    ...sessionSchemas.update,
+    ...definitions
+});
+const validateNotes = Validator(sessionSchemas.notes);
 
 const sessionController = Router();
 

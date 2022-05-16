@@ -6,9 +6,9 @@ import Validator from '../services/validator';
 import { SocketAudioPlay } from '../types/socket';
 import { ForbiddenError, ValidationError } from '../services/errors';
 
-import AudioSchemas from './schemas/audio.json';
+import audioSchemas from './schemas/audio.json';
 
-const validatePlay = Validator(AudioSchemas.play);
+const validatePlay = Validator(audioSchemas.play);
 
 const audioHandler = (io: Server, socket: Socket) => {
     // notify session players that game master started playing audio asset

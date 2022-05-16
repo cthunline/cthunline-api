@@ -17,9 +17,9 @@ import {
     getCookieOptions
 } from '../services/controllerServices/auth';
 
-import AuthSchemas from './schemas/auth.json';
+import authSchemas from './schemas/auth.json';
 
-const validateLogin = Validator(AuthSchemas.login);
+const validateLogin = Validator(authSchemas.login);
 
 // express middleware controling jwt validity
 // injects user data in express request object
