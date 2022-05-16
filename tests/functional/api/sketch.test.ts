@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import Api from '../helpers/api.helper';
 import Data, { sketchsData } from '../helpers/data.helper';
-import { assertUserSketch } from '../helpers/assert.helper';
+import { assertSketchObject } from '../helpers/assert.helper';
 
 describe('[API] Sketchs', () => {
     before(async () => {
@@ -23,7 +23,7 @@ describe('[API] Sketchs', () => {
                 data: sketchsData.filter(({ userId }) => (
                     Api.userId === userId
                 )),
-                assert: assertUserSketch
+                assert: assertSketchObject
             });
         });
     });
@@ -55,7 +55,7 @@ describe('[API] Sketchs', () => {
                     name: 'Test',
                     sketch
                 },
-                assert: assertUserSketch
+                assert: assertSketchObject
             });
         });
     });
@@ -71,7 +71,7 @@ describe('[API] Sketchs', () => {
             await Api.testGetOne({
                 route: '/sketchs/:id',
                 data: sketchsData[0],
-                assert: assertUserSketch
+                assert: assertSketchObject
             });
         });
     });
