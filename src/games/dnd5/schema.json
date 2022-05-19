@@ -1,0 +1,376 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "definitions": {
+        "DnD5Abilities": {
+            "additionalProperties": false,
+            "properties": {
+                "charisma": {
+                    "$ref": "#/definitions/DnD5Ability"
+                },
+                "constitution": {
+                    "$ref": "#/definitions/DnD5Ability"
+                },
+                "dexterity": {
+                    "$ref": "#/definitions/DnD5Ability"
+                },
+                "intelligence": {
+                    "$ref": "#/definitions/DnD5Ability"
+                },
+                "strength": {
+                    "$ref": "#/definitions/DnD5Ability"
+                },
+                "wisdom": {
+                    "$ref": "#/definitions/DnD5Ability"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Ability": {
+            "additionalProperties": false,
+            "properties": {
+                "modifier": {
+                    "type": "number"
+                },
+                "score": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Attack": {
+            "additionalProperties": false,
+            "properties": {
+                "attackBonus": {
+                    "type": "number"
+                },
+                "damage": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Biography": {
+            "additionalProperties": false,
+            "properties": {
+                "alignment": {
+                    "type": "string"
+                },
+                "alliesAndOrganizations": {
+                    "type": "string"
+                },
+                "background": {
+                    "type": "string"
+                },
+                "backstory": {
+                    "type": "string"
+                },
+                "bonds": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "flaws": {
+                    "type": "string"
+                },
+                "ideals": {
+                    "type": "string"
+                },
+                "level": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "personalityTraits": {
+                    "type": "string"
+                },
+                "race": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Combat": {
+            "additionalProperties": false,
+            "properties": {
+                "armorClass": {
+                    "type": "number"
+                },
+                "currentHitPoints": {
+                    "type": "number"
+                },
+                "deathSaves": {
+                    "$ref": "#/definitions/DnD5DeathSaves"
+                },
+                "hitDice": {
+                    "type": "string"
+                },
+                "initiative": {
+                    "type": "number"
+                },
+                "maxHitPoints": {
+                    "type": "number"
+                },
+                "speed": {
+                    "type": "number"
+                },
+                "temporaryHitPoints": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5DeathSaves": {
+            "additionalProperties": false,
+            "properties": {
+                "failures": {
+                    "type": "number"
+                },
+                "successes": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Feature": {
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5SavingThrows": {
+            "additionalProperties": false,
+            "properties": {
+                "charisma": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "constitution": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "dexterity": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "intelligence": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "strength": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "wisdom": {
+                    "$ref": "#/definitions/DnD5Skill"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Skill": {
+            "additionalProperties": false,
+            "properties": {
+                "modifier": {
+                    "type": "number"
+                },
+                "proficient": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Skills": {
+            "additionalProperties": false,
+            "properties": {
+                "acrobatics": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "animalHandling": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "arcana": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "athletics": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "deception": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "history": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "insight": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "intimidation": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "investigation": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "medicine": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "nature": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "perception": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "performance": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "persuasion": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "religion": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "sleightOfHand": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "stealth": {
+                    "$ref": "#/definitions/DnD5Skill"
+                },
+                "survival": {
+                    "$ref": "#/definitions/DnD5Skill"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Spell": {
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "prepared": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5SpellLevel": {
+            "additionalProperties": false,
+            "properties": {
+                "level": {
+                    "type": "number"
+                },
+                "slotsExpended": {
+                    "type": "number"
+                },
+                "slotsTotal": {
+                    "type": "number"
+                },
+                "spells": {
+                    "items": {
+                        "$ref": "#/definitions/DnD5Spell"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Spellcasting": {
+            "additionalProperties": false,
+            "properties": {
+                "cantrips": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "levels": {
+                    "items": {
+                        "$ref": "#/definitions/DnD5SpellLevel"
+                    },
+                    "type": "array"
+                },
+                "spellAbility": {
+                    "type": "string"
+                },
+                "spellAttackBonus": {
+                    "type": "number"
+                },
+                "spellSave": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "DnD5Statistics": {
+            "additionalProperties": false,
+            "properties": {
+                "experiencePoints": {
+                    "type": "number"
+                },
+                "inspiration": {
+                    "type": "number"
+                },
+                "passiveWisdom": {
+                    "type": "number"
+                },
+                "proficiencyBonus": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "abilities": {
+            "$ref": "#/definitions/DnD5Abilities"
+        },
+        "attacks": {
+            "items": {
+                "$ref": "#/definitions/DnD5Attack"
+            },
+            "type": "array"
+        },
+        "biography": {
+            "$ref": "#/definitions/DnD5Biography"
+        },
+        "combat": {
+            "$ref": "#/definitions/DnD5Combat"
+        },
+        "features": {
+            "items": {
+                "$ref": "#/definitions/DnD5Feature"
+            },
+            "type": "array"
+        },
+        "portrait": {
+            "type": "string"
+        },
+        "savingThrows": {
+            "$ref": "#/definitions/DnD5SavingThrows"
+        },
+        "skills": {
+            "$ref": "#/definitions/DnD5Skills"
+        },
+        "spellcasting": {
+            "$ref": "#/definitions/DnD5Spellcasting"
+        },
+        "statistics": {
+            "$ref": "#/definitions/DnD5Statistics"
+        }
+    },
+    "type": "object"
+}
+
