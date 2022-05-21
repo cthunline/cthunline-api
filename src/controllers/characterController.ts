@@ -10,7 +10,7 @@ import { controlSelf } from '../services/controllerServices/auth';
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
-import { Games, GameId, isValidGameId } from '../games';
+import { Games, GameId, isValidGameId } from '../services/games';
 import { controlPortrait, getCharacter } from '../services/controllerServices/character';
 
 import characterSchemas from './schemas/character.json';

@@ -1,24 +1,23 @@
-import Validator from '../services/validator';
-import CoCCharacterSchema from './callOfCthulhu/schema.json';
-import DnD5CharacterSchema from './dnd5/schema.json';
-import SWD6CharacterSchema from './starWarsD6/schema.json';
+import schemas from '@cthunline/games';
+
+import Validator from './validator';
 
 // list of available games
 export const Games = {
     callOfCthulhu: {
         name: 'Call of Cthulhu',
-        schema: CoCCharacterSchema,
-        validator: Validator(CoCCharacterSchema)
+        schema: schemas.callOfCthulhu,
+        validator: Validator(schemas.callOfCthulhu)
     },
     dnd5: {
         name: 'Dungeons & Dragons 5E',
-        schema: DnD5CharacterSchema,
-        validator: Validator(DnD5CharacterSchema)
+        schema: schemas.dnd5,
+        validator: Validator(schemas.dnd5)
     },
     starWarsD6: {
         name: 'Star Wars D6',
-        schema: SWD6CharacterSchema,
-        validator: Validator(SWD6CharacterSchema)
+        schema: schemas.starWarsD6,
+        validator: Validator(schemas.starWarsD6)
     }
 };
 

@@ -5,7 +5,7 @@ import {
 } from 'express';
 
 import { NotFoundError } from '../services/errors';
-import { GamesData, isValidGameId } from '../games';
+import { GamesData, isValidGameId } from '../services/games';
 
 const gameController = Router();
 

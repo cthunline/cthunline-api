@@ -6,8 +6,8 @@ import {
 
 import { Prisma } from '../services/prisma';
 import { controlSelf } from '../services/controllerServices/auth';
+import { isValidGameId } from '../services/games';
 import Validator from '../services/validator';
-import { isValidGameId } from '../games';
 import { ValidationError } from '../services/errors';
 import {
     defaultSketchData,

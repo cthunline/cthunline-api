@@ -2,7 +2,7 @@ import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import { assertGame } from '../helpers/assert.helper';
 
-import { GamesData } from '../../../src/games';
+import { GamesData } from '../../../src/services/games';
 
 const games = Object.values(GamesData);
 
