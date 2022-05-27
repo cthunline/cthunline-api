@@ -1,4 +1,8 @@
-import schemas from '@cthunline/games';
+import {
+    callOfCthulhu,
+    dnd5,
+    starWarsD6
+} from '@cthunline/games';
 
 import Validator from './validator';
 
@@ -6,18 +10,18 @@ import Validator from './validator';
 export const Games = {
     callOfCthulhu: {
         name: 'Call of Cthulhu',
-        schema: schemas.callOfCthulhu,
-        validator: Validator(schemas.callOfCthulhu)
+        schema: callOfCthulhu.schema,
+        validator: Validator(callOfCthulhu.schema)
     },
     dnd5: {
         name: 'Dungeons & Dragons 5E',
-        schema: schemas.dnd5,
-        validator: Validator(schemas.dnd5)
+        schema: dnd5.schema,
+        validator: Validator(dnd5.schema)
     },
     starWarsD6: {
         name: 'Star Wars D6',
-        schema: schemas.starWarsD6,
-        validator: Validator(schemas.starWarsD6)
+        schema: starWarsD6.schema,
+        validator: Validator(starWarsD6.schema)
     }
 };
 

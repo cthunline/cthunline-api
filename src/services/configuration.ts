@@ -20,13 +20,13 @@ export const parseConfigurationValue = <ConfigurationDataType>(
             return String(value);
         case 'number':
             if (!numberRegex.test(value)) {
-                throw new Error(`${key} should be a number`);
+                throw new Error(`${String(key)} should be a number`);
             }
             return Number(value);
         case 'boolean':
             if (value === '1') { return true; }
             if (value === '0') { return false; }
-            throw new Error(`${key} should be either 0 (for false) or 1 (for true)`);
+            throw new Error(`${String(key)} should be either 0 (for false) or 1 (for true)`);
         default:
             throw new Error(`Unexpected configuration type ${type}`);
     }
@@ -53,11 +53,11 @@ export const parseConfiguration = <ConfigurationDataType>(
                     type
                 );
                 if (filter && !filter.includes(value)) {
-                    throw new Error(`invalid ${key} value (expected ${filter.join(' or ')})`);
+                    throw new Error(`invalid ${String(key)} value (expected ${filter.join(' or ')})`);
                 }
                 conf[key] = value;
             } else if (required) {
-                throw new Error(`missing or empty ${key} in configuration`);
+                throw new Error(`missing or empty ${String(key)} in configuration`);
             }
         } catch (err: any) {
             errors.push(err.message);
