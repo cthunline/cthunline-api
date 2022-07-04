@@ -1,6 +1,7 @@
 import {
     callOfCthulhu,
     dnd5,
+    seventhSea,
     starWarsD6
 } from '@cthunline/games';
 
@@ -17,6 +18,11 @@ export const Games = {
         name: 'Dungeons & Dragons 5E',
         schema: dnd5.schema,
         validator: Validator(dnd5.schema)
+    },
+    seventhSea: {
+        name: '7th Sea',
+        schema: seventhSea.schema,
+        validator: Validator(seventhSea.schema)
     },
     starWarsD6: {
         name: 'Star Wars D6',
