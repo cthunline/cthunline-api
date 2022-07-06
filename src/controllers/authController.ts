@@ -86,7 +86,7 @@ authController.post('/auth', rateLimiter, async ({ body }: Request, res: Respons
 });
 
 // logout
-authController.delete('/auth', async (req: Request, res: Response): Promise<void> => {
+authController.delete('/auth', async (_req: Request, res: Response): Promise<void> => {
     try {
         res.clearCookie('token').send({});
     } catch (err: any) {

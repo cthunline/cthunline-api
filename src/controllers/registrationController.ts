@@ -62,7 +62,7 @@ registrationController.post('/register', rateLimiter, async (req: Request, res: 
 });
 
 // generate a new invitation
-registrationController.post('/invitation', async (req: Request, res: Response): Promise<void> => {
+registrationController.post('/invitation', async (_req: Request, res: Response): Promise<void> => {
     try {
         if (!isRegistrationEnabled()) {
             throw new ForbiddenError('Registration is disabled');

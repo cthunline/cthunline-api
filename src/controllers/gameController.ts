@@ -10,7 +10,7 @@ import { GamesData, isValidGameId } from '../services/games';
 const gameController = Router();
 
 // get all games
-gameController.get('/games', async (req: Request, res: Response): Promise<void> => {
+gameController.get('/games', async (_req: Request, res: Response): Promise<void> => {
     try {
         const games = Object.values(GamesData);
         res.json({

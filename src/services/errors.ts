@@ -66,7 +66,7 @@ declare global {
 
 // express middlware injecting a response.error function that handles custom errors
 // it returns the correct status code and additional data if specified
-export const errorMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+export const errorMiddleware = (_req: Request, res: Response, next: NextFunction): void => {
     res.error = (err: Error): void => {
         const { message, stack } = err;
         const invalidDataMessage = 'Invalid data provided';
@@ -101,7 +101,7 @@ export const errorMiddleware = (req: Request, res: Response, next: NextFunction)
 // handles payload too large errors thrown by bordy parser middleware
 export const payloadTooLargeHandler = (
     err: Error,
-    req: Request,
+    _req: Request,
     res: Response,
     next: NextFunction
 ) => {

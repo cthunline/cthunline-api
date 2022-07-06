@@ -53,7 +53,7 @@ mainController.use('/api', characterController);
 mainController.use('/api', configurationController);
 
 // throw 404 on unknown api routes
-mainController.use('/api/*', (req: Request, res: Response) => {
+mainController.use('/api/*', (_req: Request, res: Response) => {
     res.error(
         new NotFoundError('Route does not exist')
     );
@@ -68,13 +68,13 @@ if (ENVIRONMENT === 'prod') {
     mainController.use(Express.static(
         Path.join(__dirname, '../client')
     ));
-    mainController.get('*', (req: Request, res: Response) => {
+    mainController.get('*', (_req: Request, res: Response) => {
         res.sendFile('index.html', {
             root: Path.join(__dirname, '../client')
         });
     });
 } else { // any other request falls in 404 if in dev mode
-    mainController.use('*', (req: Request, res: Response) => {
+    mainController.use('*', (_req: Request, res: Response) => {
         res.error(new NotFoundError());
     });
 }

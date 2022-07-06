@@ -40,7 +40,7 @@ const sketchCacheSaver = (sessionId: number) => (
     )
 );
 
-const sketchHandler = (io: Server, socket: Socket) => {
+const sketchHandler = (_io: Server, socket: Socket) => {
     // updates sketch data (for game master only)
     // notifies other users in the room of the sketch update
     socket.on('sketchUpdate', async (sketch: SketchData) => {

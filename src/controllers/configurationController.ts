@@ -18,7 +18,7 @@ const {
 const configurationController = Router();
 
 // public configuration
-configurationController.get('/configuration', async (req: Request, res: Response): Promise<void> => {
+configurationController.get('/configuration', async (_req: Request, res: Response): Promise<void> => {
     try {
         res.json({
             registrationEnabled: isRegistrationEnabled(),
