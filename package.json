@@ -14,7 +14,7 @@
         "prod": "npx prisma migrate deploy --schema prisma/schema.prisma && node index.js"
     },
     "dependencies": {
-        "@cthunline/games": "^0.0.19",
+        "@cthunline/games": "^0.0.20",
         "@prisma/client": "^4.0.0",
         "ajv": "^8.11.0",
         "ajv-formats": "^2.1.1",
