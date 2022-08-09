@@ -61,7 +61,7 @@ export interface GetOneOptions {
 export interface CreateOptions {
     route: string;
     data: Record<string, any>;
-    createdById?: number | null;
+    expected?: Record<string, any>;
     getRoute?: string;
     assert: (
         data: Record<string, any>,
@@ -72,7 +72,7 @@ export interface CreateOptions {
 export interface EditOptions {
     route: string;
     data: Record<string, any>;
-    updatedBy?: number | null;
+    expected?: Record<string, any>;
     assert: (
         data: Record<string, any>,
         expected?: Record<string, any>
@@ -245,7 +245,7 @@ const Api = {
             route,
             data,
             assert,
-            createdById,
+            expected,
             getRoute
         } = options;
         const createResponse = await Api.request({
@@ -256,11 +256,8 @@ const Api = {
         expect(createResponse).to.have.status(200);
         expect(createResponse).to.be.json;
         const { body: createBody } = createResponse;
-        const expected = { ...data };
-        if (createdById) {
-            expected.createdById = createdById;
-        }
-        assert(createBody, expected);
+        const expectedData = expected ?? data;
+        assert(createBody, expectedData);
         const getResponse = await Api.request({
             method: 'GET',
             route: getRoute ? (
@@ -272,7 +269,7 @@ const Api = {
         expect(getResponse).to.have.status(200);
         expect(getResponse).to.be.json;
         const { body: getBody } = getResponse;
-        assert(getBody, expected);
+        assert(getBody, expectedData);
     },
 
     async testEdit(options: EditOptions): Promise<void> {
@@ -280,7 +277,7 @@ const Api = {
             route,
             data,
             assert,
-            updatedBy
+            expected
         } = options;
         const editResponse = await Api.request({
             method: 'POST',
@@ -290,11 +287,8 @@ const Api = {
         expect(editResponse).to.have.status(200);
         expect(editResponse).to.be.json;
         const { body: editBody } = editResponse;
-        const expected = { ...data };
-        if (updatedBy) {
-            expected.updatedBy = updatedBy;
-        }
-        assert(editBody, expected);
+        const expectedData = expected ?? data;
+        assert(editBody, expectedData);
         const getResponse = await Api.request({
             method: 'GET',
             route
@@ -302,7 +296,7 @@ const Api = {
         expect(getResponse).to.have.status(200);
         expect(getResponse).to.be.json;
         const { body: getBody } = getResponse;
-        assert(getBody, expected);
+        assert(getBody, expectedData);
     },
 
     async testDelete(options: DeleteOptions): Promise<void> {

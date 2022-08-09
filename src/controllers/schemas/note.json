@@ -3,18 +3,17 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-            "gameId",
-            "name"
+            "title"
         ],
         "properties": {
-            "gameId": {
+            "title": {
                 "type": "string"
             },
-            "name": {
+            "text": {
                 "type": "string"
             },
-            "sketch": {
-                "$ref": "#/definitions/sketch"
+            "isShared": {
+                "type": "boolean"
             }
         }
     },
@@ -23,11 +22,14 @@
         "additionalProperties": false,
         "minProperties": 1,
         "properties": {
-            "name": {
+            "title": {
                 "type": "string"
             },
-            "sketch": {
-                "$ref": "#/definitions/sketch"
+            "text": {
+                "type": "string"
+            },
+            "isShared": {
+                "type": "boolean"
             }
         }
     }

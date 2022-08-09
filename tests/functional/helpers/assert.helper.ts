@@ -207,19 +207,32 @@ export const assertSession = (
     assertSketchObject(data, expected);
 };
 
-export const assertNotes = (
+export const assertNote = (
     data: Record<string, any>,
-    expected?: Record<string, any>
+    expected?: Record<string, any>,
+    shouldContainUser: boolean | null = null
 ) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
     expect(data.id).to.be.a('number');
+    expect(data).to.have.property('position');
+    expect(data.position).to.be.a('number');
+    expect(data).to.have.property('isShared');
+    expect(data.isShared).to.be.a('boolean');
+    expect(data).to.have.property('title');
+    expect(data.title).to.be.a('string');
     expect(data).to.have.property('text');
     expect(data.text).to.be.a('string');
     expect(data).to.have.property('sessionId');
     expect(data.sessionId).to.be.a('number');
     expect(data).to.have.property('userId');
     expect(data.userId).to.be.a('number');
+    if (shouldContainUser !== null && shouldContainUser) {
+        expect(data).to.have.property('user');
+        assertUser(data.user);
+    } else if (shouldContainUser !== null && !shouldContainUser) {
+        expect(data).to.not.have.property('user');
+    }
     if (expected) {
         compareDataWithExpected(data, expected);
     }

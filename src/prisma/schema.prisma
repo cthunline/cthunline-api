@@ -106,6 +106,9 @@ model Sketch {
 
 model Note {
     id Int @id @default(autoincrement())
+    position Int
+    isShared Boolean @default(false)
+    title String
     text String @db.Text
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

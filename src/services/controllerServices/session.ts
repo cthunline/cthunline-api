@@ -1,4 +1,4 @@
-import { Session, Note } from '@prisma/client';
+import { Session } from '@prisma/client';
 
 import {
     Prisma,
@@ -34,23 +34,3 @@ export const getSession = async (sessionId: number): Promise<Session> => (
         )
     )
 );
-
-// get notes of a user for a session / create default notes if not exist
-export const getNotes = async (sessionId: number, userId: number): Promise<Note> => {
-    const notes = await Prisma.note.findFirst({
-        where: {
-            sessionId,
-            userId
-        }
-    });
-    if (!notes) {
-        return Prisma.note.create({
-            data: {
-                text: '',
-                sessionId,
-                userId
-            }
-        });
-    }
-    return notes;
-};

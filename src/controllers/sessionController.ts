@@ -12,8 +12,7 @@ import { ValidationError } from '../services/errors';
 import {
     defaultSketchData,
     getInclude,
-    getSession,
-    getNotes
+    getSession
 } from '../services/controllerServices/session';
 
 import definitions from './schemas/definitions.json';
@@ -27,7 +26,6 @@ const validateUpdateSession = Validator({
     ...sessionSchemas.update,
     ...definitions
 });
-const validateNotes = Validator(sessionSchemas.notes);
 
 const sessionController = Router();
 
@@ -111,37 +109,6 @@ sessionController.delete('/sessions/:sessionId', async (req: Request, res: Respo
             }
         });
         res.send({});
-    } catch (err: any) {
-        res.error(err);
-    }
-});
-
-// get current user notes in a session
-sessionController.get('/sessions/:sessionId/notes', async ({ params, user }: Request, res: Response): Promise<void> => {
-    try {
-        const sessionId = Number(params.sessionId);
-        await getSession(sessionId);
-        const notes = await getNotes(sessionId, user.id);
-        res.json(notes);
-    } catch (err: any) {
-        res.error(err);
-    }
-});
-
-// set current user notes in a session
-sessionController.post('/sessions/:sessionId/notes', async ({ body, params, user }: Request, res: Response): Promise<void> => {
-    try {
-        const sessionId = Number(params.sessionId);
-        await getSession(sessionId);
-        validateNotes(body);
-        const notes = await getNotes(sessionId, user.id);
-        const updatedNotes = await Prisma.note.update({
-            data: body,
-            where: {
-                id: notes.id
-            }
-        });
-        res.json(updatedNotes);
     } catch (err: any) {
         res.error(err);
     }
