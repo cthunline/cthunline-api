@@ -37,7 +37,7 @@ mainController.use(async (req: Request, res: Response, next: NextFunction): Prom
         next();
     } else if (req.path.startsWith('/api') || req.path.startsWith('/static')) { // api routes and static ressource are protected
         await authMiddleware(req, res, next);
-    } else { // any other route is for client build
+    } else { // any other route is for web client build
         next();
     }
 });
@@ -64,15 +64,15 @@ mainController.use('/api/*', (_req: Request, res: Response) => {
 // serve static assets
 mainController.use('/static', Express.static(assetDir));
 
-// serve client build in production
+// serve web client build in production
 if (ENVIRONMENT === 'prod') {
-    Log.info('Serving production client build');
+    Log.info('Serving production web client build');
     mainController.use(Express.static(
-        Path.join(__dirname, '../client')
+        Path.join(__dirname, '../web')
     ));
     mainController.get('*', (_req: Request, res: Response) => {
         res.sendFile('index.html', {
-            root: Path.join(__dirname, '../client')
+            root: Path.join(__dirname, '../web')
         });
     });
 } else { // any other request falls in 404 if in dev mode
