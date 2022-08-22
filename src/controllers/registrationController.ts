@@ -12,7 +12,7 @@ import rateLimiter from '../services/rateLimiter';
 import {
     isRegistrationEnabled,
     isInvitationEnabled
-} from '../services/configuration';
+} from '../services/env';
 import {
     userSelect,
     controlUniqueEmail,

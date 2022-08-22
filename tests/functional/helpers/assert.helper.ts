@@ -1,7 +1,7 @@
 import Chai, { expect } from 'chai';
 import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
 
-import { locales } from '../../../src/types/configuration';
+import { locales } from '../../../src/types/env';
 
 Chai.use(DeepEqualInAnyOrder);
 

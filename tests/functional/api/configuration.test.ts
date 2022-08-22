@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import { compareDataWithExpected } from '../helpers/assert.helper';
-import { setConfMock } from '../../../src/services/configuration';
+import { setEnvMock } from '../../../src/services/env';
 
 const getConfiguration = async (expected: any) => {
     const response = await Api.request({
@@ -26,8 +26,8 @@ describe('[API] Configuration', () => {
             await Api.login();
             await Api.logout();
             for (const value of [true, false]) {
-                setConfMock('REGISTRATION_ENABLED', value);
-                setConfMock('INVITATION_ENABLED', value);
+                setEnvMock('REGISTRATION_ENABLED', value);
+                setEnvMock('INVITATION_ENABLED', value);
                 await getConfiguration({
                     registrationEnabled: value,
                     invitationEnabled: value,

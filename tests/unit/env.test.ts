@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 
-import { parseConfiguration } from '../../src/services/configuration';
-import { ConfigurationSchema } from '../../src/types/configuration';
+import { parseEnv } from '../../src/services/env';
+import { EnvSchema } from '../../src/types/env';
 
-interface ConfType {
+interface EnvType {
     STRING: string;
     NUMBER: number;
     BOOLEAN: boolean;
@@ -11,7 +11,7 @@ interface ConfType {
     ENUM: string;
 }
 
-const schema: ConfigurationSchema<ConfType> = {
+const schema: EnvSchema<EnvType> = {
     STRING: {
         type: 'string',
         required: true
@@ -35,61 +35,61 @@ const schema: ConfigurationSchema<ConfType> = {
     }
 };
 
-const validConf: Record<string, string> = {
+const validEnv: Record<string, string> = {
     STRING: 'test',
     NUMBER: '123',
-    BOOLEAN: '1',
+    BOOLEAN: 'true',
     OPTIONAL: 'test',
     ENUM: 'value1'
 };
 
-describe('[Unit] Configuration', () => {
-    describe('parseConfiguration', () => {
-        it('Should control and parse configuration', async () => {
-            const { OPTIONAL, ...validPartialConf } = validConf;
-            const { STRING, ...invalidPartialConf } = validConf;
+describe('[Unit] Environment', () => {
+    describe('parseEnvironment', () => {
+        it('Should control and parse environment variables', async () => {
+            const { OPTIONAL, ...validPartialEnv } = validEnv;
+            const { STRING, ...invalidPartialEnv } = validEnv;
             const data = [{
-                conf: validConf,
+                env: validEnv,
                 shouldSucceed: true
             }, {
-                conf: validPartialConf,
+                env: validPartialEnv,
                 shouldSucceed: true
             }, {
-                conf: invalidPartialConf,
+                env: invalidPartialEnv,
                 shouldSucceed: false
             }, {
-                conf: {
-                    ...validConf,
+                env: {
+                    ...validEnv,
                     STRING: ''
                 },
                 shouldSucceed: false
             }, {
-                conf: {
-                    ...validConf,
+                env: {
+                    ...validEnv,
                     NUMBER: 'invalid'
                 },
                 shouldSucceed: false
             }, {
-                conf: {
-                    ...validConf,
+                env: {
+                    ...validEnv,
                     BOOLEAN: 'invalid'
                 },
                 shouldSucceed: false
             }, {
-                conf: {
-                    ...validConf,
+                env: {
+                    ...validEnv,
                     ENUM: 'value3'
                 },
                 shouldSucceed: false
             }];
-            data.forEach(({ conf, shouldSucceed }) => {
+            data.forEach(({ env, shouldSucceed }) => {
                 if (shouldSucceed) {
                     expect(() => (
-                        parseConfiguration(conf, schema)
+                        parseEnv(env, schema)
                     )).to.not.throw();
                 } else {
                     expect(() => (
-                        parseConfiguration(conf, schema)
+                        parseEnv(env, schema)
                     )).to.throw(Error);
                 }
             });

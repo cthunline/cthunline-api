@@ -10,7 +10,7 @@ import {
 } from './services/errors';
 import Log from './services/log';
 import { initDb } from './services/prisma';
-import { configuration } from './services/configuration';
+import { env } from './services/env';
 import mainController from './controllers';
 import socketRouter from './sockets';
 
@@ -21,7 +21,7 @@ const {
     REVERSE_PROXY,
     COOKIE_SECRET,
     PORT
-} = configuration;
+} = env;
 
 (async () => {
     try {

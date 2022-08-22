@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { configuration } from './configuration';
+import { env } from './env';
 import Log from './log';
 import { hashPassword } from './controllerServices/auth';
 import { NotFoundError } from './errors';
@@ -11,7 +11,7 @@ const {
     DEFAULT_ADMIN_PASSWORD,
     DEFAULT_THEME,
     DEFAULT_LOCALE
-} = configuration;
+} = env;
 
 export const Prisma = new PrismaClient();
 

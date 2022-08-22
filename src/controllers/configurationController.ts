@@ -7,13 +7,13 @@ import {
 import {
     isRegistrationEnabled,
     isInvitationEnabled,
-    configuration
-} from '../services/configuration';
+    env
+} from '../services/env';
 
 const {
     DEFAULT_THEME,
     DEFAULT_LOCALE
-} = configuration;
+} = env;
 
 const configurationController = Router();
 

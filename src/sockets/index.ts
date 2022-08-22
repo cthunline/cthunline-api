@@ -2,7 +2,7 @@ import { Socket, Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import CookieParser from 'cookie-parser';
 
-import { configuration } from '../services/configuration';
+import { env } from '../services/env';
 import {
     connectionMiddleware,
     disconnectCopycats,
@@ -13,7 +13,7 @@ import characterHandler from './characterHandler';
 import audioHandler from './audioHandler';
 import sketchHandler from './sketchHandler';
 
-const { COOKIE_SECRET } = configuration;
+const { COOKIE_SECRET } = env;
 
 const wrapExpressMiddleware = (middleware: Function) => (
     (socket: Socket, next: Function) => (

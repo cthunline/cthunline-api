@@ -2,9 +2,9 @@ import Path from 'path';
 import Fs from 'fs';
 import Winston, { format } from 'winston';
 
-import { configuration } from './configuration';
+import { env } from './env';
 
-const { LOG_ENABLED, LOG_DIR } = configuration;
+const { LOG_ENABLED, LOG_DIR } = env;
 
 const isLogEnabled = LOG_ENABLED;
 const logDir = LOG_DIR;

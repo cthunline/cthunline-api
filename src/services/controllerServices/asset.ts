@@ -4,7 +4,7 @@ import { Asset, Directory } from '@prisma/client';
 import Formidable from 'formidable';
 
 import { Prisma, handleNotFound } from '../prisma';
-import { configuration } from '../configuration';
+import { env } from '../env';
 import { ForbiddenError, InternError, ValidationError } from '../errors';
 import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
@@ -12,7 +12,7 @@ const {
     ASSET_DIR,
     ASSET_MAX_SIZE_MB,
     ASSET_MAX_SIZE_MB_PER_FILE
-} = configuration;
+} = env;
 
 /* There's a bug in formidable@v2 where maxFileSize option is applied to
 all files and not each file so we have to control each file size ourself */

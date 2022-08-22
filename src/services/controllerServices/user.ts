@@ -8,10 +8,10 @@ import {
     ValidationError
 } from '../errors';
 import { UserSelect } from '../../types/user';
-import { configuration } from '../configuration';
-import { locales } from '../../types/configuration';
+import { env } from '../env';
+import { locales } from '../../types/env';
 
-const { DEFAULT_THEME, DEFAULT_LOCALE } = configuration;
+const { DEFAULT_THEME, DEFAULT_LOCALE } = env;
 
 // default optional fields for a new user
 export const defaultUserData: Partial<UserSelect> = {

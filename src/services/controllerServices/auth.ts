@@ -2,7 +2,7 @@ import { Request, CookieOptions } from 'express';
 import Jwt from 'jsonwebtoken';
 import DaysJs from 'dayjs';
 
-import { configuration } from '../configuration';
+import { env } from '../env';
 import {
     AuthenticationError,
     ForbiddenError
@@ -10,7 +10,7 @@ import {
 
 const Bcrypt = require('bcrypt');
 
-const { JWT_SECRET, COOKIE_SECURE } = configuration;
+const { JWT_SECRET, COOKIE_SECURE } = env;
 
 // hash a string
 export const hashPassword = async (password: string): Promise<string> => (
