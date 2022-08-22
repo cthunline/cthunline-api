@@ -1,4 +1,4 @@
-# Cthunline Server
+# Cthunline API
 
 * [Requirements](#requirements)
 * [Configuration](#configuration)
