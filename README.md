@@ -1,8 +1,17 @@
 # Cthunline API
 
+> Cthunline API (REST + WebSockets) made with Express, Prisma, Socket.io and more
+
+* [Useful resources](#useful-resources)
 * [Requirements](#requirements)
 * [Configuration](#configuration)
 * [Usage](#usage)
+
+## Useful resources
+
+* [Official documentation](https://doc.cthunline.org/)
+* [Docker repository](https://hub.docker.com/r/cthunline/cthunline)
+* [Games NPM package](https://www.npmjs.com/package/@cthunline/games)
 
 ## Requirements
 
@@ -15,7 +24,7 @@
   * `.env` for running app (development or production)
   * `.env.test` for running tests (not required in production)
 * Use `.env.sample` as an example
-* Do not use the same database for running app and tests
+* Do not use the same database for running app and tests!
 
 ## Usage
 
@@ -36,6 +45,8 @@ npm run test
 npx prisma generate
 # Push Prisma schema to database
 npx prisma db push
+# When modifying the database structure it is necessary to create Prisma migrations
+npx prisma migrate dev --name <name_of_the_migration>
 ```
 
 ### Production
