@@ -69,3 +69,32 @@ services:
     MARIADB_USER: cthunline
     MARIADB_PASSWORD: cthunline
     MARIADB_DATABASE: cthunline_ci
+
+---
+kind: pipeline
+type: docker
+name: cthunline-api-cd
+
+trigger:
+  event:
+  - tag
+
+clone:
+  disable: true
+
+steps:
+- name: clone
+  image: alpine/git
+  commands:
+  - git clone https://github.com/cthunline/cthunline-docker.git .
+- name: docker  
+  image: plugins/docker
+  settings:
+    repo: cthunline/cthunline
+    tags:
+    - ${DRONE_TAG}
+    - latest
+    username:
+      from_secret: docker_user
+    password:
+      from_secret: docker_token
