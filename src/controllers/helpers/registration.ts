@@ -1,8 +1,8 @@
 import { customAlphabet } from 'nanoid';
 import DayJs from 'dayjs';
 
-import { Prisma } from '../prisma';
-import { ForbiddenError } from '../errors';
+import { Prisma } from '../../services/prisma';
+import { ForbiddenError } from '../../services/errors';
 
 const generateCode = customAlphabet('1234567890abcdef', 16);
 

@@ -3,9 +3,9 @@ import Path from 'path';
 import { Asset, Directory } from '@prisma/client';
 import Formidable from 'formidable';
 
-import { Prisma } from '../prisma';
-import { env } from '../env';
-import { ForbiddenError, InternError, ValidationError } from '../errors';
+import { Prisma } from '../../services/prisma';
+import { env } from '../../services/env';
+import { ForbiddenError, InternError, ValidationError } from '../../services/errors';
 import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
 const {

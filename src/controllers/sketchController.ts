@@ -6,7 +6,7 @@ import {
 
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
-import { controlSelf } from '../services/controllerServices/auth';
+import { controlSelf } from './helpers/auth';
 
 import definitions from './schemas/definitions.json';
 import sketchSchemas from './schemas/sketch.json';

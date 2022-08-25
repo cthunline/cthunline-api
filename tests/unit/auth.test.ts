@@ -5,14 +5,16 @@ import {
     hashPassword,
     verifyPassword,
     generateJwt,
-    verifyJwt,
-    controlSelf,
-    controlSelfAdmin
-} from '../../src/services/controllerServices/auth';
+    verifyJwt
+} from '../../src/services/crypto';
 import {
     AuthenticationError,
     ForbiddenError
 } from '../../src/services/errors';
+import {
+    controlSelf,
+    controlSelfAdmin
+} from '../../src/controllers/helpers/auth';
 
 describe('[Unit] Auth', () => {
     describe('hashPassword + verifyPassword', () => {

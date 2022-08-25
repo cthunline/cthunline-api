@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { env } from './env';
 import Log from './log';
-import { hashPassword } from './controllerServices/auth';
+import { hashPassword } from './crypto';
 
 const {
     DEFAULT_ADMIN_NAME,

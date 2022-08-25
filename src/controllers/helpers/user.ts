@@ -1,11 +1,11 @@
-import { Prisma } from '../prisma';
+import { Prisma } from '../../services/prisma';
 import {
     ForbiddenError,
     ConflictError,
     ValidationError
-} from '../errors';
+} from '../../services/errors';
 import { UserSelect } from '../../types/user';
-import { env } from '../env';
+import { env } from '../../services/env';
 import { locales } from '../../types/env';
 
 const { DEFAULT_THEME, DEFAULT_LOCALE } = env;

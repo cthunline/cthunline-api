@@ -13,9 +13,9 @@ import rateLimiter from '../services/rateLimiter';
 import {
     verifyPassword,
     generateJwt,
-    verifyJwt,
-    getCookieOptions
-} from '../services/controllerServices/auth';
+    verifyJwt
+} from '../services/crypto';
+import { getCookieOptions } from './helpers/auth';
 
 import authSchemas from './schemas/auth.json';
 

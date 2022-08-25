@@ -3,7 +3,7 @@ import { Session, Character } from '@prisma/client';
 
 import { UserSelect } from '../types/user';
 import { Prisma } from '../services/prisma';
-import { verifyJwt } from '../services/controllerServices/auth';
+import { verifyJwt } from '../services/crypto';
 import { cacheGet, cacheSet } from '../services/cache';
 import {
     CustomError,

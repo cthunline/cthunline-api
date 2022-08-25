@@ -2,7 +2,7 @@ import Fs from 'fs';
 import Path from 'path';
 
 import { Prisma } from '../../../src/services/prisma';
-import { assetDir } from '../../../src/services/controllerServices/asset';
+import { assetDir } from '../../../src/controllers/helpers/asset';
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
 import sketchs from '../data/sketchs.json';

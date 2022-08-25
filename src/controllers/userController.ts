@@ -5,14 +5,10 @@ import {
 } from 'express';
 
 import { Prisma } from '../services/prisma';
-import {
-    controlSelf,
-    controlSelfAdmin,
-    verifyPassword,
-    hashPassword
-} from '../services/controllerServices/auth';
+import { verifyPassword, hashPassword } from '../services/crypto';
 import { ValidationError } from '../services/errors';
 import Validator from '../services/validator';
+import { controlSelf, controlSelfAdmin } from './helpers/auth';
 import {
     userSelect,
     getUser,
@@ -20,7 +16,7 @@ import {
     controlUniqueEmail,
     controlLocale,
     defaultUserData
-} from '../services/controllerServices/user';
+} from './helpers/user';
 
 import userSchemas from './schemas/user.json';
 

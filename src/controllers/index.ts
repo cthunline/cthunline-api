@@ -9,7 +9,7 @@ import Path from 'path';
 import { NotFoundError } from '../services/errors';
 import Log from '../services/log';
 import { env } from '../services/env';
-import { assetDir } from '../services/controllerServices/asset';
+import { assetDir } from './helpers/asset';
 import authController, { authMiddleware } from './authController';
 import userController from './userController';
 import registrationController from './registrationController';

@@ -1,6 +1,6 @@
 import { Session } from '@prisma/client';
 
-import { Prisma } from '../prisma';
+import { Prisma } from '../../services/prisma';
 import { userSelect } from './user';
 
 export const defaultSketchData = {

@@ -22,7 +22,7 @@ import {
     getDirectories,
     getDirectory,
     getChildrenDirectories
-} from '../services/controllerServices/asset';
+} from './helpers/asset';
 
 import assetSchemas from './schemas/asset.json';
 

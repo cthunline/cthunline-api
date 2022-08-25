@@ -5,7 +5,7 @@ import {
 } from 'express';
 
 import { Prisma } from '../services/prisma';
-import { hashPassword } from '../services/controllerServices/auth';
+import { hashPassword } from '../services/crypto';
 import { ForbiddenError } from '../services/errors';
 import Validator from '../services/validator';
 import rateLimiter from '../services/rateLimiter';
@@ -17,11 +17,11 @@ import {
     userSelect,
     controlUniqueEmail,
     defaultUserData
-} from '../services/controllerServices/user';
+} from './helpers/user';
 import {
     controlInvitationCode,
     generateInvitationCode
-} from '../services/controllerServices/registration';
+} from './helpers/registration';
 
 import userSchemas from './schemas/user.json';
 

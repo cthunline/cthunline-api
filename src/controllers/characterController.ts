@@ -5,13 +5,13 @@ import {
 } from 'express';
 import { Prisma as PrismaNS } from '@prisma/client';
 
-import { getUser } from '../services/controllerServices/user';
-import { controlSelf } from '../services/controllerServices/auth';
+import { getUser } from './helpers/user';
+import { controlSelf } from './helpers/auth';
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
 import { Games, GameId, isValidGameId } from '../services/games';
-import { controlPortrait, getCharacter } from '../services/controllerServices/character';
+import { controlPortrait, getCharacter } from './helpers/character';
 
 import characterSchemas from './schemas/character.json';
 

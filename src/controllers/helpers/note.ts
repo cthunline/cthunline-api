@@ -1,8 +1,8 @@
 import { Note } from '@prisma/client';
 
-import { Prisma } from '../prisma';
+import { Prisma } from '../../services/prisma';
 import { userSelect } from './user';
-import { ForbiddenError } from '../errors';
+import { ForbiddenError } from '../../services/errors';
 
 // get notes of a user for a session ordered by position
 // also returns the other user's shared notes in the session

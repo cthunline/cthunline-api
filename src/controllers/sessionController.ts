@@ -5,7 +5,7 @@ import {
 } from 'express';
 
 import { Prisma } from '../services/prisma';
-import { controlSelf } from '../services/controllerServices/auth';
+import { controlSelf } from './helpers/auth';
 import { isValidGameId } from '../services/games';
 import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
@@ -13,7 +13,7 @@ import {
     defaultSketchData,
     getInclude,
     getSession
-} from '../services/controllerServices/session';
+} from './helpers/session';
 
 import definitions from './schemas/definitions.json';
 import sessionSchemas from './schemas/session.json';

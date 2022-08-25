@@ -6,15 +6,15 @@ import {
 
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
-import { getSession } from '../services/controllerServices/session';
+import { getSession } from './helpers/session';
 import {
     getNotes,
     getNote,
     getMaxNotePosition,
     getNextNotePosition,
     switchNotePositions
-} from '../services/controllerServices/note';
-import { controlSelf } from '../services/controllerServices/auth';
+} from './helpers/note';
+import { controlSelf } from './helpers/auth';
 import { ConflictError, InternError } from '../services/errors';
 
 import noteSchemas from './schemas/note.json';
