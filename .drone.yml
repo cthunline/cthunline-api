@@ -75,13 +75,16 @@ kind: pipeline
 type: docker
 name: cthunline-api-cd
 
+# when to execute pipeline
 trigger:
   event:
   - tag
 
+# disable default cloning
 clone:
   disable: true
 
+# building and publishing docker image
 steps:
 - name: clone
   image: alpine/git
