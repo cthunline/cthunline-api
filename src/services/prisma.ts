@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import { env } from './env';
 import Log from './log';
 import { hashPassword } from './controllerServices/auth';
-import { NotFoundError } from './errors';
 
 const {
     DEFAULT_ADMIN_NAME,
@@ -45,16 +44,4 @@ export const initDb = async () => {
             Log.error('Environment file is missing default admin information');
         }
     }
-};
-
-// execute query and throw a not found error if there's no result
-export const handleNotFound = async <T>(
-    name: string,
-    queryPromise: Promise<T | null>
-): Promise<T> => {
-    const result = await queryPromise;
-    if (!result) {
-        throw new NotFoundError(`${name} not found`);
-    }
-    return result;
 };

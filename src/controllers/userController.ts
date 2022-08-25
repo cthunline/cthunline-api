@@ -3,12 +3,8 @@ import {
     Request,
     Response
 } from 'express';
-import { User } from '@prisma/client';
 
-import {
-    Prisma,
-    handleNotFound
-} from '../services/prisma';
+import { Prisma } from '../services/prisma';
 import {
     controlSelf,
     controlSelfAdmin,
@@ -91,15 +87,11 @@ userController.post('/users/:userId', async (req: Request, res: Response): Promi
     try {
         const { params, body } = req;
         const userId = Number(params.userId);
-        const user = await handleNotFound<User>(
-            'User', (
-                Prisma.user.findUnique({
-                    where: {
-                        id: userId
-                    }
-                })
-            )
-        );
+        const user = await Prisma.user.findUniqueOrThrow({
+            where: {
+                id: userId
+            }
+        });
         try {
             controlSelfAdmin(req);
         } catch (err) {

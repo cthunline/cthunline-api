@@ -3,10 +3,10 @@ import {
     Request,
     Response
 } from 'express';
-import { Sketch } from '@prisma/client';
 
-import { Prisma, handleNotFound } from '../services/prisma';
+import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
+import { controlSelf } from '../services/controllerServices/auth';
 
 import definitions from './schemas/definitions.json';
 import sketchSchemas from './schemas/sketch.json';
@@ -54,16 +54,12 @@ sketchController.post('/sketchs', async (req: Request, res: Response): Promise<v
 sketchController.get('/sketchs/:sketchId', async ({ params, user }: Request, res: Response): Promise<void> => {
     try {
         const sketchId = Number(params.sketchId);
-        const sketch = await handleNotFound<Sketch>(
-            'Sketch', (
-                Prisma.sketch.findFirst({
-                    where: {
-                        id: sketchId,
-                        userId: user.id
-                    }
-                })
-            )
-        );
+        const sketch = await Prisma.sketch.findFirstOrThrow({
+            where: {
+                id: sketchId,
+                userId: user.id
+            }
+        });
         res.json(sketch);
     } catch (err: any) {
         res.error(err);
@@ -71,19 +67,15 @@ sketchController.get('/sketchs/:sketchId', async ({ params, user }: Request, res
 });
 
 // delete a sketch belonging to the current user
-sketchController.delete('/sketchs/:sketchId', async ({ params, user }: Request, res: Response): Promise<void> => {
+sketchController.delete('/sketchs/:sketchId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const sketchId = Number(params.sketchId);
-        await handleNotFound<Sketch>(
-            'Sketch', (
-                Prisma.sketch.findFirst({
-                    where: {
-                        id: sketchId,
-                        userId: user.id
-                    }
-                })
-            )
-        );
+        const sketchId = Number(req.params.sketchId);
+        const sketch = await Prisma.sketch.findFirstOrThrow({
+            where: {
+                id: sketchId
+            }
+        });
+        controlSelf(req, sketch.userId);
         await Prisma.sketch.delete({
             where: {
                 id: sketchId

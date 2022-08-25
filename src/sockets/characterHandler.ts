@@ -1,7 +1,6 @@
-import { Character } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
 
-import { Prisma, handleNotFound } from '../services/prisma';
+import { Prisma } from '../services/prisma';
 
 const characterHandler = (io: Server, socket: Socket) => {
     // notify game master when any character is updated during game
@@ -14,15 +13,11 @@ const characterHandler = (io: Server, socket: Socket) => {
                 sessionId,
                 characterId
             } = socket.data;
-            const character = await handleNotFound<Character>(
-                'Character', (
-                    Prisma.character.findUnique({
-                        where: {
-                            id: characterId
-                        }
-                    })
-                )
-            );
+            const character = await Prisma.character.findUniqueOrThrow({
+                where: {
+                    id: characterId
+                }
+            });
             socket.data.character = character;
             const sessionSockets = await io.in(String(sessionId)).fetchSockets();
             const masterSocket = sessionSockets.find(({ data }) => (

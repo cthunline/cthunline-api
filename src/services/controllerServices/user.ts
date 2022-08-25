@@ -1,7 +1,4 @@
-import {
-    Prisma,
-    handleNotFound
-} from '../prisma';
+import { Prisma } from '../prisma';
 import {
     ForbiddenError,
     ConflictError,
@@ -36,16 +33,12 @@ export const userSelect = {
 // check a user exists and return it
 // returned user data will not contain password
 export const getUser = async (userId: number): Promise<UserSelect> => (
-    handleNotFound<UserSelect>(
-        'User', (
-            Prisma.user.findUnique({
-                select: userSelect,
-                where: {
-                    id: userId
-                }
-            })
-        )
-    )
+    Prisma.user.findUniqueOrThrow({
+        select: userSelect,
+        where: {
+            id: userId
+        }
+    })
 );
 
 // throws forbidden error if any of the admin fields exists in the user edit body

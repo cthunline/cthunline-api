@@ -1,9 +1,6 @@
 import { Note } from '@prisma/client';
 
-import {
-    Prisma,
-    handleNotFound
-} from '../prisma';
+import { Prisma } from '../prisma';
 import { userSelect } from './user';
 import { ForbiddenError } from '../errors';
 
@@ -47,15 +44,11 @@ export const getNotes = async (
 // get a note
 // if user is not the owner and the note is not shared throw a forbidden error
 export const getNote = async (noteId: number, userId: number): Promise<Note> => {
-    const note = await handleNotFound<Note>(
-        'Note', (
-            Prisma.note.findUnique({
-                where: {
-                    id: noteId
-                }
-            })
-        )
-    );
+    const note = await Prisma.note.findUniqueOrThrow({
+        where: {
+            id: noteId
+        }
+    });
     if (note.userId !== userId && !note.isShared) {
         throw new ForbiddenError();
     }

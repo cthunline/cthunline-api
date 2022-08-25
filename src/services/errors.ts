@@ -1,14 +1,17 @@
 /* eslint-disable max-classes-per-file */
 import {
     PrismaClientValidationError,
-    PrismaClientKnownRequestError
+    PrismaClientKnownRequestError,
+    NotFoundError as PrismaNotFoundError
 } from '@prisma/client/runtime';
 import {
     Request,
     Response,
     NextFunction
 } from 'express';
+
 import Log from './log';
+import { ErrorJsonResponse } from '../types/errors';
 
 // custom error class with additional http status and data
 // unless realy necessary do not throw error using this class
@@ -56,44 +59,44 @@ export class ConflictError extends CustomError {
     }
 }
 
-declare global {
-    namespace Express {
-        export interface Response {
-            error: (err: Error) => void
-        }
+// if the given error is a prisma error and is handled then
+// returns the matching custom error
+const handlePrismaError = (err: Error): Error => {
+    if (err instanceof PrismaNotFoundError) {
+        return new NotFoundError(err.message);
     }
-}
+    if (err instanceof PrismaClientValidationError) {
+        return new ValidationError();
+    }
+    if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2023') {
+            return new ValidationError();
+        }
+        return new ValidationError(err.message);
+    }
+    return err;
+};
 
 // express middlware injecting a response.error function that handles custom errors
 // it returns the correct status code and additional data if specified
 export const errorMiddleware = (_req: Request, res: Response, next: NextFunction): void => {
     res.error = (err: Error): void => {
-        const { message, stack } = err;
-        const invalidDataMessage = 'Invalid data provided';
-        let statusCode = 500;
-        const response: Record<string, any> = {
-            error: 'Intern error'
-        };
-        if (err instanceof CustomError) {
-            statusCode = err.status;
-            response.error = message;
-            if (err.data) {
-                response.data = err.data;
+        // handles prisma errors by "converting" them into custom errors
+        const error = handlePrismaError(err);
+        if (error instanceof CustomError) { // handles custom errors
+            const response: ErrorJsonResponse = {
+                error: error.message
+            };
+            if (error.data) {
+                response.data = error.data;
             }
-        } else if (err instanceof PrismaClientValidationError) {
-            statusCode = 400;
-            response.error = invalidDataMessage;
-        } else if (err instanceof PrismaClientKnownRequestError) {
-            const { code } = err;
-            response.error = message;
-            if (code === 'P2023') {
-                statusCode = 400;
-                response.error = invalidDataMessage;
-            }
-        } else {
-            Log.error(stack);
+            res.status(error.status).json(response);
+        } else { // if error is not handled throw an intern error and logs stack
+            Log.error(error.stack);
+            res.status(500).json({
+                error: 'Intern error'
+            });
         }
-        res.status(statusCode).json(response);
     };
     return next();
 };

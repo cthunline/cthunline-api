@@ -1,6 +1,6 @@
 import { Character } from '@prisma/client';
 
-import { Prisma, handleNotFound } from '../prisma';
+import { Prisma } from '../prisma';
 import { ValidationError } from '../errors';
 
 import { isBase64 } from '../tools';
@@ -25,13 +25,9 @@ export const controlPortrait = (base64: string) => {
 };
 
 export const getCharacter = async (characterId: number): Promise<Character> => (
-    handleNotFound<Character>(
-        'Character', (
-            Prisma.character.findUnique({
-                where: {
-                    id: characterId
-                }
-            })
-        )
-    )
+    Prisma.character.findUniqueOrThrow({
+        where: {
+            id: characterId
+        }
+    })
 );

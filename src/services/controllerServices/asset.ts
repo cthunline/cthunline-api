@@ -3,7 +3,7 @@ import Path from 'path';
 import { Asset, Directory } from '@prisma/client';
 import Formidable from 'formidable';
 
-import { Prisma, handleNotFound } from '../prisma';
+import { Prisma } from '../prisma';
 import { env } from '../env';
 import { ForbiddenError, InternError, ValidationError } from '../errors';
 import { mimeTypes, FileType, MimeType } from '../../types/asset';
@@ -76,15 +76,11 @@ export const formidableOptions: Formidable.Options = {
 };
 
 export const getAsset = async (userId: number, assetId: number): Promise<Asset> => {
-    const asset = await handleNotFound<Asset>(
-        'Asset', (
-            Prisma.asset.findFirst({
-                where: {
-                    id: assetId
-                }
-            })
-        )
-    );
+    const asset = await Prisma.asset.findFirstOrThrow({
+        where: {
+            id: assetId
+        }
+    });
     if (asset.userId !== userId) {
         throw new ForbiddenError('Asset does not belong to you');
     }
@@ -103,15 +99,11 @@ export const getDirectory = async (
     userId: number,
     directoryId: number
 ): Promise<Directory> => {
-    const directory = await handleNotFound<Directory>(
-        'Directory', (
-            Prisma.directory.findFirst({
-                where: {
-                    id: directoryId
-                }
-            })
-        )
-    );
+    const directory = await Prisma.directory.findFirstOrThrow({
+        where: {
+            id: directoryId
+        }
+    });
     if (directory.userId !== userId) {
         throw new ForbiddenError('Directory does not belong to you');
     }

@@ -1,7 +1,6 @@
-import { Asset } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
 
-import { Prisma, handleNotFound } from '../services/prisma';
+import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { SocketAudioPlay } from '../types/socket';
 import { ForbiddenError, ValidationError } from '../services/errors';
@@ -27,15 +26,11 @@ const audioHandler = (_io: Server, socket: Socket) => {
                 assetId,
                 time
             } = request;
-            const asset = await handleNotFound<Asset>(
-                'Asset', (
-                    Prisma.asset.findUnique({
-                        where: {
-                            id: Number(assetId)
-                        }
-                    })
-                )
-            );
+            const asset = await Prisma.asset.findUniqueOrThrow({
+                where: {
+                    id: Number(assetId)
+                }
+            });
             if (asset.type !== 'audio') {
                 throw new ValidationError('Asset type is not audio');
             }
