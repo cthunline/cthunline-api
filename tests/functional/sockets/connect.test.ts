@@ -15,8 +15,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of invalid handshake data', async () => {
-        await Api.login();
-        const { token } = Api;
+        const { token } = await Api.login();
         const invalidData = [{
             token,
             query: {}
@@ -52,8 +51,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of invalid sessionId or characterId', async () => {
-        await Api.login();
-        const { token } = Api;
+        const { token } = await Api.login();
         const invalidQueries = [{
             sessionId: 'invalid',
             characterId: charactersData[0].id
@@ -71,8 +69,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of not found sessionId or characterId', async () => {
-        await Api.login();
-        const { token } = Api;
+        const { token } = await Api.login();
         const notFoundQueries = [{
             sessionId: 999,
             characterId: charactersData[0].id
@@ -90,8 +87,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of forbidden characterId', async () => {
-        await Api.login();
-        const { token } = Api;
+        const { token } = await Api.login();
         await Sockets.failConnect({
             token,
             query: {
@@ -103,8 +99,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should connect to socket', async () => {
-        await Api.login();
-        const { token } = Api;
+        const { token } = await Api.login();
         await Sockets.connect({
             token,
             sessionId: sessionsData[1].id,
@@ -126,8 +121,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should disconnect copycat socket on connection', async () => {
-        await Api.login();
-        const { token } = Api;
+        const { token } = await Api.login();
         const copycatSocket = await Sockets.connect({
             token,
             sessionId: sessionsData[1].id,

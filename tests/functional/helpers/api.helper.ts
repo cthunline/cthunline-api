@@ -105,7 +105,6 @@ export interface CredentialOptions {
 
 const Api = {
     userId: 0,
-    token: '',
     credentials: {
         email: 'admin@test.com',
         password: 'test'
@@ -125,8 +124,10 @@ const Api = {
             expect(response).to.have.status(200);
             assertUser(body);
             Api.userId = body.id;
-            Api.token = this.getCookieToken(response);
-            return body;
+            return {
+                ...body,
+                token: this.getCookieToken(response)
+            };
         }
         expect(response).to.have.status(401);
         expect(response).to.be.json;
