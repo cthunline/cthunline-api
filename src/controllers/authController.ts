@@ -76,10 +76,7 @@ authController.post('/auth', rateLimiter, async ({ body }: Request, res: Respons
             'token',
             token,
             getCookieOptions()
-        ).json({
-            ...user,
-            token
-        });
+        ).json(user);
     } catch (err: any) {
         res.error(err);
     }

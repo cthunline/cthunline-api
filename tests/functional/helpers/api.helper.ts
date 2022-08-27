@@ -1,6 +1,7 @@
 import Chai, { expect } from 'chai';
 import ChaiHttp from 'chai-http';
 import Path from 'path';
+import CookieParser from 'cookie-parser';
 
 import server from '../../../src';
 import { assertError, assertUser } from './assert.helper';
@@ -104,6 +105,7 @@ export interface CredentialOptions {
 
 const Api = {
     userId: 0,
+    token: '',
     credentials: {
         email: 'admin@test.com',
         password: 'test'
@@ -123,12 +125,31 @@ const Api = {
             expect(response).to.have.status(200);
             assertUser(body);
             Api.userId = body.id;
+            Api.token = this.getCookieToken(response);
             return body;
         }
         expect(response).to.have.status(401);
         expect(response).to.be.json;
         assertError(body);
         return null;
+    },
+
+    getCookieToken(response: ChaiHttp.Response) {
+        const tokenRegex = /token=([^;]+);/;
+        const responseCookie = response.get('Set-Cookie');
+        if (responseCookie[0]) {
+            const match = tokenRegex.exec(responseCookie[0]);
+            if (match?.[1]) {
+                const decodedToken = CookieParser.signedCookie(
+                    decodeURIComponent(match[1]),
+                    process.env.COOKIE_SECRET ?? ''
+                );
+                if (decodedToken) {
+                    return decodedToken;
+                }
+            }
+        }
+        throw new Error('Could not get token from response cookie');
     },
 
     async logout(expectSuccess: boolean = true): Promise<void> {
