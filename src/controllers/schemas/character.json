@@ -33,5 +33,15 @@
                 "additionalProperties": true
             }
         }
+    },
+    "uploadPortrait": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "portrait"
+        ],
+        "properties": {
+            "portrait": {}
+        }
     }
 }

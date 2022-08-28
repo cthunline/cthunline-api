@@ -45,7 +45,7 @@ describe('[Unit] Auth', () => {
                 exp,
                 iat,
                 ...decoded
-            } = verifyJwt(jwt);
+            } = verifyJwt<typeof data>(jwt);
             expect(decoded).to.deep.equal(data);
             expect(exp).to.be.a('number');
             expect(iat).to.be.a('number');

@@ -1,4 +1,4 @@
-import Jwt from 'jsonwebtoken';
+import Jwt, { JwtPayload } from 'jsonwebtoken';
 
 import { env } from './env';
 import { AuthenticationError } from './errors';
@@ -22,9 +22,9 @@ export const generateJwt = <DataType extends object>(user: DataType) => (
     Jwt.sign(user, JWT_SECRET, { expiresIn: '12h' })
 );
 
-export const verifyJwt = <DataType extends object>(token: string): DataType => {
+export const verifyJwt = <DataType extends object>(token: string): DataType & JwtPayload => {
     try {
-        return Jwt.verify(token, JWT_SECRET) as DataType;
+        return Jwt.verify(token, JWT_SECRET) as DataType & JwtPayload;
     } catch {
         throw new AuthenticationError();
     }

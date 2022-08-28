@@ -1,29 +1,17 @@
 import { Character } from '@prisma/client';
+import Formidable from 'formidable';
+import Fs from 'fs';
+import Path from 'path';
 
 import { Prisma } from '../../services/prisma';
-import { ValidationError } from '../../services/errors';
+import { env } from '../../services/env';
+import { assetTempDir, getAssetDir } from './asset';
 
-import { isBase64 } from '../../services/tools';
-import { mimeTypes } from '../../types/asset';
+const { PORTRAIT_MAX_SIZE_MB } = env;
 
-export const imageMimeTypes = Object.entries(mimeTypes).filter(
-    ([, { type }]) => type === 'image'
-).map(
-    ([mimeType]) => mimeType
-);
+export const portraitDirName = 'portraits';
 
-export const portraitLimitSizeInKb = 500;
-export const controlPortrait = (base64: string) => {
-    if (!isBase64(base64, imageMimeTypes)) {
-        throw new ValidationError('Portrait is not a valid base64 string');
-    }
-    const buffer = Buffer.from(base64);
-    const sizeInKb = buffer.length / 1000;
-    if (sizeInKb > portraitLimitSizeInKb) {
-        throw new ValidationError(`Portrait is too big (max ${portraitLimitSizeInKb}Kb)`);
-    }
-};
-
+// eslint-disable-next-line import/prefer-default-export
 export const getCharacter = async (characterId: number): Promise<Character> => (
     Prisma.character.findUniqueOrThrow({
         where: {
@@ -31,3 +19,21 @@ export const getCharacter = async (characterId: number): Promise<Character> => (
         }
     })
 );
+
+export const formidablePortraitOptions: Formidable.Options = {
+    uploadDir: assetTempDir,
+    keepExtensions: false,
+    maxFileSize: PORTRAIT_MAX_SIZE_MB * 1024 * 1024,
+    multiples: false
+};
+
+// create user subdirectory in asset dir if not exist and return its path
+export const controlPortraitDir = async (): Promise<string> => {
+    const dir = Path.join(getAssetDir(), portraitDirName);
+    try {
+        await Fs.promises.access(dir, Fs.constants.F_OK);
+    } catch {
+        await Fs.promises.mkdir(dir);
+    }
+    return dir;
+};

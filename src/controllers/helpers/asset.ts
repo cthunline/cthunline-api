@@ -5,8 +5,16 @@ import Formidable from 'formidable';
 
 import { Prisma } from '../../services/prisma';
 import { env } from '../../services/env';
-import { ForbiddenError, InternError, ValidationError } from '../../services/errors';
-import { mimeTypes, FileType, MimeType } from '../../types/asset';
+import {
+    ForbiddenError,
+    InternError,
+    ValidationError
+} from '../../services/errors';
+import {
+    mimeTypes,
+    FileType,
+    MimeType
+} from '../../types/asset';
 
 const {
     ASSET_DIR,
@@ -14,18 +22,19 @@ const {
     ASSET_MAX_SIZE_MB_PER_FILE
 } = env;
 
-/* There's a bug in formidable@v2 where maxFileSize option is applied to
-all files and not each file so we have to control each file size ourself */
-export const maxEachFileSize = ASSET_MAX_SIZE_MB_PER_FILE * 1024 * 1024;
-
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
-export const controlFile = (file: Formidable.File): FileType => {
+export const controlFile = (file: Formidable.File, fileType?: FileType): FileType => {
     const { mimetype, originalFilename } = file;
     const ext = originalFilename?.split('.').pop() ?? '';
-    if (file.size <= maxEachFileSize) {
+    // There's a bug in formidable@v2 where maxFileSize option is applied to
+    // all files and not each file so we have to control each file size ourself
+    const limitSize = ASSET_MAX_SIZE_MB_PER_FILE * 1024 * 1024;
+    if (file.size <= limitSize) {
         if (mimetype) {
-            if (mimeTypes[mimetype as MimeType]) {
+            const mimeTypeData = mimeTypes[mimetype as MimeType];
+            // fileType
+            if (mimeTypeData && (!fileType || mimeTypeData.type === fileType)) {
                 const { extensions, type } = mimeTypes[mimetype as MimeType];
                 if (extensions.includes(ext)) {
                     return type as FileType;

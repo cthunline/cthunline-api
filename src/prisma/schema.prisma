@@ -126,6 +126,7 @@ model Character {
     id Int @id @default(autoincrement())
     gameId String
     name String
+    portrait String?
     data Json
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

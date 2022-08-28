@@ -3,6 +3,7 @@ import Path from 'path';
 
 import { Prisma } from '../../../src/services/prisma';
 import { assetDir } from '../../../src/controllers/helpers/asset';
+
 import users from '../data/users.json';
 import sessions from '../data/sessions.json';
 import sketchs from '../data/sketchs.json';
@@ -36,11 +37,11 @@ const Data = {
     },
 
     async deleteAll() {
+        await Data.deleteAssetFiles();
         await Prisma.character.deleteMany();
         await Prisma.note.deleteMany();
         await Prisma.session.deleteMany();
         await Prisma.sketch.deleteMany();
-        await Data.deleteAssetFiles();
         await Prisma.asset.deleteMany();
         await Prisma.directory.deleteMany();
         await Prisma.user.deleteMany();
@@ -114,6 +115,31 @@ const Data = {
                 })()
             ))
         );
+        const characters = await Prisma.character.findMany();
+        await Promise.all(
+            characters.map(({ portrait }) => (
+                (async () => {
+                    try {
+                        if (portrait) {
+                            const filePath = Path.join(assetDir, portrait);
+                            await Fs.promises.access(filePath, Fs.constants.F_OK);
+                            await Fs.promises.rm(filePath);
+                        }
+                    } catch {
+                        //
+                    }
+                })()
+            ))
+        );
+    },
+
+    async getAssetBuffer(assetName: string) {
+        const localPath = Path.join(
+            __dirname,
+            '../data/assets',
+            assetName
+        );
+        return Fs.promises.readFile(localPath);
     }
 };
 

@@ -1,19 +1,9 @@
 import { expect } from 'chai';
-import Fs from 'fs';
 import Path from 'path';
 
 import Api from '../helpers/api.helper';
 import Data, { assetsData, directoriesData } from '../helpers/data.helper';
 import { assertAsset, assertDirectory } from '../helpers/assert.helper';
-
-const getAssetBuffer = async (assetName: string) => {
-    const localPath = Path.join(
-        __dirname,
-        '../data/assets',
-        assetName
-    );
-    return Fs.promises.readFile(localPath);
-};
 
 const { userId } = assetsData[0];
 const userAssets = assetsData.filter(({ userId: assetUserId }) => (
@@ -78,7 +68,7 @@ describe('[API] Assets', () => {
             await Promise.all(
                 ['asset.pdf', 'asset.ico'].map((name) => (
                     (async () => {
-                        const buffer = await getAssetBuffer(name);
+                        const buffer = await Data.getAssetBuffer(name);
                         await Api.testError({
                             method: 'POST',
                             route: '/assets',
@@ -94,7 +84,7 @@ describe('[API] Assets', () => {
         });
         it('Should throw a validation error because uploaded file is too big', async () => {
             const name = 'too-big.png';
-            const buffer = await getAssetBuffer(name);
+            const buffer = await Data.getAssetBuffer(name);
             await Api.testError({
                 method: 'POST',
                 route: '/assets',
@@ -107,7 +97,7 @@ describe('[API] Assets', () => {
         });
         it('Should throw a validation error because payload is too big', async () => {
             const name = 'big.jpg';
-            const buffer = await getAssetBuffer(name);
+            const buffer = await Data.getAssetBuffer(name);
             const files = [];
             for (let i = 0; i < 10; i += 1) {
                 files.push({
@@ -137,7 +127,7 @@ describe('[API] Assets', () => {
             await Promise.all(
                 uploadData.map(({ name, directoryId }) => (
                     (async () => {
-                        const buffer = await getAssetBuffer(name);
+                        const buffer = await Data.getAssetBuffer(name);
                         const response = await Api.request({
                             method: 'POST',
                             route: '/assets',
@@ -179,7 +169,7 @@ describe('[API] Assets', () => {
                 assetNames.map((name) => (
                     (async () => ({
                         field: 'assets',
-                        buffer: await getAssetBuffer(name),
+                        buffer: await Data.getAssetBuffer(name),
                         name
                     }))()
                 ))
@@ -259,6 +249,10 @@ describe('[API] Assets', () => {
                 route: `/assets/${userAssets[2].id}`,
                 testGet: true
             });
+            await Api.testStaticFile(
+                Path.join('/static', userAssets[2].path),
+                false
+            );
         });
     });
 
@@ -424,7 +418,7 @@ describe('[API] Assets', () => {
             expect(subdirResponse).to.have.status(200);
             const subDirectory = subdirResponse.body;
             // upload asset in subdirectory
-            const buffer = await getAssetBuffer('asset.png');
+            const buffer = await Data.getAssetBuffer('asset.png');
             const response = await Api.request({
                 method: 'POST',
                 route: '/assets',
@@ -454,6 +448,10 @@ describe('[API] Assets', () => {
                 method: 'GET',
                 route: `/assets/${asset.id}`
             }, 404);
+            await Api.testStaticFile(
+                Path.join('/static', asset.id.toString()),
+                false
+            );
         });
     });
 });

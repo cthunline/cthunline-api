@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import Path from 'path';
 
 import Api from '../helpers/api.helper';
 import Data, { charactersData } from '../helpers/data.helper';
@@ -248,7 +249,7 @@ describe('[API] Characters', () => {
         });
     });
 
-    describe('DELETE /users/:id/characters/:id', () => {
+    describe('DELETE /characters/:id', () => {
         it('Should throw error because of invalid ID', async () => {
             await Api.testInvalidIdError({
                 method: 'DELETE',
@@ -278,6 +279,183 @@ describe('[API] Characters', () => {
                 route: `/characters/${id}`,
                 testGet: true
             });
+        });
+    });
+
+    describe('POST /characters/:id/portrait', () => {
+        it('Should throw error because of invalid ID', async () => {
+            const invalidData = [{
+                id: 'invalid',
+                status: 400
+            }, {
+                id: '1234',
+                status: 404
+            }];
+            const name = 'asset.png';
+            const buffer = await Data.getAssetBuffer(name);
+            await Promise.all(
+                invalidData.map(({ id, status }) => (
+                    Api.testError({
+                        method: 'POST',
+                        route: `/characters/${id}/portrait`,
+                        files: [{
+                            field: 'portrait',
+                            buffer,
+                            name
+                        }]
+                    }, status)
+                ))
+            );
+        });
+        it('Should throw a forbidden error', async () => {
+            const name = 'asset.png';
+            const buffer = await Data.getAssetBuffer(name);
+            await Api.testError({
+                method: 'POST',
+                route: `/characters/${charactersData[1].id}/portrait`,
+                files: [{
+                    field: 'portrait',
+                    buffer,
+                    name
+                }]
+            }, 403);
+        });
+        it('Should throw a validation error', async () => {
+            const { id: characterId } = findCharacter(
+                Api.userId,
+                'callOfCthulhu'
+            );
+            const name = 'asset.png';
+            const buffer = await Data.getAssetBuffer(name);
+            await Api.testError({
+                method: 'POST',
+                route: `/characters/${characterId}/portrait`,
+                files: [{
+                    field: 'invalid',
+                    buffer,
+                    name
+                }]
+            }, 400);
+        });
+        it('Should throw a validation error because of wrong file type', async () => {
+            const { id: characterId } = findCharacter(
+                Api.userId,
+                'callOfCthulhu'
+            );
+            const name = 'asset.mp3';
+            const buffer = await Data.getAssetBuffer(name);
+            await Api.testError({
+                method: 'POST',
+                route: `/characters/${characterId}/portrait`,
+                files: [{
+                    field: 'portrait',
+                    buffer,
+                    name
+                }]
+            }, 400);
+        });
+        it('Should throw a validation error because uploaded file is too big', async () => {
+            const { id: characterId } = findCharacter(
+                Api.userId,
+                'callOfCthulhu'
+            );
+            const name = 'too-big.png';
+            const buffer = await Data.getAssetBuffer(name);
+            await Api.testError({
+                method: 'POST',
+                route: `/characters/${characterId}/portrait`,
+                files: [{
+                    field: 'portrait',
+                    buffer,
+                    name
+                }]
+            }, 400);
+        });
+        it('Should upload a portrait', async () => {
+            const character = findCharacter(
+                Api.userId,
+                'callOfCthulhu'
+            );
+            const { id: characterId } = character;
+            const uploadData = [
+                'asset.jpg',
+                'asset.png'
+            ];
+            await Promise.all(
+                uploadData.map((name) => (
+                    (async () => {
+                        const buffer = await Data.getAssetBuffer(name);
+                        const response = await Api.request({
+                            method: 'POST',
+                            route: `/characters/${characterId}/portrait`,
+                            files: [{
+                                field: 'portrait',
+                                buffer,
+                                name
+                            }]
+                        });
+                        expect(response).to.have.status(200);
+                        expect(response).to.be.json;
+                        const updatedCharacter = response.body;
+                        assertCharacter(updatedCharacter, {
+                            ...character,
+                            portrait: updatedCharacter.portrait
+                        });
+                        await Api.testStaticFile(
+                            Path.join('/static', updatedCharacter.portrait)
+                        );
+                    })()
+                ))
+            );
+        });
+    });
+
+    describe('DELETE /characters/:id/portrait', () => {
+        it('Should throw error because of invalid ID', async () => {
+            await Api.testInvalidIdError({
+                method: 'DELETE',
+                route: '/characters/:id/portrait'
+            });
+        });
+        it('Should throw a forbidden error', async () => {
+            await Api.testError({
+                method: 'DELETE',
+                route: `/characters/${charactersData[1].id}/portrait`
+            }, 403);
+        });
+        it('Should delete an asset', async () => {
+            const character = findCharacter(
+                Api.userId,
+                'callOfCthulhu'
+            );
+            const { id: characterId } = character;
+            const name = 'asset.png';
+            const buffer = await Data.getAssetBuffer(name);
+            const response = await Api.request({
+                method: 'POST',
+                route: `/characters/${characterId}/portrait`,
+                files: [{
+                    field: 'portrait',
+                    buffer,
+                    name
+                }]
+            });
+            expect(response).to.have.status(200);
+            const updatedCharacter = response.body;
+            await Api.testStaticFile(
+                Path.join('/static', updatedCharacter.portrait)
+            );
+            const deleteResponse = await Api.request({
+                method: 'DELETE',
+                route: `/characters/${characterId}/portrait`
+            });
+            expect(deleteResponse).to.have.status(200);
+            expect(deleteResponse).to.be.json;
+            assertCharacter(deleteResponse.body);
+            await Api.testStaticFile(
+                Path.join('/static', updatedCharacter.portrait),
+                false
+            );
         });
     });
 });

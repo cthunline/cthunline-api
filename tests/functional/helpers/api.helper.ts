@@ -388,13 +388,17 @@ const Api = {
         );
     },
 
-    async testStaticFile(route: string): Promise<void> {
+    async testStaticFile(route: string, expectSuccess: boolean = true): Promise<void> {
         const response = await Api.request({
             apiPrefix: false,
             method: 'GET',
             route
         });
-        expect(response).to.have.status(200);
+        if (expectSuccess) {
+            expect(response).to.have.status(200);
+        } else {
+            expect(response).to.have.status(404);
+        }
     }
 };
 

@@ -33,9 +33,7 @@ const {
         Log.info('Setting middlewares');
         app.use(CookieParser(COOKIE_SECRET));
         app.use(Helmet());
-        app.use(Express.json({
-            limit: '1mb'
-        }));
+        app.use(Express.json());
         app.use(Express.urlencoded({
             extended: false
         }));

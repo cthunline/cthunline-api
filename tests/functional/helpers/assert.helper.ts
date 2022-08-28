@@ -251,6 +251,12 @@ export const assertCharacter = (
     expect(data.gameId).to.be.a('string');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
+    expect(data).to.have.property('portrait');
+    if (data.portrait) {
+        expect(data.portrait).to.be.a('string');
+    } else {
+        expect(data.portrait).to.be.null;
+    }
     if (expected) {
         Object.keys(expected).forEach((key) => {
             if (key === 'data') {

@@ -25,6 +25,7 @@ export interface EnvData {
     ASSET_DIR: string;
     ASSET_MAX_SIZE_MB: number;
     ASSET_MAX_SIZE_MB_PER_FILE: number;
+    PORTRAIT_MAX_SIZE_MB: number;
 }
 
 export type EnvValueType = 'string' | 'number' | 'boolean' | 'path';
