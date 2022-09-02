@@ -6,9 +6,6 @@ import { env } from './env';
 
 const { LOG_ENABLED, LOG_DIR } = env;
 
-const isLogEnabled = LOG_ENABLED;
-const logDir = LOG_DIR;
-
 const printf = (i: Winston.Logform.TransformableInfo) => (
     `${i.timestamp} [${i.level}] ${i.message}`
 );
@@ -32,23 +29,23 @@ const transports: Winston.transport[] = [
 
 // control log file directory exists and is writable
 let fileTransportError = null;
-if (!logDir) {
+if (!LOG_DIR) {
     fileTransportError = 'no log directory provided';
 } else {
     try {
-        Fs.accessSync(logDir, Fs.constants.F_OK);
-        Fs.accessSync(logDir, Fs.constants.W_OK);
+        Fs.accessSync(LOG_DIR, Fs.constants.F_OK);
+        Fs.accessSync(LOG_DIR, Fs.constants.W_OK);
     } catch (err) {
-        fileTransportError = `log directory ${logDir} does not exist or is not writable`;
+        fileTransportError = `log directory ${LOG_DIR} does not exist or is not writable`;
     }
 }
 
-if (logDir && !fileTransportError) {
+if (LOG_DIR && !fileTransportError) {
     // log transport in file
     transports.push(
         new Winston.transports.File({
             level: 'info',
-            filename: Path.join(logDir, 'sample-express-ts.log'),
+            filename: Path.join(LOG_DIR, 'sample-express-ts.log'),
             handleExceptions: false,
             maxsize: 5242880,
             maxFiles: 5,
@@ -61,17 +58,11 @@ if (logDir && !fileTransportError) {
 }
 
 // logging instance to use in code
-// if logging is disabled return a fake log object
-const Log = isLogEnabled ? (
-    Winston.createLogger({
-        transports,
-        exitOnError: false
-    })
-) : {
-    info: () => { /* silent log */ },
-    warn: () => { /* silent log */ },
-    error: () => { /* silent log */ }
-};
+const Log = Winston.createLogger({
+    transports,
+    exitOnError: false,
+    silent: LOG_ENABLED
+});
 
 if (fileTransportError) {
     Log.warn(`Winston file transport could not be initialized (${fileTransportError})`);
