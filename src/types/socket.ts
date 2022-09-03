@@ -38,8 +38,15 @@ export interface SketchTokenData {
     id: string;
     index: number;
     color: string;
-    user: { id: number; name: string; } | null;
+    attachedData: SketchTokenAttachedData | null;
     x: number;
     y: number;
     tooltipPlacement: string;
+}
+
+export interface SketchTokenAttachedData {
+    userId: number;
+    userName: string;
+    characterId: number;
+    characterName: string;
 }

@@ -75,7 +75,7 @@
                 "id",
                 "index",
                 "color",
-                "user",
+                "attachedData",
                 "x",
                 "y"
             ],
@@ -89,19 +89,27 @@
                 "color": {
                     "type": "string"
                 },
-                "user": {
+                "attachedData": {
                     "oneOf": [{
                         "type": "object",
                         "additionalProperties": false,
                         "required": [
-                            "id",
-                            "name"
+                            "userId",
+                            "userName",
+                            "characterId",
+                            "characterName"
                         ],
                         "properties": {
-                            "id": {
+                            "userId": {
                                 "type": "number"
                             },
-                            "name": {
+                            "userName": {
+                                "type": "string"
+                            },
+                            "characterId": {
+                                "type": "number"
+                            },
+                            "characterName": {
                                 "type": "string"
                             }
                         }

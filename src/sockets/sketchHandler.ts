@@ -64,7 +64,7 @@ const sketchHandler = (_io: Server, socket: Socket) => {
                 isMaster,
                 sketch
             });
-        } catch (err) {
+        } catch (err: any) {
             socket.emit('error', err);
         }
     });
