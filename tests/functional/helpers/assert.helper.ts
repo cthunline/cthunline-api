@@ -133,12 +133,16 @@ export const assertSketchToken = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('color');
     expect(data.color).to.be.a('string');
-    expect(data).to.have.property('user');
-    if (data.user) {
-        expect(data.user).to.have.property('id');
-        expect(data.user.id).to.be.a('number');
-        expect(data.user).to.have.property('name');
-        expect(data.user.name).to.be.a('string');
+    expect(data).to.have.property('attachedData');
+    if (data.attachedData) {
+        expect(data.attachedData).to.have.property('userId');
+        expect(data.attachedData.userId).to.be.a('number');
+        expect(data.attachedData).to.have.property('userName');
+        expect(data.attachedData.userName).to.be.a('string');
+        expect(data.attachedData).to.have.property('characterId');
+        expect(data.attachedData.characterId).to.be.a('number');
+        expect(data.attachedData).to.have.property('characterName');
+        expect(data.attachedData.characterName).to.be.a('string');
     }
     expect(data).to.have.property('x');
     expect(data.x).to.be.a('number');
