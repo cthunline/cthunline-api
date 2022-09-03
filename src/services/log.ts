@@ -61,7 +61,7 @@ if (LOG_DIR && !fileTransportError) {
 const Log = Winston.createLogger({
     transports,
     exitOnError: false,
-    silent: LOG_ENABLED
+    silent: !LOG_ENABLED
 });
 
 if (fileTransportError) {
