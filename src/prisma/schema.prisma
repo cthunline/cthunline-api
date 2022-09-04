@@ -37,7 +37,7 @@ model Invitation {
     isUsed Boolean
 
     @@unique(code)
-    @@map("invitation")
+    @@map("invitations")
 }
 
 model Asset {
