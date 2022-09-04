@@ -1,13 +1,21 @@
 import Chai, { expect } from 'chai';
+import DayJs from 'dayjs';
 import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
 
 import { locales } from '../../../src/types/env';
 
 Chai.use(DeepEqualInAnyOrder);
-
-const ChaiDateString = require('chai-date-string');
-
-ChaiDateString(Chai);
+Chai.use((chai: Chai.ChaiStatic) => {
+    chai.Assertion.addMethod('dateString', function assertDateString() {
+        const obj = this._obj; // eslint-disable-line no-underscore-dangle
+        this.assert(
+            DayJs(obj).isValid(),
+            'expected #{this} to be a date-time string',
+            'expected #{this} to not be a date-time string',
+            obj
+        );
+    });
+});
 
 declare global {
     export namespace Chai {
@@ -277,4 +285,9 @@ export const assertError = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('error');
     expect(data.error).to.be.a('string');
+};
+
+export const assertSocketMeta = (data: Record<string, any>) => {
+    expect(data).to.have.property('dateTime');
+    expect(data.dateTime).to.be.a.dateString();
 };

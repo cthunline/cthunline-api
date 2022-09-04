@@ -1,6 +1,7 @@
 import { Socket, Server } from 'socket.io';
 
 import { Prisma } from '../services/prisma';
+import { meta } from './helper';
 
 const characterHandler = (io: Server, socket: Socket) => {
     // notify game master when any character is updated during game
@@ -24,14 +25,14 @@ const characterHandler = (io: Server, socket: Socket) => {
                 data.isMaster
             ));
             if (masterSocket) {
-                masterSocket.emit('characterUpdate', {
+                masterSocket.emit('characterUpdate', meta({
                     user,
                     isMaster,
                     character
-                });
+                }));
             }
         } catch (err) {
-            socket.emit('error', err);
+            socket.emit('error', meta(err));
         }
     });
 };

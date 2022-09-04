@@ -13,6 +13,7 @@ import {
     cacheSave,
     cacheSet
 } from '../services/cache';
+import { meta } from './helper';
 
 import { definitions } from '../controllers/schemas/definitions.json';
 
@@ -59,13 +60,13 @@ const sketchHandler = (_io: Server, socket: Socket) => {
             cacheSet(cacheId, () => sketch);
             const saver = sketchCacheSaver(sessionId);
             cacheSave(cacheId, saver, 1000);
-            socket.to(String(sessionId)).emit('sketchUpdate', {
+            socket.to(String(sessionId)).emit('sketchUpdate', meta({
                 user,
                 isMaster,
                 sketch
-            });
+            }));
         } catch (err: any) {
-            socket.emit('error', err);
+            socket.emit('error', meta(err));
         }
     });
 
@@ -89,13 +90,13 @@ const sketchHandler = (_io: Server, socket: Socket) => {
             }));
             const saver = sketchCacheSaver(sessionId);
             cacheSave(cacheId, saver, 1000);
-            socket.to(String(sessionId)).emit('sketchUpdate', {
+            socket.to(String(sessionId)).emit('sketchUpdate', meta({
                 user,
                 isMaster,
                 sketch
-            });
+            }));
         } catch (err) {
-            socket.emit('error', err);
+            socket.emit('error', meta(err));
         }
     });
 };

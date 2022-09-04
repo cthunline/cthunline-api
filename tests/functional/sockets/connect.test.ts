@@ -7,7 +7,11 @@ import Data, {
     usersData
 } from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
-import { assertUser, assertCharacter } from '../helpers/assert.helper';
+import {
+    assertUser,
+    assertCharacter,
+    assertSocketMeta
+} from '../helpers/assert.helper';
 
 describe('[Sockets] Connection', () => {
     before(async () => {
@@ -161,10 +165,12 @@ describe('[Sockets] Connection', () => {
             masterAuthUser.id === masterId
         ))?.id;
         const assertData = (
-            { user, isMaster, users }: Record<string, any>,
+            data: Record<string, any>,
             expectedIsMaster: boolean,
             expectedUsersLength: number
         ) => {
+            const { user, isMaster, users } = data;
+            assertSocketMeta(data);
             assertUser(user);
             expect(isMaster).to.equal(expectedIsMaster);
             expect(users).have.lengthOf(expectedUsersLength);

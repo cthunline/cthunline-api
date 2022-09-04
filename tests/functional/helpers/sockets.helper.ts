@@ -7,6 +7,7 @@ import Client, {
 import CookieSignature from 'cookie-signature';
 
 import Api from './api.helper';
+import { assertSocketMeta } from './assert.helper';
 import {
     sessionsData,
     charactersData,
@@ -175,8 +176,9 @@ const Sockets: SocketsHelper = {
                     socket.disconnect();
                     reject(new Error(`Should have thrown a ${expectedStatus} error`));
                 });
-                socket.on('error', ({ status }: any) => {
-                    expect(status).to.equal(expectedStatus);
+                socket.on('error', (errorData: any) => {
+                    assertSocketMeta(errorData);
+                    expect(errorData.status).to.equal(expectedStatus);
                     socket.disconnect();
                     resolve();
                 });

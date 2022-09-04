@@ -10,6 +10,7 @@ import {
     SocketDiceRequest,
     SocketDiceResult
 } from '../types/socket';
+import { meta } from './helper';
 
 import diceSchemas from './schemas/dice.json';
 
@@ -56,10 +57,12 @@ const diceHandler = (io: Server, socket: Socket) => {
             const { user, isMaster, sessionId } = socket.data;
             io.sockets.to(String(sessionId)).emit(
                 'diceResult',
-                getDiceResult(user, isMaster, request)
+                meta(
+                    getDiceResult(user, isMaster, request)
+                )
             );
         } catch (err) {
-            socket.emit('error', err);
+            socket.emit('error', meta(err));
         }
     });
 
@@ -74,10 +77,12 @@ const diceHandler = (io: Server, socket: Socket) => {
             }
             socket.emit(
                 'diceResult',
-                getDiceResult(user, isMaster, request, true)
+                meta(
+                    getDiceResult(user, isMaster, request, true)
+                )
             );
         } catch (err) {
-            socket.emit('error', err);
+            socket.emit('error', meta(err));
         }
     });
 };

@@ -4,6 +4,7 @@ import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { SocketAudioPlay } from '../types/socket';
 import { ForbiddenError, ValidationError } from '../services/errors';
+import { meta } from './helper';
 
 import audioSchemas from './schemas/audio.json';
 
@@ -34,14 +35,14 @@ const audioHandler = (_io: Server, socket: Socket) => {
             if (asset.type !== 'audio') {
                 throw new ValidationError('Asset type is not audio');
             }
-            socket.to(String(sessionId)).emit('audioPlay', {
+            socket.to(String(sessionId)).emit('audioPlay', meta({
                 user,
                 isMaster,
                 asset,
                 time
-            });
+            }));
         } catch (err) {
-            socket.emit('error', err);
+            socket.emit('error', meta(err));
         }
     });
 
@@ -56,12 +57,12 @@ const audioHandler = (_io: Server, socket: Socket) => {
             if (!isMaster) {
                 throw new ForbiddenError();
             }
-            socket.to(String(sessionId)).emit('audioStop', {
+            socket.to(String(sessionId)).emit('audioStop', meta({
                 user,
                 isMaster
-            });
+            }));
         } catch (err) {
-            socket.emit('error', err);
+            socket.emit('error', meta(err));
         }
     });
 };

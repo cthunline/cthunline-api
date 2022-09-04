@@ -3,7 +3,11 @@ import { expect } from 'chai';
 import Data, { assetsData } from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 
-import { assertUser, assertAsset } from '../helpers/assert.helper';
+import {
+    assertUser,
+    assertAsset,
+    assertSocketMeta
+} from '../helpers/assert.helper';
 
 const audioAsset = assetsData.find(({ type }) => (
     type === 'audio'
@@ -59,11 +63,13 @@ describe('[Sockets] Audio', () => {
             await Promise.all([
                 ...[player1Socket, player2Socket].map((socket) => (
                     new Promise<void>((resolve, reject) => {
-                        socket.on(event, ({
-                            user,
-                            isMaster,
-                            asset
-                        }: any) => {
+                        socket.on(event, (data: any) => {
+                            const {
+                                user,
+                                isMaster,
+                                asset
+                            } = data;
+                            assertSocketMeta(data);
                             assertUser(user);
                             expect(isMaster).to.be.true;
                             if (event === 'audioPlay') {

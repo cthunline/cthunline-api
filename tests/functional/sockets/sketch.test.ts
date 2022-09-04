@@ -3,7 +3,11 @@ import { expect } from 'chai';
 import Data, { sessionsData } from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 
-import { assertUser, assertSketch } from '../helpers/assert.helper';
+import {
+    assertUser,
+    assertSketch,
+    assertSocketMeta
+} from '../helpers/assert.helper';
 
 const sketchData = sessionsData[0].sketch;
 const tokenData = sessionsData[0].sketch.tokens[0];
@@ -67,11 +71,13 @@ describe('[Sockets] Sketch', () => {
         await Promise.all([
             ...[player1Socket, player2Socket].map((socket) => (
                 new Promise<void>((resolve, reject) => {
-                    socket.on('sketchUpdate', ({
-                        user,
-                        isMaster,
-                        sketch
-                    }: any) => {
+                    socket.on('sketchUpdate', (data: any) => {
+                        const {
+                            user,
+                            isMaster,
+                            sketch
+                        } = data;
+                        assertSocketMeta(data);
                         assertUser(user);
                         expect(isMaster).to.be.true;
                         assertSketch(sketch, sketchData);
@@ -113,11 +119,13 @@ describe('[Sockets] Sketch', () => {
         await Promise.all([
             ...[masterSocket, player1Socket].map((socket) => (
                 new Promise<void>((resolve, reject) => {
-                    socket.on('sketchUpdate', ({
-                        user,
-                        isMaster,
-                        sketch
-                    }: any) => {
+                    socket.on('sketchUpdate', (data: any) => {
+                        const {
+                            user,
+                            isMaster,
+                            sketch
+                        } = data;
+                        assertSocketMeta(data);
                         assertUser(user);
                         expect(isMaster).to.be.false;
                         assertSketch(sketch, sketchData);

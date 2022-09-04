@@ -3,7 +3,11 @@ import { expect } from 'chai';
 import Data from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
 
-import { assertUser, assertCharacter } from '../helpers/assert.helper';
+import {
+    assertUser,
+    assertCharacter,
+    assertSocketMeta
+} from '../helpers/assert.helper';
 
 describe('[Sockets] Character', () => {
     before(async () => {
@@ -17,11 +21,13 @@ describe('[Sockets] Character', () => {
         ] = await Sockets.setupSession();
         await Promise.all([
             new Promise<void>((resolve, reject) => {
-                masterSocket.on('characterUpdate', ({
-                    user,
-                    isMaster,
-                    character
-                }: any) => {
+                masterSocket.on('characterUpdate', (data: any) => {
+                    const {
+                        user,
+                        isMaster,
+                        character
+                    } = data;
+                    assertSocketMeta(data);
                     assertUser(user);
                     expect(isMaster).to.be.false;
                     assertCharacter(character);

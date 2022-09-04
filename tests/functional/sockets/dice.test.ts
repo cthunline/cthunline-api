@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import Data from '../helpers/data.helper';
 import Sockets from '../helpers/sockets.helper';
-import { assertUser } from '../helpers/assert.helper';
+import { assertSocketMeta, assertUser } from '../helpers/assert.helper';
 
 describe('[Sockets] Dice', () => {
     before(async () => {
@@ -50,13 +50,15 @@ describe('[Sockets] Dice', () => {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
                 const socket = await Sockets.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', ({
-                        user,
-                        isMaster,
-                        request,
-                        isPrivate,
-                        result
-                    }: any) => {
+                    socket.on('diceResult', (resultData: any) => {
+                        const {
+                            user,
+                            isMaster,
+                            request,
+                            isPrivate,
+                            result
+                        } = resultData;
+                        assertSocketMeta(resultData);
                         assertUser(user);
                         expect(isMaster).to.be.true;
                         expect(request).to.deep.equal(data);
@@ -87,13 +89,15 @@ describe('[Sockets] Dice', () => {
         await Promise.all([
             ...[masterSocket, player1Socket, player2Socket].map((socket) => (
                 new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', ({
-                        user,
-                        isMaster,
-                        request,
-                        isPrivate,
-                        result
-                    }: any) => {
+                    socket.on('diceResult', (resultData: any) => {
+                        const {
+                            user,
+                            isMaster,
+                            request,
+                            isPrivate,
+                            result
+                        } = resultData;
+                        assertSocketMeta(resultData);
                         assertUser(user);
                         expect(isMaster).to.be.false;
                         expect(request).to.deep.equal(diceRequest);
