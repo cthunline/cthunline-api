@@ -48,31 +48,19 @@ const Data = {
     },
 
     async insertAll() {
-        await Promise.all(usersData.map((data) => (
-            Prisma.user.create({ data })
-        )));
+        await Prisma.user.createMany({ data: usersData });
         // must not be inserted simultaneously because of relation id constraint
         for (const data of directoriesData) {
             await Prisma.directory.create({ data });
         }
         await Promise.all([
-            ...assetsData.map((data) => (
-                Prisma.asset.create({ data })
-            )),
+            Prisma.asset.createMany({ data: assetsData }),
             Data.copyAssetFiles()
         ]);
-        await Promise.all(sessionsData.map((data) => (
-            Prisma.session.create({ data })
-        )));
-        await Promise.all(sketchsData.map((data) => (
-            Prisma.sketch.create({ data })
-        )));
-        await Promise.all(notesData.map((data) => (
-            Prisma.note.create({ data })
-        )));
-        await Promise.all(charactersData.map((data) => (
-            Prisma.character.create({ data })
-        )));
+        await Prisma.session.createMany({ data: sessionsData });
+        await Prisma.sketch.createMany({ data: sketchsData });
+        await Prisma.note.createMany({ data: notesData });
+        await Prisma.character.createMany({ data: charactersData });
     },
 
     async copyAssetFiles() {
