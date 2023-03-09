@@ -21,32 +21,42 @@ describe('[Sockets] Sketch', () => {
         await Sockets.testError(
             'sketchUpdate',
             'sketchUpdate',
-            [{}, undefined, {
-                dislayed: true,
-                paths: [],
-                images: [],
-                invalidKey: 'value'
-            }, {
-                dislayed: 'invalidValue',
-                paths: [],
-                images: []
-            }, {
-                dislayed: true,
-                paths: 'invalidValue',
-                images: []
-            }, {
-                dislayed: false,
-                paths: [],
-                images: 'invalidValue'
-            }, {
-                dislayed: false,
-                images: []
-            }, {
-                dislayed: false,
-                paths: []
-            }, {
-                dislayed: false
-            }],
+            [
+                {},
+                undefined,
+                {
+                    dislayed: true,
+                    paths: [],
+                    images: [],
+                    invalidKey: 'value'
+                },
+                {
+                    dislayed: 'invalidValue',
+                    paths: [],
+                    images: []
+                },
+                {
+                    dislayed: true,
+                    paths: 'invalidValue',
+                    images: []
+                },
+                {
+                    dislayed: false,
+                    paths: [],
+                    images: 'invalidValue'
+                },
+                {
+                    dislayed: false,
+                    images: []
+                },
+                {
+                    dislayed: false,
+                    paths: []
+                },
+                {
+                    dislayed: false
+                }
+            ],
             400,
             true
         );
@@ -63,33 +73,27 @@ describe('[Sockets] Sketch', () => {
     });
 
     it('Should update sketch', async () => {
-        const [
-            masterSocket,
-            player1Socket,
-            player2Socket
-        ] = await Sockets.setupSession();
+        const [masterSocket, player1Socket, player2Socket] =
+            await Sockets.setupSession();
         await Promise.all([
-            ...[player1Socket, player2Socket].map((socket) => (
-                new Promise<void>((resolve, reject) => {
-                    socket.on('sketchUpdate', (data: any) => {
-                        const {
-                            user,
-                            isMaster,
-                            sketch
-                        } = data;
-                        assertSocketMeta(data);
-                        assertUser(user);
-                        expect(isMaster).to.be.true;
-                        assertSketch(sketch, sketchData);
-                        socket.disconnect();
-                        resolve();
-                    });
-                    socket.on('error', (err: any) => {
-                        socket.disconnect();
-                        reject(err);
-                    });
-                })
-            )),
+            ...[player1Socket, player2Socket].map(
+                (socket) =>
+                    new Promise<void>((resolve, reject) => {
+                        socket.on('sketchUpdate', (data: any) => {
+                            const { user, isMaster, sketch } = data;
+                            assertSocketMeta(data);
+                            assertUser(user);
+                            expect(isMaster).to.be.true;
+                            assertSketch(sketch, sketchData);
+                            socket.disconnect();
+                            resolve();
+                        });
+                        socket.on('error', (err: any) => {
+                            socket.disconnect();
+                            reject(err);
+                        });
+                    })
+            ),
             (async () => {
                 masterSocket.emit('sketchUpdate', sketchData);
             })()
@@ -100,44 +104,42 @@ describe('[Sockets] Sketch', () => {
         await Sockets.testError(
             'tokenUpdate',
             'tokenUpdate',
-            [{}, undefined, {
-                id: 1,
-                index: 0,
-                color: 'test'
-            }],
+            [
+                {},
+                undefined,
+                {
+                    id: 1,
+                    index: 0,
+                    color: 'test'
+                }
+            ],
             400,
             true
         );
     });
 
     it('Should update sketch token', async () => {
-        const [
-            masterSocket,
-            player1Socket,
-            player2Socket
-        ] = await Sockets.setupSession();
+        const [masterSocket, player1Socket, player2Socket] =
+            await Sockets.setupSession();
         await Promise.all([
-            ...[masterSocket, player1Socket].map((socket) => (
-                new Promise<void>((resolve, reject) => {
-                    socket.on('sketchUpdate', (data: any) => {
-                        const {
-                            user,
-                            isMaster,
-                            sketch
-                        } = data;
-                        assertSocketMeta(data);
-                        assertUser(user);
-                        expect(isMaster).to.be.false;
-                        assertSketch(sketch, sketchData);
-                        socket.disconnect();
-                        resolve();
-                    });
-                    socket.on('error', (err: any) => {
-                        socket.disconnect();
-                        reject(err);
-                    });
-                })
-            )),
+            ...[masterSocket, player1Socket].map(
+                (socket) =>
+                    new Promise<void>((resolve, reject) => {
+                        socket.on('sketchUpdate', (data: any) => {
+                            const { user, isMaster, sketch } = data;
+                            assertSocketMeta(data);
+                            assertUser(user);
+                            expect(isMaster).to.be.false;
+                            assertSketch(sketch, sketchData);
+                            socket.disconnect();
+                            resolve();
+                        });
+                        socket.on('error', (err: any) => {
+                            socket.disconnect();
+                            reject(err);
+                        });
+                    })
+            ),
             (async () => {
                 player2Socket.emit('tokenUpdate', tokenData);
             })()

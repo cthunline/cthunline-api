@@ -2,11 +2,7 @@
     "create": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "gameId",
-            "name",
-            "data"
-        ],
+        "required": ["gameId", "name", "data"],
         "properties": {
             "gameId": {
                 "type": "string"
@@ -37,9 +33,7 @@
     "uploadPortrait": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "portrait"
-        ],
+        "required": ["portrait"],
         "properties": {
             "portrait": {}
         }

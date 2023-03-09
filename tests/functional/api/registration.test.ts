@@ -27,7 +27,9 @@ const generateInvitation = async () => {
     });
     expect(response).to.have.status(200);
     expect(response).to.be.json;
-    const { body: { code } } = response;
+    const {
+        body: { code }
+    } = response;
     expect(code).to.be.a('string');
     expect(code).to.have.lengthOf(16);
     return code;
@@ -43,39 +45,48 @@ describe('[API] Registration', () => {
             await Api.login();
             await Api.logout();
             setEnvMock('REGISTRATION_ENABLED', false);
-            await Api.testError({
-                method: 'POST',
-                route: '/register',
-                body: {
-                    name: 'Test',
-                    email: 'ttt@test.com',
-                    password: 'abc123'
-                }
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: '/register',
+                    body: {
+                        name: 'Test',
+                        email: 'ttt@test.com',
+                        password: 'abc123'
+                    }
+                },
+                403
+            );
         });
         it('Should throw a forbidden error because invitation code is invalid', async () => {
             await Api.login();
             await Api.logout();
             setEnvMock('REGISTRATION_ENABLED', true);
             setEnvMock('INVITATION_ENABLED', true);
-            const registerData = [{
-                name: 'Test',
-                email: 'ttt@test.com',
-                password: 'abc123'
-            }, {
-                name: 'Test',
-                email: 'ttt@test.com',
-                password: 'abc123',
-                invitationCode: 'invalidCode'
-            }];
+            const registerData = [
+                {
+                    name: 'Test',
+                    email: 'ttt@test.com',
+                    password: 'abc123'
+                },
+                {
+                    name: 'Test',
+                    email: 'ttt@test.com',
+                    password: 'abc123',
+                    invitationCode: 'invalidCode'
+                }
+            ];
             await Promise.all(
-                registerData.map((data) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: '/register',
-                        body: data
-                    }, 403)
-                ))
+                registerData.map((data) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: '/register',
+                            body: data
+                        },
+                        403
+                    )
+                )
             );
         });
         it('Should throw a forbidden error because invitation code is already used', async () => {
@@ -90,16 +101,19 @@ describe('[API] Registration', () => {
                 password: 'abc123',
                 invitationCode: code
             });
-            await Api.testError({
-                method: 'POST',
-                route: '/register',
-                body: {
-                    name: 'Test',
-                    email: 'sss@test.com',
-                    password: 'abc123',
-                    invitationCode: code
-                }
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: '/register',
+                    body: {
+                        name: 'Test',
+                        email: 'sss@test.com',
+                        password: 'abc123',
+                        invitationCode: code
+                    }
+                },
+                403
+            );
         });
         it('Should throw a forbidden error because invitation code is expired', async () => {
             await Api.login();
@@ -109,16 +123,19 @@ describe('[API] Registration', () => {
             await Api.logout();
             setEnvMock('REGISTRATION_ENABLED', true);
             setEnvMock('INVITATION_ENABLED', true);
-            await Api.testError({
-                method: 'POST',
-                route: '/register',
-                body: {
-                    name: 'Test',
-                    email: 'uuu@test.com',
-                    password: 'abc123',
-                    invitationCode: code
-                }
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: '/register',
+                    body: {
+                        name: 'Test',
+                        email: 'uuu@test.com',
+                        password: 'abc123',
+                        invitationCode: code
+                    }
+                },
+                403
+            );
         });
         it('Should register a user', async () => {
             await Api.login();
@@ -151,16 +168,22 @@ describe('[API] Registration', () => {
             await Api.login();
             setEnvMock('REGISTRATION_ENABLED', false);
             setEnvMock('INVITATION_ENABLED', true);
-            await Api.testError({
-                method: 'POST',
-                route: '/invitation'
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: '/invitation'
+                },
+                403
+            );
             setEnvMock('REGISTRATION_ENABLED', true);
             setEnvMock('INVITATION_ENABLED', false);
-            await Api.testError({
-                method: 'POST',
-                route: '/invitation'
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: '/invitation'
+                },
+                403
+            );
         });
         it('Should generate an invitation code', async () => {
             await Api.login();

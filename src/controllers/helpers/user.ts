@@ -32,23 +32,22 @@ export const userSelect = {
 
 // check a user exists and return it
 // returned user data will not contain password
-export const getUser = async (userId: number): Promise<UserSelect> => (
+export const getUser = async (userId: number): Promise<UserSelect> =>
     Prisma.user.findUniqueOrThrow({
         select: userSelect,
         where: {
             id: userId
         }
-    })
-);
+    });
 
 // throws forbidden error if any of the admin fields exists in the user edit body
 export const controlAdminFields = (body: object) => {
     const adminFields = ['isAdmin', 'isEnabled'];
-    for (const field of adminFields) {
+    adminFields.forEach((field) => {
         if (Object.hasOwn(body, field)) {
             throw new ForbiddenError();
         }
-    }
+    });
 };
 
 // check user email is unique

@@ -54,11 +54,7 @@ export const assertUser = (
     expect(data.isAdmin).to.be.a('boolean');
     expect(data).to.not.have.property('password');
     if (expected) {
-        const {
-            password,
-            oldPassword,
-            ...expectedWithoutPassword
-        } = expected;
+        const { password, oldPassword, ...expectedWithoutPassword } = expected;
         compareDataWithExpected(data, expectedWithoutPassword);
     }
 };
@@ -79,9 +75,9 @@ export const assertAsset = (
     expect(data).to.have.property('userId');
     expect(data.userId).to.be.a('number');
     if (data.directoryId) {
-        expect(data.directoryId).to.satisfy((id: any) => (
-            id === null || typeof id === 'number'
-        ));
+        expect(data.directoryId).to.satisfy(
+            (id: any) => id === null || typeof id === 'number'
+        );
     }
     if (expected) {
         compareDataWithExpected(data, expected);
@@ -100,9 +96,9 @@ export const assertDirectory = (
     expect(data).to.have.property('userId');
     expect(data.userId).to.be.a('number');
     if (data.parentId) {
-        expect(data.parentId).to.satisfy((id: any) => (
-            id === null || typeof id === 'number'
-        ));
+        expect(data.parentId).to.satisfy(
+            (id: any) => id === null || typeof id === 'number'
+        );
     }
     if (expected) {
         compareDataWithExpected(data, expected);

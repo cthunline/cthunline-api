@@ -8,11 +8,7 @@ import CookieSignature from 'cookie-signature';
 
 import Api from './api.helper';
 import { assertSocketMeta } from './assert.helper';
-import {
-    sessionsData,
-    charactersData,
-    usersData
-} from './data.helper';
+import { sessionsData, charactersData, usersData } from './data.helper';
 
 interface SocketsHelper {
     url: string;
@@ -93,12 +89,12 @@ const Sockets: SocketsHelper = {
 
     connectRole: async (isMaster: boolean) => {
         const { id, token } = await Api.login();
-        const sessionId = sessionsData.find(({ masterId }) => (
+        const sessionId = sessionsData.find(({ masterId }) =>
             isMaster ? id === masterId : id !== masterId
-        ))?.id;
-        const characterId = charactersData.find((char) => (
-            char.userId === Api.userId
-        ))?.id;
+        )?.id;
+        const characterId = charactersData.find(
+            (char) => char.userId === Api.userId
+        )?.id;
         return Sockets.connect({
             token,
             sessionId,
@@ -110,7 +106,7 @@ const Sockets: SocketsHelper = {
         token,
         query,
         status
-    }: FailSocketConnectionData): Promise<void> => (
+    }: FailSocketConnectionData): Promise<void> =>
         new Promise((resolve, reject) => {
             const socket = Sockets.getSocketClient({
                 token,
@@ -124,40 +120,40 @@ const Sockets: SocketsHelper = {
                 expect(err.data.status).to.equal(status);
                 resolve();
             });
-        })
-    ),
+        }),
 
     // setup a session with a game master and 2 players
     // returns array with master socket, player1 socker and player2 socket
     setupSession: async (): Promise<Socket[]> => {
-        const [masterEmail, player1Email, player2Email] = usersData.map(({ email }) => email);
-        const [masterTokenUser, player1TokenUser, player2TokenUser] = (
+        const [masterEmail, player1Email, player2Email] = usersData.map(
+            ({ email }) => email
+        );
+        const [masterTokenUser, player1TokenUser, player2TokenUser] =
             await Promise.all(
-                [masterEmail, player1Email, player2Email].map((email) => (
+                [masterEmail, player1Email, player2Email].map((email) =>
                     Api.login({
                         email,
                         password: 'test'
                     })
-                ))
-            )
-        );
-        const sessionId = sessionsData.find(({ masterId }) => (
-            masterTokenUser.id === masterId
-        ))?.id;
+                )
+            );
+        const sessionId = sessionsData.find(
+            ({ masterId }) => masterTokenUser.id === masterId
+        )?.id;
         return Promise.all([
             Sockets.connect({
                 token: masterTokenUser.token,
                 sessionId
             }),
-            ...[player1TokenUser, player2TokenUser].map(({ id, token }) => (
+            ...[player1TokenUser, player2TokenUser].map(({ id, token }) =>
                 Sockets.connect({
                     token,
                     sessionId,
-                    characterId: charactersData.find((character) => (
-                        character.userId === id
-                    ))?.id
+                    characterId: charactersData.find(
+                        (character) => character.userId === id
+                    )?.id
                 })
-            ))
+            )
         ]);
     },
 
@@ -174,7 +170,11 @@ const Sockets: SocketsHelper = {
             await new Promise<void>((resolve, reject) => {
                 socket.on(onEvent, () => {
                     socket.disconnect();
-                    reject(new Error(`Should have thrown a ${expectedStatus} error`));
+                    reject(
+                        new Error(
+                            `Should have thrown a ${expectedStatus} error`
+                        )
+                    );
                 });
                 socket.on('error', (errorData: any) => {
                     assertSocketMeta(errorData);

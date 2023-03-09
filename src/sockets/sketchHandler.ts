@@ -4,15 +4,8 @@ import { Socket, Server } from 'socket.io';
 import { Prisma } from '../services/prisma';
 import Validator from '../services/validator';
 import { ForbiddenError } from '../services/errors';
-import {
-    SketchData,
-    SketchTokenData
-} from '../types/socket';
-import {
-    cacheGet,
-    cacheSave,
-    cacheSet
-} from '../services/cache';
+import { SketchData, SketchTokenData } from '../types/socket';
+import { cacheGet, cacheSave, cacheSet } from '../services/cache';
 import { meta } from './helper';
 
 import { definitions } from '../controllers/schemas/definitions.json';
@@ -28,18 +21,15 @@ const validateSketchToken = Validator({
     definitions
 });
 
-const sketchCacheSaver = (sessionId: number) => (
-    (data: SketchData) => (
-        Prisma.session.update({
-            where: {
-                id: sessionId
-            },
-            data: {
-                sketch: data as unknown as JsonObject
-            }
-        })
-    )
-);
+const sketchCacheSaver = (sessionId: number) => (data: SketchData) =>
+    Prisma.session.update({
+        where: {
+            id: sessionId
+        },
+        data: {
+            sketch: data as unknown as JsonObject
+        }
+    });
 
 const sketchHandler = (_io: Server, socket: Socket) => {
     // updates sketch data (for game master only)
@@ -47,11 +37,7 @@ const sketchHandler = (_io: Server, socket: Socket) => {
     socket.on('sketchUpdate', async (sketch: SketchData) => {
         try {
             validateSketchUpdate(sketch);
-            const {
-                user,
-                sessionId,
-                isMaster
-            } = socket.data;
+            const { user, sessionId, isMaster } = socket.data;
             if (!isMaster) {
                 throw new ForbiddenError();
             }
@@ -60,11 +46,14 @@ const sketchHandler = (_io: Server, socket: Socket) => {
             cacheSet(cacheId, () => sketch);
             const saver = sketchCacheSaver(sessionId);
             cacheSave(cacheId, saver, 1000);
-            socket.to(String(sessionId)).emit('sketchUpdate', meta({
-                user,
-                isMaster,
-                sketch
-            }));
+            socket.to(String(sessionId)).emit(
+                'sketchUpdate',
+                meta({
+                    user,
+                    isMaster,
+                    sketch
+                })
+            );
         } catch (err: any) {
             socket.emit('error', meta(err));
         }
@@ -75,26 +64,25 @@ const sketchHandler = (_io: Server, socket: Socket) => {
     socket.on('tokenUpdate', async (token: SketchTokenData) => {
         try {
             validateSketchToken(token);
-            const {
-                user,
-                sessionId,
-                isMaster
-            } = socket.data;
+            const { user, sessionId, isMaster } = socket.data;
             const cacheId = `sketch-${sessionId}`;
             cacheGet(cacheId, true);
             const sketch = cacheSet(cacheId, (previous) => ({
                 ...previous,
-                tokens: previous.tokens.map((tok: SketchTokenData) => (
+                tokens: previous.tokens.map((tok: SketchTokenData) =>
                     tok.id === token.id ? token : tok
-                ))
+                )
             }));
             const saver = sketchCacheSaver(sessionId);
             cacheSave(cacheId, saver, 1000);
-            socket.to(String(sessionId)).emit('sketchUpdate', meta({
-                user,
-                isMaster,
-                sketch
-            }));
+            socket.to(String(sessionId)).emit(
+                'sketchUpdate',
+                meta({
+                    user,
+                    isMaster,
+                    sketch
+                })
+            );
         } catch (err) {
             socket.emit('error', meta(err));
         }

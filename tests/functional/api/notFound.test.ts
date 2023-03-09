@@ -5,12 +5,7 @@ import { assertError } from '../helpers/assert.helper';
 
 describe('[API] Global', () => {
     describe('Invalid route should throw not found error', async () => {
-        const methods: HttpMethod[] = [
-            'GET',
-            'POST',
-            'PUT',
-            'DELETE'
-        ];
+        const methods: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
         const invalidRoutes = [
             '/12345',
             '/azeqsd',
@@ -18,17 +13,21 @@ describe('[API] Global', () => {
             '/321-654-987'
         ];
         await Promise.all(
-            methods.map((method) => (
-                invalidRoutes.map((route) => (async () => {
-                    const response = await Api.request({
-                        method,
-                        route
-                    });
-                    expect(response).to.have.status(404);
-                    expect(response).to.be.json;
-                    assertError(response.body);
-                })())
-            )).flat()
+            methods
+                .map((method) =>
+                    invalidRoutes.map((route) =>
+                        (async () => {
+                            const response = await Api.request({
+                                method,
+                                route
+                            });
+                            expect(response).to.have.status(404);
+                            expect(response).to.be.json;
+                            assertError(response.body);
+                        })()
+                    )
+                )
+                .flat()
         );
     });
 });

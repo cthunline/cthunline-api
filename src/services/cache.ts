@@ -6,10 +6,7 @@ type CacheSaver = (data: any) => any;
 const cache: Record<string, any> = {};
 const timeouts: Record<string, ReturnType<typeof setTimeout>> = {};
 
-export const cacheGet = (
-    key: string,
-    throwNotFound: boolean = false
-): any => {
+export const cacheGet = (key: string, throwNotFound: boolean = false): any => {
     if (Object.hasOwn(cache, key)) {
         return cache[key];
     }
@@ -19,10 +16,7 @@ export const cacheGet = (
     return null;
 };
 
-export const cacheSet = (
-    key: string,
-    handler: CacheHandler
-): any => {
+export const cacheSet = (key: string, handler: CacheHandler): any => {
     cache[key] = handler(cache[key]);
     return cache[key];
 };

@@ -15,18 +15,11 @@ const audioHandler = (_io: Server, socket: Socket) => {
     socket.on('audioPlay', async (request: SocketAudioPlay) => {
         try {
             validatePlay(request);
-            const {
-                user,
-                sessionId,
-                isMaster
-            } = socket.data;
+            const { user, sessionId, isMaster } = socket.data;
             if (!isMaster) {
                 throw new ForbiddenError();
             }
-            const {
-                assetId,
-                time
-            } = request;
+            const { assetId, time } = request;
             const asset = await Prisma.asset.findUniqueOrThrow({
                 where: {
                     id: Number(assetId)
@@ -35,12 +28,15 @@ const audioHandler = (_io: Server, socket: Socket) => {
             if (asset.type !== 'audio') {
                 throw new ValidationError('Asset type is not audio');
             }
-            socket.to(String(sessionId)).emit('audioPlay', meta({
-                user,
-                isMaster,
-                asset,
-                time
-            }));
+            socket.to(String(sessionId)).emit(
+                'audioPlay',
+                meta({
+                    user,
+                    isMaster,
+                    asset,
+                    time
+                })
+            );
         } catch (err) {
             socket.emit('error', meta(err));
         }
@@ -49,18 +45,17 @@ const audioHandler = (_io: Server, socket: Socket) => {
     // notify session players that game master stopped playing audio asset
     socket.on('audioStop', async () => {
         try {
-            const {
-                user,
-                sessionId,
-                isMaster
-            } = socket.data;
+            const { user, sessionId, isMaster } = socket.data;
             if (!isMaster) {
                 throw new ForbiddenError();
             }
-            socket.to(String(sessionId)).emit('audioStop', meta({
-                user,
-                isMaster
-            }));
+            socket.to(String(sessionId)).emit(
+                'audioStop',
+                meta({
+                    user,
+                    isMaster
+                })
+            );
         } catch (err) {
             socket.emit('error', meta(err));
         }

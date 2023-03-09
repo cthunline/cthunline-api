@@ -65,9 +65,7 @@ const Data = {
 
     async copyAssetFiles() {
         await Promise.all(
-            [...new Set(
-                assets.map(({ userId }) => userId)
-            )].map((userId) => (
+            [...new Set(assets.map(({ userId }) => userId))].map((userId) =>
                 (async () => {
                     const userDir = Path.join(assetDir, userId.toString());
                     try {
@@ -76,22 +74,22 @@ const Data = {
                         await Fs.promises.mkdir(userDir);
                     }
                 })()
-            ))
+            )
         );
         await Promise.all(
-            assets.map(({ name, path }) => (
+            assets.map(({ name, path }) =>
                 Fs.promises.copyFile(
                     Path.join(__dirname, '../data/assets', name),
                     Path.join(assetDir, path)
                 )
-            ))
+            )
         );
     },
 
     async deleteAssetFiles() {
         const dbAssets = await Prisma.asset.findMany();
         await Promise.all(
-            dbAssets.map(({ path }) => (
+            dbAssets.map(({ path }) =>
                 (async () => {
                     try {
                         const filePath = Path.join(assetDir, path);
@@ -101,32 +99,31 @@ const Data = {
                         //
                     }
                 })()
-            ))
+            )
         );
         const characters = await Prisma.character.findMany();
         await Promise.all(
-            characters.map(({ portrait }) => (
+            characters.map(({ portrait }) =>
                 (async () => {
                     try {
                         if (portrait) {
                             const filePath = Path.join(assetDir, portrait);
-                            await Fs.promises.access(filePath, Fs.constants.F_OK);
+                            await Fs.promises.access(
+                                filePath,
+                                Fs.constants.F_OK
+                            );
                             await Fs.promises.rm(filePath);
                         }
                     } catch {
                         //
                     }
                 })()
-            ))
+            )
         );
     },
 
     async getAssetBuffer(assetName: string) {
-        const localPath = Path.join(
-            __dirname,
-            '../data/assets',
-            assetName
-        );
+        const localPath = Path.join(__dirname, '../data/assets', assetName);
         return Fs.promises.readFile(localPath);
     }
 };

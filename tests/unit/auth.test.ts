@@ -7,10 +7,7 @@ import {
     generateJwt,
     verifyJwt
 } from '../../src/services/crypto';
-import {
-    AuthenticationError,
-    ForbiddenError
-} from '../../src/services/errors';
+import { AuthenticationError, ForbiddenError } from '../../src/services/errors';
 import {
     controlSelf,
     controlSelfAdmin
@@ -26,10 +23,12 @@ describe('[Unit] Auth', () => {
                 'azeqsfzret'
             ];
             await Promise.all(
-                strings.map((string) => (async () => {
-                    const hash = await hashPassword(string);
-                    expect(await verifyPassword(string, hash)).to.be.true;
-                })())
+                strings.map((string) =>
+                    (async () => {
+                        const hash = await hashPassword(string);
+                        expect(await verifyPassword(string, hash)).to.be.true;
+                    })()
+                )
             );
         });
     });
@@ -41,19 +40,11 @@ describe('[Unit] Auth', () => {
                 key2: 'value2'
             };
             const jwt = generateJwt(data);
-            const {
-                exp,
-                iat,
-                ...decoded
-            } = verifyJwt<typeof data>(jwt);
+            const { exp, iat, ...decoded } = verifyJwt<typeof data>(jwt);
             expect(decoded).to.deep.equal(data);
             expect(exp).to.be.a('number');
             expect(iat).to.be.a('number');
-            expect(() => (
-                verifyJwt('invalidJwt')
-            )).to.throw(
-                AuthenticationError
-            );
+            expect(() => verifyJwt('invalidJwt')).to.throw(AuthenticationError);
         });
     });
 
@@ -61,12 +52,8 @@ describe('[Unit] Auth', () => {
         it('Should control request user match userId', async () => {
             const id = 123;
             const req = { user: { id } };
-            expect(() => (
-                controlSelf(req as Request, id)
-            )).to.not.throw();
-            expect(() => (
-                controlSelf(req as Request, 999)
-            )).to.throw(
+            expect(() => controlSelf(req as Request, id)).to.not.throw();
+            expect(() => controlSelf(req as Request, 999)).to.throw(
                 ForbiddenError
             );
         });
@@ -76,12 +63,8 @@ describe('[Unit] Auth', () => {
         it('Should control request user is an admin', async () => {
             const reqAdmin = { user: { isAdmin: true } };
             const reqNotAdmin = { user: { isAdmin: false } };
-            expect(() => (
-                controlSelfAdmin(reqAdmin as Request)
-            )).to.not.throw();
-            expect(() => (
-                controlSelfAdmin(reqNotAdmin as Request)
-            )).to.throw(
+            expect(() => controlSelfAdmin(reqAdmin as Request)).to.not.throw();
+            expect(() => controlSelfAdmin(reqNotAdmin as Request)).to.throw(
                 ForbiddenError
             );
         });

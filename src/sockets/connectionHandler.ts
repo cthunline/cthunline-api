@@ -40,7 +40,10 @@ const verifySession = async (socket: Socket): Promise<Session> => {
 };
 
 // verify character
-const verifyCharacter = async (socket: Socket, userId: number): Promise<Character> => {
+const verifyCharacter = async (
+    socket: Socket,
+    userId: number
+): Promise<Character> => {
     const characterId = Number(socket.handshake.query.characterId);
     if (!characterId) {
         throw new ValidationError('Missing characterId in handshare query');
@@ -54,7 +57,9 @@ const verifyCharacter = async (socket: Socket, userId: number): Promise<Characte
         throw new NotFoundError(`Character ${characterId} does not exist`);
     }
     if (character.userId !== userId) {
-        throw new ForbiddenError(`Character ${characterId} does not belong to user ${userId}`);
+        throw new ForbiddenError(
+            `Character ${characterId} does not belong to user ${userId}`
+        );
     }
     return character;
 };
@@ -65,10 +70,11 @@ export const connectionMiddleware = async (socket: Socket, next: Function) => {
         const user = await verifyToken(socket);
         const session = await verifySession(socket);
         const isMaster = session.masterId === user.id;
-        const character = isMaster ? null : (
-            await verifyCharacter(socket, user.id)
-        );
+        const character = isMaster
+            ? null
+            : await verifyCharacter(socket, user.id);
         // set data on socket
+        // eslint-disable-next-line no-param-reassign
         socket.data = {
             user,
             characterId: character?.id,
@@ -104,9 +110,10 @@ export const disconnectCopycats = async (io: Server, socket: Socket) => {
     const { id: socketId } = socket;
     const userId = socket.data.user.id;
     const allSockets = await io.fetchSockets();
-    const copycatSockets = allSockets.filter((otherSocket) => (
-        otherSocket.id !== socketId && otherSocket.data.user.id === userId
-    ));
+    const copycatSockets = allSockets.filter(
+        (otherSocket) =>
+            otherSocket.id !== socketId && otherSocket.data.user.id === userId
+    );
     copycatSockets.forEach((copycatSocket) => {
         copycatSocket.disconnect();
     });

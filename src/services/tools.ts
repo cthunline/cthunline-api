@@ -15,9 +15,8 @@ export const trimChar = (str: string, char: string): string => {
 };
 
 // return sum of an array of numbers
-export const sum = (numbers: number[]): number => (
-    numbers.reduce((i, j) => i + j, 0)
-);
+export const sum = (numbers: number[]): number =>
+    numbers.reduce((i, j) => i + j, 0);
 
 /**
 Check if a number is an integer. The input can be a string or a number.

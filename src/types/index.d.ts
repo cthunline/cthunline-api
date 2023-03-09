@@ -3,6 +3,6 @@ declare namespace Express {
         user: UserSelect;
     }
     interface Response {
-        error: (err: Error) => void
+        error: (err: Error) => void;
     }
 }

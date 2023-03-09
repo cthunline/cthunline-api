@@ -16,9 +16,6 @@ export default (schema: Record<string, any>) => {
         if (valid) {
             return true;
         }
-        throw new ValidationError(
-            'Invalid data',
-            validate.errors
-        );
+        throw new ValidationError('Invalid data', validate.errors);
     };
 };

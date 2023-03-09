@@ -2,11 +2,7 @@
     "create": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "name",
-            "email",
-            "password"
-        ],
+        "required": ["name", "email", "password"],
         "properties": {
             "name": {
                 "type": "string"
@@ -66,11 +62,7 @@
     "register": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "name",
-            "email",
-            "password"
-        ],
+        "required": ["name", "email", "password"],
         "properties": {
             "name": {
                 "type": "string"

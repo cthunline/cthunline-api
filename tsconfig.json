@@ -8,15 +8,7 @@
         "outDir": "./build",
         "resolveJsonModule": true
     },
-    "include": [
-        "src",
-        "tests"
-    ],
-    "exclude": [
-        "node_modules",
-        "build"
-    ],
-    "files": [
-        "src/types/index.d.ts"
-    ]
+    "include": ["src", "tests"],
+    "exclude": ["node_modules", "build"],
+    "files": ["src/types/index.d.ts"]
 }

@@ -2,11 +2,7 @@
 This file must not import any other services and have the bare minimum imports
 since it is used in a lot of files in the code base
 */
-import {
-    EnvData,
-    EnvSchema,
-    EnvValueType
-} from '../types/env';
+import { EnvData, EnvSchema, EnvValueType } from '../types/env';
 
 import envSchema from './env.schema.json';
 
@@ -25,9 +21,15 @@ export const parseEnvVar = <EnvDataType>(
             }
             return Number(value);
         case 'boolean':
-            if (value === '1' || value === 'true') { return true; }
-            if (value === '0' || value === 'false') { return false; }
-            throw new Error(`${String(key)} should be either 0 (for false) or 1 (for true)`);
+            if (value === '1' || value === 'true') {
+                return true;
+            }
+            if (value === '0' || value === 'false') {
+                return false;
+            }
+            throw new Error(
+                `${String(key)} should be either 0 (for false) or 1 (for true)`
+            );
         default:
             throw new Error(`Unexpected environment variable type ${type}`);
     }
@@ -42,11 +44,7 @@ export const parseEnv = <EnvDataType>(
     const keys = Object.keys(schema) as (keyof EnvDataType)[];
     keys.forEach((key) => {
         try {
-            const {
-                type,
-                required,
-                filter
-            } = schema[key];
+            const { type, required, filter } = schema[key];
             if (data[String(key)]) {
                 const value = parseEnvVar<EnvDataType>(
                     key,
@@ -54,7 +52,11 @@ export const parseEnv = <EnvDataType>(
                     type
                 );
                 if (filter && !filter.includes(value)) {
-                    throw new Error(`${String(key)} has invalid value (expected ${filter.join(' or ')})`);
+                    throw new Error(
+                        `${String(
+                            key
+                        )} has invalid value (expected ${filter.join(' or ')})`
+                    );
                 }
                 env[key] = value;
             } else if (required) {
@@ -85,13 +87,19 @@ export const setEnvMock = (key: keyof EnvData, value: any) => {
 
 // utility functions to allow mocking registration env vars
 export const isRegistrationEnabled = (): boolean => {
-    if (env.ENVIRONMENT === 'dev' && Object.hasOwn(mockedEnv, 'REGISTRATION_ENABLED')) {
+    if (
+        env.ENVIRONMENT === 'dev' &&
+        Object.hasOwn(mockedEnv, 'REGISTRATION_ENABLED')
+    ) {
         return !!mockedEnv.REGISTRATION_ENABLED;
     }
     return env.REGISTRATION_ENABLED;
 };
 export const isInvitationEnabled = (): boolean => {
-    if (env.ENVIRONMENT === 'dev' && Object.hasOwn(mockedEnv, 'INVITATION_ENABLED')) {
+    if (
+        env.ENVIRONMENT === 'dev' &&
+        Object.hasOwn(mockedEnv, 'INVITATION_ENABLED')
+    ) {
         return !!mockedEnv.INVITATION_ENABLED;
     }
     return env.INVITATION_ENABLED;

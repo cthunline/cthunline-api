@@ -9,13 +9,9 @@ import {
     assertSocketMeta
 } from '../helpers/assert.helper';
 
-const audioAsset = assetsData.find(({ type }) => (
-    type === 'audio'
-));
+const audioAsset = assetsData.find(({ type }) => type === 'audio');
 
-const imageAsset = assetsData.find(({ type }) => (
-    type === 'image'
-));
+const imageAsset = assetsData.find(({ type }) => type === 'image');
 
 describe('[Sockets] Audio', () => {
     before(async () => {
@@ -44,9 +40,11 @@ describe('[Sockets] Audio', () => {
             await Sockets.testError(
                 event,
                 event,
-                event === 'audioPlay' ? {
-                    assetId: audioAsset?.id
-                } : undefined,
+                event === 'audioPlay'
+                    ? {
+                          assetId: audioAsset?.id
+                      }
+                    : undefined,
                 403,
                 false
             );
@@ -55,40 +53,39 @@ describe('[Sockets] Audio', () => {
 
     it('Should play or stop audio', async () => {
         for (const event of ['audioPlay', 'audioStop']) {
-            const [
-                masterSocket,
-                player1Socket,
-                player2Socket
-            ] = await Sockets.setupSession();
+            const [masterSocket, player1Socket, player2Socket] =
+                await Sockets.setupSession();
             await Promise.all([
-                ...[player1Socket, player2Socket].map((socket) => (
-                    new Promise<void>((resolve, reject) => {
-                        socket.on(event, (data: any) => {
-                            const {
-                                user,
-                                isMaster,
-                                asset
-                            } = data;
-                            assertSocketMeta(data);
-                            assertUser(user);
-                            expect(isMaster).to.be.true;
-                            if (event === 'audioPlay') {
-                                assertAsset(asset);
-                            }
-                            socket.disconnect();
-                            resolve();
-                        });
-                        socket.on('error', (err: any) => {
-                            socket.disconnect();
-                            reject(err);
-                        });
-                    })
-                )),
+                ...[player1Socket, player2Socket].map(
+                    (socket) =>
+                        new Promise<void>((resolve, reject) => {
+                            socket.on(event, (data: any) => {
+                                const { user, isMaster, asset } = data;
+                                assertSocketMeta(data);
+                                assertUser(user);
+                                expect(isMaster).to.be.true;
+                                if (event === 'audioPlay') {
+                                    assertAsset(asset);
+                                }
+                                socket.disconnect();
+                                resolve();
+                            });
+                            socket.on('error', (err: any) => {
+                                socket.disconnect();
+                                reject(err);
+                            });
+                        })
+                ),
                 (async () => {
-                    masterSocket.emit(event, event === 'audioPlay' ? {
-                        assetId: audioAsset?.id,
-                        time: 1234
-                    } : undefined);
+                    masterSocket.emit(
+                        event,
+                        event === 'audioPlay'
+                            ? {
+                                  assetId: audioAsset?.id,
+                                  time: 1234
+                              }
+                            : undefined
+                    );
                 })()
             ]);
         }

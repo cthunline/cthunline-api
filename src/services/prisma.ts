@@ -39,7 +39,9 @@ export const initDb = async () => {
                     password: await hashPassword(defaultAdminUser.password)
                 }
             });
-            Log.warn(`Default user created (email: ${email} / password: ${password})`);
+            Log.warn(
+                `Default user created (email: ${email} / password: ${password})`
+            );
         } else {
             Log.error('Environment file is missing default admin information');
         }

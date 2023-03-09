@@ -2,10 +2,7 @@
     "create": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "name",
-            "sketch"
-        ],
+        "required": ["name", "sketch"],
         "properties": {
             "name": {
                 "type": "string"

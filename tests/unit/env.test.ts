@@ -48,49 +48,53 @@ describe('[Unit] Environment', () => {
         it('Should control and parse environment variables', async () => {
             const { OPTIONAL, ...validPartialEnv } = validEnv;
             const { STRING, ...invalidPartialEnv } = validEnv;
-            const data = [{
-                env: validEnv,
-                shouldSucceed: true
-            }, {
-                env: validPartialEnv,
-                shouldSucceed: true
-            }, {
-                env: invalidPartialEnv,
-                shouldSucceed: false
-            }, {
-                env: {
-                    ...validEnv,
-                    STRING: ''
+            const data = [
+                {
+                    env: validEnv,
+                    shouldSucceed: true
                 },
-                shouldSucceed: false
-            }, {
-                env: {
-                    ...validEnv,
-                    NUMBER: 'invalid'
+                {
+                    env: validPartialEnv,
+                    shouldSucceed: true
                 },
-                shouldSucceed: false
-            }, {
-                env: {
-                    ...validEnv,
-                    BOOLEAN: 'invalid'
+                {
+                    env: invalidPartialEnv,
+                    shouldSucceed: false
                 },
-                shouldSucceed: false
-            }, {
-                env: {
-                    ...validEnv,
-                    ENUM: 'value3'
+                {
+                    env: {
+                        ...validEnv,
+                        STRING: ''
+                    },
+                    shouldSucceed: false
                 },
-                shouldSucceed: false
-            }];
+                {
+                    env: {
+                        ...validEnv,
+                        NUMBER: 'invalid'
+                    },
+                    shouldSucceed: false
+                },
+                {
+                    env: {
+                        ...validEnv,
+                        BOOLEAN: 'invalid'
+                    },
+                    shouldSucceed: false
+                },
+                {
+                    env: {
+                        ...validEnv,
+                        ENUM: 'value3'
+                    },
+                    shouldSucceed: false
+                }
+            ];
             data.forEach(({ env, shouldSucceed }) => {
                 if (shouldSucceed) {
-                    expect(() => (
-                        parseEnv(env, schema)
-                    )).to.not.throw();
+                    expect(() => parseEnv(env, schema)).to.not.throw();
                 } else {
-                    expect(() => (
-                        parseEnv(env, schema)
-                    )).to.throw(Error);
+                    expect(() => parseEnv(env, schema)).to.throw(Error);
                 }
             });
         });

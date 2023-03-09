@@ -3,11 +3,7 @@ import {
     PrismaClientValidationError,
     PrismaClientKnownRequestError
 } from '@prisma/client/runtime/library';
-import {
-    Request,
-    Response,
-    NextFunction
-} from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 import Log from './log';
 import { ErrorJsonResponse } from '../types/errors';
@@ -77,11 +73,16 @@ const handlePrismaError = (err: Error): Error => {
 
 // express middlware injecting a response.error function that handles custom errors
 // it returns the correct status code and additional data if specified
-export const errorMiddleware = (_req: Request, res: Response, next: NextFunction): void => {
+export const errorMiddleware = (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
     res.error = (err: Error): void => {
         // handles prisma errors by "converting" them into custom errors
         const error = handlePrismaError(err);
-        if (error instanceof CustomError) { // handles custom errors
+        if (error instanceof CustomError) {
+            // handles custom errors
             const response: ErrorJsonResponse = {
                 error: error.message
             };
@@ -89,7 +90,8 @@ export const errorMiddleware = (_req: Request, res: Response, next: NextFunction
                 response.data = error.data;
             }
             res.status(error.status).json(response);
-        } else { // if error is not handled throw an intern error and logs stack
+        } else {
+            // if error is not handled throw an intern error and logs stack
             Log.error(error.stack);
             res.status(500).json({
                 error: 'Intern error'

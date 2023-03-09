@@ -4,10 +4,7 @@ import CookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import Helmet from 'helmet';
 
-import {
-    errorMiddleware,
-    payloadTooLargeHandler
-} from './services/errors';
+import { errorMiddleware, payloadTooLargeHandler } from './services/errors';
 import Log from './services/log';
 import { initDb } from './services/prisma';
 import { env } from './services/env';
@@ -17,11 +14,7 @@ import socketRouter from './sockets';
 const app = Express();
 const httpServer = createServer(app);
 
-const {
-    REVERSE_PROXY,
-    COOKIE_SECRET,
-    PORT
-} = env;
+const { REVERSE_PROXY, COOKIE_SECRET, PORT } = env;
 
 (async () => {
     try {
@@ -34,9 +27,11 @@ const {
         app.use(CookieParser(COOKIE_SECRET));
         app.use(Helmet());
         app.use(Express.json());
-        app.use(Express.urlencoded({
-            extended: false
-        }));
+        app.use(
+            Express.urlencoded({
+                extended: false
+            })
+        );
         app.use(payloadTooLargeHandler);
         app.use(errorMiddleware);
 

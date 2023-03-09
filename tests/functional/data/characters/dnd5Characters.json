@@ -408,9 +408,7 @@
                 "spellAbility": 2,
                 "spellSaveDC": 2,
                 "spellAttackBonus": 3,
-                "cantrips": [
-                    "Light a room with the mage staff"
-                ],
+                "cantrips": ["Light a room with the mage staff"],
                 "levels": [
                     {
                         "level": 1,

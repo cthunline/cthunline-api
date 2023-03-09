@@ -2,10 +2,7 @@ import RateLimit from 'express-rate-limit';
 
 import { env } from './env';
 
-const {
-    RL_WINDOW_DURATION,
-    RL_MAX_REQUESTS
-} = env;
+const { RL_WINDOW_DURATION, RL_MAX_REQUESTS } = env;
 
 const rateLimiter = RateLimit({
     // window duration in ms

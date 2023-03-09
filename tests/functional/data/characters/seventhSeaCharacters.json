@@ -32,10 +32,7 @@
                     "name": "A story ",
                     "goal": "The goal of the story",
                     "reward": "And the reward",
-                    "steps": [
-                        "Step one is nice",
-                        "But step two is nicer"
-                    ]
+                    "steps": ["Step one is nice", "But step two is nicer"]
                 }
             ],
             "traits": {
@@ -116,18 +113,13 @@
                     "name": "Hey this is a story",
                     "goal": "Some goal",
                     "reward": "Some reward",
-                    "steps": [
-                        "Step one",
-                        "Step two"
-                    ]
+                    "steps": ["Step one", "Step two"]
                 },
                 {
                     "name": "Another story",
                     "goal": "Goal here",
                     "reward": "Reward here",
-                    "steps": [
-                        "Step one"
-                    ]
+                    "steps": ["Step one"]
                 }
             ],
             "traits": {

@@ -3,11 +3,7 @@
         "sketch": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "displayed",
-                "paths",
-                "images"
-            ],
+            "required": ["displayed", "paths", "images"],
             "properties": {
                 "displayed": {
                     "type": "boolean"
@@ -35,15 +31,7 @@
         "image": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "id",
-                "index",
-                "url",
-                "width",
-                "height",
-                "x",
-                "y"
-            ],
+            "required": ["id", "index", "url", "width", "height", "x", "y"],
             "properties": {
                 "id": {
                     "type": "string"
@@ -71,14 +59,7 @@
         "token": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "id",
-                "index",
-                "color",
-                "attachedData",
-                "x",
-                "y"
-            ],
+            "required": ["id", "index", "color", "attachedData", "x", "y"],
             "properties": {
                 "id": {
                     "type": "string"
@@ -90,32 +71,35 @@
                     "type": "string"
                 },
                 "attachedData": {
-                    "oneOf": [{
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                            "userId",
-                            "userName",
-                            "characterId",
-                            "characterName"
-                        ],
-                        "properties": {
-                            "userId": {
-                                "type": "number"
-                            },
-                            "userName": {
-                                "type": "string"
-                            },
-                            "characterId": {
-                                "type": "number"
-                            },
-                            "characterName": {
-                                "type": "string"
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "userId",
+                                "userName",
+                                "characterId",
+                                "characterName"
+                            ],
+                            "properties": {
+                                "userId": {
+                                    "type": "number"
+                                },
+                                "userName": {
+                                    "type": "string"
+                                },
+                                "characterId": {
+                                    "type": "number"
+                                },
+                                "characterName": {
+                                    "type": "string"
+                                }
                             }
+                        },
+                        {
+                            "type": "null"
                         }
-                    }, {
-                        "type": "null"
-                    }]
+                    ]
                 },
                 "x": {
                     "type": "number"
@@ -125,12 +109,7 @@
                 },
                 "tooltipPlacement": {
                     "type": "string",
-                    "enum": [
-                        "top",
-                        "left",
-                        "bottom",
-                        "right"
-                    ]
+                    "enum": ["top", "left", "bottom", "right"]
                 }
             }
         }

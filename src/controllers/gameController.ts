@@ -1,8 +1,4 @@
-import {
-    Router,
-    Request,
-    Response
-} from 'express';
+import { Router, Request, Response } from 'express';
 
 import { GamesData, isValidGameId } from '../services/games';
 import { NotFoundError } from '../services/errors';
@@ -10,28 +6,34 @@ import { NotFoundError } from '../services/errors';
 const gameController = Router();
 
 // get all games
-gameController.get('/games', async (_req: Request, res: Response): Promise<void> => {
-    try {
-        const games = Object.values(GamesData);
-        res.json({
-            games
-        });
-    } catch (err: any) {
-        res.error(err);
+gameController.get(
+    '/games',
+    async (_req: Request, res: Response): Promise<void> => {
+        try {
+            const games = Object.values(GamesData);
+            res.json({
+                games
+            });
+        } catch (err: any) {
+            res.error(err);
+        }
     }
-});
+);
 
 // get a game
-gameController.get('/games/:gameId', async ({ params }: Request, res: Response): Promise<void> => {
-    try {
-        const { gameId } = params;
-        if (!isValidGameId(gameId)) {
-            throw new NotFoundError('Game not found');
+gameController.get(
+    '/games/:gameId',
+    async ({ params }: Request, res: Response): Promise<void> => {
+        try {
+            const { gameId } = params;
+            if (!isValidGameId(gameId)) {
+                throw new NotFoundError('Game not found');
+            }
+            res.json(GamesData[gameId]);
+        } catch (err: any) {
+            res.error(err);
         }
-        res.json(GamesData[gameId]);
-    } catch (err: any) {
-        res.error(err);
     }
-});
+);
 
 export default gameController;

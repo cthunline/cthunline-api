@@ -8,7 +8,10 @@ const generateCode = customAlphabet('1234567890abcdef', 16);
 
 // control an invitation code is valid
 // if asked, updated the isUsed field to true on the invitation object
-export const controlInvitationCode = async (code: string, updateIsUsed: boolean) => {
+export const controlInvitationCode = async (
+    code: string,
+    updateIsUsed: boolean
+) => {
     if (!code) {
         throw new ForbiddenError('Missing invitation code');
     }

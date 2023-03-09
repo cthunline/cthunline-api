@@ -8,28 +8,29 @@ const characterHandler = (io: Server, socket: Socket) => {
     // send character data to game master
     socket.on('characterUpdate', async () => {
         try {
-            const {
-                user,
-                isMaster,
-                sessionId,
-                characterId
-            } = socket.data;
+            const { user, isMaster, sessionId, characterId } = socket.data;
             const character = await Prisma.character.findUniqueOrThrow({
                 where: {
                     id: characterId
                 }
             });
+            // eslint-disable-next-line no-param-reassign
             socket.data.character = character;
-            const sessionSockets = await io.in(String(sessionId)).fetchSockets();
-            const masterSocket = sessionSockets.find(({ data }) => (
-                data.isMaster
-            ));
+            const sessionSockets = await io
+                .in(String(sessionId))
+                .fetchSockets();
+            const masterSocket = sessionSockets.find(
+                ({ data }) => data.isMaster
+            );
             if (masterSocket) {
-                masterSocket.emit('characterUpdate', meta({
-                    user,
-                    isMaster,
-                    character
-                }));
+                masterSocket.emit(
+                    'characterUpdate',
+                    meta({
+                        user,
+                        isMaster,
+                        character
+                    })
+                );
             }
         } catch (err) {
             socket.emit('error', meta(err));

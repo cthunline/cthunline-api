@@ -20,9 +20,7 @@ describe('[API] Sketchs', () => {
             await Api.testGetList({
                 route: '/sketchs',
                 listKey: 'sketchs',
-                data: sketchsData.filter(({ userId }) => (
-                    Api.userId === userId
-                )),
+                data: sketchsData.filter(({ userId }) => Api.userId === userId),
                 assert: assertSketchObject
             });
         });
@@ -30,21 +28,28 @@ describe('[API] Sketchs', () => {
 
     describe('POST /sketchs', () => {
         it('Should throw a validation error', async () => {
-            const invalidData = [{
-                invalidProperty: 'Test'
-            }, {
-                name: 'Test',
-                sketch: {},
-                invalidProperty: 'Test'
-            }, {}];
+            const invalidData = [
+                {
+                    invalidProperty: 'Test'
+                },
+                {
+                    name: 'Test',
+                    sketch: {},
+                    invalidProperty: 'Test'
+                },
+                {}
+            ];
             await Promise.all(
-                invalidData.map((body) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: '/sketchs',
-                        body
-                    }, 400)
-                ))
+                invalidData.map((body) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: '/sketchs',
+                            body
+                        },
+                        400
+                    )
+                )
             );
         });
         it('Should save a sketch for the current user', async () => {
@@ -94,7 +99,9 @@ describe('[API] Sketchs', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id } } = response;
+            const {
+                body: { id }
+            } = response;
             await Api.testDelete({
                 route: `/sketchs/${id}`,
                 testGet: true

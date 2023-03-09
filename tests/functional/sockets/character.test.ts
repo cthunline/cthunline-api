@@ -15,18 +15,11 @@ describe('[Sockets] Character', () => {
     });
 
     it('Should send character update to game master', async () => {
-        const [
-            masterSocket,
-            playerSocket
-        ] = await Sockets.setupSession();
+        const [masterSocket, playerSocket] = await Sockets.setupSession();
         await Promise.all([
             new Promise<void>((resolve, reject) => {
                 masterSocket.on('characterUpdate', (data: any) => {
-                    const {
-                        user,
-                        isMaster,
-                        character
-                    } = data;
+                    const { user, isMaster, character } = data;
                     assertSocketMeta(data);
                     assertUser(user);
                     expect(isMaster).to.be.false;

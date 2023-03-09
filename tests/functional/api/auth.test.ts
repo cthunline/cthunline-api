@@ -18,41 +18,54 @@ describe('[API] Authentication', () => {
 
     describe('POST /auth', () => {
         it('Should throw validation error', async () => {
-            const invalidData = [{
-                invalidProperty: 'Test'
-            }, {
-                email: 'admin@test.com',
-                password: 'abc123',
-                invalidProperty: 'Test'
-            }, {}];
+            const invalidData = [
+                {
+                    invalidProperty: 'Test'
+                },
+                {
+                    email: 'admin@test.com',
+                    password: 'abc123',
+                    invalidProperty: 'Test'
+                },
+                {}
+            ];
             await Promise.all(
-                invalidData.map((body) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: '/auth',
-                        body
-                    }, 400)
-                ))
+                invalidData.map((body) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: '/auth',
+                            body
+                        },
+                        400
+                    )
+                )
             );
         });
         it('Should throw authentication error', async () => {
-            const invalidCredentials = [{
-                email: 'admin@test.com',
-                password: '654987azeaze'
-            }, {
-                email: 'fake@fake.com',
-                password: 'azeaze321321'
-            }];
+            const invalidCredentials = [
+                {
+                    email: 'admin@test.com',
+                    password: '654987azeaze'
+                },
+                {
+                    email: 'fake@fake.com',
+                    password: 'azeaze321321'
+                }
+            ];
             await Promise.all(
-                invalidCredentials.map((credentials) => (
+                invalidCredentials.map((credentials) =>
                     Api.login(credentials, false)
-                ))
+                )
             );
             const disabledUser = usersData.find(({ isEnabled }) => !isEnabled);
-            await Api.login({
-                email: disabledUser?.email ?? '',
-                password: 'test'
-            }, false);
+            await Api.login(
+                {
+                    email: disabledUser?.email ?? '',
+                    password: 'test'
+                },
+                false
+            );
         });
         it('Should check authentication successfully', async () => {
             await Api.login();

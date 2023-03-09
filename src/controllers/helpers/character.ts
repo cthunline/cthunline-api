@@ -11,14 +11,12 @@ const { PORTRAIT_MAX_SIZE_MB } = env;
 
 export const portraitDirName = 'portraits';
 
-// eslint-disable-next-line import/prefer-default-export
-export const getCharacter = async (characterId: number): Promise<Character> => (
+export const getCharacter = async (characterId: number): Promise<Character> =>
     Prisma.character.findUniqueOrThrow({
         where: {
             id: characterId
         }
-    })
-);
+    });
 
 export const formidablePortraitOptions: Formidable.Options = {
     uploadDir: assetTempDir,

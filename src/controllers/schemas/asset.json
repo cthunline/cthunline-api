@@ -2,9 +2,7 @@
     "uploadAssets": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "assets"
-        ],
+        "required": ["assets"],
         "properties": {
             "assets": {},
             "directoryId": {
@@ -16,9 +14,7 @@
     "createDirectory": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-            "name"
-        ],
+        "required": ["name"],
         "properties": {
             "name": {
                 "type": "string"

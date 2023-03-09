@@ -10,21 +10,16 @@ import {
     InternError,
     ValidationError
 } from '../../services/errors';
-import {
-    mimeTypes,
-    FileType,
-    MimeType
-} from '../../types/asset';
+import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
-const {
-    ASSET_DIR,
-    ASSET_MAX_SIZE_MB,
-    ASSET_MAX_SIZE_MB_PER_FILE
-} = env;
+const { ASSET_DIR, ASSET_MAX_SIZE_MB, ASSET_MAX_SIZE_MB_PER_FILE } = env;
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
-export const controlFile = (file: Formidable.File, fileType?: FileType): FileType => {
+export const controlFile = (
+    file: Formidable.File,
+    fileType?: FileType
+): FileType => {
     const { mimetype, originalFilename } = file;
     const ext = originalFilename?.split('.').pop() ?? '';
     // There's a bug in formidable@v2 where maxFileSize option is applied to
@@ -43,11 +38,17 @@ export const controlFile = (file: Formidable.File, fileType?: FileType): FileTyp
                     `Extension of file ${originalFilename} ${ext} does not match mimetype ${mimetype}`
                 );
             }
-            throw new ValidationError(`Mimetype of file ${originalFilename} ${mimetype} is not allowed`);
+            throw new ValidationError(
+                `Mimetype of file ${originalFilename} ${mimetype} is not allowed`
+            );
         }
-        throw new ValidationError(`Could not get mimetype of file ${originalFilename}`);
+        throw new ValidationError(
+            `Could not get mimetype of file ${originalFilename}`
+        );
     }
-    throw new ValidationError(`Size of file ${originalFilename} is to big (max ${ASSET_MAX_SIZE_MB_PER_FILE}Mb)`);
+    throw new ValidationError(
+        `Size of file ${originalFilename} is to big (max ${ASSET_MAX_SIZE_MB_PER_FILE}Mb)`
+    );
 };
 
 // check asset directory exists and is writable
@@ -58,7 +59,9 @@ export const getAssetDir = (): string => {
         Fs.accessSync(dir, Fs.constants.W_OK);
         return dir;
     } catch {
-        throw new InternError(`Asset directory ${dir} does not exist or is not writable`);
+        throw new InternError(
+            `Asset directory ${dir} does not exist or is not writable`
+        );
     }
 };
 
@@ -84,7 +87,10 @@ export const formidableOptions: Formidable.Options = {
     multiples: true
 };
 
-export const getAsset = async (userId: number, assetId: number): Promise<Asset> => {
+export const getAsset = async (
+    userId: number,
+    assetId: number
+): Promise<Asset> => {
     const asset = await Prisma.asset.findFirstOrThrow({
         where: {
             id: assetId
@@ -96,13 +102,12 @@ export const getAsset = async (userId: number, assetId: number): Promise<Asset> 
     return asset;
 };
 
-export const getDirectories = async (userId: number): Promise<Directory[]> => (
+export const getDirectories = async (userId: number): Promise<Directory[]> =>
     Prisma.directory.findMany({
         where: {
             userId
         }
-    })
-);
+    });
 
 export const getDirectory = async (
     userId: number,
@@ -127,10 +132,12 @@ export const getChildrenDirectories = (
     const childrenDirs: Directory[] = [];
     directories.forEach((directory) => {
         if (directory.parentId === directoryId) {
-            childrenDirs.push(...[
-                directory,
-                ...getChildrenDirectories(directory.id, directories)
-            ]);
+            childrenDirs.push(
+                ...[
+                    directory,
+                    ...getChildrenDirectories(directory.id, directories)
+                ]
+            );
         }
     });
     return childrenDirs;

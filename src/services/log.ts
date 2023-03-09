@@ -6,9 +6,8 @@ import { env } from './env';
 
 const { LOG_ENABLED, LOG_DIR } = env;
 
-const printf = (i: Winston.Logform.TransformableInfo) => (
-    `${i.timestamp} [${i.level}] ${i.message}`
-);
+const printf = (i: Winston.Logform.TransformableInfo) =>
+    `${i.timestamp} [${i.level}] ${i.message}`;
 
 const timestamp = {
     format: 'YYYY-MM-DD HH:mm:ss'
@@ -65,7 +64,9 @@ const Log = Winston.createLogger({
 });
 
 if (fileTransportError) {
-    Log.warn(`Winston file transport could not be initialized (${fileTransportError})`);
+    Log.warn(
+        `Winston file transport could not be initialized (${fileTransportError})`
+    );
 }
 
 export default Log;

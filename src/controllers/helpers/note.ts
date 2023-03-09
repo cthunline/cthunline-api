@@ -10,40 +10,53 @@ export const getNotes = async (
     sessionId: number,
     userId: number,
     includeUsers: boolean = false
-): Promise<Note[]> => (
+): Promise<Note[]> =>
     Prisma.note.findMany({
         where: {
-            AND: [{
-                sessionId
-            }, {
-                OR: [{
-                    userId
-                }, {
-                    AND: {
-                        NOT: {
+            AND: [
+                {
+                    sessionId
+                },
+                {
+                    OR: [
+                        {
                             userId
                         },
-                        isShared: true
-                    }
-                }]
-            }]
+                        {
+                            AND: {
+                                NOT: {
+                                    userId
+                                },
+                                isShared: true
+                            }
+                        }
+                    ]
+                }
+            ]
         },
         include: {
-            user: includeUsers ? {
-                select: userSelect
-            } : false
+            user: includeUsers
+                ? {
+                      select: userSelect
+                  }
+                : false
         },
-        orderBy: [{
-            userId: 'asc'
-        }, {
-            position: 'asc'
-        }]
-    })
-);
+        orderBy: [
+            {
+                userId: 'asc'
+            },
+            {
+                position: 'asc'
+            }
+        ]
+    });
 
 // get a note
 // if user is not the owner and the note is not shared throw a forbidden error
-export const getNote = async (noteId: number, userId: number): Promise<Note> => {
+export const getNote = async (
+    noteId: number,
+    userId: number
+): Promise<Note> => {
     const note = await Prisma.note.findUniqueOrThrow({
         where: {
             id: noteId
@@ -57,7 +70,10 @@ export const getNote = async (noteId: number, userId: number): Promise<Note> => 
 
 // get the highest current position for user's notes in a session
 // if no notes are found returns 0
-export const getMaxNotePosition = async (sessionId: number, userId: number): Promise<number> => {
+export const getMaxNotePosition = async (
+    sessionId: number,
+    userId: number
+): Promise<number> => {
     const note = await Prisma.note.findFirst({
         where: {
             sessionId,
@@ -71,7 +87,10 @@ export const getMaxNotePosition = async (sessionId: number, userId: number): Pro
 };
 
 // get the next position for a note to be created
-export const getNextNotePosition = async (sessionId: number, userId: number): Promise<number> => {
+export const getNextNotePosition = async (
+    sessionId: number,
+    userId: number
+): Promise<number> => {
     const maxPosition = await getMaxNotePosition(sessionId, userId);
     return maxPosition + 1;
 };
@@ -82,7 +101,7 @@ export const switchNotePositions = async (
     userId: number,
     position1: number,
     position2: number
-): Promise<number> => (
+): Promise<number> =>
     Prisma.$executeRaw`UPDATE notes n1 INNER JOIN notes n2 
         ON (n1.position, n2.position) IN (
             (${position1}, ${position2}), 
@@ -90,5 +109,4 @@ export const switchNotePositions = async (
         ) 
         AND (n1.sessionId, n2.sessionId) = (${sessionId}, ${sessionId}) 
         AND (n1.userId, n2.userId) = (${userId}, ${userId}) 
-        SET n1.position = n2.position;`
-);
+        SET n1.position = n2.position;`;

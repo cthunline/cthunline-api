@@ -36,33 +36,34 @@ describe('[Sockets] Dice', () => {
     });
 
     it('Should request dice rolls', async () => {
-        const requestData = [{
-            D4: 3
-        }, {
-            D6: 1,
-            D8: 2
-        }, {
-            D12: 3,
-            D20: 2,
-            D100: 3
-        }];
+        const requestData = [
+            {
+                D4: 3
+            },
+            {
+                D6: 1,
+                D8: 2
+            },
+            {
+                D12: 3,
+                D20: 2,
+                D100: 3
+            }
+        ];
         for (const data of requestData) {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
                 const socket = await Sockets.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
                     socket.on('diceResult', (resultData: any) => {
-                        const {
-                            user,
-                            isMaster,
-                            request,
-                            isPrivate,
-                            result
-                        } = resultData;
+                        const { user, isMaster, request, isPrivate, result } =
+                            resultData;
                         assertSocketMeta(resultData);
                         assertUser(user);
                         expect(isMaster).to.be.true;
                         expect(request).to.deep.equal(data);
-                        expect(isPrivate).to.equal(event === 'dicePrivateRequest');
+                        expect(isPrivate).to.equal(
+                            event === 'dicePrivateRequest'
+                        );
                         expect(result).to.be.a('number');
                         socket.disconnect();
                         resolve();
@@ -78,40 +79,38 @@ describe('[Sockets] Dice', () => {
     });
 
     it('Should send dice roll result to all players in session', async () => {
-        const [
-            masterSocket,
-            player1Socket,
-            player2Socket
-        ] = await Sockets.setupSession();
+        const [masterSocket, player1Socket, player2Socket] =
+            await Sockets.setupSession();
         const diceRequest = {
             D6: 3
         };
         await Promise.all([
-            ...[masterSocket, player1Socket, player2Socket].map((socket) => (
-                new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', (resultData: any) => {
-                        const {
-                            user,
-                            isMaster,
-                            request,
-                            isPrivate,
-                            result
-                        } = resultData;
-                        assertSocketMeta(resultData);
-                        assertUser(user);
-                        expect(isMaster).to.be.false;
-                        expect(request).to.deep.equal(diceRequest);
-                        expect(isPrivate).to.equal(false);
-                        expect(result).to.be.a('number');
-                        socket.disconnect();
-                        resolve();
-                    });
-                    socket.on('error', (err: any) => {
-                        socket.disconnect();
-                        reject(err);
-                    });
-                })
-            )),
+            ...[masterSocket, player1Socket, player2Socket].map(
+                (socket) =>
+                    new Promise<void>((resolve, reject) => {
+                        socket.on('diceResult', (resultData: any) => {
+                            const {
+                                user,
+                                isMaster,
+                                request,
+                                isPrivate,
+                                result
+                            } = resultData;
+                            assertSocketMeta(resultData);
+                            assertUser(user);
+                            expect(isMaster).to.be.false;
+                            expect(request).to.deep.equal(diceRequest);
+                            expect(isPrivate).to.equal(false);
+                            expect(result).to.be.a('number');
+                            socket.disconnect();
+                            resolve();
+                        });
+                        socket.on('error', (err: any) => {
+                            socket.disconnect();
+                            reject(err);
+                        });
+                    })
+            ),
             (async () => {
                 player1Socket.emit('diceRequest', diceRequest);
             })()

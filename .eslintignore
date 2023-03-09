@@ -1,0 +1,6 @@
+build
+node_modules
+.husky
+.drone.yml
+coverage
+.nyc_output

@@ -6,23 +6,18 @@ import { sum } from '../services/tools';
 import Validator from '../services/validator';
 import { ForbiddenError } from '../services/errors';
 import { DiceType } from '../types/dice';
-import {
-    SocketDiceRequest,
-    SocketDiceResult
-} from '../types/socket';
+import { SocketDiceRequest, SocketDiceResult } from '../types/socket';
 import { meta } from './helper';
 
 import diceSchemas from './schemas/dice.json';
 
 const validateRequest = Validator(diceSchemas.request);
 
-const getDiceMax = (diceType: DiceType): number => (
-    parseInt(diceType.replace('D', ''))
-);
+const getDiceMax = (diceType: DiceType): number =>
+    parseInt(diceType.replace('D', ''));
 
-const rollDice = (diceType: DiceType): number => (
-    randomInt(getDiceMax(diceType)) + 1
-);
+const rollDice = (diceType: DiceType): number =>
+    randomInt(getDiceMax(diceType)) + 1;
 
 const getDiceResult = (
     user: User,
@@ -34,17 +29,13 @@ const getDiceResult = (
     isMaster,
     request,
     isPrivate,
-    result: (
-        sum( // sum results of all dice types
-            Object.entries(request).map((
-                [diceType, diceCount]
-            ) => (
-                sum( // sum results of one dice type
-                    [...Array(diceCount)].map(() => (
-                        rollDice(diceType as DiceType)
-                    ))
-                )
-            ))
+    result: sum(
+        // sum results of all dice types
+        Object.entries(request).map(([diceType, diceCount]) =>
+            sum(
+                // sum results of one dice type
+                [...Array(diceCount)].map(() => rollDice(diceType as DiceType))
+            )
         )
     )
 });
@@ -55,12 +46,12 @@ const diceHandler = (io: Server, socket: Socket) => {
         try {
             validateRequest(request);
             const { user, isMaster, sessionId } = socket.data;
-            io.sockets.to(String(sessionId)).emit(
-                'diceResult',
-                meta(
-                    getDiceResult(user, isMaster, request)
-                )
-            );
+            io.sockets
+                .to(String(sessionId))
+                .emit(
+                    'diceResult',
+                    meta(getDiceResult(user, isMaster, request))
+                );
         } catch (err) {
             socket.emit('error', meta(err));
         }
@@ -77,9 +68,7 @@ const diceHandler = (io: Server, socket: Socket) => {
             }
             socket.emit(
                 'diceResult',
-                meta(
-                    getDiceResult(user, isMaster, request, true)
-                )
+                meta(getDiceResult(user, isMaster, request, true))
             );
         } catch (err) {
             socket.emit('error', meta(err));

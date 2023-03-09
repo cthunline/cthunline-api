@@ -44,19 +44,13 @@ export interface GetListOptions {
     route: string;
     listKey: string;
     data: Record<string, any>[];
-    assert: (
-        data: Record<string, any>,
-        expected?: Record<string, any>
-    ) => void;
+    assert: (data: Record<string, any>, expected?: Record<string, any>) => void;
 }
 
 export interface GetOneOptions {
     route: string;
     data: Record<string, any>;
-    assert: (
-        data: Record<string, any>,
-        expected?: Record<string, any>
-    ) => void;
+    assert: (data: Record<string, any>, expected?: Record<string, any>) => void;
 }
 
 export interface CreateOptions {
@@ -64,20 +58,14 @@ export interface CreateOptions {
     data: Record<string, any>;
     expected?: Record<string, any>;
     getRoute?: string;
-    assert: (
-        data: Record<string, any>,
-        expected?: Record<string, any>
-    ) => void;
+    assert: (data: Record<string, any>, expected?: Record<string, any>) => void;
 }
 
 export interface EditOptions {
     route: string;
     data: Record<string, any>;
     expected?: Record<string, any>;
-    assert: (
-        data: Record<string, any>,
-        expected?: Record<string, any>
-    ) => void;
+    assert: (data: Record<string, any>, expected?: Record<string, any>) => void;
 }
 
 export interface DeleteOptions {
@@ -215,7 +203,10 @@ const Api = {
         return request;
     },
 
-    async testError(options: RequestOptions, expectedStatus: number): Promise<void> {
+    async testError(
+        options: RequestOptions,
+        expectedStatus: number
+    ): Promise<void> {
         const response = await Api.request(options);
         expect(response).to.have.status(expectedStatus);
         expect(response).to.be.json;
@@ -223,12 +214,7 @@ const Api = {
     },
 
     async testGetList(options: GetListOptions): Promise<void> {
-        const {
-            route,
-            listKey,
-            data,
-            assert
-        } = options;
+        const { route, listKey, data, assert } = options;
         const dataById: Record<number, object> = Object.fromEntries(
             data.map((item: Record<string, any>) => [item.id, item])
         );
@@ -247,11 +233,7 @@ const Api = {
     },
 
     async testGetOne(options: GetOneOptions): Promise<void> {
-        const {
-            route,
-            data,
-            assert
-        } = options;
+        const { route, data, assert } = options;
         const response = await Api.request({
             method: 'GET',
             route: route.replace(':id', data.id)
@@ -263,13 +245,7 @@ const Api = {
     },
 
     async testCreate(options: CreateOptions): Promise<void> {
-        const {
-            route,
-            data,
-            assert,
-            expected,
-            getRoute
-        } = options;
+        const { route, data, assert, expected, getRoute } = options;
         const createResponse = await Api.request({
             method: 'POST',
             route,
@@ -282,11 +258,9 @@ const Api = {
         assert(createBody, expectedData);
         const getResponse = await Api.request({
             method: 'GET',
-            route: getRoute ? (
-                getRoute.replace(':id', createBody.id)
-            ) : (
-                `${route}/${createBody.id}`
-            )
+            route: getRoute
+                ? getRoute.replace(':id', createBody.id)
+                : `${route}/${createBody.id}`
         });
         expect(getResponse).to.have.status(200);
         expect(getResponse).to.be.json;
@@ -295,12 +269,7 @@ const Api = {
     },
 
     async testEdit(options: EditOptions): Promise<void> {
-        const {
-            route,
-            data,
-            assert,
-            expected
-        } = options;
+        const { route, data, assert, expected } = options;
         const editResponse = await Api.request({
             method: 'POST',
             route,
@@ -322,12 +291,7 @@ const Api = {
     },
 
     async testDelete(options: DeleteOptions): Promise<void> {
-        const {
-            route,
-            testGet,
-            data,
-            assert
-        } = options;
+        const { route, testGet, data, assert } = options;
         const deleteResponse = await Api.request({
             method: 'DELETE',
             route
@@ -352,13 +316,7 @@ const Api = {
     },
 
     async testInvalidIdError(options: InvalidIdOptions): Promise<void> {
-        const {
-            method,
-            route,
-            body,
-            ids,
-            isInteger = true
-        } = options;
+        const { method, route, body, ids, isInteger = true } = options;
         const invalidIds = ids ?? [
             '123456789',
             '987654',
@@ -370,7 +328,7 @@ const Api = {
             '61f5655cb7c63e78815de1c8'
         ];
         await Promise.all(
-            invalidIds.map((id) => (
+            invalidIds.map((id) =>
                 (async () => {
                     const isInvalid = !/^\d+$/.test(id);
                     const response = await Api.request({
@@ -384,11 +342,14 @@ const Api = {
                     expect(response).to.be.json;
                     assertError(response.body);
                 })()
-            ))
+            )
         );
     },
 
-    async testStaticFile(route: string, expectSuccess: boolean = true): Promise<void> {
+    async testStaticFile(
+        route: string,
+        expectSuccess: boolean = true
+    ): Promise<void> {
         const response = await Api.request({
             apiPrefix: false,
             method: 'GET',

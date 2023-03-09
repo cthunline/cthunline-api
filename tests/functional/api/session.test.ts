@@ -2,10 +2,7 @@ import { expect } from 'chai';
 
 import Api from '../helpers/api.helper';
 import Data, { sessionsData } from '../helpers/data.helper';
-import {
-    assertSession,
-    assertUser
-} from '../helpers/assert.helper';
+import { assertSession, assertUser } from '../helpers/assert.helper';
 
 const { gameId } = sessionsData[0];
 
@@ -44,21 +41,28 @@ describe('[API] Sessions', () => {
 
     describe('POST /sessions', () => {
         it('Should throw a validation error', async () => {
-            const invalidData = [{
-                invalidProperty: 'Test'
-            }, {
-                name: 'Test',
-                sketch: {},
-                invalidProperty: 'Test'
-            }, {}];
+            const invalidData = [
+                {
+                    invalidProperty: 'Test'
+                },
+                {
+                    name: 'Test',
+                    sketch: {},
+                    invalidProperty: 'Test'
+                },
+                {}
+            ];
             await Promise.all(
-                invalidData.map((body) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: '/sessions',
-                        body
-                    }, 400)
-                ))
+                invalidData.map((body) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: '/sessions',
+                            body
+                        },
+                        400
+                    )
+                )
             );
         });
         it('Should create a session', async () => {
@@ -119,32 +123,44 @@ describe('[API] Sessions', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id } } = response;
-            const invalidData = [{
-                invalidProperty: 'Test'
-            }, {
-                name: 'Test',
-                sketch: {},
-                invalidProperty: 'Test'
-            }, {}];
+            const {
+                body: { id }
+            } = response;
+            const invalidData = [
+                {
+                    invalidProperty: 'Test'
+                },
+                {
+                    name: 'Test',
+                    sketch: {},
+                    invalidProperty: 'Test'
+                },
+                {}
+            ];
             await Promise.all(
-                invalidData.map((body) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: `/sessions/${id}`,
-                        body
-                    }, 400)
-                ))
+                invalidData.map((body) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: `/sessions/${id}`,
+                            body
+                        },
+                        400
+                    )
+                )
             );
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError({
-                method: 'POST',
-                route: `/sessions/${sessionsData[1].id}`,
-                body: {
-                    name: 'Test11'
-                }
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: `/sessions/${sessionsData[1].id}`,
+                    body: {
+                        name: 'Test11'
+                    }
+                },
+                403
+            );
         });
         it('Should edit a session', async () => {
             const response = await Api.request({
@@ -156,7 +172,9 @@ describe('[API] Sessions', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id } } = response;
+            const {
+                body: { id }
+            } = response;
             await Api.testEdit({
                 route: `/sessions/${id}`,
                 data: {
@@ -184,10 +202,13 @@ describe('[API] Sessions', () => {
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError({
-                method: 'DELETE',
-                route: `/sessions/${sessionsData[1].id}`
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'DELETE',
+                    route: `/sessions/${sessionsData[1].id}`
+                },
+                403
+            );
         });
         it('Should delete a session', async () => {
             const response = await Api.request({
@@ -199,7 +220,9 @@ describe('[API] Sessions', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id } } = response;
+            const {
+                body: { id }
+            } = response;
             await Api.testDelete({
                 route: `/sessions/${id}`,
                 testGet: true

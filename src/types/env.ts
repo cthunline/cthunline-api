@@ -1,7 +1,4 @@
-export const locales = [
-    'fr',
-    'en'
-];
+export const locales = ['fr', 'en'];
 
 export interface EnvData {
     DEFAULT_ADMIN_NAME: string;
@@ -36,6 +33,4 @@ export interface EnvValueData {
     filter?: any[];
 }
 
-export type EnvSchema<EnvDataType> = (
-    Record<keyof EnvDataType, EnvValueData>
-);
+export type EnvSchema<EnvDataType> = Record<keyof EnvDataType, EnvValueData>;

@@ -6,9 +6,9 @@ import Data, { charactersData } from '../helpers/data.helper';
 import { assertCharacter } from '../helpers/assert.helper';
 
 const findCharacter = (userId: number, gameId: string) => {
-    const character = charactersData.find((char) => (
-        char.userId === Api.userId && char.gameId === gameId
-    ));
+    const character = charactersData.find(
+        (char) => char.userId === Api.userId && char.gameId === gameId
+    );
     if (character) {
         return character as any;
     }
@@ -40,9 +40,9 @@ describe('[API] Characters', () => {
             await Api.testGetList({
                 route: `/characters?user=${userId}`,
                 listKey: 'characters',
-                data: charactersData.filter(({ userId: charUserId }) => (
-                    userId === charUserId
-                )),
+                data: charactersData.filter(
+                    ({ userId: charUserId }) => userId === charUserId
+                ),
                 assert: assertCharacter
             });
         });
@@ -54,57 +54,68 @@ describe('[API] Characters', () => {
                 Api.userId,
                 'callOfCthulhu'
             );
-            const invalidData = [{
-                invalidProperty: 'Test'
-            }, {
-                gameId,
-                name,
-                data,
-                invalidProperty: 'Test'
-            }, {
-                gameId: 'invalidGame',
-                name,
-                data
-            }, {
-                name,
-                data
-            }, {
-                gameId,
-                name,
-                data: {
-                    ...data,
+            const invalidData = [
+                {
                     invalidProperty: 'Test'
-                }
-            }, {
-                gameId,
-                name,
-                data: {
-                    ...data,
-                    characteristics: {
-                        ...data.characteristics,
-                        strength: {
-                            regular: 50,
-                            half: 25,
-                            fifth: 10,
-                            invalidProperty: 'Test'
+                },
+                {
+                    gameId,
+                    name,
+                    data,
+                    invalidProperty: 'Test'
+                },
+                {
+                    gameId: 'invalidGame',
+                    name,
+                    data
+                },
+                {
+                    name,
+                    data
+                },
+                {
+                    gameId,
+                    name,
+                    data: {
+                        ...data,
+                        invalidProperty: 'Test'
+                    }
+                },
+                {
+                    gameId,
+                    name,
+                    data: {
+                        ...data,
+                        characteristics: {
+                            ...data.characteristics,
+                            strength: {
+                                regular: 50,
+                                half: 25,
+                                fifth: 10,
+                                invalidProperty: 'Test'
+                            }
                         }
                     }
-                }
-            }, {}];
+                },
+                {}
+            ];
             await Promise.all(
-                invalidData.map((body) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: '/characters',
-                        body
-                    }, 400)
-                ))
+                invalidData.map((body) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: '/characters',
+                            body
+                        },
+                        400
+                    )
+                )
             );
         });
         it('Should create a character', async () => {
             const gameIds = ['callOfCthulhu', 'starWarsD6'];
             await Promise.all(
-                gameIds.map((gameId) => (
+                gameIds.map((gameId) =>
                     (async () => {
                         const { data } = findCharacter(Api.userId, gameId);
                         await Api.testCreate({
@@ -117,7 +128,7 @@ describe('[API] Characters', () => {
                             assert: assertCharacter
                         });
                     })()
-                ))
+                )
             );
         });
     });
@@ -149,7 +160,10 @@ describe('[API] Characters', () => {
             });
         });
         it('Should throw a validation error', async () => {
-            const { gameId, name, data } = findCharacter(Api.userId, 'callOfCthulhu');
+            const { gameId, name, data } = findCharacter(
+                Api.userId,
+                'callOfCthulhu'
+            );
             const response = await Api.request({
                 method: 'POST',
                 route: '/characters',
@@ -160,63 +174,77 @@ describe('[API] Characters', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id } } = response;
-            const invalidData = [{
-                invalidProperty: 'Test'
-            }, {
-                name,
-                data,
-                invalidProperty: 'Test'
-            }, {
-                gameId,
-                name,
-                data
-            }, {
-                name,
-                data: {
-                    ...data,
+            const {
+                body: { id }
+            } = response;
+            const invalidData = [
+                {
                     invalidProperty: 'Test'
-                }
-            }, {
-                name,
-                data: {
-                    ...data,
-                    characteristics: {
-                        ...data.characteristics,
-                        strength: {
-                            regular: 50,
-                            half: 25,
-                            fifth: 10,
-                            invalidProperty: 'Test'
+                },
+                {
+                    name,
+                    data,
+                    invalidProperty: 'Test'
+                },
+                {
+                    gameId,
+                    name,
+                    data
+                },
+                {
+                    name,
+                    data: {
+                        ...data,
+                        invalidProperty: 'Test'
+                    }
+                },
+                {
+                    name,
+                    data: {
+                        ...data,
+                        characteristics: {
+                            ...data.characteristics,
+                            strength: {
+                                regular: 50,
+                                half: 25,
+                                fifth: 10,
+                                invalidProperty: 'Test'
+                            }
                         }
                     }
-                }
-            }, {}];
+                },
+                {}
+            ];
             await Promise.all(
-                invalidData.map((body) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: `/characters/${id}`,
-                        body
-                    }, 400)
-                ))
+                invalidData.map((body) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: `/characters/${id}`,
+                            body
+                        },
+                        400
+                    )
+                )
             );
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError({
-                method: 'POST',
-                route: `/characters/${charactersData[1].id}`,
-                body: {
-                    name: 'Test'
-                }
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: `/characters/${charactersData[1].id}`,
+                    body: {
+                        name: 'Test'
+                    }
+                },
+                403
+            );
         });
         it('Should edit a character', async () => {
-            const {
-                id,
-                gameId,
-                data
-            } = findCharacter(Api.userId, 'callOfCthulhu');
+            const { id, gameId, data } = findCharacter(
+                Api.userId,
+                'callOfCthulhu'
+            );
             const response = await Api.request({
                 method: 'POST',
                 route: '/characters',
@@ -227,13 +255,13 @@ describe('[API] Characters', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id: createdId } } = response;
-            const editChar = charactersData.find(({
-                id: charId,
-                gameId: charGameId
-            }) => (
-                charGameId === gameId && charId !== id
-            ));
+            const {
+                body: { id: createdId }
+            } = response;
+            const editChar = charactersData.find(
+                ({ id: charId, gameId: charGameId }) =>
+                    charGameId === gameId && charId !== id
+            );
             if (editChar) {
                 await Api.testEdit({
                     route: `/characters/${createdId}`,
@@ -257,10 +285,13 @@ describe('[API] Characters', () => {
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError({
-                method: 'DELETE',
-                route: `/characters/${charactersData[1].id}`
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'DELETE',
+                    route: `/characters/${charactersData[1].id}`
+                },
+                403
+            );
         });
         it('Should delete a character', async () => {
             const { gameId, data } = findCharacter(Api.userId, 'callOfCthulhu');
@@ -274,7 +305,9 @@ describe('[API] Characters', () => {
                 }
             });
             expect(response).to.have.status(200);
-            const { body: { id } } = response;
+            const {
+                body: { id }
+            } = response;
             await Api.testDelete({
                 route: `/characters/${id}`,
                 testGet: true
@@ -284,41 +317,54 @@ describe('[API] Characters', () => {
 
     describe('POST /characters/:id/portrait', () => {
         it('Should throw error because of invalid ID', async () => {
-            const invalidData = [{
-                id: 'invalid',
-                status: 400
-            }, {
-                id: '1234',
-                status: 404
-            }];
+            const invalidData = [
+                {
+                    id: 'invalid',
+                    status: 400
+                },
+                {
+                    id: '1234',
+                    status: 404
+                }
+            ];
             const name = 'asset.png';
             const buffer = await Data.getAssetBuffer(name);
             await Promise.all(
-                invalidData.map(({ id, status }) => (
-                    Api.testError({
-                        method: 'POST',
-                        route: `/characters/${id}/portrait`,
-                        files: [{
-                            field: 'portrait',
-                            buffer,
-                            name
-                        }]
-                    }, status)
-                ))
+                invalidData.map(({ id, status }) =>
+                    Api.testError(
+                        {
+                            method: 'POST',
+                            route: `/characters/${id}/portrait`,
+                            files: [
+                                {
+                                    field: 'portrait',
+                                    buffer,
+                                    name
+                                }
+                            ]
+                        },
+                        status
+                    )
+                )
             );
         });
         it('Should throw a forbidden error', async () => {
             const name = 'asset.png';
             const buffer = await Data.getAssetBuffer(name);
-            await Api.testError({
-                method: 'POST',
-                route: `/characters/${charactersData[1].id}/portrait`,
-                files: [{
-                    field: 'portrait',
-                    buffer,
-                    name
-                }]
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: `/characters/${charactersData[1].id}/portrait`,
+                    files: [
+                        {
+                            field: 'portrait',
+                            buffer,
+                            name
+                        }
+                    ]
+                },
+                403
+            );
         });
         it('Should throw a validation error', async () => {
             const { id: characterId } = findCharacter(
@@ -327,15 +373,20 @@ describe('[API] Characters', () => {
             );
             const name = 'asset.png';
             const buffer = await Data.getAssetBuffer(name);
-            await Api.testError({
-                method: 'POST',
-                route: `/characters/${characterId}/portrait`,
-                files: [{
-                    field: 'invalid',
-                    buffer,
-                    name
-                }]
-            }, 400);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: `/characters/${characterId}/portrait`,
+                    files: [
+                        {
+                            field: 'invalid',
+                            buffer,
+                            name
+                        }
+                    ]
+                },
+                400
+            );
         });
         it('Should throw a validation error because of wrong file type', async () => {
             const { id: characterId } = findCharacter(
@@ -344,15 +395,20 @@ describe('[API] Characters', () => {
             );
             const name = 'asset.mp3';
             const buffer = await Data.getAssetBuffer(name);
-            await Api.testError({
-                method: 'POST',
-                route: `/characters/${characterId}/portrait`,
-                files: [{
-                    field: 'portrait',
-                    buffer,
-                    name
-                }]
-            }, 400);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: `/characters/${characterId}/portrait`,
+                    files: [
+                        {
+                            field: 'portrait',
+                            buffer,
+                            name
+                        }
+                    ]
+                },
+                400
+            );
         });
         it('Should throw a validation error because uploaded file is too big', async () => {
             const { id: characterId } = findCharacter(
@@ -361,38 +417,39 @@ describe('[API] Characters', () => {
             );
             const name = 'too-big.png';
             const buffer = await Data.getAssetBuffer(name);
-            await Api.testError({
-                method: 'POST',
-                route: `/characters/${characterId}/portrait`,
-                files: [{
-                    field: 'portrait',
-                    buffer,
-                    name
-                }]
-            }, 400);
+            await Api.testError(
+                {
+                    method: 'POST',
+                    route: `/characters/${characterId}/portrait`,
+                    files: [
+                        {
+                            field: 'portrait',
+                            buffer,
+                            name
+                        }
+                    ]
+                },
+                400
+            );
         });
         it('Should upload a portrait', async () => {
-            const character = findCharacter(
-                Api.userId,
-                'callOfCthulhu'
-            );
+            const character = findCharacter(Api.userId, 'callOfCthulhu');
             const { id: characterId } = character;
-            const uploadData = [
-                'asset.jpg',
-                'asset.png'
-            ];
+            const uploadData = ['asset.jpg', 'asset.png'];
             await Promise.all(
-                uploadData.map((name) => (
+                uploadData.map((name) =>
                     (async () => {
                         const buffer = await Data.getAssetBuffer(name);
                         const response = await Api.request({
                             method: 'POST',
                             route: `/characters/${characterId}/portrait`,
-                            files: [{
-                                field: 'portrait',
-                                buffer,
-                                name
-                            }]
+                            files: [
+                                {
+                                    field: 'portrait',
+                                    buffer,
+                                    name
+                                }
+                            ]
                         });
                         expect(response).to.have.status(200);
                         expect(response).to.be.json;
@@ -405,7 +462,7 @@ describe('[API] Characters', () => {
                             Path.join('/static', updatedCharacter.portrait)
                         );
                     })()
-                ))
+                )
             );
         });
     });
@@ -418,27 +475,29 @@ describe('[API] Characters', () => {
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError({
-                method: 'DELETE',
-                route: `/characters/${charactersData[1].id}/portrait`
-            }, 403);
+            await Api.testError(
+                {
+                    method: 'DELETE',
+                    route: `/characters/${charactersData[1].id}/portrait`
+                },
+                403
+            );
         });
         it('Should delete an asset', async () => {
-            const character = findCharacter(
-                Api.userId,
-                'callOfCthulhu'
-            );
+            const character = findCharacter(Api.userId, 'callOfCthulhu');
             const { id: characterId } = character;
             const name = 'asset.png';
             const buffer = await Data.getAssetBuffer(name);
             const response = await Api.request({
                 method: 'POST',
                 route: `/characters/${characterId}/portrait`,
-                files: [{
-                    field: 'portrait',
-                    buffer,
-                    name
-                }]
+                files: [
+                    {
+                        field: 'portrait',
+                        buffer,
+                        name
+                    }
+                ]
             });
             expect(response).to.have.status(200);
             const updatedCharacter = response.body;
