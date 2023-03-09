@@ -5,17 +5,17 @@ import {
     NextFunction
 } from 'express';
 
-import { Prisma } from '../services/prisma';
-import Validator from '../services/validator';
 import { AuthenticationError } from '../services/errors';
-import { UserSelect } from '../types/user';
+import { getCookieOptions } from './helpers/auth';
 import rateLimiter from '../services/rateLimiter';
+import Validator from '../services/validator';
+import { Prisma } from '../services/prisma';
+import { UserSelect } from '../types/user';
 import {
     verifyPassword,
     generateJwt,
     verifyJwt
 } from '../services/crypto';
-import { getCookieOptions } from './helpers/auth';
 
 import authSchemas from './schemas/auth.json';
 

@@ -7,11 +7,12 @@ import {
 } from 'express';
 import Formidable from 'formidable';
 
-import { Prisma } from '../services/prisma';
 import { ValidationError } from '../services/errors';
-import Log from '../services/log';
-import { TypedFile } from '../types/asset';
+import { parseParamId } from '../services/tools';
 import Validator from '../services/validator';
+import { Prisma } from '../services/prisma';
+import { TypedFile } from '../types/asset';
+import Log from '../services/log';
 import {
     controlFile,
     assetDir,
@@ -149,7 +150,7 @@ assetController.post('/assets', async (req: Request, res: Response): Promise<voi
 assetController.get('/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.user.id;
-        const assetId = Number(req.params.assetId);
+        const assetId = parseParamId(req.params, 'assetId');
         const asset = await getAsset(userId, assetId);
         res.json(asset);
     } catch (err: any) {
@@ -161,7 +162,7 @@ assetController.get('/assets/:assetId', async (req: Request, res: Response): Pro
 assetController.delete('/assets/:assetId', async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.user.id;
-        const assetId = Number(req.params.assetId);
+        const assetId = parseParamId(req.params, 'assetId');
         const { path } = await getAsset(userId, assetId);
         await Promise.all([
             Prisma.asset.delete({
@@ -215,7 +216,7 @@ assetController.post('/directories', async (req: Request, res: Response): Promis
 assetController.get('/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.user.id;
-        const directoryId = Number(req.params.directoryId);
+        const directoryId = parseParamId(req.params, 'directoryId');
         const directory = await getDirectory(userId, directoryId);
         res.json(directory);
     } catch (err: any) {
@@ -227,7 +228,7 @@ assetController.get('/directories/:directoryId', async (req: Request, res: Respo
 assetController.post('/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.user.id;
-        const directoryId = Number(req.params.directoryId);
+        const directoryId = parseParamId(req.params, 'directoryId');
         await getDirectory(userId, directoryId);
         validateUpdateDirectory(req.body);
         const directory = await Prisma.directory.update({
@@ -246,7 +247,7 @@ assetController.post('/directories/:directoryId', async (req: Request, res: Resp
 assetController.delete('/directories/:directoryId', async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.user.id;
-        const directoryId = Number(req.params.directoryId);
+        const directoryId = parseParamId(req.params, 'directoryId');
         await getDirectory(userId, directoryId);
         // get all directories of the user
         const directories = await getDirectories(userId);

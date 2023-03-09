@@ -4,9 +4,10 @@ import {
     Response
 } from 'express';
 
-import { Prisma } from '../services/prisma';
+import { parseParamId } from '../services/tools';
 import Validator from '../services/validator';
 import { controlSelf } from './helpers/auth';
+import { Prisma } from '../services/prisma';
 
 import definitions from './schemas/definitions.json';
 import sketchSchemas from './schemas/sketch.json';
@@ -53,7 +54,7 @@ sketchController.post('/sketchs', async (req: Request, res: Response): Promise<v
 // get a sketch belonging to current user
 sketchController.get('/sketchs/:sketchId', async ({ params, user }: Request, res: Response): Promise<void> => {
     try {
-        const sketchId = Number(params.sketchId);
+        const sketchId = parseParamId(params, 'sketchId');
         const sketch = await Prisma.sketch.findFirstOrThrow({
             where: {
                 id: sketchId,
@@ -69,7 +70,7 @@ sketchController.get('/sketchs/:sketchId', async ({ params, user }: Request, res
 // delete a sketch belonging to the current user
 sketchController.delete('/sketchs/:sketchId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const sketchId = Number(req.params.sketchId);
+        const sketchId = parseParamId(req.params, 'sketchId');
         const sketch = await Prisma.sketch.findFirstOrThrow({
             where: {
                 id: sketchId

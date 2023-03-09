@@ -4,11 +4,15 @@ import {
     Response
 } from 'express';
 
-import { Prisma } from '../services/prisma';
-import { hashPassword } from '../services/crypto';
 import { ForbiddenError } from '../services/errors';
-import Validator from '../services/validator';
 import rateLimiter from '../services/rateLimiter';
+import { hashPassword } from '../services/crypto';
+import Validator from '../services/validator';
+import { Prisma } from '../services/prisma';
+import {
+    controlInvitationCode,
+    generateInvitationCode
+} from './helpers/registration';
 import {
     isRegistrationEnabled,
     isInvitationEnabled
@@ -18,10 +22,6 @@ import {
     controlUniqueEmail,
     defaultUserData
 } from './helpers/user';
-import {
-    controlInvitationCode,
-    generateInvitationCode
-} from './helpers/registration';
 
 import userSchemas from './schemas/user.json';
 

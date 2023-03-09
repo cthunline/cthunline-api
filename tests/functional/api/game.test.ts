@@ -33,7 +33,7 @@ describe('[API] Games', () => {
             await Api.testInvalidIdError({
                 method: 'GET',
                 route: '/games/:id',
-                isObjectId: false
+                isInteger: false
             });
         });
         it('Should get a game', async () => {

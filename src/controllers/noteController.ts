@@ -4,9 +4,12 @@ import {
     Response
 } from 'express';
 
-import { Prisma } from '../services/prisma';
-import Validator from '../services/validator';
+import { ConflictError, InternError } from '../services/errors';
+import { parseParamId } from '../services/tools';
 import { getSession } from './helpers/session';
+import Validator from '../services/validator';
+import { controlSelf } from './helpers/auth';
+import { Prisma } from '../services/prisma';
 import {
     getNotes,
     getNote,
@@ -14,8 +17,6 @@ import {
     getNextNotePosition,
     switchNotePositions
 } from './helpers/note';
-import { controlSelf } from './helpers/auth';
-import { ConflictError, InternError } from '../services/errors';
 
 import noteSchemas from './schemas/note.json';
 
@@ -28,7 +29,7 @@ const noteController = Router();
 // also returns shared notes in a separate list
 noteController.get('/sessions/:sessionId/notes', async ({ params, query, user }: Request, res: Response): Promise<void> => {
     try {
-        const sessionId = Number(params.sessionId);
+        const sessionId = parseParamId(params, 'sessionId');
         await getSession(sessionId);
         const notes = await getNotes(
             sessionId,
@@ -48,7 +49,7 @@ noteController.get('/sessions/:sessionId/notes', async ({ params, query, user }:
 noteController.post('/sessions/:sessionId/notes', async ({ params, body, user }: Request, res: Response): Promise<void> => {
     try {
         validateCreateNote(body);
-        const sessionId = Number(params.sessionId);
+        const sessionId = parseParamId(params, 'sessionId');
         await getSession(sessionId);
         const position = await getNextNotePosition(sessionId, user.id);
         const note = await Prisma.note.create({
@@ -70,7 +71,7 @@ noteController.post('/sessions/:sessionId/notes', async ({ params, body, user }:
 // get a note
 noteController.get('/notes/:noteId', async ({ params, user }: Request, res: Response): Promise<void> => {
     try {
-        const noteId = Number(params.noteId);
+        const noteId = parseParamId(params, 'noteId');
         const note = await getNote(noteId, user.id);
         res.json(note);
     } catch (err: any) {
@@ -83,7 +84,7 @@ noteController.post('/notes/:noteId', async (req: Request, res: Response): Promi
     try {
         const { params, body, user } = req;
         validateUpdateNote(body);
-        const noteId = Number(params.noteId);
+        const noteId = parseParamId(params, 'noteId');
         const note = await getNote(noteId, user.id);
         controlSelf(req, note.userId);
         const updatedNote = await Prisma.note.update({
@@ -104,7 +105,7 @@ noteController.post('/notes/:noteId', async (req: Request, res: Response): Promi
 noteController.put('/notes/:noteId/:action(up|down)', async (req: Request, res: Response): Promise<void> => {
     try {
         const { params, user } = req;
-        const noteId = Number(params.noteId);
+        const noteId = parseParamId(params, 'noteId');
         const note = await getNote(noteId, user.id);
         controlSelf(req, note.userId);
         let positionToSwitch: number;
@@ -141,7 +142,7 @@ noteController.put('/notes/:noteId/:action(up|down)', async (req: Request, res: 
 noteController.delete('/notes/:noteId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { params, user } = req;
-        const noteId = Number(params.noteId);
+        const noteId = parseParamId(params, 'noteId');
         const note = await getNote(noteId, user.id);
         controlSelf(req, note.userId);
         await Prisma.note.delete({

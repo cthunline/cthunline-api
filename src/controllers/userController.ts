@@ -4,11 +4,12 @@ import {
     Response
 } from 'express';
 
-import { Prisma } from '../services/prisma';
 import { verifyPassword, hashPassword } from '../services/crypto';
-import { ValidationError } from '../services/errors';
-import Validator from '../services/validator';
 import { controlSelf, controlSelfAdmin } from './helpers/auth';
+import { ValidationError } from '../services/errors';
+import { parseParamId } from '../services/tools';
+import Validator from '../services/validator';
+import { Prisma } from '../services/prisma';
 import {
     userSelect,
     getUser,
@@ -70,7 +71,7 @@ userController.post('/users', async (req: Request, res: Response): Promise<void>
 // get a user
 userController.get('/users/:userId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const userId = Number(params.userId);
+        const userId = parseParamId(params, 'userId');
         const user = await getUser(userId);
         res.json(user);
     } catch (err: any) {
@@ -82,7 +83,7 @@ userController.get('/users/:userId', async ({ params }: Request, res: Response):
 userController.post('/users/:userId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { params, body } = req;
-        const userId = Number(params.userId);
+        const userId = parseParamId(params, 'userId');
         const user = await Prisma.user.findUniqueOrThrow({
             where: {
                 id: userId

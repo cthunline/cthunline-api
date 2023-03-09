@@ -4,11 +4,12 @@ import {
     Response
 } from 'express';
 
-import { Prisma } from '../services/prisma';
-import { controlSelf } from './helpers/auth';
-import { isValidGameId } from '../services/games';
-import Validator from '../services/validator';
 import { ValidationError } from '../services/errors';
+import { isValidGameId } from '../services/games';
+import { parseParamId } from '../services/tools';
+import Validator from '../services/validator';
+import { controlSelf } from './helpers/auth';
+import { Prisma } from '../services/prisma';
 import {
     defaultSketchData,
     getInclude,
@@ -69,7 +70,7 @@ sessionController.post('/sessions', async (req: Request, res: Response): Promise
 // get a session
 sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const sessionId = Number(params.sessionId);
+        const sessionId = parseParamId(params, 'sessionId');
         const session = await getSession(sessionId);
         res.json(session);
     } catch (err: any) {
@@ -81,7 +82,7 @@ sessionController.get('/sessions/:sessionId', async ({ params }: Request, res: R
 sessionController.post('/sessions/:sessionId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { body, params } = req;
-        const sessionId = Number(params.sessionId);
+        const sessionId = parseParamId(params, 'sessionId');
         const session = await getSession(sessionId);
         controlSelf(req, session.masterId);
         validateUpdateSession(body);
@@ -100,7 +101,7 @@ sessionController.post('/sessions/:sessionId', async (req: Request, res: Respons
 // delete a session
 sessionController.delete('/sessions/:sessionId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const sessionId = Number(req.params.sessionId);
+        const sessionId = parseParamId(req.params, 'sessionId');
         const session = await getSession(sessionId);
         controlSelf(req, session.masterId);
         await Prisma.session.delete({

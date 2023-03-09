@@ -5,16 +5,17 @@ import {
 } from 'express';
 import Fs from 'fs';
 import Path from 'path';
-import { Prisma as PrismaNS } from '@prisma/client';
 import Formidable from 'formidable';
+import { Prisma as PrismaNS } from '@prisma/client';
 
-import { getUser } from './helpers/user';
-import { controlSelf } from './helpers/auth';
-import { Prisma } from '../services/prisma';
-import Validator from '../services/validator';
 import { InternError, ValidationError } from '../services/errors';
 import { Games, GameId, isValidGameId } from '../services/games';
 import { assetDir, controlFile } from './helpers/asset';
+import { parseParamId } from '../services/tools';
+import Validator from '../services/validator';
+import { controlSelf } from './helpers/auth';
+import { Prisma } from '../services/prisma';
+import { getUser } from './helpers/user';
 import {
     getCharacter,
     formidablePortraitOptions,
@@ -79,7 +80,7 @@ characterController.post('/characters', async (req: Request, res: Response): Pro
 // get a character
 characterController.get('/characters/:characterId', async ({ params }: Request, res: Response): Promise<void> => {
     try {
-        const characterId = Number(params.characterId);
+        const characterId = parseParamId(params, 'characterId');
         const character = await getCharacter(characterId);
         res.json(character);
     } catch (err: any) {
@@ -91,7 +92,7 @@ characterController.get('/characters/:characterId', async ({ params }: Request, 
 characterController.post('/characters/:characterId', async (req: Request, res: Response): Promise<void> => {
     try {
         const { body, params } = req;
-        const characterId = Number(params.characterId);
+        const characterId = parseParamId(params, 'characterId');
         const { gameId, userId } = await getCharacter(characterId);
         controlSelf(req, userId);
         validateUpdateCharacter(body);
@@ -113,7 +114,7 @@ characterController.post('/characters/:characterId', async (req: Request, res: R
 // delete a user's character
 characterController.delete('/characters/:characterId', async (req: Request, res: Response): Promise<void> => {
     try {
-        const characterId = Number(req.params.characterId);
+        const characterId = parseParamId(req.params, 'characterId');
         const { userId } = await getCharacter(characterId);
         controlSelf(req, userId);
         await Prisma.character.delete({
@@ -130,7 +131,7 @@ characterController.delete('/characters/:characterId', async (req: Request, res:
 // set a character portrait
 characterController.post('/characters/:characterId/portrait', async (req: Request, res: Response): Promise<void> => {
     try {
-        const characterId = Number(req.params.characterId);
+        const characterId = parseParamId(req.params, 'characterId');
         const character = await getCharacter(characterId);
         controlSelf(req, character.userId);
         // get portraits directory
@@ -197,7 +198,7 @@ characterController.post('/characters/:characterId/portrait', async (req: Reques
 // delete a user's character
 characterController.delete('/characters/:characterId/portrait', async (req: Request, res: Response): Promise<void> => {
     try {
-        const characterId = Number(req.params.characterId);
+        const characterId = parseParamId(req.params, 'characterId');
         const character = await getCharacter(characterId);
         controlSelf(req, character.userId);
         if (character.portrait) {

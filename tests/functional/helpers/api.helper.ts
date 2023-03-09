@@ -95,7 +95,7 @@ export interface InvalidIdOptions {
     route: string;
     body?: Record<string, any>;
     ids?: string[];
-    isObjectId?: boolean;
+    isInteger?: boolean;
 }
 
 export interface CredentialOptions {
@@ -357,7 +357,7 @@ const Api = {
             route,
             body,
             ids,
-            isObjectId = true
+            isInteger = true
         } = options;
         const invalidIds = ids ?? [
             '123456789',
@@ -379,7 +379,7 @@ const Api = {
                         body
                     });
                     expect(response).to.have.status(
-                        isInvalid && isObjectId ? 400 : 404
+                        isInvalid && isInteger ? 400 : 404
                     );
                     expect(response).to.be.json;
                     assertError(response.body);

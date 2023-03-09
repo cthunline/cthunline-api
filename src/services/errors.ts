@@ -1,9 +1,8 @@
 /* eslint-disable max-classes-per-file */
 import {
     PrismaClientValidationError,
-    PrismaClientKnownRequestError,
-    NotFoundError as PrismaNotFoundError
-} from '@prisma/client/runtime';
+    PrismaClientKnownRequestError
+} from '@prisma/client/runtime/library';
 import {
     Request,
     Response,
@@ -62,9 +61,6 @@ export class ConflictError extends CustomError {
 // if the given error is a prisma error and is handled then
 // returns the matching custom error
 const handlePrismaError = (err: Error): Error => {
-    if (err instanceof PrismaNotFoundError) {
-        return new NotFoundError(err.message);
-    }
     if (err instanceof PrismaClientValidationError) {
         return new ValidationError();
     }
@@ -72,7 +68,9 @@ const handlePrismaError = (err: Error): Error => {
         if (err.code === 'P2023') {
             return new ValidationError();
         }
-        return new ValidationError(err.message);
+        if (err.code === 'P2025') {
+            return new NotFoundError();
+        }
     }
     return err;
 };
