@@ -11,11 +11,11 @@
         "pretest": "dotenv -e .env.test -- npx prisma db push",
         "test": "nyc dotenv -e .env.test -- mocha --exit",
         "prepare": "[ -d '.husky' ] && husky install || true",
-        "lint": "npx eslint . --ext=.ts --max-warnings=0 && npx prettier --check . && markdownlint **/*.md",
-        "format": "npx eslint . --fix --ext=.ts --max-warnings=0 && npx prettier --write . && markdownlint --fix **/*.md"
+        "lint": "npx eslint . --ext=.ts --max-warnings=0 && npx prettier --check . && npx tsc --noEmit && npx markdownlint **/*.md",
+        "format": "npx eslint . --fix --ext=.ts --max-warnings=0 && npx prettier --write . && npx tsc --noEmit && npx markdownlint --fix **/*.md"
     },
     "dependencies": {
-        "@cthunline/games": "^2.1.2",
+        "@cthunline/games": "^2.2.0",
         "@fastify/cookie": "^8.3.0",
         "@fastify/helmet": "^11.0.0",
         "@fastify/rate-limit": "^8.0.3",
@@ -48,6 +48,7 @@
         "@types/jsonwebtoken": "^9.0.2",
         "@types/mocha": "^10.0.1",
         "@types/node": "^20.4.2",
+        "@types/qs": "^6.9.7",
         "@types/type-detect": "^4.0.1",
         "@typescript-eslint/eslint-plugin": "^6.0.0",
         "@typescript-eslint/parser": "^6.0.0",
