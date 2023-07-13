@@ -1,4 +1,4 @@
-import CookieSignature from 'cookie-signature';
+import { fastifyCookie } from '@fastify/cookie';
 import { expect } from 'chai';
 import Client, {
     Socket,
@@ -56,7 +56,7 @@ const Sockets: SocketsHelper = {
             autoConnect: false
         });
         if (jwt) {
-            const signed = CookieSignature.sign(
+            const signed = fastifyCookie.sign(
                 jwt,
                 process.env.COOKIE_SECRET ?? ''
             );
