@@ -14,7 +14,7 @@
                 "reputations": "Some reputation",
                 "wealth": 1
             },
-            "hitPoints": 1,
+            "heroPoints": 0,
             "arcana": {
                 "name": "Some Arcana",
                 "virtue": "A random virtue",
@@ -90,7 +90,7 @@
                 "reputations": "Some reputation",
                 "wealth": 1
             },
-            "hitPoints": 2,
+            "heroPoints": 1,
             "arcana": {
                 "name": "Random arcana",
                 "virtue": "A virtue",

@@ -4,10 +4,8 @@ import Fs from 'fs';
 import Path from 'path';
 
 import { Prisma } from '../../services/prisma';
-import { env } from '../../services/env';
+import { getEnv } from '../../services/env';
 import { assetTempDir, getAssetDir } from './asset';
-
-const { PORTRAIT_MAX_SIZE_MB } = env;
 
 export const portraitDirName = 'portraits';
 
@@ -18,12 +16,12 @@ export const getCharacter = async (characterId: number): Promise<Character> =>
         }
     });
 
-export const formidablePortraitOptions: Formidable.Options = {
+export const getFormidablePortraitOptions = (): Formidable.Options => ({
     uploadDir: assetTempDir,
     keepExtensions: false,
-    maxFileSize: PORTRAIT_MAX_SIZE_MB * 1024 * 1024,
+    maxFileSize: getEnv('PORTRAIT_MAX_SIZE_MB') * 1024 * 1024,
     multiples: false
-};
+});
 
 // create user subdirectory in asset dir if not exist and return its path
 export const controlPortraitDir = async (): Promise<string> => {

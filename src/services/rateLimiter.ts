@@ -1,18 +1,16 @@
-import RateLimit from 'express-rate-limit';
+import { FastifyInstance } from 'fastify';
+import FastifyRateLimit from '@fastify/rate-limit';
 
-import { env } from './env';
+import { getEnv } from './env';
 
-const { RL_WINDOW_DURATION, RL_MAX_REQUESTS } = env;
-
-const rateLimiter = RateLimit({
-    // window duration in ms
-    windowMs: RL_WINDOW_DURATION * 60 * 1000,
-    // limit each IP to N requests per window
-    max: RL_MAX_REQUESTS,
-    // return rate limit info in the RateLimit-* headers
-    standardHeaders: true,
-    // disable the X-RateLimit-* headers
-    legacyHeaders: false
-});
-
-export default rateLimiter;
+/**
+Register Fastify rate limiter plugin
+*/
+export const registerRateLimiter = async (app: FastifyInstance) => {
+    await app.register(FastifyRateLimit, {
+        // window duration in ms
+        timeWindow: getEnv('RL_WINDOW_DURATION') * 60 * 1000,
+        // limit each IP to N requests per window
+        max: getEnv('RL_MAX_REQUESTS')
+    });
+};

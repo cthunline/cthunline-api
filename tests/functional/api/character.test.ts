@@ -1,9 +1,11 @@
 import { expect } from 'chai';
 import Path from 'path';
 
-import Api from '../helpers/api.helper';
+import { mockEnvVar } from '../../../src/services/env';
+
 import Data, { charactersData } from '../helpers/data.helper';
 import { assertCharacter } from '../helpers/assert.helper';
+import Api from '../helpers/api.helper';
 
 const findCharacter = (userId: number, gameId: string) => {
     const character = charactersData.find(
@@ -99,37 +101,36 @@ describe('[API] Characters', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: '/characters',
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/characters',
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should create a character', async () => {
-            const gameIds = ['callOfCthulhu', 'starWarsD6'];
-            await Promise.all(
-                gameIds.map((gameId) =>
-                    (async () => {
-                        const { data } = findCharacter(Api.userId, gameId);
-                        await Api.testCreate({
-                            route: '/characters',
-                            data: {
-                                gameId,
-                                name: `Test ${gameId}`,
-                                data
-                            },
-                            assert: assertCharacter
-                        });
-                    })()
-                )
-            );
+            const gameIds = [
+                'callOfCthulhu',
+                'starWarsD6',
+                'dnd5',
+                'seventhSea'
+            ];
+            for (const gameId of gameIds) {
+                const { data } = findCharacter(Api.userId, gameId);
+                await Api.testCreate({
+                    route: '/characters',
+                    data: {
+                        gameId,
+                        name: `Test ${gameId}`,
+                        data
+                    },
+                    assert: assertCharacter
+                });
+            }
         });
     });
 
@@ -215,18 +216,16 @@ describe('[API] Characters', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/characters/${id}`,
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/characters/${id}`,
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should throw a forbidden error', async () => {
             await Api.testError(
@@ -329,24 +328,22 @@ describe('[API] Characters', () => {
             ];
             const name = 'asset.png';
             const buffer = await Data.getAssetBuffer(name);
-            await Promise.all(
-                invalidData.map(({ id, status }) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/characters/${id}/portrait`,
-                            files: [
-                                {
-                                    field: 'portrait',
-                                    buffer,
-                                    name
-                                }
-                            ]
-                        },
-                        status
-                    )
-                )
-            );
+            for (const { id, status } of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/characters/${id}/portrait`,
+                        files: [
+                            {
+                                field: 'portrait',
+                                buffer,
+                                name
+                            }
+                        ]
+                    },
+                    status
+                );
+            }
         });
         it('Should throw a forbidden error', async () => {
             const name = 'asset.png';
@@ -411,6 +408,7 @@ describe('[API] Characters', () => {
             );
         });
         it('Should throw a validation error because uploaded file is too big', async () => {
+            mockEnvVar('PORTRAIT_MAX_SIZE_MB', 1);
             const { id: characterId } = findCharacter(
                 Api.userId,
                 'callOfCthulhu'
@@ -436,34 +434,30 @@ describe('[API] Characters', () => {
             const character = findCharacter(Api.userId, 'callOfCthulhu');
             const { id: characterId } = character;
             const uploadData = ['asset.jpg', 'asset.png'];
-            await Promise.all(
-                uploadData.map((name) =>
-                    (async () => {
-                        const buffer = await Data.getAssetBuffer(name);
-                        const response = await Api.request({
-                            method: 'POST',
-                            route: `/characters/${characterId}/portrait`,
-                            files: [
-                                {
-                                    field: 'portrait',
-                                    buffer,
-                                    name
-                                }
-                            ]
-                        });
-                        expect(response).to.have.status(200);
-                        expect(response).to.be.json;
-                        const updatedCharacter = response.body;
-                        assertCharacter(updatedCharacter, {
-                            ...character,
-                            portrait: updatedCharacter.portrait
-                        });
-                        await Api.testStaticFile(
-                            Path.join('/static', updatedCharacter.portrait)
-                        );
-                    })()
-                )
-            );
+            for (const name of uploadData) {
+                const buffer = await Data.getAssetBuffer(name);
+                const response = await Api.request({
+                    method: 'POST',
+                    route: `/characters/${characterId}/portrait`,
+                    files: [
+                        {
+                            field: 'portrait',
+                            buffer,
+                            name
+                        }
+                    ]
+                });
+                expect(response).to.have.status(200);
+                expect(response.body).to.be.an('object');
+                const updatedCharacter = response.body;
+                assertCharacter(updatedCharacter, {
+                    ...character,
+                    portrait: updatedCharacter.portrait
+                });
+                await Api.testStaticFile(
+                    Path.join('/static', updatedCharacter.portrait)
+                );
+            }
         });
     });
 
@@ -509,7 +503,7 @@ describe('[API] Characters', () => {
                 route: `/characters/${characterId}/portrait`
             });
             expect(deleteResponse).to.have.status(200);
-            expect(deleteResponse).to.be.json;
+            expect(deleteResponse.body).to.be.an('object');
             assertCharacter(deleteResponse.body);
             await Api.testStaticFile(
                 Path.join('/static', updatedCharacter.portrait),

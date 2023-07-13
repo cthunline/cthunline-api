@@ -1,21 +1,17 @@
-import Chai, { expect } from 'chai';
-import DayJs from 'dayjs';
 import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
+import ChaiDateTime from 'chai-datetime';
+import Chai, { expect } from 'chai';
 
+import { AppErrorConstructor } from '../../../src/services/errors';
 import { locales } from '../../../src/types/env';
 
+import { ChaiDateString, ChaiArrayOfType, ChaiHttpStatus } from './chai.helper';
+
+Chai.use(ChaiHttpStatus);
 Chai.use(DeepEqualInAnyOrder);
-Chai.use((chai: Chai.ChaiStatic) => {
-    chai.Assertion.addMethod('dateString', function assertDateString() {
-        const obj = this._obj; // eslint-disable-line no-underscore-dangle
-        this.assert(
-            DayJs(obj).isValid(),
-            'expected #{this} to be a date-time string',
-            'expected #{this} to not be a date-time string',
-            obj
-        );
-    });
-});
+Chai.use(ChaiDateTime);
+Chai.use(ChaiDateString);
+Chai.use(ChaiArrayOfType);
 
 declare global {
     export namespace Chai {
@@ -24,6 +20,23 @@ declare global {
         }
     }
 }
+
+export const expectAsync = async (
+    promise: Promise<any>,
+    ErrorClassThatShouldBeThrown?: AppErrorConstructor
+) => {
+    let error = null;
+    try {
+        await promise;
+    } catch (err: any) {
+        error = err;
+    }
+    if (ErrorClassThatShouldBeThrown) {
+        expect(error).to.be.an.instanceOf(ErrorClassThatShouldBeThrown);
+    } else {
+        expect(error).to.be.null;
+    }
+};
 
 export const compareDataWithExpected = (
     data: Record<string, any>,

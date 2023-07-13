@@ -1,81 +1,97 @@
-import Express, { Router, Request, Response, NextFunction } from 'express';
+import { FastifyInstance, FastifyRequest } from 'fastify';
+import FastifyStatic from '@fastify/static';
 import Path from 'path';
 
-import { NotFoundError } from '../services/errors';
-import Log from '../services/log';
-import { env } from '../services/env';
-import { assetDir } from './helpers/asset';
-import authController, { authMiddleware } from './authController';
-import userController from './userController';
-import registrationController from './registrationController';
-import assetController from './assetController';
-import gameController from './gameController';
-import sessionController from './sessionController';
-import noteController from './noteController';
-import sketchController from './sketchController';
-import characterController from './characterController';
 import configurationController from './configurationController';
+import registrationController from './registrationController';
+import characterController from './characterController';
+import sessionController from './sessionController';
+import sketchController from './sketchController';
+import assetController from './assetController';
+import authController from './authController';
+import userController from './userController';
+import gameController from './gameController';
+import noteController from './noteController';
 
-const { ENVIRONMENT } = env;
+import { authMiddleware } from './helpers/auth';
+import { assetDir } from './helpers/asset';
 
-const mainController = Router();
+import { getFastifyHttpMethods } from '../services/api';
+import { NotFoundError } from '../services/errors';
+import { getEnv } from '../services/env';
+import Log from '../services/log';
 
-// apply authentication middleware
-mainController.use(
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const mainController = async (app: FastifyInstance) => {
+    app.decorateRequest('user', null);
+
+    app.addHook('onRequest', async (req: FastifyRequest) => {
+        // public routes
         if (
-            (req.method === 'GET' && req.path === '/api/configuration') || // public configuration route
-            (req.method === 'POST' && req.path === '/api/auth') || // api login route is public
-            (req.method === 'POST' && req.path === '/api/register') // registration route is public
+            (req.method === 'GET' && req.url === '/api/configuration') || // public configuration route
+            (req.method === 'POST' && req.url === '/api/auth') || // api login route is public
+            (req.method === 'POST' && req.url === '/api/register') // registration route is public
         ) {
-            next();
-        } else if (
-            req.path.startsWith('/api') ||
-            req.path.startsWith('/static')
-        ) {
-            // api routes and static ressource are protected
-            await authMiddleware(req, res, next);
-        } else {
-            // any other route is for web client build
-            next();
+            return;
         }
-    }
-);
+        if (
+            // api routes and static ressource are protected
+            req.url.startsWith('/api') ||
+            req.url.startsWith('/static')
+        ) {
+            // apply authentication middleware on private routes
+            await authMiddleware(req);
+        }
+    });
 
-// apply api controllers
-mainController.use('/api', authController);
-mainController.use('/api', userController);
-mainController.use('/api', registrationController);
-mainController.use('/api', assetController);
-mainController.use('/api', gameController);
-mainController.use('/api', sessionController);
-mainController.use('/api', noteController);
-mainController.use('/api', sketchController);
-mainController.use('/api', characterController);
-mainController.use('/api', configurationController);
+    // apply api controllers
+    await Promise.all(
+        [
+            assetController,
+            authController,
+            characterController,
+            configurationController,
+            gameController,
+            noteController,
+            sessionController,
+            sketchController,
+            registrationController,
+            userController
+        ].map((controller) =>
+            app.register(controller, {
+                prefix: '/api'
+            })
+        )
+    );
 
-// throw 404 on unknown api routes
-mainController.use('/api/*', (_req: Request, res: Response) => {
-    res.error(new NotFoundError('Route does not exist'));
-});
+    // throw 404 on unknown api routes
+    app.all('/api/*', () => {
+        throw new NotFoundError('Route does not exist');
+    });
 
-// serve static assets
-mainController.use('/static', Express.static(assetDir));
+    // serve static assets
+    await app.register(FastifyStatic, {
+        root: assetDir,
+        prefix: '/static'
+    });
 
-// serve web client build in production
-if (ENVIRONMENT === 'prod') {
-    Log.info('Serving production web client build');
-    mainController.use(Express.static(Path.join(__dirname, '../web')));
-    mainController.get('*', (_req: Request, res: Response) => {
-        res.sendFile('index.html', {
-            root: Path.join(__dirname, '../web')
+    // serve web client build in production
+    if (getEnv('ENVIRONMENT') === 'prod') {
+        Log.info('Serving production web client build');
+        await app.register(FastifyStatic, {
+            root: Path.join(__dirname, '../web'),
+            decorateReply: false,
+            index: 'index.html'
         });
-    });
-} else {
-    // any other request falls in 404 if in dev mode
-    mainController.use('*', (_req: Request, res: Response) => {
-        res.error(new NotFoundError());
-    });
-}
+    } else {
+        // any other request falls in 404
+        app.route({
+            method: getFastifyHttpMethods({ exclude: 'OPTIONS' }),
+            url: '*',
+            handler: () => {
+                throw new NotFoundError();
+            }
+        });
+    }
+};
 
 export default mainController;

@@ -1,16 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
-import { env } from './env';
+import { getEnv } from './env';
 import Log from './log';
 import { hashPassword } from './crypto';
-
-const {
-    DEFAULT_ADMIN_NAME,
-    DEFAULT_ADMIN_EMAIL,
-    DEFAULT_ADMIN_PASSWORD,
-    DEFAULT_THEME,
-    DEFAULT_LOCALE
-} = env;
 
 export const Prisma = new PrismaClient();
 
@@ -19,11 +11,11 @@ export const Prisma = new PrismaClient();
 export const initDb = async () => {
     const users = await Prisma.user.findMany();
     if (!users.length) {
-        const name = DEFAULT_ADMIN_NAME;
-        const email = DEFAULT_ADMIN_EMAIL;
-        const password = DEFAULT_ADMIN_PASSWORD;
-        const theme = DEFAULT_THEME;
-        const locale = DEFAULT_LOCALE;
+        const name = getEnv('DEFAULT_ADMIN_NAME');
+        const email = getEnv('DEFAULT_ADMIN_EMAIL');
+        const password = getEnv('DEFAULT_ADMIN_PASSWORD');
+        const theme = getEnv('DEFAULT_THEME');
+        const locale = getEnv('DEFAULT_LOCALE');
         if (name && email && password) {
             const defaultAdminUser = {
                 name,

@@ -1,28 +1,27 @@
-import Chai, { expect } from 'chai';
-import ChaiHttp from 'chai-http';
+import { fastifyCookie } from '@fastify/cookie';
+import { OutgoingHttpHeaders } from 'http';
+import FormData from 'form-data';
+import { expect } from 'chai';
 import Path from 'path';
-import CookieParser from 'cookie-parser';
 
-import server from '../../../src';
+import { getEnv } from '../../../src/services/env';
+import { app, initApp } from '../../../src/app';
+
 import { assertError, assertUser } from './assert.helper';
+import Agent from './agent.helper';
 
-Chai.use(ChaiHttp);
+export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
-const chaiHttpAgent = Chai.request.agent(server);
+export const httpMethods: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
-before((done) => {
-    server.on('ready', () => {
-        done();
-    });
+before(async () => {
+    await initApp();
+    await app.listen({ port: getEnv('PORT'), host: '0.0.0.0' });
 });
 
-after(() => {
-    chaiHttpAgent.close();
+after(async () => {
+    await app.close();
 });
-
-type HttpUpperMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
-type HttpLowerMethod = 'get' | 'post' | 'put' | 'delete';
-export type HttpMethod = HttpUpperMethod | HttpLowerMethod;
 
 export interface RequestFileOption {
     field: string;
@@ -31,6 +30,7 @@ export interface RequestFileOption {
 }
 
 export interface RequestOptions {
+    customAgent?: Agent;
     method: HttpMethod;
     route: string;
     body?: Record<string, any>;
@@ -38,6 +38,7 @@ export interface RequestOptions {
     files?: RequestFileOption[];
     auth?: boolean;
     apiPrefix?: boolean;
+    parseJson?: boolean;
 }
 
 export interface GetListOptions {
@@ -92,10 +93,53 @@ export interface CredentialOptions {
 }
 
 const Api = {
+    agent: new Agent(app),
+    apiPrefix: '/api',
     userId: 0,
     credentials: {
         email: 'admin@test.com',
         password: 'test'
+    },
+
+    async request({
+        customAgent,
+        method,
+        route,
+        body,
+        fields,
+        files,
+        apiPrefix = true,
+        parseJson = true
+    }: RequestOptions) {
+        let headers: OutgoingHttpHeaders | undefined;
+        let formData: FormData | null = null;
+        if (!body && (fields || files)) {
+            formData = new FormData();
+            if (fields) {
+                Object.entries(fields).forEach(([key, value]) => {
+                    formData?.append(key, value);
+                });
+            }
+            if (files) {
+                files.forEach(({ field, buffer, name }) => {
+                    formData?.append(field, buffer, {
+                        filename: name
+                    });
+                });
+            }
+            headers = formData.getHeaders();
+        }
+        return (customAgent ?? this.agent).request({
+            method,
+            url: apiPrefix ? Path.join(this.apiPrefix, route) : route,
+            payload: body ?? formData ?? undefined,
+            parseJson,
+            headers
+        });
+    },
+
+    newAgent() {
+        return new Agent(app);
     },
 
     async login(
@@ -112,33 +156,24 @@ const Api = {
             expect(response).to.have.status(200);
             assertUser(body);
             Api.userId = body.id;
-            return {
-                ...body,
-                token: this.getCookieToken(response)
-            };
-        }
-        expect(response).to.have.status(401);
-        expect(response).to.be.json;
-        assertError(body);
-        return null;
-    },
-
-    getCookieToken(response: ChaiHttp.Response) {
-        const tokenRegex = /token=([^;]+);/;
-        const responseCookie = response.get('Set-Cookie');
-        if (responseCookie[0]) {
-            const match = tokenRegex.exec(responseCookie[0]);
-            if (match?.[1]) {
-                const decodedToken = CookieParser.signedCookie(
-                    decodeURIComponent(match[1]),
+            if (Api.agent.cookies.jwt) {
+                const { value } = fastifyCookie.unsign(
+                    Api.agent.cookies.jwt,
                     process.env.COOKIE_SECRET ?? ''
                 );
-                if (decodedToken) {
-                    return decodedToken;
+                if (value) {
+                    return {
+                        ...body,
+                        jwt: value
+                    };
                 }
             }
+            throw new Error('Could not get token from response cookie');
         }
-        throw new Error('Could not get token from response cookie');
+        expect(response).to.have.status(401);
+        expect(body).to.be.an('object');
+        assertError(body);
+        return null;
     },
 
     async logout(expectSuccess: boolean = true): Promise<void> {
@@ -148,12 +183,12 @@ const Api = {
         });
         if (expectSuccess) {
             expect(response).to.have.status(200);
-            expect(response).to.be.json;
+            expect(response.body).to.be.an('object');
             expect(response.body).to.be.an('object').and.be.empty;
             Api.userId = 0;
         } else {
             expect(response).to.have.status(401);
-            expect(response).to.be.json;
+            expect(response.body).to.be.an('object');
             assertError(response.body);
         }
     },
@@ -165,42 +200,13 @@ const Api = {
         });
         if (expectSuccess) {
             expect(response).to.have.status(200);
-            expect(response).to.be.json;
+            expect(response.body).to.be.an('object');
             assertUser(response.body);
         } else {
             expect(response).to.have.status(401);
-            expect(response).to.be.json;
+            expect(response.body).to.be.an('object');
             assertError(response.body);
         }
-    },
-
-    async request({
-        method,
-        route,
-        body,
-        fields,
-        files,
-        apiPrefix = true
-    }: RequestOptions): Promise<ChaiHttp.Response> {
-        const lowerMethod = method.toLowerCase() as HttpLowerMethod;
-        const request = chaiHttpAgent[lowerMethod](
-            apiPrefix ? Path.join('/api', route) : route
-        );
-        if (body) {
-            request.send(body);
-        } else {
-            if (fields) {
-                Object.entries(fields).forEach(([key, value]) => {
-                    request.field(key, value);
-                });
-            }
-            if (files) {
-                files.forEach(({ field, buffer, name }) => {
-                    request.attach(field, buffer, name);
-                });
-            }
-        }
-        return request;
     },
 
     async testError(
@@ -209,7 +215,7 @@ const Api = {
     ): Promise<void> {
         const response = await Api.request(options);
         expect(response).to.have.status(expectedStatus);
-        expect(response).to.be.json;
+        expect(response.body).to.be.an('object');
         assertError(response.body);
     },
 
@@ -223,7 +229,7 @@ const Api = {
             route
         });
         expect(response).to.have.status(200);
-        expect(response).to.be.json;
+        expect(response.body).to.be.an('object');
         const { body } = response;
         expect(body[listKey]).to.be.an('array');
         expect(body[listKey]).to.have.lengthOf(data.length);
@@ -239,7 +245,7 @@ const Api = {
             route: route.replace(':id', data.id)
         });
         expect(response).to.have.status(200);
-        expect(response).to.be.json;
+        expect(response.body).to.be.an('object');
         const { body } = response;
         assert(body, data);
     },
@@ -252,7 +258,7 @@ const Api = {
             body: data
         });
         expect(createResponse).to.have.status(200);
-        expect(createResponse).to.be.json;
+        expect(createResponse.body).to.be.an('object');
         const { body: createBody } = createResponse;
         const expectedData = expected ?? data;
         assert(createBody, expectedData);
@@ -263,7 +269,7 @@ const Api = {
                 : `${route}/${createBody.id}`
         });
         expect(getResponse).to.have.status(200);
-        expect(getResponse).to.be.json;
+        expect(getResponse.body).to.be.an('object');
         const { body: getBody } = getResponse;
         assert(getBody, expectedData);
     },
@@ -276,7 +282,7 @@ const Api = {
             body: data
         });
         expect(editResponse).to.have.status(200);
-        expect(editResponse).to.be.json;
+        expect(editResponse.body).to.be.an('object');
         const { body: editBody } = editResponse;
         const expectedData = expected ?? data;
         assert(editBody, expectedData);
@@ -285,7 +291,7 @@ const Api = {
             route
         });
         expect(getResponse).to.have.status(200);
-        expect(getResponse).to.be.json;
+        expect(getResponse.body).to.be.an('object');
         const { body: getBody } = getResponse;
         assert(getBody, expectedData);
     },
@@ -297,7 +303,7 @@ const Api = {
             route
         });
         expect(deleteResponse).to.have.status(200);
-        expect(deleteResponse).to.be.json;
+        expect(deleteResponse.body).to.be.an('object');
         const { body: deleteBody } = deleteResponse;
         if (assert && data) {
             assert(deleteBody, data);
@@ -310,7 +316,7 @@ const Api = {
                 route
             });
             expect(getResponse).to.have.status(404);
-            expect(getResponse).to.be.json;
+            expect(getResponse.body).to.be.an('object');
             assertError(getResponse.body);
         }
     },
@@ -327,23 +333,17 @@ const Api = {
             '61f5655bb7c63e78815de1c7',
             '61f5655cb7c63e78815de1c8'
         ];
-        await Promise.all(
-            invalidIds.map((id) =>
-                (async () => {
-                    const isInvalid = !/^\d+$/.test(id);
-                    const response = await Api.request({
-                        method,
-                        route: route.split(':id').join(id),
-                        body
-                    });
-                    expect(response).to.have.status(
-                        isInvalid && isInteger ? 400 : 404
-                    );
-                    expect(response).to.be.json;
-                    assertError(response.body);
-                })()
-            )
-        );
+        for (const id of invalidIds) {
+            const isInvalid = !/^\d+$/.test(id);
+            const response = await Api.request({
+                method,
+                route: route.split(':id').join(id),
+                body
+            });
+            expect(response).to.have.status(isInvalid && isInteger ? 400 : 404);
+            expect(response.body).to.be.an('object');
+            assertError(response.body);
+        }
     },
 
     async testStaticFile(
@@ -353,7 +353,8 @@ const Api = {
         const response = await Api.request({
             apiPrefix: false,
             method: 'GET',
-            route
+            route,
+            parseJson: false
         });
         if (expectSuccess) {
             expect(response).to.have.status(200);

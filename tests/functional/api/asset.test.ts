@@ -1,9 +1,11 @@
 import { expect } from 'chai';
 import Path from 'path';
 
-import Api from '../helpers/api.helper';
+import { mockEnvVar } from '../../../src/services/env';
+
 import Data, { assetsData, directoriesData } from '../helpers/data.helper';
 import { assertAsset, assertDirectory } from '../helpers/assert.helper';
+import Api from '../helpers/api.helper';
 
 const { userId } = assetsData[0];
 const userAssets = assetsData.filter(
@@ -38,11 +40,9 @@ describe('[API] Assets', () => {
                 data: userAssets,
                 assert: assertAsset
             });
-            await Promise.all(
-                assetsData.map(({ path }) =>
-                    Api.testStaticFile(Path.join('/static', path))
-                )
-            );
+            for (const { path } of assetsData) {
+                await Api.testStaticFile(Path.join('/static', path));
+            }
         });
         it('Should list all assets including directory data', async () => {
             await Api.testGetList({
@@ -63,29 +63,26 @@ describe('[API] Assets', () => {
 
     describe('POST /assets', () => {
         it('Should throw a validation error because of wrong file type', async () => {
-            await Promise.all(
-                ['asset.pdf', 'asset.ico'].map((name) =>
-                    (async () => {
-                        const buffer = await Data.getAssetBuffer(name);
-                        await Api.testError(
+            for (const name of ['asset.pdf', 'asset.ico']) {
+                const buffer = await Data.getAssetBuffer(name);
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/assets',
+                        files: [
                             {
-                                method: 'POST',
-                                route: '/assets',
-                                files: [
-                                    {
-                                        field: 'assets',
-                                        buffer,
-                                        name
-                                    }
-                                ]
-                            },
-                            400
-                        );
-                    })()
-                )
-            );
+                                field: 'assets',
+                                buffer,
+                                name
+                            }
+                        ]
+                    },
+                    400
+                );
+            }
         });
         it('Should throw a validation error because uploaded file is too big', async () => {
+            mockEnvVar('ASSET_MAX_SIZE_MB_PER_FILE', 1);
             const name = 'too-big.png';
             const buffer = await Data.getAssetBuffer(name);
             await Api.testError(
@@ -104,6 +101,7 @@ describe('[API] Assets', () => {
             );
         });
         it('Should throw a validation error because payload is too big', async () => {
+            mockEnvVar('ASSET_MAX_SIZE_MB', 3);
             const name = 'big.jpg';
             const buffer = await Data.getAssetBuffer(name);
             const files = [];
@@ -140,41 +138,37 @@ describe('[API] Assets', () => {
                     directoryId: directoriesData[1].id
                 }
             ];
-            await Promise.all(
-                uploadData.map(({ name, directoryId }) =>
-                    (async () => {
-                        const buffer = await Data.getAssetBuffer(name);
-                        const response = await Api.request({
-                            method: 'POST',
-                            route: '/assets',
-                            files: [
-                                {
-                                    field: 'assets',
-                                    buffer,
-                                    name
-                                }
-                            ],
-                            fields: directoryId
-                                ? {
-                                      directoryId
-                                  }
-                                : undefined
-                        });
-                        expect(response).to.have.status(200);
-                        expect(response).to.be.json;
-                        const { assets } = response.body;
-                        expect(assets).to.be.an('array');
-                        expect(assets).to.have.lengthOf(1);
-                        assertAsset(assets[0], {
-                            type: name.endsWith('mp3') ? 'audio' : 'image',
-                            name,
-                            userId
-                        });
-                        const { path } = assets[0];
-                        await Api.testStaticFile(Path.join('/static', path));
-                    })()
-                )
-            );
+            for (const { name, directoryId } of uploadData) {
+                const buffer = await Data.getAssetBuffer(name);
+                const response = await Api.request({
+                    method: 'POST',
+                    route: '/assets',
+                    files: [
+                        {
+                            field: 'assets',
+                            buffer,
+                            name
+                        }
+                    ],
+                    fields: directoryId
+                        ? {
+                              directoryId
+                          }
+                        : undefined
+                });
+                expect(response).to.have.status(200);
+                expect(response.body).to.be.an('object');
+                const { assets } = response.body;
+                expect(assets).to.be.an('array');
+                expect(assets).to.have.lengthOf(1);
+                assertAsset(assets[0], {
+                    type: name.endsWith('mp3') ? 'audio' : 'image',
+                    name,
+                    userId
+                });
+                const { path } = assets[0];
+                await Api.testStaticFile(Path.join('/static', path));
+            }
         });
         it('Should upload multiple assets', async () => {
             const assetNames = [
@@ -183,42 +177,35 @@ describe('[API] Assets', () => {
                 'asset.png',
                 'asset.svg'
             ];
-            const files = await Promise.all(
-                assetNames.map((name) =>
-                    (async () => ({
-                        field: 'assets',
-                        buffer: await Data.getAssetBuffer(name),
-                        name
-                    }))()
-                )
-            );
+            const files: { field: string; buffer: Buffer; name: string }[] = [];
+            for (const name of assetNames) {
+                files.push({
+                    field: 'assets',
+                    buffer: await Data.getAssetBuffer(name),
+                    name
+                });
+            }
             const response = await Api.request({
                 method: 'POST',
                 route: '/assets',
                 files
             });
             expect(response).to.have.status(200);
-            expect(response).to.be.json;
+            expect(response.body).to.be.an('object');
             const { assets } = response.body;
             expect(assets).to.be.an('array');
             expect(assets).to.have.lengthOf(files.length);
-            await Promise.all(
-                assetNames.map((assetName) =>
-                    (async () => {
-                        const asset = assets.find(
-                            ({ name }: any) => name === assetName
-                        );
-                        assertAsset(asset, {
-                            type: assetName.endsWith('mp3') ? 'audio' : 'image',
-                            name: assetName,
-                            userId
-                        });
-                        await Api.testStaticFile(
-                            Path.join('/static', asset.path)
-                        );
-                    })()
-                )
-            );
+            for (const assetName of assetNames) {
+                const asset = assets.find(
+                    ({ name }: any) => name === assetName
+                );
+                assertAsset(asset, {
+                    type: assetName.endsWith('mp3') ? 'audio' : 'image',
+                    name: assetName,
+                    userId
+                });
+                await Api.testStaticFile(Path.join('/static', asset.path));
+            }
         });
     });
 
@@ -239,14 +226,12 @@ describe('[API] Assets', () => {
             );
         });
         it('Should get an asset', async () => {
-            await Promise.all([
-                Api.testGetOne({
-                    route: '/assets/:id',
-                    data: userAssets[0],
-                    assert: assertAsset
-                }),
-                Api.testStaticFile(Path.join('/static', userAssets[0].path))
-            ]);
+            await Api.testGetOne({
+                route: '/assets/:id',
+                data: userAssets[0],
+                assert: assertAsset
+            });
+            await Api.testStaticFile(Path.join('/static', userAssets[0].path));
         });
     });
 
@@ -309,18 +294,16 @@ describe('[API] Assets', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: '/directories',
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/directories',
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should create a directory', async () => {
             const createData = [
@@ -332,15 +315,13 @@ describe('[API] Assets', () => {
                     parentId: directoriesData[0].id
                 }
             ];
-            await Promise.all(
-                createData.map((data) =>
-                    Api.testCreate({
-                        route: '/directories',
-                        data,
-                        assert: assertDirectory
-                    })
-                )
-            );
+            for (const data of createData) {
+                await Api.testCreate({
+                    route: '/directories',
+                    data,
+                    assert: assertDirectory
+                });
+            }
         });
     });
 
@@ -385,18 +366,16 @@ describe('[API] Assets', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/directories/${userDirectories[0].id}`,
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/directories/${userDirectories[0].id}`,
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should throw a forbidden error', async () => {
             await Api.testError(

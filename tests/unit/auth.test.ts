@@ -1,5 +1,6 @@
+import { FastifyRequest } from 'fastify';
+import { User } from '@prisma/client';
 import { expect } from 'chai';
-import { Request } from 'express';
 
 import {
     hashPassword,
@@ -10,8 +11,16 @@ import {
 import { AuthenticationError, ForbiddenError } from '../../src/services/errors';
 import {
     controlSelf,
-    controlSelfAdmin
+    controlAdmin,
+    controlSelfMiddleware,
+    controlAdminMiddleware
 } from '../../src/controllers/helpers/auth';
+
+import { SafeUser } from '../../src/types/user';
+
+import { expectAsync } from '../functional/helpers/assert.helper';
+
+import users from '../functional/data/users.json';
 
 describe('[Unit] Auth', () => {
     describe('hashPassword + verifyPassword', () => {
@@ -35,13 +44,10 @@ describe('[Unit] Auth', () => {
 
     describe('generateJwt + verifyJwt', () => {
         it('Should generate and verify a JWT', async () => {
-            const data = {
-                key1: 'value1',
-                key2: 'value2'
-            };
-            const jwt = generateJwt(data);
-            const { exp, iat, ...decoded } = verifyJwt<typeof data>(jwt);
-            expect(decoded).to.deep.equal(data);
+            const { password, ...user } = users[0];
+            const jwt = generateJwt(user as SafeUser);
+            const { exp, iat, ...decoded } = verifyJwt(jwt);
+            expect(decoded).to.deep.equal(user);
             expect(exp).to.be.a('number');
             expect(iat).to.be.a('number');
             expect(() => verifyJwt('invalidJwt')).to.throw(AuthenticationError);
@@ -51,20 +57,50 @@ describe('[Unit] Auth', () => {
     describe('controlSelf', () => {
         it('Should control request user match userId', async () => {
             const id = 123;
-            const req = { user: { id } };
-            expect(() => controlSelf(req as Request, id)).to.not.throw();
-            expect(() => controlSelf(req as Request, 999)).to.throw(
+            expect(() => controlSelf(id, { id } as User)).to.not.throw();
+            expect(() => controlSelf(999, { id } as User)).to.throw(
                 ForbiddenError
             );
         });
     });
 
-    describe('controlSelfAdmin', () => {
+    describe('controlSelfMiddleware', () => {
+        it('Should control request user match userId', async () => {
+            const id = 123;
+            await expectAsync(
+                controlSelfMiddleware({
+                    user: { id },
+                    params: { userId: id.toString() }
+                } as FastifyRequest<{ Params: { userId: string } }>)
+            );
+            await expectAsync(
+                controlSelfMiddleware({
+                    user: { id },
+                    params: { userId: '999' }
+                } as FastifyRequest<{ Params: { userId: string } }>),
+                ForbiddenError
+            );
+        });
+    });
+
+    describe('controlAdmin', () => {
+        it('Should control request user is an admin', async () => {
+            const adminUser = { isAdmin: true } as User;
+            const notAdminUser = { isAdmin: false } as User;
+            expect(() => controlAdmin(adminUser)).to.not.throw();
+            expect(() => controlAdmin(notAdminUser)).to.throw(ForbiddenError);
+        });
+    });
+
+    describe('controlAdminMiddleware', () => {
         it('Should control request user is an admin', async () => {
             const reqAdmin = { user: { isAdmin: true } };
             const reqNotAdmin = { user: { isAdmin: false } };
-            expect(() => controlSelfAdmin(reqAdmin as Request)).to.not.throw();
-            expect(() => controlSelfAdmin(reqNotAdmin as Request)).to.throw(
+            await expectAsync(
+                controlAdminMiddleware(reqAdmin as FastifyRequest)
+            );
+            await expectAsync(
+                controlAdminMiddleware(reqNotAdmin as FastifyRequest),
                 ForbiddenError
             );
         });

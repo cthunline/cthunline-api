@@ -1,78 +1,87 @@
-import { Router, Request, Response } from 'express';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+import { registerRateLimiter } from '../services/rateLimiter';
 import { ForbiddenError } from '../services/errors';
-import rateLimiter from '../services/rateLimiter';
 import { hashPassword } from '../services/crypto';
-import Validator from '../services/validator';
 import { Prisma } from '../services/prisma';
+import { getEnv } from '../services/env';
+
 import {
     controlInvitationCode,
     generateInvitationCode
 } from './helpers/registration';
-import { isRegistrationEnabled, isInvitationEnabled } from '../services/env';
 import {
-    userSelect,
+    safeUserSelect,
     controlUniqueEmail,
     defaultUserData
 } from './helpers/user';
 
-import userSchemas from './schemas/user.json';
+import { registerUserSchema, RegisterUserBody } from './schemas/user';
 
-const validateRegisterUser = Validator(userSchemas.register);
-
-const registrationController = Router();
-
-// register a new user
-registrationController.post(
-    '/register',
-    rateLimiter,
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { body } = req;
-            if (!isRegistrationEnabled()) {
-                throw new ForbiddenError('Registration is disabled');
-            }
-            validateRegisterUser(body);
-            if (isInvitationEnabled()) {
-                await controlInvitationCode(body.invitationCode, true);
-            }
-            await controlUniqueEmail(body.email);
-            const hashedPassword = await hashPassword(body.password);
-            const { password, invitationCode, ...cleanBody } = body;
-            const user = await Prisma.user.create({
-                select: userSelect,
-                data: {
-                    ...defaultUserData,
-                    ...cleanBody,
-                    password: hashedPassword
+const registrationController = async (app: FastifyInstance) => {
+    await app.register(async (routeApp: FastifyInstance) => {
+        // rate limiter
+        await registerRateLimiter(routeApp);
+        // register a new user
+        app.route({
+            method: 'POST',
+            url: '/register',
+            schema: { body: registerUserSchema },
+            handler: async (
+                {
+                    body
+                }: FastifyRequest<{
+                    Body: RegisterUserBody;
+                }>,
+                rep: FastifyReply
+            ) => {
+                if (!getEnv('REGISTRATION_ENABLED')) {
+                    throw new ForbiddenError('Registration is disabled');
                 }
-            });
-            res.json(user);
-        } catch (err: any) {
-            res.error(err);
-        }
-    }
-);
+                if (getEnv('INVITATION_ENABLED')) {
+                    await controlInvitationCode(
+                        body.invitationCode ?? '',
+                        true
+                    );
+                }
+                await controlUniqueEmail(body.email);
+                const hashedPassword = await hashPassword(body.password);
+                const { password, invitationCode, ...cleanBody } = body;
+                const user = await Prisma.user.create({
+                    select: safeUserSelect,
+                    data: {
+                        ...defaultUserData,
+                        ...cleanBody,
+                        password: hashedPassword
+                    }
+                });
+                rep.send(user);
+            }
+        });
+    });
 
-// generate a new invitation
-registrationController.post(
-    '/invitation',
-    async (_req: Request, res: Response): Promise<void> => {
-        try {
-            if (!isRegistrationEnabled()) {
+    // generate a new invitation
+    app.route({
+        method: 'POST',
+        url: '/invitation',
+        handler: async (
+            req: FastifyRequest<{
+                Body: RegisterUserBody;
+            }>,
+            rep: FastifyReply
+        ) => {
+            if (!getEnv('REGISTRATION_ENABLED')) {
                 throw new ForbiddenError('Registration is disabled');
             }
-            if (!isInvitationEnabled()) {
+            if (!getEnv('INVITATION_ENABLED')) {
                 throw new ForbiddenError('Invitation codes are disabled');
             }
             const { code } = await Prisma.invitation.create({
                 data: generateInvitationCode()
             });
-            res.json({ code });
-        } catch (err: any) {
-            res.error(err);
+            rep.send({ code });
         }
-    }
-);
+    });
+};
 
 export default registrationController;

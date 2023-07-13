@@ -1,18 +1,17 @@
-import Fs from 'fs';
-import Path from 'path';
 import { Asset, Directory } from '@prisma/client';
 import Formidable from 'formidable';
+import Path from 'path';
+import Fs from 'fs';
 
 import { Prisma } from '../../services/prisma';
-import { env } from '../../services/env';
+import { getEnv } from '../../services/env';
 import {
     ForbiddenError,
     InternError,
     ValidationError
 } from '../../services/errors';
-import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
-const { ASSET_DIR, ASSET_MAX_SIZE_MB, ASSET_MAX_SIZE_MB_PER_FILE } = env;
+import { mimeTypes, FileType, MimeType } from '../../types/asset';
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
@@ -24,7 +23,7 @@ export const controlFile = (
     const ext = originalFilename?.split('.').pop() ?? '';
     // There's a bug in formidable@v2 where maxFileSize option is applied to
     // all files and not each file so we have to control each file size ourself
-    const limitSize = ASSET_MAX_SIZE_MB_PER_FILE * 1024 * 1024;
+    const limitSize = getEnv('ASSET_MAX_SIZE_MB_PER_FILE') * 1024 * 1024;
     if (file.size <= limitSize) {
         if (mimetype) {
             const mimeTypeData = mimeTypes[mimetype as MimeType];
@@ -47,13 +46,15 @@ export const controlFile = (
         );
     }
     throw new ValidationError(
-        `Size of file ${originalFilename} is to big (max ${ASSET_MAX_SIZE_MB_PER_FILE}Mb)`
+        `Size of file ${originalFilename} is to big (max ${getEnv(
+            'ASSET_MAX_SIZE_MB_PER_FILE'
+        )}Mb)`
     );
 };
 
 // check asset directory exists and is writable
 export const getAssetDir = (): string => {
-    const dir = ASSET_DIR;
+    const dir = getEnv('ASSET_DIR');
     try {
         Fs.accessSync(dir, Fs.constants.F_OK);
         Fs.accessSync(dir, Fs.constants.W_OK);
@@ -80,12 +81,12 @@ export const controlUserDir = async (userId: number): Promise<string> => {
 };
 
 // formidable initialization options
-export const formidableOptions: Formidable.Options = {
+export const getFormidableOptions = (): Formidable.Options => ({
     uploadDir: assetTempDir,
     keepExtensions: false,
-    maxFileSize: ASSET_MAX_SIZE_MB * 1024 * 1024,
+    maxFileSize: getEnv('ASSET_MAX_SIZE_MB') * 1024 * 1024,
     multiples: true
-};
+});
 
 export const getAsset = async (
     userId: number,

@@ -1,6 +1,6 @@
 # Cthunline API
 
-> Cthunline API (REST + WebSockets) made with Express, Prisma, Socket.io and more
+> Cthunline API (REST + WebSockets) made with Fastify, Prisma, Socket.io and more
 
 - [Useful resources](#useful-resources)
 - [Requirements](#requirements)

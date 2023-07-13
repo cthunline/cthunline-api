@@ -4,21 +4,19 @@ import {
     ConflictError,
     ValidationError
 } from '../../services/errors';
-import { UserSelect } from '../../types/user';
-import { env } from '../../services/env';
+import { SafeUser } from '../../types/user';
+import { getEnv } from '../../services/env';
 import { locales } from '../../types/env';
 
-const { DEFAULT_THEME, DEFAULT_LOCALE } = env;
-
 // default optional fields for a new user
-export const defaultUserData: Partial<UserSelect> = {
-    theme: DEFAULT_THEME,
-    locale: DEFAULT_LOCALE,
+export const defaultUserData: Pick<SafeUser, 'theme' | 'locale' | 'isAdmin'> = {
+    theme: getEnv('DEFAULT_THEME'),
+    locale: getEnv('DEFAULT_LOCALE'),
     isAdmin: false
 };
 
 // prisma select object to exclude password in returned data
-export const userSelect = {
+export const safeUserSelect = {
     id: true,
     name: true,
     email: true,
@@ -32,16 +30,16 @@ export const userSelect = {
 
 // check a user exists and return it
 // returned user data will not contain password
-export const getUser = async (userId: number): Promise<UserSelect> =>
+export const getUser = async (userId: number): Promise<SafeUser> =>
     Prisma.user.findUniqueOrThrow({
-        select: userSelect,
+        select: safeUserSelect,
         where: {
             id: userId
         }
     });
 
 // throws forbidden error if any of the admin fields exists in the user edit body
-export const controlAdminFields = (body: object) => {
+export const controlAdminFields = <T extends object>(body: T) => {
     const adminFields = ['isAdmin', 'isEnabled'];
     adminFields.forEach((field) => {
         if (Object.hasOwn(body, field)) {

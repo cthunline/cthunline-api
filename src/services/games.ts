@@ -1,28 +1,22 @@
 import { callOfCthulhu, dnd5, seventhSea, starWarsD6 } from '@cthunline/games';
 
-import Validator from './validator';
-
 // list of available games
 export const Games = {
     callOfCthulhu: {
         name: 'Call of Cthulhu',
-        schema: callOfCthulhu.schema,
-        validator: Validator(callOfCthulhu.schema)
+        schema: callOfCthulhu.schema
     },
     dnd5: {
         name: 'Dungeons & Dragons 5E',
-        schema: dnd5.schema,
-        validator: Validator(dnd5.schema)
+        schema: dnd5.schema
     },
     seventhSea: {
         name: '7th Sea',
-        schema: seventhSea.schema,
-        validator: Validator(seventhSea.schema)
+        schema: seventhSea.schema
     },
     starWarsD6: {
         name: 'Star Wars D6',
-        schema: starWarsD6.schema,
-        validator: Validator(starWarsD6.schema)
+        schema: starWarsD6.schema
     }
 };
 

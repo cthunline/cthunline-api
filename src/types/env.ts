@@ -12,6 +12,7 @@ export interface EnvData {
     PORT: number;
     JWT_SECRET: string;
     COOKIE_SECRET: string;
+    CRYPTO_SECRET: string;
     COOKIE_SECURE: boolean;
     LOG_ENABLED: boolean;
     LOG_DIR: string;

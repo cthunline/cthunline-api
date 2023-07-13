@@ -39,18 +39,16 @@ describe('[API] Sketchs', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: '/sketchs',
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/sketchs',
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should save a sketch for the current user', async () => {
             const { sketch } = sketchsData[0];

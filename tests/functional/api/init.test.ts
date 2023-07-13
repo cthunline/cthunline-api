@@ -2,29 +2,21 @@ import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import { assertUser } from '../helpers/assert.helper';
 import { initDb } from '../../../src/services/prisma';
-import { env } from '../../../src/services/env';
-
-const {
-    DEFAULT_ADMIN_NAME,
-    DEFAULT_ADMIN_EMAIL,
-    DEFAULT_ADMIN_PASSWORD,
-    DEFAULT_THEME,
-    DEFAULT_LOCALE
-} = env;
+import { getEnv } from '../../../src/services/env';
 
 describe('[API] Initialization', () => {
     it('Should create a default user', async () => {
         await Data.reset(false);
         await initDb();
         await Api.login({
-            email: DEFAULT_ADMIN_EMAIL,
-            password: DEFAULT_ADMIN_PASSWORD
+            email: getEnv('DEFAULT_ADMIN_EMAIL'),
+            password: getEnv('DEFAULT_ADMIN_PASSWORD')
         });
         const defaultUser = {
-            name: DEFAULT_ADMIN_NAME,
-            email: DEFAULT_ADMIN_EMAIL,
-            theme: DEFAULT_THEME,
-            locale: DEFAULT_LOCALE,
+            name: getEnv('DEFAULT_ADMIN_NAME'),
+            email: getEnv('DEFAULT_ADMIN_EMAIL'),
+            theme: getEnv('DEFAULT_THEME'),
+            locale: getEnv('DEFAULT_LOCALE'),
             isAdmin: true,
             isEnabled: true
         };

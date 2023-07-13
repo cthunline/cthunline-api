@@ -1,31 +1,37 @@
-import Fs from 'fs';
-import Path from 'path';
-import { Router, Request, Response } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import Formidable from 'formidable';
+import Path from 'path';
+import Fs from 'fs';
 
 import { ValidationError } from '../services/errors';
-import { parseParamId } from '../services/tools';
-import Validator from '../services/validator';
+import { validateSchema } from '../services/typebox';
+import { parseParamId } from '../services/api';
 import { Prisma } from '../services/prisma';
-import { TypedFile } from '../types/asset';
 import Log from '../services/log';
+
 import {
     controlFile,
     assetDir,
     assetTempDir,
     controlUserDir,
-    formidableOptions,
+    getFormidableOptions,
     getAsset,
     getDirectories,
     getDirectory,
     getChildrenDirectories
 } from './helpers/asset';
 
-import assetSchemas from './schemas/asset.json';
+import { TypedFile } from '../types/asset';
+import { QueryParam } from '../types/api';
 
-const validateUploadAssets = Validator(assetSchemas.uploadAssets);
-const validateCreateDirectory = Validator(assetSchemas.createDirectory);
-const validateUpdateDirectory = Validator(assetSchemas.updateDirectory);
+import {
+    createDirectorySchema,
+    CreateDirectoryBody,
+    updateDirectorySchema,
+    UpdateDirectoryBody,
+    uploadAssetsSchema,
+    UploadAssetsBody
+} from './schemas/asset';
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {
@@ -39,18 +45,27 @@ const validateUpdateDirectory = Validator(assetSchemas.updateDirectory);
     return tempDir;
 })();
 
-const assetController = Router();
-
-// get all assets of the authenticated user
-assetController.get(
-    '/assets',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const { type, include } = req.query;
+const assetController = async (app: FastifyInstance) => {
+    // get all assets of the authenticated user
+    app.route({
+        method: 'GET',
+        url: '/assets',
+        handler: async (
+            {
+                query,
+                user
+            }: FastifyRequest<{
+                Querystring: {
+                    type?: QueryParam;
+                    include?: QueryParam;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const { type, include } = query;
             const assets = await Prisma.asset.findMany({
                 where: {
-                    userId,
+                    userId: user.id,
                     ...(type
                         ? {
                               type: String(type)
@@ -61,119 +76,126 @@ assetController.get(
                     directory: include === 'true'
                 }
             });
-            res.json({ assets });
-        } catch (err: any) {
-            res.error(err);
+            rep.send({ assets });
         }
-    }
-);
+    });
 
-// upload an asset for the authenticated user
-// this endpoint expect multipart/form-data
-assetController.post(
-    '/assets',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            // create user subdirectory if not exist
-            const userDir = await controlUserDir(userId);
-            // initialize formidable
-            const form = Formidable(formidableOptions);
+    // upload an asset for the authenticated user
+    // this endpoint expect multipart/form-data
+    app.route({
+        method: 'POST',
+        url: '/assets',
+        handler: async (
+            req: FastifyRequest<{
+                Body: UploadAssetsBody;
+            }>,
+            rep: FastifyReply
+        ) => {
             // parse form data
-            form.parse(req, async (err, fields, files) => {
-                try {
-                    // file controls
-                    if (err) {
-                        throw new ValidationError('Error while parsing file');
-                    }
-                    // validates body
-                    validateUploadAssets({
-                        ...fields,
-                        ...files
-                    });
-                    // control directoryId
-                    const directoryId = fields.directoryId
-                        ? Number(fields.directoryId)
-                        : null;
-                    if (directoryId !== null) {
-                        await getDirectory(userId, directoryId);
-                    }
-                    // get files data
-                    const assetFiles = Array.isArray(files.assets)
-                        ? files.assets
-                        : [files.assets];
-                    const typedAssetFiles: TypedFile[] = assetFiles.map(
-                        (file) => ({
-                            ...file,
-                            type: controlFile(file)
-                        })
-                    );
-                    // move temporary files to user's directory
-                    await Promise.all(
-                        typedAssetFiles.map(
-                            ({ filepath: temporaryPath, newFilename }) =>
-                                Fs.promises.rename(
-                                    temporaryPath,
-                                    Path.join(userDir, newFilename)
-                                )
-                        )
-                    );
-                    // save assets in database
-                    const assets = await Prisma.$transaction(
-                        typedAssetFiles.map(
-                            ({ originalFilename, newFilename, type }) => {
-                                const name = originalFilename ?? newFilename;
-                                const path = Path.join(
-                                    userId.toString(),
-                                    newFilename
-                                );
-                                return Prisma.asset.create({
-                                    data: {
-                                        userId,
-                                        directoryId,
-                                        type,
-                                        name,
-                                        path
-                                    }
-                                });
-                            }
-                        )
-                    );
-                    //
-                    res.json({ assets });
-                } catch (formErr: any) {
-                    res.error(formErr);
-                }
+            try {
+                await req.parseMultipart(getFormidableOptions());
+            } catch {
+                throw new ValidationError('Error while parsing file');
+            }
+            const { body, files, user } = req;
+            // create user subdirectory if not exist
+            const userDir = await controlUserDir(user.id);
+            // validate body
+            validateSchema(uploadAssetsSchema, {
+                ...body,
+                ...files
             });
-        } catch (err: any) {
-            res.error(err);
+            // control directoryId
+            const directoryId = body.directoryId
+                ? Number(body.directoryId)
+                : null;
+            if (directoryId !== null) {
+                await getDirectory(user.id, directoryId);
+            }
+            // get files data
+            const assetFiles: Formidable.File[] = [];
+            if (files?.assets) {
+                if (Array.isArray(files.assets)) {
+                    assetFiles.push(...files.assets);
+                } else {
+                    assetFiles.push(files.assets);
+                }
+            }
+            const typedAssetFiles: TypedFile[] = assetFiles.map((file) => ({
+                ...file,
+                type: controlFile(file)
+            }));
+            // move temporary files to user's directory
+            await Promise.all(
+                typedAssetFiles.map(
+                    ({ filepath: temporaryPath, newFilename }) =>
+                        Fs.promises.rename(
+                            temporaryPath,
+                            Path.join(userDir, newFilename)
+                        )
+                )
+            );
+            // save assets in database
+            const assets = await Prisma.$transaction(
+                typedAssetFiles.map(
+                    ({ originalFilename, newFilename, type }) => {
+                        const name = originalFilename ?? newFilename;
+                        const path = Path.join(user.id.toString(), newFilename);
+                        return Prisma.asset.create({
+                            data: {
+                                userId: user.id,
+                                directoryId,
+                                type,
+                                name,
+                                path
+                            }
+                        });
+                    }
+                )
+            );
+            //
+            rep.send({ assets });
         }
-    }
-);
+    });
 
-// get an asset belonging to the athenticated user
-assetController.get(
-    '/assets/:assetId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const assetId = parseParamId(req.params, 'assetId');
-            const asset = await getAsset(userId, assetId);
-            res.json(asset);
-        } catch (err: any) {
-            res.error(err);
+    // get an asset belonging to the athenticated user
+    app.route({
+        method: 'GET',
+        url: '/assets/:assetId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    assetId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const assetId = parseParamId(params, 'assetId');
+            const asset = await getAsset(user.id, assetId);
+            rep.send(asset);
         }
-    }
-);
+    });
 
-// delete an asset belonging to the authenticated user
-assetController.delete(
-    '/assets/:assetId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const assetId = parseParamId(req.params, 'assetId');
-            const { path } = await getAsset(userId, assetId);
+    // delete an asset belonging to the authenticated user
+    app.route({
+        method: 'DELETE',
+        url: '/assets/:assetId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    assetId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const assetId = parseParamId(params, 'assetId');
+            const { path } = await getAsset(user.id, assetId);
             await Promise.all([
                 Prisma.asset.delete({
                     where: {
@@ -182,98 +204,129 @@ assetController.delete(
                 }),
                 Fs.promises.rm(Path.join(assetDir, path))
             ]);
-            res.send({});
-        } catch (err: any) {
-            res.error(err);
+            rep.send({});
         }
-    }
-);
+    });
 
-// get all directories of the authenticated user
-assetController.get(
-    '/directories',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const directories = await getDirectories(userId);
-            res.json({ directories });
-        } catch (err: any) {
-            res.error(err);
+    // get all directories of the authenticated user
+    app.route({
+        method: 'GET',
+        url: '/directories',
+        handler: async (
+            {
+                user
+            }: FastifyRequest<{
+                Querystring: {
+                    type?: QueryParam;
+                    include?: QueryParam;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const directories = await getDirectories(user.id);
+            rep.send({ directories });
         }
-    }
-);
+    });
 
-// create directory for the authenticated user
-assetController.post(
-    '/directories',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const { parentId } = req.body;
-            validateCreateDirectory(req.body);
+    // create directory for the authenticated user
+    app.route({
+        method: 'POST',
+        url: '/directories',
+        schema: { body: createDirectorySchema },
+        handler: async (
+            {
+                body,
+                user
+            }: FastifyRequest<{
+                Body: CreateDirectoryBody;
+            }>,
+            rep: FastifyReply
+        ) => {
+            const { parentId } = body;
             if (parentId) {
-                await getDirectory(userId, parentId);
+                await getDirectory(user.id, parentId);
             }
             const directory = await Prisma.directory.create({
                 data: {
-                    ...req.body,
-                    userId
+                    ...body,
+                    userId: user.id
                 }
             });
-            res.json(directory);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(directory);
         }
-    }
-);
+    });
 
-// get a directory belonging to the authenticated user
-assetController.get(
-    '/directories/:directoryId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const directoryId = parseParamId(req.params, 'directoryId');
-            const directory = await getDirectory(userId, directoryId);
-            res.json(directory);
-        } catch (err: any) {
-            res.error(err);
+    // get a directory belonging to the authenticated user
+    app.route({
+        method: 'GET',
+        url: '/directories/:directoryId',
+        handler: async (
+            {
+                user,
+                params
+            }: FastifyRequest<{
+                Params: {
+                    directoryId: string;
+                };
+                Body: CreateDirectoryBody;
+            }>,
+            rep: FastifyReply
+        ) => {
+            const directoryId = parseParamId(params, 'directoryId');
+            const directory = await getDirectory(user.id, directoryId);
+            rep.send(directory);
         }
-    }
-);
+    });
 
-// update a directory belonging to the authenticated user
-assetController.post(
-    '/directories/:directoryId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const directoryId = parseParamId(req.params, 'directoryId');
-            await getDirectory(userId, directoryId);
-            validateUpdateDirectory(req.body);
+    // update a directory belonging to the authenticated user
+    app.route({
+        method: 'POST',
+        url: '/directories/:directoryId',
+        schema: { body: updateDirectorySchema },
+        handler: async (
+            {
+                body,
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    directoryId: string;
+                };
+                Body: UpdateDirectoryBody;
+            }>,
+            rep: FastifyReply
+        ) => {
+            const directoryId = parseParamId(params, 'directoryId');
+            await getDirectory(user.id, directoryId);
             const directory = await Prisma.directory.update({
-                data: req.body,
+                data: body,
                 where: {
                     id: directoryId
                 }
             });
-            res.json(directory);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(directory);
         }
-    }
-);
+    });
 
-// delete a directory belonging to the authenticated user
-assetController.delete(
-    '/directories/:directoryId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.user.id;
-            const directoryId = parseParamId(req.params, 'directoryId');
-            await getDirectory(userId, directoryId);
+    // delete a directory belonging to the authenticated user
+    app.route({
+        method: 'DELETE',
+        url: '/directories/:directoryId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    directoryId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const directoryId = parseParamId(params, 'directoryId');
+            await getDirectory(user.id, directoryId);
             // get all directories of the user
-            const directories = await getDirectories(userId);
+            const directories = await getDirectories(user.id);
             // get all children directories
             const childrenDirectories = getChildrenDirectories(
                 directoryId,
@@ -285,7 +338,7 @@ assetController.delete(
             // get assets within all children directories
             const assets = await Prisma.asset.findMany({
                 where: {
-                    userId,
+                    userId: user.id,
                     directoryId: {
                         in: childrenDirectoryIds
                     }
@@ -310,11 +363,9 @@ assetController.delete(
                     id: directoryId
                 }
             });
-            res.send({});
-        } catch (err: any) {
-            res.error(err);
+            rep.send({});
         }
-    }
-);
+    });
+};
 
 export default assetController;

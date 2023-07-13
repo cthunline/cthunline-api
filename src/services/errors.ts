@@ -1,11 +1,16 @@
 /* eslint-disable max-classes-per-file */
+import { FastifyReply, FastifyRequest } from 'fastify';
+import type {
+    FastifySchemaValidationError,
+    SchemaErrorFormatter
+} from 'fastify/types/schema';
 import {
     PrismaClientValidationError,
     PrismaClientKnownRequestError
 } from '@prisma/client/runtime/library';
-import { Request, Response, NextFunction } from 'express';
 
 import Log from './log';
+
 import { ErrorJsonResponse } from '../types/errors';
 
 // custom error class with additional http status and data
@@ -20,6 +25,13 @@ export class CustomError extends Error {
             this.data = data;
         }
     }
+}
+
+/**
+Can be used as type for any custom app error class
+*/
+export interface AppErrorConstructor {
+    new (message?: string, data?: any): CustomError;
 }
 
 // specific custom error classes that should be used to throw errors
@@ -71,49 +83,57 @@ const handlePrismaError = (err: Error): Error => {
     return err;
 };
 
-// express middlware injecting a response.error function that handles custom errors
-// it returns the correct status code and additional data if specified
-export const errorMiddleware = (
-    _req: Request,
-    res: Response,
-    next: NextFunction
-): void => {
-    res.error = (err: Error): void => {
-        // handles prisma errors by "converting" them into custom errors
-        const error = handlePrismaError(err);
-        if (error instanceof CustomError) {
-            // handles custom errors
-            const response: ErrorJsonResponse = {
-                error: error.message
-            };
-            if (error.data) {
-                response.data = error.data;
-            }
-            res.status(error.status).json(response);
-        } else {
-            // if error is not handled throw an intern error and logs stack
-            Log.error(error.stack);
-            res.status(500).json({
-                error: 'Intern error'
-            });
-        }
-    };
-    return next();
-};
-
+// TODO
 // handles payload too large errors thrown by bordy parser middleware
-export const payloadTooLargeHandler = (
+// export const payloadTooLargeHandler = (
+//     err: Error,
+//     _req: Request,
+//     res: Response,
+//     next: NextFunction
+// ) => {
+//     if (err.constructor.name === 'PayloadTooLargeError') {
+//         res.status(413).json({
+//             error: 'Payload is too large'
+//         });
+//     } else {
+//         next();
+//     }
+// };
+
+/**
+Fastify schema error formatter
+*/
+export const schemaErrorFormatter: SchemaErrorFormatter = (
+    errors: FastifySchemaValidationError[]
+) => new ValidationError('Invalid data', errors);
+
+/**
+Fastify error middleware
+Send JSON data with the correct HTTP status code and
+additional data if specified in the error object
+*/
+export const errorHandler = (
     err: Error,
-    _req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    if (err.constructor.name === 'PayloadTooLargeError') {
-        res.status(413).json({
-            error: 'Payload is too large'
-        });
+    _req: FastifyRequest,
+    rep: FastifyReply
+): void => {
+    // handles prisma errors by "converting" them into custom errors
+    const error = handlePrismaError(err);
+    if (error instanceof CustomError) {
+        // handles custom errors
+        const response: ErrorJsonResponse = {
+            error: error.message
+        };
+        if (error.data) {
+            response.data = error.data;
+        }
+        rep.status(error.status).send(response);
     } else {
-        next();
+        // if error is not handled throw an intern error and logs stack
+        Log.error(error.stack);
+        rep.status(500).send({
+            error: 'Intern error'
+        });
     }
 };
 

@@ -1,13 +1,16 @@
-import { Router, Request, Response } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { verifyPassword, hashPassword } from '../services/crypto';
-import { controlSelf, controlSelfAdmin } from './helpers/auth';
+import {
+    controlSelf,
+    controlAdmin,
+    controlAdminMiddleware
+} from './helpers/auth';
 import { ValidationError } from '../services/errors';
-import { parseParamId } from '../services/tools';
-import Validator from '../services/validator';
+import { parseParamId } from '../services/api';
 import { Prisma } from '../services/prisma';
 import {
-    userSelect,
+    safeUserSelect,
     getUser,
     controlAdminFields,
     controlUniqueEmail,
@@ -15,96 +18,125 @@ import {
     defaultUserData
 } from './helpers/user';
 
-import userSchemas from './schemas/user.json';
+import { QueryParam } from '../types/api';
 
-const validateCreateUser = Validator(userSchemas.create);
-const validateUpdateUser = Validator(userSchemas.update);
+import {
+    createUserSchema,
+    CreateUserBody,
+    updateUserSchema,
+    UpdateUserBody
+} from './schemas/user';
 
-const userController = Router();
-
-// get all users
-userController.get(
-    '/users',
-    async ({ query }: Request, res: Response): Promise<void> => {
-        try {
+const userController = async (app: FastifyInstance) => {
+    // get all users
+    app.route({
+        method: 'GET',
+        url: '/users',
+        handler: async (
+            {
+                query
+            }: FastifyRequest<{
+                Querystring: {
+                    disabled?: QueryParam;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
             const getDisabled = query.disabled === 'true';
             const users = await Prisma.user.findMany({
-                select: userSelect,
+                select: safeUserSelect,
                 where: getDisabled
                     ? {}
                     : {
                           isEnabled: true
                       }
             });
-            res.json({ users });
-        } catch (err: any) {
-            res.error(err);
+            rep.send({ users });
         }
-    }
-);
+    });
 
-// create a user
-userController.post(
-    '/users',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { body } = req;
-            controlSelfAdmin(req);
-            validateCreateUser(body);
+    // create a user
+    app.route({
+        method: 'POST',
+        url: '/users',
+        schema: { body: createUserSchema },
+        onRequest: controlAdminMiddleware,
+        handler: async (
+            {
+                body
+            }: FastifyRequest<{
+                Body: CreateUserBody;
+            }>,
+            rep: FastifyReply
+        ) => {
             await controlUniqueEmail(body.email);
             if (body.locale) {
                 controlLocale(body.locale);
             }
             const hashedPassword = await hashPassword(body.password);
             const { password, ...cleanBody } = body;
-            const user = await Prisma.user.create({
-                select: userSelect,
+            const createdUser = await Prisma.user.create({
+                select: safeUserSelect,
                 data: {
                     ...defaultUserData,
                     ...cleanBody,
                     password: hashedPassword
                 }
             });
-            res.json(user);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(createdUser);
         }
-    }
-);
+    });
 
-// get a user
-userController.get(
-    '/users/:userId',
-    async ({ params }: Request, res: Response): Promise<void> => {
-        try {
+    // get a user
+    app.route({
+        method: 'GET',
+        url: '/users/:userId',
+        handler: async (
+            {
+                params
+            }: FastifyRequest<{
+                Params: {
+                    userId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
             const userId = parseParamId(params, 'userId');
             const user = await getUser(userId);
-            res.json(user);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(user);
         }
-    }
-);
+    });
 
-// edit user
-userController.post(
-    '/users/:userId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { params, body } = req;
+    // edit user
+    app.route({
+        method: 'POST',
+        url: '/users/:userId',
+        schema: { body: updateUserSchema },
+        handler: async (
+            {
+                params,
+                body,
+                user: reqUser
+            }: FastifyRequest<{
+                Params: {
+                    userId: string;
+                };
+                Body: UpdateUserBody;
+            }>,
+            rep: FastifyReply
+        ) => {
             const userId = parseParamId(params, 'userId');
-            const user = await Prisma.user.findUniqueOrThrow({
+            try {
+                controlAdmin(reqUser);
+            } catch (err) {
+                controlSelf(userId, reqUser);
+                controlAdminFields<UpdateUserBody>(body);
+            }
+            const userData = await Prisma.user.findUniqueOrThrow({
                 where: {
                     id: userId
                 }
             });
-            try {
-                controlSelfAdmin(req);
-            } catch (err) {
-                controlSelf(req, userId);
-                controlAdminFields(body);
-            }
-            validateUpdateUser(body);
             if (body.locale) {
                 controlLocale(body.locale);
             }
@@ -115,7 +147,7 @@ userController.post(
                 }
                 const verified = await verifyPassword(
                     body.oldPassword,
-                    user.password
+                    userData.password
                 );
                 if (!verified) {
                     throw new ValidationError('Old password is not valid');
@@ -124,17 +156,15 @@ userController.post(
                 delete data.oldPassword;
             }
             const updatedUser = await Prisma.user.update({
-                select: userSelect,
+                select: safeUserSelect,
                 data,
                 where: {
-                    id: user.id
+                    id: userData.id
                 }
             });
-            res.json(updatedUser);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(updatedUser);
         }
-    }
-);
+    });
+};
 
 export default userController;

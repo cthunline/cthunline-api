@@ -65,18 +65,16 @@ describe('[API] Users', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: '/users',
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/users',
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should throw a forbidden error', async () => {
             await Api.login({
@@ -147,15 +145,13 @@ describe('[API] Users', () => {
                     locale: 'fr'
                 }
             ];
-            await Promise.all(
-                createData.map((data) =>
-                    Api.testCreate({
-                        route: '/users',
-                        data,
-                        assert: assertUser
-                    })
-                )
-            );
+            for (const data of createData) {
+                await Api.testCreate({
+                    route: '/users',
+                    data,
+                    assert: assertUser
+                });
+            }
         });
     });
 
@@ -213,27 +209,27 @@ describe('[API] Users', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/users/${Api.userId}`,
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/users/${Api.userId}`,
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should throw a forbidden error', async () => {
+            const email = 'yyy@test.com';
+            const password = 'testtest';
             const response = await Api.request({
                 method: 'POST',
                 route: '/users',
                 body: {
                     name: 'Test',
-                    email: 'yyy@test.com',
-                    password: 'test'
+                    email,
+                    password
                 }
             });
             expect(response).to.have.status(200);
@@ -241,8 +237,8 @@ describe('[API] Users', () => {
                 body: { id }
             } = response;
             await Api.login({
-                email: 'yyy@test.com',
-                password: 'test'
+                email,
+                password
             });
             const bodies = [
                 {
@@ -252,18 +248,16 @@ describe('[API] Users', () => {
                     isEnabled: true
                 }
             ];
-            await Promise.all(
-                bodies.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/users/${id}`,
-                            body
-                        },
-                        403
-                    )
-                )
-            );
+            for (const body of bodies) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/users/${id}`,
+                        body
+                    },
+                    403
+                );
+            }
             await Api.testError(
                 {
                     method: 'POST',
@@ -276,13 +270,17 @@ describe('[API] Users', () => {
             );
         });
         it('Should edit a user', async () => {
+            const newEmail = 'fff@test.com';
+            const newPassword1 = 'abc123';
+            const newPassword2 = 'def456';
+            const newPassword3 = 'oiu345';
             const response = await Api.request({
                 method: 'POST',
                 route: '/users',
                 body: {
                     name: 'Test',
                     email: 'eee@test.com',
-                    password: 'abc123'
+                    password: newPassword1
                 }
             });
             expect(response).to.have.status(200);
@@ -291,15 +289,15 @@ describe('[API] Users', () => {
             } = response;
             await Api.login({
                 email: 'eee@test.com',
-                password: 'abc123'
+                password: newPassword1
             });
             await Api.testEdit({
                 route: `/users/${id}`,
                 data: {
                     name: 'Test1',
-                    email: 'fff@test.com',
-                    password: 'def456',
-                    oldPassword: 'abc123',
+                    email: newEmail,
+                    password: newPassword2,
+                    oldPassword: newPassword1,
                     theme: 'dark',
                     locale: 'en'
                 },
@@ -309,9 +307,9 @@ describe('[API] Users', () => {
             const editData = [
                 {
                     name: 'Test1',
-                    email: 'fff@test.com',
-                    password: 'oiu345',
-                    oldPassword: 'def456',
+                    email: newEmail,
+                    password: newPassword3,
+                    oldPassword: newPassword2,
                     isAdmin: true
                 },
                 {
@@ -319,15 +317,13 @@ describe('[API] Users', () => {
                     locale: 'fr'
                 }
             ];
-            await Promise.all(
-                editData.map((data) =>
-                    Api.testEdit({
-                        route: `/users/${id}`,
-                        data,
-                        assert: assertUser
-                    })
-                )
-            );
+            for (const data of editData) {
+                await Api.testEdit({
+                    route: `/users/${id}`,
+                    data,
+                    assert: assertUser
+                });
+            }
         });
     });
 });

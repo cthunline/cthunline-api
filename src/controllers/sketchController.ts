@@ -1,63 +1,67 @@
-import { Router, Request, Response } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { parseParamId } from '../services/tools';
-import Validator from '../services/validator';
-import { controlSelf } from './helpers/auth';
+import { parseParamId } from '../services/api';
 import { Prisma } from '../services/prisma';
 
-import definitions from './schemas/definitions.json';
-import sketchSchemas from './schemas/sketch.json';
+import { controlSelf } from './helpers/auth';
 
-const validateCreateSketch = Validator({
-    ...sketchSchemas.create,
-    ...definitions
-});
+import { createSketchSchema, CreateSketchBody } from './schemas/sketch';
 
-const sketchController = Router();
-
-// get all sketchs belonging to current user
-sketchController.get(
-    '/sketchs',
-    async ({ user }: Request, res: Response): Promise<void> => {
-        try {
+const sketchController = async (app: FastifyInstance) => {
+    // get all sketchs belonging to current user
+    app.route({
+        method: 'GET',
+        url: '/sketchs',
+        handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
             const userId = user.id;
             const sketchs = await Prisma.sketch.findMany({
                 where: {
                     userId
                 }
             });
-            res.json({ sketchs });
-        } catch (err: any) {
-            res.error(err);
+            rep.send({ sketchs });
         }
-    }
-);
+    });
 
-// save a sketch for current user
-sketchController.post(
-    '/sketchs',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { body, user } = req;
-            validateCreateSketch(body);
+    // save a sketch for current user
+    app.route({
+        method: 'POST',
+        url: '/sketchs',
+        schema: { body: createSketchSchema },
+        handler: async (
+            {
+                body,
+                user
+            }: FastifyRequest<{
+                Body: CreateSketchBody;
+            }>,
+            rep: FastifyReply
+        ) => {
             const sketch = await Prisma.sketch.create({
                 data: {
                     ...body,
                     userId: user.id
                 }
             });
-            res.json(sketch);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(sketch);
         }
-    }
-);
+    });
 
-// get a sketch belonging to current user
-sketchController.get(
-    '/sketchs/:sketchId',
-    async ({ params, user }: Request, res: Response): Promise<void> => {
-        try {
+    // get a sketch belonging to current user
+    app.route({
+        method: 'GET',
+        url: '/sketchs/:sketchId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    sketchId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
             const sketchId = parseParamId(params, 'sketchId');
             const sketch = await Prisma.sketch.findFirstOrThrow({
                 where: {
@@ -65,35 +69,40 @@ sketchController.get(
                     userId: user.id
                 }
             });
-            res.json(sketch);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(sketch);
         }
-    }
-);
+    });
 
-// delete a sketch belonging to the current user
-sketchController.delete(
-    '/sketchs/:sketchId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const sketchId = parseParamId(req.params, 'sketchId');
+    // delete a sketch belonging to the current user
+    app.route({
+        method: 'DELETE',
+        url: '/sketchs/:sketchId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    sketchId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const sketchId = parseParamId(params, 'sketchId');
             const sketch = await Prisma.sketch.findFirstOrThrow({
                 where: {
                     id: sketchId
                 }
             });
-            controlSelf(req, sketch.userId);
+            controlSelf(sketch.userId, user);
             await Prisma.sketch.delete({
                 where: {
                     id: sketchId
                 }
             });
-            res.send({});
-        } catch (err: any) {
-            res.error(err);
+            rep.send({});
         }
-    }
-);
+    });
+};
 
 export default sketchController;

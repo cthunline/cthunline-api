@@ -1,125 +1,154 @@
-import { Router, Request, Response } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { ValidationError } from '../services/errors';
 import { isValidGameId } from '../services/games';
-import { parseParamId } from '../services/tools';
-import Validator from '../services/validator';
-import { controlSelf } from './helpers/auth';
+import { parseParamId } from '../services/api';
 import { Prisma } from '../services/prisma';
+
 import { defaultSketchData, getInclude, getSession } from './helpers/session';
+import { controlSelf } from './helpers/auth';
 
-import definitions from './schemas/definitions.json';
-import sessionSchemas from './schemas/session.json';
+import { QueryParam } from '../types/api';
 
-const validateCreateSession = Validator({
-    ...sessionSchemas.create,
-    ...definitions
-});
-const validateUpdateSession = Validator({
-    ...sessionSchemas.update,
-    ...definitions
-});
+import {
+    createSessionSchema,
+    CreateSessionBody,
+    updateSessionSchema,
+    UpdateSessionBody
+} from './schemas/session';
 
-const sessionController = Router();
-
-// get all sessions
-sessionController.get(
-    '/sessions',
-    async ({ query }: Request, res: Response): Promise<void> => {
-        try {
+const sessionController = async (app: FastifyInstance) => {
+    // get all sessions
+    app.route({
+        method: 'GET',
+        url: '/sessions',
+        handler: async (
+            {
+                query
+            }: FastifyRequest<{
+                Params: {
+                    sessionId: string;
+                };
+                Querystring: {
+                    include?: QueryParam;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
             const { include } = query;
             const sessions = await Prisma.session.findMany({
                 ...getInclude(include === 'true')
             });
-            res.json({ sessions });
-        } catch (err: any) {
-            res.error(err);
+            rep.send({ sessions });
         }
-    }
-);
+    });
 
-// create a session
-sessionController.post(
-    '/sessions',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const createData = req.body;
-            const { gameId, sketch } = createData;
-            validateCreateSession(createData);
+    // create a session
+    app.route({
+        method: 'POST',
+        url: '/sessions',
+        schema: { body: createSessionSchema },
+        handler: async (
+            {
+                body,
+                user
+            }: FastifyRequest<{
+                Body: CreateSessionBody;
+            }>,
+            rep: FastifyReply
+        ) => {
+            const { gameId, sketch } = body;
             if (!isValidGameId(gameId)) {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
-            if (!sketch) {
-                createData.sketch = defaultSketchData;
-            }
             const session = await Prisma.session.create({
                 data: {
-                    ...createData,
-                    masterId: req.user.id
+                    ...body,
+                    sketch: sketch ?? defaultSketchData,
+                    masterId: user.id
                 }
             });
-            res.json(session);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(session);
         }
-    }
-);
+    });
 
-// get a session
-sessionController.get(
-    '/sessions/:sessionId',
-    async ({ params }: Request, res: Response): Promise<void> => {
-        try {
+    // get a session
+    app.route({
+        method: 'GET',
+        url: '/sessions/:sessionId',
+        handler: async (
+            {
+                params
+            }: FastifyRequest<{
+                Params: {
+                    sessionId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
             const sessionId = parseParamId(params, 'sessionId');
             const session = await getSession(sessionId);
-            res.json(session);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(session);
         }
-    }
-);
+    });
 
-// edit a session
-sessionController.post(
-    '/sessions/:sessionId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { body, params } = req;
+    // edit a session
+    app.route({
+        method: 'POST',
+        url: '/sessions/:sessionId',
+        schema: { body: updateSessionSchema },
+        handler: async (
+            {
+                body,
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    sessionId: string;
+                };
+                Body: UpdateSessionBody;
+            }>,
+            rep: FastifyReply
+        ) => {
             const sessionId = parseParamId(params, 'sessionId');
             const session = await getSession(sessionId);
-            controlSelf(req, session.masterId);
-            validateUpdateSession(body);
+            controlSelf(session.masterId, user);
             const updatedSession = await Prisma.session.update({
                 data: body,
                 where: {
                     id: session.id
                 }
             });
-            res.json(updatedSession);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(updatedSession);
         }
-    }
-);
+    });
 
-// delete a session
-sessionController.delete(
-    '/sessions/:sessionId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const sessionId = parseParamId(req.params, 'sessionId');
+    // delete a session
+    app.route({
+        method: 'DELETE',
+        url: '/sessions/:sessionId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    sessionId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const sessionId = parseParamId(params, 'sessionId');
             const session = await getSession(sessionId);
-            controlSelf(req, session.masterId);
+            controlSelf(session.masterId, user);
             await Prisma.session.delete({
                 where: {
                     id: sessionId
                 }
             });
-            res.send({});
-        } catch (err: any) {
-            res.error(err);
+            rep.send({});
         }
-    }
-);
+    });
+};
 
 export default sessionController;

@@ -1,10 +1,8 @@
-import { customAlphabet } from 'nanoid';
 import DayJs from 'dayjs';
 
-import { Prisma } from '../../services/prisma';
 import { ForbiddenError } from '../../services/errors';
-
-const generateCode = customAlphabet('1234567890abcdef', 16);
+import { generateToken } from '../../services/tools';
+import { Prisma } from '../../services/prisma';
 
 // control an invitation code is valid
 // if asked, updated the isUsed field to true on the invitation object
@@ -43,7 +41,7 @@ export const controlInvitationCode = async (
 
 // generate a new invitation code
 export const generateInvitationCode = () => ({
-    code: generateCode(),
+    code: generateToken(16),
     expire: DayJs().add(24, 'hours').toDate(),
     isUsed: false
 });

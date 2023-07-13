@@ -1,65 +1,81 @@
-import { Router, Request, Response } from 'express';
-import Fs from 'fs';
-import Path from 'path';
-import Formidable from 'formidable';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Prisma as PrismaNS } from '@prisma/client';
+import Path from 'path';
+import Fs from 'fs';
 
 import { InternError, ValidationError } from '../services/errors';
 import { Games, GameId, isValidGameId } from '../services/games';
-import { assetDir, controlFile } from './helpers/asset';
-import { parseParamId } from '../services/tools';
-import Validator from '../services/validator';
-import { controlSelf } from './helpers/auth';
+import { parseParamId } from '../services/api';
 import { Prisma } from '../services/prisma';
+
+import { assetDir, controlFile } from './helpers/asset';
+import { validateSchema } from '../services/typebox';
+import { controlSelf } from './helpers/auth';
 import { getUser } from './helpers/user';
 import {
     getCharacter,
-    formidablePortraitOptions,
+    getFormidablePortraitOptions,
     controlPortraitDir,
     portraitDirName
 } from './helpers/character';
 
-import characterSchemas from './schemas/character.json';
+import { QueryParam } from '../types/api';
 
-const validateCreateCharacter = Validator(characterSchemas.create);
-const validateUpdateCharacter = Validator(characterSchemas.update);
-const validateUploadPortrait = Validator(characterSchemas.uploadPortrait);
+import {
+    createCharacterSchema,
+    CreateCharacterBody,
+    updateCharacterSchema,
+    UpdateCharacterBody,
+    uploadPortraitSchema
+} from './schemas/character';
 
-const characterController = Router();
-
-// get all characters
-// can filter on a userId by providing a 'user' query parameter
-characterController.get(
-    '/characters',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = req.query.user ? Number(req.query.user) : null;
+const characterController = async (app: FastifyInstance) => {
+    // get all characters
+    // can filter on a userId by providing a 'user' query parameter
+    app.route({
+        method: 'GET',
+        url: '/characters',
+        handler: async (
+            {
+                query
+            }: FastifyRequest<{
+                Querystring: {
+                    user?: QueryParam;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const userId = query.user ? Number(query.user) : null;
             const options: PrismaNS.CharacterFindManyArgs = {};
             if (userId) {
                 await getUser(userId);
                 options.where = { userId };
             }
             const characters = await Prisma.character.findMany(options);
-            res.json({ characters });
-        } catch (err: any) {
-            res.error(err);
+            rep.send({ characters });
         }
-    }
-);
+    });
 
-// create a character for a user
-characterController.post(
-    '/characters',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { body, user } = req;
+    // create a character for a user
+    app.route({
+        method: 'POST',
+        url: '/characters',
+        schema: { body: createCharacterSchema },
+        handler: async (
+            {
+                body,
+                user
+            }: FastifyRequest<{
+                Body: CreateCharacterBody;
+            }>,
+            rep: FastifyReply
+        ) => {
             const userId = user.id;
-            validateCreateCharacter(body);
             const { gameId, name, data } = body;
             if (!isValidGameId(gameId)) {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
-            Games[gameId as GameId].validator(data);
+            validateSchema(Games[gameId as GameId].schema, data);
             const character = await Prisma.character.create({
                 data: {
                     userId,
@@ -68,39 +84,53 @@ characterController.post(
                     data
                 }
             });
-            res.json(character);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(character);
         }
-    }
-);
+    });
 
-// get a character
-characterController.get(
-    '/characters/:characterId',
-    async ({ params }: Request, res: Response): Promise<void> => {
-        try {
+    // get a character
+    app.route({
+        method: 'GET',
+        url: '/characters/:characterId',
+        handler: async (
+            {
+                params
+            }: FastifyRequest<{
+                Params: {
+                    characterId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
             const characterId = parseParamId(params, 'characterId');
             const character = await getCharacter(characterId);
-            res.json(character);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(character);
         }
-    }
-);
+    });
 
-// edit a character
-characterController.post(
-    '/characters/:characterId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { body, params } = req;
+    // edit a character
+    app.route({
+        method: 'POST',
+        url: '/characters/:characterId',
+        schema: { body: updateCharacterSchema },
+        handler: async (
+            {
+                body,
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    characterId: string;
+                };
+                Body: UpdateCharacterBody;
+            }>,
+            rep: FastifyReply
+        ) => {
             const characterId = parseParamId(params, 'characterId');
             const { gameId, userId } = await getCharacter(characterId);
-            controlSelf(req, userId);
-            validateUpdateCharacter(body);
+            controlSelf(userId, user);
             if (body.data) {
-                Games[gameId as GameId].validator(body.data);
+                validateSchema(Games[gameId as GameId].schema, body.data);
             }
             const character = await Prisma.character.update({
                 data: body,
@@ -108,111 +138,118 @@ characterController.post(
                     id: characterId
                 }
             });
-            res.json(character);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(character);
         }
-    }
-);
+    });
 
-// delete a user's character
-characterController.delete(
-    '/characters/:characterId',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const characterId = parseParamId(req.params, 'characterId');
+    // delete a user's character
+    app.route({
+        method: 'DELETE',
+        url: '/characters/:characterId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    characterId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const characterId = parseParamId(params, 'characterId');
             const { userId } = await getCharacter(characterId);
-            controlSelf(req, userId);
+            controlSelf(userId, user);
             await Prisma.character.delete({
                 where: {
                     id: characterId
                 }
             });
-            res.send({});
-        } catch (err: any) {
-            res.error(err);
+            rep.send({});
         }
-    }
-);
+    });
 
-// set a character portrait
-characterController.post(
-    '/characters/:characterId/portrait',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
+    // set a character portrait
+    app.route({
+        method: 'POST',
+        url: '/characters/:characterId/portrait',
+        handler: async (
+            req: FastifyRequest<{
+                Params: {
+                    characterId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            // parse form data
+            try {
+                await req.parseMultipart(getFormidablePortraitOptions());
+            } catch {
+                throw new ValidationError('Error while parsing file');
+            }
+            const { user, files } = req;
             const characterId = parseParamId(req.params, 'characterId');
             const character = await getCharacter(characterId);
-            controlSelf(req, character.userId);
+            controlSelf(character.userId, user);
             // get portraits directory
             const portraitDirPath = await controlPortraitDir();
-            // initialize formidable
-            const form = Formidable(formidablePortraitOptions);
-            // parse form data
-            form.parse(req, async (err, _fields, files) => {
-                try {
-                    // file controls
-                    if (err) {
-                        throw new ValidationError('Error while parsing file');
-                    }
-                    // validate body
-                    validateUploadPortrait(files);
-                    // get file data
-                    const file = Array.isArray(files.portrait)
-                        ? files.portrait.shift()
-                        : files.portrait;
-                    if (!file) {
-                        throw new InternError('Could not get portrait file');
-                    }
-                    const typedFile = {
-                        ...file,
-                        type: controlFile(file, 'image')
-                    };
-                    // move temporary file to character's directory
-                    const { filepath: temporaryPath, newFilename } = typedFile;
-                    const portraitFileName = `${characterId}-${newFilename}`;
-                    await Fs.promises.rename(
-                        temporaryPath,
-                        Path.join(portraitDirPath, portraitFileName)
-                    );
-                    // save portrait on character
-                    const portrait = Path.join(
-                        portraitDirName,
-                        portraitFileName
-                    );
-                    const updatedCharacter = await Prisma.character.update({
-                        data: {
-                            portrait
-                        },
-                        where: {
-                            id: characterId
-                        }
-                    });
-                    // if there was a portrait before then delete it
-                    if (character.portrait) {
-                        await Fs.promises.rm(
-                            Path.join(assetDir, character.portrait)
-                        );
-                    }
-                    //
-                    res.json(updatedCharacter);
-                } catch (formErr: any) {
-                    res.error(formErr);
+            // validate body
+            validateSchema(uploadPortraitSchema, files);
+            // get file data
+            const file = Array.isArray(files?.portrait)
+                ? files?.portrait?.shift()
+                : files?.portrait;
+            if (!file) {
+                throw new InternError('Could not get portrait file');
+            }
+            const typedFile = {
+                ...file,
+                type: controlFile(file, 'image')
+            };
+            // move temporary file to character's directory
+            const { filepath: temporaryPath, newFilename } = typedFile;
+            const portraitFileName = `${characterId}-${newFilename}`;
+            await Fs.promises.rename(
+                temporaryPath,
+                Path.join(portraitDirPath, portraitFileName)
+            );
+            // save portrait on character
+            const portrait = Path.join(portraitDirName, portraitFileName);
+            const updatedCharacter = await Prisma.character.update({
+                data: {
+                    portrait
+                },
+                where: {
+                    id: characterId
                 }
             });
-        } catch (err: any) {
-            res.error(err);
+            // if there was a portrait before then delete it
+            if (character.portrait) {
+                await Fs.promises.rm(Path.join(assetDir, character.portrait));
+            }
+            //
+            rep.send(updatedCharacter);
         }
-    }
-);
+    });
 
-// delete a user's character
-characterController.delete(
-    '/characters/:characterId/portrait',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            const characterId = parseParamId(req.params, 'characterId');
+    // delete a user's character
+    app.route({
+        method: 'DELETE',
+        url: '/characters/:characterId/portrait',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    characterId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const characterId = parseParamId(params, 'characterId');
             const character = await getCharacter(characterId);
-            controlSelf(req, character.userId);
+            controlSelf(character.userId, user);
             if (character.portrait) {
                 const [updatedCharacter] = await Promise.all([
                     Prisma.character.update({
@@ -225,14 +262,12 @@ characterController.delete(
                     }),
                     Fs.promises.rm(Path.join(assetDir, character.portrait))
                 ]);
-                res.send(updatedCharacter);
+                rep.send(updatedCharacter);
             } else {
-                res.send(character);
+                rep.send(character);
             }
-        } catch (err: any) {
-            res.error(err);
         }
-    }
-);
+    });
+};
 
 export default characterController;

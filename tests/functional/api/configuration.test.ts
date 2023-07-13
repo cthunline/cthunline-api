@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import Api from '../helpers/api.helper';
 import Data from '../helpers/data.helper';
 import { compareDataWithExpected } from '../helpers/assert.helper';
-import { setEnvMock } from '../../../src/services/env';
+import { mockEnvVar } from '../../../src/services/env';
 
 const getConfiguration = async (expected: any) => {
     const response = await Api.request({
@@ -11,7 +11,7 @@ const getConfiguration = async (expected: any) => {
         route: '/configuration'
     });
     expect(response).to.have.status(200);
-    expect(response).to.be.json;
+    expect(response.body).to.be.an('object');
     const { body } = response;
     compareDataWithExpected(body, expected);
 };
@@ -26,8 +26,8 @@ describe('[API] Configuration', () => {
             await Api.login();
             await Api.logout();
             for (const value of [true, false]) {
-                setEnvMock('REGISTRATION_ENABLED', value);
-                setEnvMock('INVITATION_ENABLED', value);
+                mockEnvVar('REGISTRATION_ENABLED', value);
+                mockEnvVar('INVITATION_ENABLED', value);
                 await getConfiguration({
                     registrationEnabled: value,
                     invitationEnabled: value,

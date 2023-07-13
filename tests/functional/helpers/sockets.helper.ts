@@ -1,14 +1,16 @@
+import CookieSignature from 'cookie-signature';
 import { expect } from 'chai';
 import Client, {
     Socket,
     ManagerOptions,
     SocketOptions
 } from 'socket.io-client';
-import CookieSignature from 'cookie-signature';
 
-import Api from './api.helper';
-import { assertSocketMeta } from './assert.helper';
+import { getEnv } from '../../../src/services/env';
+
 import { sessionsData, charactersData, usersData } from './data.helper';
+import { assertSocketMeta } from './assert.helper';
+import Api from './api.helper';
 
 interface SocketsHelper {
     url: string;
@@ -22,18 +24,18 @@ interface SocketsHelper {
 }
 
 interface GetSocketClientData {
-    token?: string;
+    jwt?: string;
     query?: object;
 }
 
 export interface FailSocketConnectionData {
-    token?: string;
+    jwt?: string;
     query?: object;
     status: number;
 }
 
 export interface SocketConnectionData {
-    token?: string;
+    jwt?: string;
     sessionId?: number;
     characterId?: number;
 }
@@ -45,21 +47,21 @@ interface SocketClientConstructor {
 const SocketClient = Client as unknown as SocketClientConstructor;
 
 const Sockets: SocketsHelper = {
-    url: 'http://localhost:8080',
+    url: `http://localhost:${getEnv('PORT')}`,
     connectedSockets: [],
 
-    getSocketClient: ({ token, query }: GetSocketClientData) => {
+    getSocketClient: ({ jwt, query }: GetSocketClientData) => {
         const socketClient = new SocketClient(Sockets.url, {
             query,
             autoConnect: false
         });
-        if (token) {
+        if (jwt) {
             const signed = CookieSignature.sign(
-                token,
+                jwt,
                 process.env.COOKIE_SECRET ?? ''
             );
             socketClient.io.opts.extraHeaders = {
-                cookie: `token=s:${signed}`
+                cookie: `jwt=s:${signed}`
             };
         }
         return socketClient;
@@ -70,7 +72,7 @@ const Sockets: SocketsHelper = {
         const characterId = connectionData?.characterId ?? charactersData[0].id;
         return new Promise((resolve, reject) => {
             const socket = Sockets.getSocketClient({
-                token: connectionData?.token,
+                jwt: connectionData?.jwt,
                 query: {
                     sessionId,
                     characterId
@@ -88,7 +90,7 @@ const Sockets: SocketsHelper = {
     },
 
     connectRole: async (isMaster: boolean) => {
-        const { id, token } = await Api.login();
+        const { id, jwt } = await Api.login();
         const sessionId = sessionsData.find(({ masterId }) =>
             isMaster ? id === masterId : id !== masterId
         )?.id;
@@ -96,20 +98,20 @@ const Sockets: SocketsHelper = {
             (char) => char.userId === Api.userId
         )?.id;
         return Sockets.connect({
-            token,
+            jwt,
             sessionId,
             characterId
         });
     },
 
     failConnect: async ({
-        token,
+        jwt,
         query,
         status
     }: FailSocketConnectionData): Promise<void> =>
         new Promise((resolve, reject) => {
             const socket = Sockets.getSocketClient({
-                token,
+                jwt,
                 query
             });
             socket.connect();
@@ -128,33 +130,63 @@ const Sockets: SocketsHelper = {
         const [masterEmail, player1Email, player2Email] = usersData.map(
             ({ email }) => email
         );
-        const [masterTokenUser, player1TokenUser, player2TokenUser] =
-            await Promise.all(
-                [masterEmail, player1Email, player2Email].map((email) =>
-                    Api.login({
-                        email,
-                        password: 'test'
-                    })
-                )
-            );
+        const masterJWTUser = await Api.login({
+            email: masterEmail,
+            password: 'test'
+        });
+        const player1JWTUser = await Api.login({
+            email: player1Email,
+            password: 'test'
+        });
+        const player2JWTUser = await Api.login({
+            email: player2Email,
+            password: 'test'
+        });
         const sessionId = sessionsData.find(
-            ({ masterId }) => masterTokenUser.id === masterId
+            ({ masterId }) => masterJWTUser.id === masterId
         )?.id;
-        return Promise.all([
-            Sockets.connect({
-                token: masterTokenUser.token,
+        const sockets: Socket[] = [];
+        sockets.push(
+            await Sockets.connect({
+                jwt: masterJWTUser.jwt,
                 sessionId
-            }),
-            ...[player1TokenUser, player2TokenUser].map(({ id, token }) =>
-                Sockets.connect({
-                    token,
-                    sessionId,
-                    characterId: charactersData.find(
-                        (character) => character.userId === id
-                    )?.id
-                })
-            )
-        ]);
+            })
+        );
+        sockets.push(
+            await Sockets.connect({
+                jwt: player1JWTUser.jwt,
+                sessionId,
+                characterId: charactersData.find(
+                    (character) => character.userId === player1JWTUser.id
+                )?.id
+            })
+        );
+        sockets.push(
+            await Sockets.connect({
+                jwt: player2JWTUser.jwt,
+                sessionId,
+                characterId: charactersData.find(
+                    (character) => character.userId === player2JWTUser.id
+                )?.id
+            })
+        );
+        return sockets;
+        // TODO remove ? test
+        // return Promise.all([
+        //     Sockets.connect({
+        //         jwt: masterJWTUser.jwt,
+        //         sessionId
+        //     }),
+        //     ...[player1JWTUser, player2JWTUser].map(({ id, jwt }) =>
+        //         Sockets.connect({
+        //             jwt,
+        //             sessionId,
+        //             characterId: charactersData.find(
+        //                 (character) => character.userId === id
+        //             )?.id
+        //         })
+        //     )
+        // ]);
     },
 
     testError: async (

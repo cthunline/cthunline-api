@@ -52,18 +52,16 @@ describe('[API] Sessions', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: '/sessions',
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/sessions',
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should create a session', async () => {
             await Api.testCreate({
@@ -137,18 +135,16 @@ describe('[API] Sessions', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/sessions/${id}`,
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/sessions/${id}`,
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should throw a forbidden error', async () => {
             await Api.testError(

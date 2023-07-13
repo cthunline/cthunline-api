@@ -1,20 +1,18 @@
 import { Socket, Server } from 'socket.io';
 
-import { Prisma } from '../services/prisma';
-import Validator from '../services/validator';
-import { SocketAudioPlay } from '../types/socket';
 import { ForbiddenError, ValidationError } from '../services/errors';
+import { validateSchema } from '../services/typebox';
+import { Prisma } from '../services/prisma';
+
 import { meta } from './helper';
 
-import audioSchemas from './schemas/audio.json';
-
-const validatePlay = Validator(audioSchemas.play);
+import { playAudioSchema, PlayAudioBody } from './schemas/audio';
 
 const audioHandler = (_io: Server, socket: Socket) => {
     // notify session players that game master started playing audio asset
-    socket.on('audioPlay', async (request: SocketAudioPlay) => {
+    socket.on('audioPlay', async (request: PlayAudioBody) => {
         try {
-            validatePlay(request);
+            validateSchema(playAudioSchema, request);
             const { user, sessionId, isMaster } = socket.data;
             if (!isMaster) {
                 throw new ForbiddenError();

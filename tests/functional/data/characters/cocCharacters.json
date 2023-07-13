@@ -239,7 +239,8 @@
                 "gearAndPossessions": "Numquam quo sunt aliquid",
                 "spendingLevel": "10$",
                 "cash": "64$",
-                "assets": "1600$"
+                "assets": "1600$",
+                "fellowInvestigators": "Delphine, Ada, Selma"
             }
         }
     },
@@ -492,7 +493,8 @@
                 "gearAndPossessions": "Dignissimos modi quo molestiae alias",
                 "spendingLevel": "10$",
                 "cash": "40$",
-                "assets": "1000$"
+                "assets": "1000$",
+                "fellowInvestigators": "Amandine, Amel, Sarah"
             }
         }
     },
@@ -736,7 +738,8 @@
                 "gearAndPossessions": "Numquam quo sunt aliquid",
                 "spendingLevel": "10$",
                 "cash": "64$",
-                "assets": "1600$"
+                "assets": "1600$",
+                "fellowInvestigators": "Lindsay, Christiane, Sakina"
             }
         }
     }

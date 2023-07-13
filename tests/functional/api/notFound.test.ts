@@ -1,33 +1,29 @@
 import { expect } from 'chai';
 
-import Api, { HttpMethod } from '../helpers/api.helper';
+import Api, { httpMethods } from '../helpers/api.helper';
 import { assertError } from '../helpers/assert.helper';
 
 describe('[API] Global', () => {
-    describe('Invalid route should throw not found error', async () => {
-        const methods: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
+    beforeEach(async () => {
+        await Api.login();
+    });
+    it('Should throw not found error because routes are invalid', async () => {
         const invalidRoutes = [
             '/12345',
             '/azeqsd',
             '/1a2s3f56a4',
             '/321-654-987'
         ];
-        await Promise.all(
-            methods
-                .map((method) =>
-                    invalidRoutes.map((route) =>
-                        (async () => {
-                            const response = await Api.request({
-                                method,
-                                route
-                            });
-                            expect(response).to.have.status(404);
-                            expect(response).to.be.json;
-                            assertError(response.body);
-                        })()
-                    )
-                )
-                .flat()
-        );
+        for (const method of httpMethods) {
+            for (const route of invalidRoutes) {
+                const response = await Api.request({
+                    method,
+                    route
+                });
+                expect(response).to.have.status(404);
+                expect(response.body).to.be.an('object');
+                assertError(response.body);
+            }
+        }
     });
 });

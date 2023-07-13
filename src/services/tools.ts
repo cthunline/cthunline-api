@@ -1,8 +1,8 @@
-import { ParamsDictionary } from 'express-serve-static-core';
+import { customAlphabet } from 'nanoid';
 
-import { ValidationError } from './errors';
-
-// trim chars on a string (at begining and end)
+/**
+Trim chars on a string (at begining and end)
+*/
 export const trimChar = (str: string, char: string): string => {
     let string = str;
     while (string.charAt(0) === char) {
@@ -14,7 +14,9 @@ export const trimChar = (str: string, char: string): string => {
     return string;
 };
 
-// return sum of an array of numbers
+/**
+Return sum of an array of numbers
+*/
 export const sum = (numbers: number[]): number =>
     numbers.reduce((i, j) => i + j, 0);
 
@@ -34,13 +36,18 @@ export const isInteger = (value: string | number) => {
     return (parsedFloat | 0) === parsedFloat;
 };
 
+const generateCode32 = customAlphabet('1234567890abcdef', 32);
+const generateCode16 = customAlphabet('1234567890abcdef', 16);
+const generateCode8 = customAlphabet('1234567890abcdef', 8);
 /**
-Parses IDs from Express path parameters object.
-If ID is a number returns the integer value otherwise throws a validation error.
+Generate a random token with length of 8, 16 or 32
 */
-export const parseParamId = (params: ParamsDictionary, idFieldName: string) => {
-    if (params[idFieldName] && isInteger(params[idFieldName])) {
-        return parseInt(params[idFieldName]);
+export const generateToken = (size: 8 | 16 | 32 = 8) => {
+    if (size === 32) {
+        return generateCode32();
     }
-    throw new ValidationError(`Parameter ${idFieldName} is not a valid ID`);
+    if (size === 16) {
+        return generateCode16();
+    }
+    return generateCode8();
 };

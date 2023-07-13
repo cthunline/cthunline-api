@@ -1,39 +1,40 @@
-import { Router, Request, Response } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { GamesData, isValidGameId } from '../services/games';
 import { NotFoundError } from '../services/errors';
 
-const gameController = Router();
-
-// get all games
-gameController.get(
-    '/games',
-    async (_req: Request, res: Response): Promise<void> => {
-        try {
+const gameController = async (app: FastifyInstance) => {
+    // get all games
+    app.route({
+        method: 'GET',
+        url: '/games',
+        handler: async (req: FastifyRequest, rep: FastifyReply) => {
             const games = Object.values(GamesData);
-            res.json({
-                games
-            });
-        } catch (err: any) {
-            res.error(err);
+            rep.send({ games });
         }
-    }
-);
+    });
 
-// get a game
-gameController.get(
-    '/games/:gameId',
-    async ({ params }: Request, res: Response): Promise<void> => {
-        try {
+    // get a game
+    app.route({
+        method: 'GET',
+        url: '/games/:gameId',
+        handler: async (
+            {
+                params
+            }: FastifyRequest<{
+                Params: {
+                    gameId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
             const { gameId } = params;
             if (!isValidGameId(gameId)) {
                 throw new NotFoundError('Game not found');
             }
-            res.json(GamesData[gameId]);
-        } catch (err: any) {
-            res.error(err);
+            rep.send(GamesData[gameId]);
         }
-    }
-);
+    });
+};
 
 export default gameController;

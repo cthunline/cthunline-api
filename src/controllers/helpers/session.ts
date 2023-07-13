@@ -1,7 +1,7 @@
 import { Session } from '@prisma/client';
 
 import { Prisma } from '../../services/prisma';
-import { userSelect } from './user';
+import { safeUserSelect } from './user';
 
 export const defaultSketchData = {
     displayed: false,
@@ -15,7 +15,7 @@ export const getInclude = (includeMaster: boolean) =>
         ? {
               include: {
                   master: {
-                      select: userSelect
+                      select: safeUserSelect
                   }
               }
           }

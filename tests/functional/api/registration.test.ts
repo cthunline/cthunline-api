@@ -1,11 +1,12 @@
-import { expect } from 'chai';
 import MockDate from 'mockdate';
+import { expect } from 'chai';
 import DayJs from 'dayjs';
 
-import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
+import { mockEnvVar } from '../../../src/services/env';
+
 import { assertUser } from '../helpers/assert.helper';
-import { setEnvMock } from '../../../src/services/env';
+import Data from '../helpers/data.helper';
+import Api from '../helpers/api.helper';
 
 const registerUser = async (data: any) => {
     const { invitationCode, ...expected } = data;
@@ -15,7 +16,7 @@ const registerUser = async (data: any) => {
         body: data
     });
     expect(response).to.have.status(200);
-    expect(response).to.be.json;
+    expect(response.body).to.be.an('object');
     const { body } = response;
     assertUser(body, expected);
 };
@@ -26,7 +27,7 @@ const generateInvitation = async () => {
         route: '/invitation'
     });
     expect(response).to.have.status(200);
-    expect(response).to.be.json;
+    expect(response.body).to.be.an('object');
     const {
         body: { code }
     } = response;
@@ -44,7 +45,7 @@ describe('[API] Registration', () => {
         it('Should throw a forbidden error because registration is disabled', async () => {
             await Api.login();
             await Api.logout();
-            setEnvMock('REGISTRATION_ENABLED', false);
+            mockEnvVar('REGISTRATION_ENABLED', false);
             await Api.testError(
                 {
                     method: 'POST',
@@ -61,8 +62,8 @@ describe('[API] Registration', () => {
         it('Should throw a forbidden error because invitation code is invalid', async () => {
             await Api.login();
             await Api.logout();
-            setEnvMock('REGISTRATION_ENABLED', true);
-            setEnvMock('INVITATION_ENABLED', true);
+            mockEnvVar('REGISTRATION_ENABLED', true);
+            mockEnvVar('INVITATION_ENABLED', true);
             const registerData = [
                 {
                     name: 'Test',
@@ -76,25 +77,23 @@ describe('[API] Registration', () => {
                     invitationCode: 'invalidCode'
                 }
             ];
-            await Promise.all(
-                registerData.map((data) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: '/register',
-                            body: data
-                        },
-                        403
-                    )
-                )
-            );
+            for (const data of registerData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/register',
+                        body: data
+                    },
+                    403
+                );
+            }
         });
         it('Should throw a forbidden error because invitation code is already used', async () => {
             await Api.login();
             const code = await generateInvitation();
             await Api.logout();
-            setEnvMock('REGISTRATION_ENABLED', true);
-            setEnvMock('INVITATION_ENABLED', true);
+            mockEnvVar('REGISTRATION_ENABLED', true);
+            mockEnvVar('INVITATION_ENABLED', true);
             await registerUser({
                 name: 'Test',
                 email: 'ttt@test.com',
@@ -121,8 +120,8 @@ describe('[API] Registration', () => {
             const code = await generateInvitation();
             MockDate.reset();
             await Api.logout();
-            setEnvMock('REGISTRATION_ENABLED', true);
-            setEnvMock('INVITATION_ENABLED', true);
+            mockEnvVar('REGISTRATION_ENABLED', true);
+            mockEnvVar('INVITATION_ENABLED', true);
             await Api.testError(
                 {
                     method: 'POST',
@@ -140,8 +139,8 @@ describe('[API] Registration', () => {
         it('Should register a user', async () => {
             await Api.login();
             await Api.logout();
-            setEnvMock('REGISTRATION_ENABLED', true);
-            setEnvMock('INVITATION_ENABLED', false);
+            mockEnvVar('REGISTRATION_ENABLED', true);
+            mockEnvVar('INVITATION_ENABLED', false);
             await registerUser({
                 name: 'Test',
                 email: 'yyy@test.com',
@@ -149,8 +148,8 @@ describe('[API] Registration', () => {
             });
         });
         it('Should register a user with an invitation code', async () => {
-            setEnvMock('REGISTRATION_ENABLED', true);
-            setEnvMock('INVITATION_ENABLED', true);
+            mockEnvVar('REGISTRATION_ENABLED', true);
+            mockEnvVar('INVITATION_ENABLED', true);
             await Api.login();
             const code = await generateInvitation();
             await Api.logout();
@@ -166,8 +165,8 @@ describe('[API] Registration', () => {
     describe('POST /invitation', () => {
         it('Should throw a forbidden error', async () => {
             await Api.login();
-            setEnvMock('REGISTRATION_ENABLED', false);
-            setEnvMock('INVITATION_ENABLED', true);
+            mockEnvVar('REGISTRATION_ENABLED', false);
+            mockEnvVar('INVITATION_ENABLED', true);
             await Api.testError(
                 {
                     method: 'POST',
@@ -175,8 +174,8 @@ describe('[API] Registration', () => {
                 },
                 403
             );
-            setEnvMock('REGISTRATION_ENABLED', true);
-            setEnvMock('INVITATION_ENABLED', false);
+            mockEnvVar('REGISTRATION_ENABLED', true);
+            mockEnvVar('INVITATION_ENABLED', false);
             await Api.testError(
                 {
                     method: 'POST',
@@ -187,8 +186,8 @@ describe('[API] Registration', () => {
         });
         it('Should generate an invitation code', async () => {
             await Api.login();
-            setEnvMock('REGISTRATION_ENABLED', true);
-            setEnvMock('INVITATION_ENABLED', true);
+            mockEnvVar('REGISTRATION_ENABLED', true);
+            mockEnvVar('INVITATION_ENABLED', true);
             await generateInvitation();
         });
     });

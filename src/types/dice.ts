@@ -1,3 +1,7 @@
+import { RequestDiceBody } from '../sockets/schemas/dice';
+
+import { SafeUser } from './user';
+
 export enum DiceType {
     d4 = 'D4',
     d6 = 'D6',
@@ -6,4 +10,12 @@ export enum DiceType {
     d12 = 'D12',
     d20 = 'D20',
     d100 = 'D100'
+}
+
+export interface SocketDiceResult {
+    user: SafeUser;
+    isMaster: boolean;
+    request: RequestDiceBody;
+    result: number;
+    isPrivate: boolean;
 }

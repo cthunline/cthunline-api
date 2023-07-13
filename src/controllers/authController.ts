@@ -1,91 +1,70 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { AuthenticationError } from '../services/errors';
 import { getCookieOptions } from './helpers/auth';
-import rateLimiter from '../services/rateLimiter';
-import Validator from '../services/validator';
+
+import { verifyPassword, generateJwt, encrypt } from '../services/crypto';
+import { registerRateLimiter } from '../services/rateLimiter';
+import { AuthenticationError } from '../services/errors';
 import { Prisma } from '../services/prisma';
-import { UserSelect } from '../types/user';
-import { verifyPassword, generateJwt, verifyJwt } from '../services/crypto';
+import { getEnv } from '../services/env';
 
-import authSchemas from './schemas/auth.json';
+import { loginSchema, LoginBody } from './schemas/auth';
 
-const validateLogin = Validator(authSchemas.login);
-
-// express middleware controling jwt validity
-// injects user data in express request object
-export const authMiddleware = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> => {
-    try {
-        const { token } = req.signedCookies;
-        if (!token) {
-            throw new AuthenticationError();
+const authController = async (app: FastifyInstance) => {
+    // check authentication validity
+    app.route({
+        method: 'GET',
+        url: '/auth',
+        handler: async (req: FastifyRequest, rep: FastifyReply) => {
+            rep.send(req.user);
         }
-        const user = verifyJwt<UserSelect>(token);
-        req.user = user;
-        next();
-    } catch (err: any) {
-        res.error(err);
-    }
-};
+    });
 
-const authController = Router();
-
-// check authentication validity
-authController.get(
-    '/auth',
-    async (req: Request, res: Response): Promise<void> => {
-        try {
-            res.send(req.user);
-        } catch (err: any) {
-            res.error(err);
-        }
-    }
-);
-
-// login
-authController.post(
-    '/auth',
-    rateLimiter,
-    async ({ body }: Request, res: Response): Promise<void> => {
-        try {
-            validateLogin(body);
-            const { email, password } = body;
-            const userWithPassword = await Prisma.user.findFirst({
-                where: {
-                    email,
-                    isEnabled: true
+    await app.register(async (routeApp: FastifyInstance) => {
+        // rate limiter
+        await registerRateLimiter(routeApp);
+        // login using an email, if the email is valid sends a magic link to the user by email
+        app.route({
+            method: 'POST',
+            url: '/auth',
+            schema: { body: loginSchema },
+            handler: async (
+                req: FastifyRequest<{
+                    Body: LoginBody;
+                }>,
+                rep: FastifyReply
+            ) => {
+                const { email, password } = req.body;
+                const userWithPassword = await Prisma.user.findFirst({
+                    where: {
+                        email,
+                        isEnabled: true
+                    }
+                });
+                if (!userWithPassword) {
+                    throw new AuthenticationError();
                 }
-            });
-            if (!userWithPassword) {
-                throw new AuthenticationError();
+                const { password: hash, ...user } = userWithPassword;
+                const verified = await verifyPassword(password, hash);
+                if (!verified) {
+                    throw new AuthenticationError();
+                }
+                const jwt = generateJwt(user);
+                const encryptedJwt = encrypt(jwt, getEnv('CRYPTO_SECRET'));
+                rep.cookie('jwt', encryptedJwt, getCookieOptions()).send(user);
             }
-            const { password: hash, ...user } = userWithPassword;
-            const verified = await verifyPassword(password, hash);
-            if (!verified) {
-                throw new AuthenticationError();
-            }
-            const token = generateJwt<UserSelect>(user);
-            res.cookie('token', token, getCookieOptions()).json(user);
-        } catch (err: any) {
-            res.error(err);
-        }
-    }
-);
+        });
+    });
 
-// logout
-authController.delete(
-    '/auth',
-    async (_req: Request, res: Response): Promise<void> => {
-        try {
-            res.clearCookie('token').send({});
-        } catch (err: any) {
-            res.error(err);
+    // logout
+    app.route({
+        method: 'DELETE',
+        url: '/auth',
+        handler: async (req: FastifyRequest, rep: FastifyReply) => {
+            // delete jwt cookie on client
+            rep.clearCookie('jwt').send({});
         }
-    }
-);
+    });
+};
 
 export default authController;

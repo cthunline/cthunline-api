@@ -1,30 +1,21 @@
-import { Router, Request, Response } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import {
-    isRegistrationEnabled,
-    isInvitationEnabled,
-    env
-} from '../services/env';
+import { getEnv } from '../services/env';
 
-const { DEFAULT_THEME, DEFAULT_LOCALE } = env;
-
-const configurationController = Router();
-
-// public configuration
-configurationController.get(
-    '/configuration',
-    async (_req: Request, res: Response): Promise<void> => {
-        try {
-            res.json({
-                registrationEnabled: isRegistrationEnabled(),
-                invitationEnabled: isInvitationEnabled(),
-                defaultTheme: DEFAULT_THEME,
-                defaultLocale: DEFAULT_LOCALE
+const configurationController = async (app: FastifyInstance) => {
+    // public configuration
+    app.route({
+        method: 'GET',
+        url: '/configuration',
+        handler: async (req: FastifyRequest, rep: FastifyReply) => {
+            rep.send({
+                registrationEnabled: getEnv('REGISTRATION_ENABLED'),
+                invitationEnabled: getEnv('INVITATION_ENABLED'),
+                defaultTheme: getEnv('DEFAULT_THEME'),
+                defaultLocale: getEnv('DEFAULT_LOCALE')
             });
-        } catch (err: any) {
-            res.error(err);
         }
-    }
-);
+    });
+};
 
 export default configurationController;

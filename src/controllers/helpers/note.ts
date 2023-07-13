@@ -1,8 +1,8 @@
 import { Note } from '@prisma/client';
 
-import { Prisma } from '../../services/prisma';
-import { userSelect } from './user';
 import { ForbiddenError } from '../../services/errors';
+import { Prisma } from '../../services/prisma';
+import { safeUserSelect } from './user';
 
 // get notes of a user for a session ordered by position
 // also returns the other user's shared notes in the session
@@ -37,7 +37,7 @@ export const getNotes = async (
         include: {
             user: includeUsers
                 ? {
-                      select: userSelect
+                      select: safeUserSelect
                   }
                 : false
         },

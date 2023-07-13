@@ -72,35 +72,36 @@ export const parseEnv = <EnvDataType>(
     return env as EnvDataType;
 };
 
-export const env = parseEnv<EnvData>(
+const env = parseEnv<EnvData>(
     process.env as Record<string, string>,
     envSchema as EnvSchema<EnvData>
 );
 
-// utility to mock env vars
-const mockedEnv: Partial<EnvData> = {};
-export const setEnvMock = (key: keyof EnvData, value: any) => {
+const initialEnv: EnvData = { ...env };
+
+/**
+Return an environment variable value
+*/
+export const getEnv = <T extends keyof EnvData>(key: T) => env[key];
+
+/**
+Dynamicaly change an environment variable value for testing purpose
+*/
+export const mockEnvVar = <T extends keyof EnvData>(
+    key: T,
+    value: EnvData[T]
+) => {
     if (env.ENVIRONMENT === 'dev') {
-        mockedEnv[key] = value;
+        env[key] = value;
     }
 };
 
-// utility functions to allow mocking registration env vars
-export const isRegistrationEnabled = (): boolean => {
-    if (
-        env.ENVIRONMENT === 'dev' &&
-        Object.hasOwn(mockedEnv, 'REGISTRATION_ENABLED')
-    ) {
-        return !!mockedEnv.REGISTRATION_ENABLED;
+/**
+Reset an environment variable value to its initial value.
+Can be used if environment variable values are changed for testing purposes.
+*/
+export const resetEnvVar = <T extends keyof EnvData>(key: T) => {
+    if (env.ENVIRONMENT === 'dev') {
+        env[key] = initialEnv[key];
     }
-    return env.REGISTRATION_ENABLED;
-};
-export const isInvitationEnabled = (): boolean => {
-    if (
-        env.ENVIRONMENT === 'dev' &&
-        Object.hasOwn(mockedEnv, 'INVITATION_ENABLED')
-    ) {
-        return !!mockedEnv.INVITATION_ENABLED;
-    }
-    return env.INVITATION_ENABLED;
 };

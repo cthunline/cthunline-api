@@ -1,42 +1,35 @@
-import { Prisma as PrismaTypes } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
 
-import { Prisma } from '../services/prisma';
-import Validator from '../services/validator';
-import { ForbiddenError } from '../services/errors';
-import { SketchData, SketchTokenData } from '../types/socket';
 import { cacheGet, cacheSave, cacheSet } from '../services/cache';
+import { validateSchema } from '../services/typebox';
+import { ForbiddenError } from '../services/errors';
+import { Prisma } from '../services/prisma';
+
 import { meta } from './helper';
 
-import { definitions } from '../controllers/schemas/definitions.json';
+import {
+    sketchSchema,
+    SketchBody,
+    tokenSchema,
+    TokenBody
+} from '../controllers/schemas/definitions';
 
-type JsonObject = PrismaTypes.JsonObject;
-
-const validateSketchUpdate = Validator({
-    ...definitions.sketch,
-    definitions
-});
-const validateSketchToken = Validator({
-    ...definitions.token,
-    definitions
-});
-
-const sketchCacheSaver = (sessionId: number) => (data: SketchData) =>
+const sketchCacheSaver = (sessionId: number) => (data: SketchBody) =>
     Prisma.session.update({
         where: {
             id: sessionId
         },
         data: {
-            sketch: data as unknown as JsonObject
+            sketch: data
         }
     });
 
 const sketchHandler = (_io: Server, socket: Socket) => {
     // updates sketch data (for game master only)
     // notifies other users in the room of the sketch update
-    socket.on('sketchUpdate', async (sketch: SketchData) => {
+    socket.on('sketchUpdate', async (sketch: SketchBody) => {
         try {
-            validateSketchUpdate(sketch);
+            validateSchema(sketchSchema, sketch);
             const { user, sessionId, isMaster } = socket.data;
             if (!isMaster) {
                 throw new ForbiddenError();
@@ -61,15 +54,15 @@ const sketchHandler = (_io: Server, socket: Socket) => {
 
     // updates a sketch token
     // notifies other users in the room of the sketch update
-    socket.on('tokenUpdate', async (token: SketchTokenData) => {
+    socket.on('tokenUpdate', async (token: TokenBody) => {
         try {
-            validateSketchToken(token);
+            validateSchema(tokenSchema, token);
             const { user, sessionId, isMaster } = socket.data;
             const cacheId = `sketch-${sessionId}`;
             cacheGet(cacheId, true);
             const sketch = cacheSet(cacheId, (previous) => ({
                 ...previous,
-                tokens: previous.tokens.map((tok: SketchTokenData) =>
+                tokens: previous.tokens.map((tok: TokenBody) =>
                     tok.id === token.id ? token : tok
                 )
             }));

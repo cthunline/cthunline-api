@@ -29,18 +29,16 @@ describe('[API] Authentication', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: '/auth',
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: '/auth',
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should throw authentication error', async () => {
             const invalidCredentials = [
@@ -53,11 +51,9 @@ describe('[API] Authentication', () => {
                     password: 'azeaze321321'
                 }
             ];
-            await Promise.all(
-                invalidCredentials.map((credentials) =>
-                    Api.login(credentials, false)
-                )
-            );
+            for (const credentials of invalidCredentials) {
+                await Api.login(credentials, false);
+            }
             const disabledUser = usersData.find(({ isEnabled }) => !isEnabled);
             await Api.login(
                 {

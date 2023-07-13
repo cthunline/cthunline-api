@@ -18,6 +18,7 @@
             }
         ],
         "@typescript-eslint/no-unused-expressions": "off",
+        "comma-dangle": "off",
         "import/no-extraneous-dependencies": [
             "error",
             {
@@ -25,6 +26,7 @@
             }
         ],
         "import/prefer-default-export": "off",
+        "indent": "off",
         "no-await-in-loop": "off",
         "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"],
         "radix": "off"

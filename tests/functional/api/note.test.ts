@@ -50,7 +50,7 @@ const testNoteList = async (includeUsers: boolean = false) => {
         route: `/sessions/${sessionsData[0].id}/notes${includeParam}`
     });
     expect(response).to.have.status(200);
-    expect(response).to.be.json;
+    expect(response.body).to.be.an('object');
     const { body } = response;
     expect(body).to.be.an('object');
     ['notes', 'sharedNotes'].forEach((key: string) => {
@@ -114,18 +114,16 @@ describe('[API] Notes', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/sessions/${sessionsData[0].id}/notes`,
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/sessions/${sessionsData[0].id}/notes`,
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should create a note in a session', async () => {
             const { notes } = getUserNotes(Api.userId);
@@ -195,20 +193,18 @@ describe('[API] Notes', () => {
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Promise.all(
-                [sharedNote.id, unsharedNote.id].map((noteId) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/notes/${noteId}`,
-                            body: {
-                                title: 'Test'
-                            }
-                        },
-                        403
-                    )
-                )
-            );
+            for (const noteId of [sharedNote.id, unsharedNote.id]) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/notes/${noteId}`,
+                        body: {
+                            title: 'Test'
+                        }
+                    },
+                    403
+                );
+            }
         });
         it('Should throw a validation error', async () => {
             const response = await Api.request({
@@ -236,18 +232,16 @@ describe('[API] Notes', () => {
                 },
                 {}
             ];
-            await Promise.all(
-                invalidData.map((body) =>
-                    Api.testError(
-                        {
-                            method: 'POST',
-                            route: `/notes/${note.id}`,
-                            body
-                        },
-                        400
-                    )
-                )
-            );
+            for (const body of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'POST',
+                        route: `/notes/${note.id}`,
+                        body
+                    },
+                    400
+                );
+            }
         });
         it('Should update a note', async () => {
             const response = await Api.request({
@@ -302,31 +296,25 @@ describe('[API] Notes', () => {
             );
         });
         it('Should throw error because of invalid ID', async () => {
-            await Promise.all(
-                ['up', 'down'].map((action) =>
-                    Api.testInvalidIdError({
-                        method: 'PUT',
-                        route: `/notes/:id/${action}`
-                    })
-                )
-            );
+            for (const action of ['up', 'down']) {
+                await Api.testInvalidIdError({
+                    method: 'PUT',
+                    route: `/notes/:id/${action}`
+                });
+            }
         });
         it('Should throw a forbidden error', async () => {
-            await Promise.all(
-                [sharedNote.id, unsharedNote.id]
-                    .map((noteId) => [
-                        ['up', 'down'].map((action) =>
-                            Api.testError(
-                                {
-                                    method: 'PUT',
-                                    route: `/notes/${noteId}/${action}`
-                                },
-                                403
-                            )
-                        )
-                    ])
-                    .flat()
-            );
+            for (const noteId of [sharedNote.id, unsharedNote.id]) {
+                for (const action of ['up', 'down']) {
+                    await Api.testError(
+                        {
+                            method: 'PUT',
+                            route: `/notes/${noteId}/${action}`
+                        },
+                        403
+                    );
+                }
+            }
         });
         it('Should throw a conflict error', async () => {
             const { notes } = await getApiNotes(sessionsData[0].id);
@@ -338,22 +326,20 @@ describe('[API] Notes', () => {
             );
             const lowestPositionNote = notesByPosition[1];
             const highestPositionNote = notesByPosition[maxPosition];
-            await Promise.all([
-                Api.testError(
-                    {
-                        method: 'PUT',
-                        route: `/notes/${highestPositionNote.id}/down`
-                    },
-                    409
-                ),
-                Api.testError(
-                    {
-                        method: 'PUT',
-                        route: `/notes/${lowestPositionNote.id}/up`
-                    },
-                    409
-                )
-            ]);
+            await Api.testError(
+                {
+                    method: 'PUT',
+                    route: `/notes/${highestPositionNote.id}/down`
+                },
+                409
+            );
+            await Api.testError(
+                {
+                    method: 'PUT',
+                    route: `/notes/${lowestPositionNote.id}/up`
+                },
+                409
+            );
         });
         it('Should move position of a note', async () => {
             const moveData = [
@@ -418,7 +404,7 @@ describe('[API] Notes', () => {
                     route: `/notes/${note.id}/${action}`
                 });
                 expect(moveUpResponse).to.have.status(200);
-                expect(moveUpResponse).to.be.json;
+                expect(moveUpResponse.body).to.be.an('object');
                 assertNote(moveUpResponse.body, expectedNotes[0]);
                 for (const expectedNote of expectedNotes) {
                     const { body } = await Api.request({
@@ -439,17 +425,15 @@ describe('[API] Notes', () => {
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Promise.all(
-                [sharedNote.id, unsharedNote.id].map((noteId) =>
-                    Api.testError(
-                        {
-                            method: 'DELETE',
-                            route: `/notes/${noteId}`
-                        },
-                        403
-                    )
-                )
-            );
+            for (const noteId of [sharedNote.id, unsharedNote.id]) {
+                await Api.testError(
+                    {
+                        method: 'DELETE',
+                        route: `/notes/${noteId}`
+                    },
+                    403
+                );
+            }
         });
         it('Should delete a note', async () => {
             const { notes } = getUserNotes(Api.userId);

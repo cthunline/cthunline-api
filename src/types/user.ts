@@ -1,3 +1,3 @@
 import { User } from '@prisma/client';
 
-export type UserSelect = Omit<User, 'password'>;
+export type SafeUser = Omit<User, 'password'>;

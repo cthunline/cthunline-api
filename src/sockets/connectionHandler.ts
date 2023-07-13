@@ -1,10 +1,9 @@
-import { Socket, Server } from 'socket.io';
 import { Session, Character } from '@prisma/client';
+import { Socket, Server } from 'socket.io';
 
-import { UserSelect } from '../types/user';
-import { Prisma } from '../services/prisma';
-import { verifyJwt } from '../services/crypto';
 import { cacheGet, cacheSet } from '../services/cache';
+import { decrypt, verifyJwt } from '../services/crypto';
+import { Prisma } from '../services/prisma';
 import {
     CustomError,
     AuthenticationError,
@@ -13,13 +12,21 @@ import {
     ForbiddenError
 } from '../services/errors';
 
+import { SafeUser } from '../types/user';
+import { getEnv } from '../services/env';
+
 // verify auth token
-const verifyToken = async (socket: Socket): Promise<UserSelect> => {
-    const token = (socket.request as any).signedCookies.token as string;
-    if (!token) {
+const verifySocketJwt = async (socket: Socket): Promise<SafeUser> => {
+    const { jwt } = socket.data.cookies;
+    if (!jwt) {
         throw new AuthenticationError('Missing authentication cookie');
     }
-    return verifyJwt<UserSelect>(token);
+    try {
+        const decryptedJwt = decrypt(jwt, getEnv('CRYPTO_SECRET'));
+        return verifyJwt(decryptedJwt);
+    } catch {
+        throw new AuthenticationError('Could not verify JWT');
+    }
 };
 
 // verify session
@@ -67,7 +74,7 @@ const verifyCharacter = async (
 // handles socket connection
 export const connectionMiddleware = async (socket: Socket, next: Function) => {
     try {
-        const user = await verifyToken(socket);
+        const user = await verifySocketJwt(socket);
         const session = await verifySession(socket);
         const isMaster = session.masterId === user.id;
         const character = isMaster

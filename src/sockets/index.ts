@@ -1,28 +1,32 @@
-import { Socket, Server } from 'socket.io';
-import { Server as HttpServer } from 'http';
-import CookieParser from 'cookie-parser';
+import { FastifyInstance } from 'fastify';
+import { Socket } from 'socket.io';
 
-import { env } from '../services/env';
-import { meta } from './helper';
+import characterHandler from './characterHandler';
+import sketchHandler from './sketchHandler';
+import audioHandler from './audioHandler';
+import diceHandler from './diceHandler';
 import {
     connectionMiddleware,
     disconnectCopycats,
     getSessionUsers
 } from './connectionHandler';
-import diceHandler from './diceHandler';
-import characterHandler from './characterHandler';
-import audioHandler from './audioHandler';
-import sketchHandler from './sketchHandler';
 
-const { COOKIE_SECRET } = env;
+import { meta } from './helper';
 
-const wrapExpressMiddleware =
-    (middleware: Function) => (socket: Socket, next: Function) =>
-        middleware(socket.request, {}, next);
-
-const socketRouter = (httpServer: HttpServer) => {
-    const io = new Server(httpServer);
-    io.use(wrapExpressMiddleware(CookieParser(COOKIE_SECRET)));
+const socketRouter = (app: FastifyInstance) => {
+    const { io } = app;
+    io.use((socket: Socket, next: Function) => {
+        if (socket.request.headers.cookie) {
+            const cookies = app.parseCookie(socket.request.headers.cookie);
+            Object.keys(cookies).forEach((key) => {
+                cookies[key] =
+                    app.unsignCookie(cookies[key].replace(/^s:/, '')).value ??
+                    cookies[key];
+            });
+            socket.data.cookies = cookies;
+        }
+        next();
+    });
     io.use(connectionMiddleware);
     io.on('connection', async (socket: Socket) => {
         disconnectCopycats(io, socket);
