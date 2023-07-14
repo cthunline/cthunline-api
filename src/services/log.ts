@@ -26,12 +26,13 @@ const transports: Winston.transport[] = [
 
 // control log file directory exists and is writable
 let fileTransportError = null;
-if (!getEnv('LOG_DIR')) {
+const logDir = getEnv('LOG_DIR');
+if (!logDir) {
     fileTransportError = 'no log directory provided';
 } else {
     try {
-        Fs.accessSync(getEnv('LOG_DIR'), Fs.constants.F_OK);
-        Fs.accessSync(getEnv('LOG_DIR'), Fs.constants.W_OK);
+        Fs.accessSync(logDir, Fs.constants.F_OK);
+        Fs.accessSync(logDir, Fs.constants.W_OK);
     } catch (err) {
         fileTransportError = `log directory ${getEnv(
             'LOG_DIR'
@@ -39,12 +40,12 @@ if (!getEnv('LOG_DIR')) {
     }
 }
 
-if (getEnv('LOG_DIR') && !fileTransportError) {
+if (logDir && !fileTransportError) {
     // log transport in file
     transports.push(
         new Winston.transports.File({
             level: 'info',
-            filename: Path.join(getEnv('LOG_DIR'), 'cthunline.log'),
+            filename: Path.join(logDir, 'cthunline.log'),
             handleExceptions: false,
             maxsize: 5242880,
             maxFiles: 5,

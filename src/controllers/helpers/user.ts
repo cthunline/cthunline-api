@@ -6,7 +6,7 @@ import {
 } from '../../services/errors';
 import { SafeUser } from '../../types/user';
 import { getEnv } from '../../services/env';
-import { locales } from '../../types/env';
+import { locales } from '../../services/locale';
 
 // default optional fields for a new user
 export const defaultUserData: Pick<SafeUser, 'theme' | 'locale' | 'isAdmin'> = {

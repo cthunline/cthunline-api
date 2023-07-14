@@ -3,7 +3,7 @@ import ChaiDateTime from 'chai-datetime';
 import Chai, { expect } from 'chai';
 
 import { AppErrorConstructor } from '../../../src/services/errors';
-import { locales } from '../../../src/types/env';
+import { locales } from '../../../src/services/locale';
 
 import { ChaiDateString, ChaiArrayOfType, ChaiHttpStatus } from './chai.helper';
 

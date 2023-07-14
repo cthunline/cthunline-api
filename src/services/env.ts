@@ -2,95 +2,54 @@
 This file must not import any other services and have the bare minimum imports
 since it is used in a lot of files in the code base
 */
-import { EnvData, EnvSchema, EnvValueType } from '../types/env';
+import { Value } from '@sinclair/typebox/value';
+import { Static } from '@sinclair/typebox';
+import Os from 'os';
 
-import envSchema from './env.schema.json';
+import { envSchema } from './env.schema';
 
-export const parseEnvVar = <EnvDataType>(
-    key: keyof EnvDataType,
-    value: string,
-    type: EnvValueType
-): any => {
-    const numberRegex = /^\d+$/;
-    switch (type) {
-        case 'string':
-            return String(value);
-        case 'number':
-            if (!numberRegex.test(value)) {
-                throw new Error(`${String(key)} should be a number`);
-            }
-            return Number(value);
-        case 'boolean':
-            if (value === '1' || value === 'true') {
-                return true;
-            }
-            if (value === '0' || value === 'false') {
-                return false;
-            }
-            throw new Error(
-                `${String(key)} should be either 0 (for false) or 1 (for true)`
-            );
-        default:
-            throw new Error(`Unexpected environment variable type ${type}`);
-    }
-};
+type Env = Static<typeof envSchema>;
 
-export const parseEnv = <EnvDataType>(
-    data: Record<string, string>,
-    schema: EnvSchema<EnvDataType>
-): EnvDataType => {
-    const env: Partial<Record<keyof EnvDataType, any>> = {};
-    const errors: string[] = [];
-    const keys = Object.keys(schema) as (keyof EnvDataType)[];
-    keys.forEach((key) => {
-        try {
-            const { type, required, filter } = schema[key];
-            if (data[String(key)]) {
-                const value = parseEnvVar<EnvDataType>(
-                    key,
-                    data[String(key)],
-                    type
-                );
-                if (filter && !filter.includes(value)) {
-                    throw new Error(
-                        `${String(
-                            key
-                        )} has invalid value (expected ${filter.join(' or ')})`
-                    );
-                }
-                env[key] = value;
-            } else if (required) {
-                throw new Error(`${String(key)} is missing or empty`);
-            }
-        } catch (err: any) {
-            errors.push(err.message);
+const parsed = Value.Convert(envSchema, process.env);
+
+const errors = [...Value.Errors(envSchema, parsed)];
+if (errors.length) {
+    const computedErrorMessages: Record<string, string[]> = {};
+    errors.forEach(({ path, message }) => {
+        const envVarName = path.replace(/^\//, '');
+        if (!computedErrorMessages[envVarName]) {
+            computedErrorMessages[envVarName] = [];
         }
+        computedErrorMessages[envVarName].push(message);
     });
-    if (errors.length) {
-        throw new Error(`Invalid environment variables: ${errors.join(' ; ')}`);
-    }
-    return env as EnvDataType;
-};
+    const errorTextParts: string[] = [
+        'Invalid environment variables',
+        ...Object.entries(computedErrorMessages).map(
+            ([varName, messages]) => `  ${varName} : ${messages.join(', ')}`
+        )
+    ];
+    throw new Error(errorTextParts.join(Os.EOL));
+}
 
-const env = parseEnv<EnvData>(
-    process.env as Record<string, string>,
-    envSchema as EnvSchema<EnvData>
+const env: Env = Value.Cast(
+    {
+        ...envSchema,
+        additionalProperties: false
+    },
+    parsed
 );
 
-const initialEnv: EnvData = { ...env };
+const initialEnv: Env = { ...env };
 
 /**
 Return an environment variable value
 */
-export const getEnv = <T extends keyof EnvData>(key: T) => env[key];
+export const getEnv = <T extends keyof Env>(key: T) => env[key];
 
 /**
 Dynamicaly change an environment variable value for testing purpose
 */
-export const mockEnvVar = <T extends keyof EnvData>(
-    key: T,
-    value: EnvData[T]
-) => {
+export const mockEnvVar = <T extends keyof Env>(key: T, value: Env[T]) => {
     if (env.ENVIRONMENT === 'dev') {
         env[key] = value;
     }
@@ -100,7 +59,7 @@ export const mockEnvVar = <T extends keyof EnvData>(
 Reset an environment variable value to its initial value.
 Can be used if environment variable values are changed for testing purposes.
 */
-export const resetEnvVar = <T extends keyof EnvData>(key: T) => {
+export const resetEnvVar = <T extends keyof Env>(key: T) => {
     if (env.ENVIRONMENT === 'dev') {
         env[key] = initialEnv[key];
     }
