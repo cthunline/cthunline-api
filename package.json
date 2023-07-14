@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "prisma": {
         "schema": "src/prisma/schema.prisma"
     },
