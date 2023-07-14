@@ -15,7 +15,7 @@
         "format": "npx eslint . --fix --ext=.ts --max-warnings=0 && npx prettier --write . && npx tsc --noEmit && npx markdownlint --fix **/*.md"
     },
     "dependencies": {
-        "@cthunline/games": "^2.2.0",
+        "@cthunline/games": "^2.3.0",
         "@fastify/cookie": "^8.3.0",
         "@fastify/helmet": "^11.0.0",
         "@fastify/rate-limit": "^8.0.3",
