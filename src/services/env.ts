@@ -2,42 +2,13 @@
 This file must not import any other services and have the bare minimum imports
 since it is used in a lot of files in the code base
 */
-import { Value } from '@sinclair/typebox/value';
-import { Static } from '@sinclair/typebox';
-import Os from 'os';
+import { envious } from '@pitininja/envious';
 
 import { envSchema } from './env.schema';
 
-type Env = Static<typeof envSchema>;
+const env = envious(envSchema);
 
-const parsed = Value.Convert(envSchema, process.env);
-
-const errors = [...Value.Errors(envSchema, parsed)];
-if (errors.length) {
-    const computedErrorMessages: Record<string, string[]> = {};
-    errors.forEach(({ path, message }) => {
-        const envVarName = path.replace(/^\//, '');
-        if (!computedErrorMessages[envVarName]) {
-            computedErrorMessages[envVarName] = [];
-        }
-        computedErrorMessages[envVarName].push(message);
-    });
-    const errorTextParts: string[] = [
-        'Invalid environment variables',
-        ...Object.entries(computedErrorMessages).map(
-            ([varName, messages]) => `  ${varName} : ${messages.join(', ')}`
-        )
-    ];
-    throw new Error(errorTextParts.join(Os.EOL));
-}
-
-const env: Env = Value.Cast(
-    {
-        ...envSchema,
-        additionalProperties: false
-    },
-    parsed
-);
+type Env = typeof env;
 
 const initialEnv: Env = { ...env };
 

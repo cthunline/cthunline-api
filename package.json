@@ -20,6 +20,7 @@
         "@fastify/helmet": "^11.0.0",
         "@fastify/rate-limit": "^8.0.3",
         "@fastify/static": "^6.10.2",
+        "@pitininja/envious": "^1.0.1",
         "@prisma/client": "^5.0.0",
         "@sinclair/typebox": "^0.29.4",
         "ajv-formats": "^2.1.1",
