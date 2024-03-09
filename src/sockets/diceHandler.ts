@@ -1,6 +1,6 @@
-import { Socket, Server } from 'socket.io';
 import { randomInt } from 'crypto';
 
+import { type SocketIoServer, type SocketIoSocket } from '../types/socket';
 import { validateSchema } from '../services/typebox';
 import { ForbiddenError } from '../services/errors';
 import { sum } from '../services/tools';
@@ -39,7 +39,7 @@ const getDiceResult = (
     )
 });
 
-const diceHandler = (io: Server, socket: Socket) => {
+const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
     // dice roll request / result sent to every player in session
     socket.on('diceRequest', async (request: RequestDiceBody) => {
         try {

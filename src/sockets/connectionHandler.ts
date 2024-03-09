@@ -1,8 +1,9 @@
 import { Session, Character } from '@prisma/client';
-import { Socket, Server } from 'socket.io';
+import { type ExtendedError } from 'socket.io/dist/namespace';
 
-import { cacheGet, cacheSet } from '../services/cache';
 import { decrypt, verifyJwt } from '../services/crypto';
+import { cacheGet, cacheSet } from '../services/cache';
+import { SocketIoServer, type SocketIoSocket } from '../types/socket';
 import { Prisma } from '../services/prisma';
 import {
     CustomError,
@@ -16,7 +17,7 @@ import { SafeUser } from '../types/user';
 import { getEnv } from '../services/env';
 
 // verify auth token
-const verifySocketJwt = async (socket: Socket): Promise<SafeUser> => {
+const verifySocketJwt = async (socket: SocketIoSocket): Promise<SafeUser> => {
     const { jwt } = socket.data.cookies;
     if (!jwt) {
         throw new AuthenticationError('Missing authentication cookie');
@@ -30,7 +31,7 @@ const verifySocketJwt = async (socket: Socket): Promise<SafeUser> => {
 };
 
 // verify session
-const verifySession = async (socket: Socket): Promise<Session> => {
+const verifySession = async (socket: SocketIoSocket): Promise<Session> => {
     const sessionId = Number(socket.handshake.query.sessionId);
     if (!sessionId) {
         throw new ValidationError('Missing sessionId in handshare query');
@@ -48,7 +49,7 @@ const verifySession = async (socket: Socket): Promise<Session> => {
 
 // verify character
 const verifyCharacter = async (
-    socket: Socket,
+    socket: SocketIoSocket,
     userId: number
 ): Promise<Character> => {
     const characterId = Number(socket.handshake.query.characterId);
@@ -72,24 +73,36 @@ const verifyCharacter = async (
 };
 
 // handles socket connection
-export const connectionMiddleware = async (socket: Socket, next: Function) => {
+export const connectionMiddleware = async (
+    socket: SocketIoSocket,
+    next: (err?: ExtendedError | undefined) => void
+) => {
     try {
         const user = await verifySocketJwt(socket);
         const session = await verifySession(socket);
         const isMaster = session.masterId === user.id;
-        const character = isMaster
-            ? null
-            : await verifyCharacter(socket, user.id);
         // set data on socket
-        // eslint-disable-next-line no-param-reassign
-        socket.data = {
+        const socketBaseData = {
             user,
-            characterId: character?.id,
-            character,
             sessionId: session.id,
-            session,
-            isMaster
+            session
         };
+        if (isMaster) {
+            socket.data = {
+                ...socket.data,
+                ...socketBaseData,
+                isMaster: true
+            };
+        } else {
+            const character = await verifyCharacter(socket, user.id);
+            socket.data = {
+                ...socket.data,
+                ...socketBaseData,
+                isMaster: false,
+                character,
+                characterId: character.id
+            };
+        }
         // stores sketch data in cache if not set already
         const cacheId = `sketch-${session.id}`;
         if (!cacheGet(cacheId)) {
@@ -113,7 +126,10 @@ export const connectionMiddleware = async (socket: Socket, next: Function) => {
 };
 
 // searches for other connected sockets with same userId and disconnect them
-export const disconnectCopycats = async (io: Server, socket: Socket) => {
+export const disconnectCopycats = async (
+    io: SocketIoServer,
+    socket: SocketIoSocket
+) => {
     const { id: socketId } = socket;
     const userId = socket.data.user.id;
     const allSockets = await io.fetchSockets();
@@ -126,11 +142,15 @@ export const disconnectCopycats = async (io: Server, socket: Socket) => {
     });
 };
 
-export const getSessionUsers = async (io: Server) => {
+export const getSessionUsers = async (io: SocketIoServer) => {
     const allSockets = await io.fetchSockets();
     return allSockets.map((socket) => ({
         ...socket.data.user,
-        character: socket.data.character,
+        ...(!socket.data.isMaster
+            ? {
+                  character: socket.data.character
+              }
+            : {}),
         isMaster: socket.data.isMaster,
         socketId: socket.id
     }));

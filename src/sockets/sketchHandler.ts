@@ -1,5 +1,4 @@
-import { Socket, Server } from 'socket.io';
-
+import { type SocketIoServer, type SocketIoSocket } from '../types/socket';
 import { cacheGet, cacheSave, cacheSet } from '../services/cache';
 import { validateSchema } from '../services/typebox';
 import { ForbiddenError } from '../services/errors';
@@ -24,7 +23,7 @@ const sketchCacheSaver = (sessionId: number) => (data: SketchBody) =>
         }
     });
 
-const sketchHandler = (_io: Server, socket: Socket) => {
+const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // updates sketch data (for game master only)
     // notifies other users in the room of the sketch update
     socket.on('sketchUpdate', async (sketch: SketchBody) => {
@@ -47,7 +46,7 @@ const sketchHandler = (_io: Server, socket: Socket) => {
                     sketch
                 })
             );
-        } catch (err: any) {
+        } catch (err: unknown) {
             socket.emit('error', meta(err));
         }
     });

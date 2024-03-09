@@ -1,5 +1,5 @@
 {
-    "loader": "tsx",
+    "import": "tsx",
     "extensions": ["ts"],
     "spec": ["tests/**/*.test.ts"]
 }

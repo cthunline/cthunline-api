@@ -3,7 +3,7 @@ import { Static, Type } from '@sinclair/typebox';
 export const uploadAssetsSchema = Type.Object(
     {
         assets: Type.Any(),
-        directoryId: Type.Optional(Type.RegEx(/^[0-9]+$/))
+        directoryId: Type.Optional(Type.RegExp(/^[0-9]+$/))
     },
     {
         additionalProperties: false

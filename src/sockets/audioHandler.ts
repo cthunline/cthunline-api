@@ -1,5 +1,4 @@
-import { Socket, Server } from 'socket.io';
-
+import { type SocketIoServer, type SocketIoSocket } from '../types/socket';
 import { ForbiddenError, ValidationError } from '../services/errors';
 import { validateSchema } from '../services/typebox';
 import { Prisma } from '../services/prisma';
@@ -8,7 +7,7 @@ import { meta } from './helper';
 
 import { playAudioSchema, PlayAudioBody } from './schemas/audio';
 
-const audioHandler = (_io: Server, socket: Socket) => {
+const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // notify session players that game master started playing audio asset
     socket.on('audioPlay', async (request: PlayAudioBody) => {
         try {
