@@ -9,8 +9,6 @@
     },
     "extends": ["airbnb-base", "airbnb-typescript/base", "prettier"],
     "rules": {
-        "@typescript-eslint/comma-dangle": ["error", "never"],
-        "@typescript-eslint/indent": "off",
         "@typescript-eslint/lines-between-class-members": [
             "error",
             "always",
@@ -18,9 +16,7 @@
                 "exceptAfterSingleLine": true
             }
         ],
-        "comma-dangle": "off",
         "import/prefer-default-export": "off",
-        "indent": "off",
         "lines-between-class-members": "off",
         "no-param-reassign": [
             "error",
