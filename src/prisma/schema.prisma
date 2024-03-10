@@ -7,39 +7,6 @@ datasource db {
     url = env("DATABASE_URL")
 }
 
-model User {
-    id Int @id @default(autoincrement())
-    name String
-    email String
-    password String
-    theme String
-    locale String
-    isAdmin Boolean @default(false)
-    isEnabled Boolean @default(true)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    assets Asset[]
-    directories Directory[]
-    sessions Session[]
-    characters Character[]
-    sketchs Sketch[]
-    notes Note[]
-
-    @@unique(email)
-    @@map("users")
-}
-
-model Invitation {
-    id Int @id @default(autoincrement())
-    code String
-    expire DateTime
-    isUsed Boolean
-
-    @@unique(code)
-    @@map("invitations")
-}
-
 model Asset {
     id Int @id @default(autoincrement())
     type String
@@ -55,6 +22,21 @@ model Asset {
     directory Directory? @relation(fields: [directoryId], references: [id])
 
     @@map("assets")
+}
+
+model Character {
+    id Int @id @default(autoincrement())
+    gameId String
+    name String
+    portrait String?
+    data Json
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId Int
+    user User @relation(fields: [userId], references: [id])
+
+    @@map("characters")
 }
 
 model Directory {
@@ -73,6 +55,34 @@ model Directory {
     assets Asset[]
 
     @@map("directories")
+}
+
+model Invitation {
+    id Int @id @default(autoincrement())
+    code String
+    expire DateTime
+    isUsed Boolean
+
+    @@unique(code)
+    @@map("invitations")
+}
+
+model Note {
+    id Int @id @default(autoincrement())
+    position Int
+    isShared Boolean @default(false)
+    title String
+    text String @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId Int
+    user User @relation(fields: [userId], references: [id])
+
+    sessionId Int
+    session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+    @@map("notes")
 }
 
 model Session {
@@ -104,35 +114,25 @@ model Sketch {
     @@map("sketchs")
 }
 
-model Note {
+model User {
     id Int @id @default(autoincrement())
-    position Int
-    isShared Boolean @default(false)
-    title String
-    text String @db.Text
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    userId Int
-    user User @relation(fields: [userId], references: [id])
-
-    sessionId Int
-    session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-    @@map("notes")
-}
-
-model Character {
-    id Int @id @default(autoincrement())
-    gameId String
     name String
-    portrait String?
-    data Json
+    email String
+    password String
+    theme String
+    locale String
+    isAdmin Boolean @default(false)
+    isEnabled Boolean @default(true)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    userId Int
-    user User @relation(fields: [userId], references: [id])
+    assets Asset[]
+    directories Directory[]
+    sessions Session[]
+    characters Character[]
+    sketchs Sketch[]
+    notes Note[]
 
-    @@map("characters")
+    @@unique(email)
+    @@map("users")
 }

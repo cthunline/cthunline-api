@@ -3,18 +3,44 @@ import Path from 'path';
 
 import { mockEnvVar } from '../../../src/services/env';
 
-import Data, { charactersData } from '../helpers/data.helper';
+import Data, { charactersData, usersData } from '../helpers/data.helper';
 import { assertCharacter } from '../helpers/assert.helper';
+import { Prisma } from '../../../src/services/prisma';
 import Api from '../helpers/api.helper';
 
-const findCharacter = (userId: number, gameId: string) => {
+const findCharacter = (userId: number, gameId?: string) => {
     const character = charactersData.find(
-        (char) => char.userId === Api.userId && char.gameId === gameId
+        (char) =>
+            char.userId === Api.userId && (!gameId || char.gameId === gameId)
     );
     if (character) {
         return character as any;
     }
     throw new Error(`Could not find character for user ${userId}`);
+};
+
+const findCharacterFromDb = async (userId: number, gameId?: string) => {
+    const character = await Prisma.character.findFirst({
+        where: {
+            userId,
+            ...(gameId ? { gameId } : {})
+        }
+    });
+    if (character) {
+        return character as any;
+    }
+    throw new Error(`Could not find character for user ${userId}`);
+};
+
+const getAnotherUser = (selfUserId: number, mustBeEnabled: boolean = true) => {
+    const user = usersData.find(
+        ({ id, isEnabled }) =>
+            (!mustBeEnabled || isEnabled) && id !== selfUserId
+    );
+    if (user) {
+        return user;
+    }
+    throw new Error('Could not find another user to run test');
 };
 
 describe('[API] Characters', () => {
@@ -509,6 +535,99 @@ describe('[API] Characters', () => {
                 Path.join('/static', updatedCharacter.portrait),
                 false
             );
+        });
+    });
+
+    describe('PUT /characters/:id/transfer/:userId', () => {
+        it('Should throw error because of invalid ID', async () => {
+            const { id: characterId } = await findCharacterFromDb(Api.userId);
+            const anotherUserId = getAnotherUser(Api.userId).id;
+            const invalidData = [
+                {
+                    characterId: 'invalid',
+                    userId: anotherUserId,
+                    status: 400
+                },
+                {
+                    characterId: '1234',
+                    userId: anotherUserId,
+                    status: 404
+                },
+                {
+                    characterId,
+                    userId: 'invalid',
+                    status: 400
+                },
+                {
+                    characterId,
+                    userId: '1234',
+                    status: 404
+                }
+            ];
+            for (const { characterId: charId, userId, status } of invalidData) {
+                await Api.testError(
+                    {
+                        method: 'PUT',
+                        route: `/characters/${charId}/transfer/${userId}`
+                    },
+                    status
+                );
+            }
+        });
+        it('Should throw a forbidden error', async () => {
+            const anotherUserId = getAnotherUser(Api.userId).id;
+            const { id: characterId } =
+                await findCharacterFromDb(anotherUserId);
+            await Api.testError(
+                {
+                    method: 'PUT',
+                    route: `/characters/${characterId}/transfer/${anotherUserId}`
+                },
+                403
+            );
+        });
+        it('Should throw a conflict error because transfering to self', async () => {
+            const { id: characterId } = await findCharacterFromDb(Api.userId);
+            await Api.testError(
+                {
+                    method: 'PUT',
+                    route: `/characters/${characterId}/transfer/${Api.userId}`
+                },
+                409
+            );
+        });
+        it('Should transfer a character to another user', async () => {
+            const { id: characterId } = await findCharacterFromDb(Api.userId);
+            const anotherUserId = getAnotherUser(Api.userId).id;
+            const transferResponse = await Api.request({
+                method: 'PUT',
+                route: `/characters/${characterId}/transfer/${anotherUserId}`
+            });
+            expect(transferResponse).to.have.status(200);
+            expect(transferResponse.body).to.be.an('object');
+            expect(transferResponse.body).to.be.empty;
+            const charResponse = await Api.request({
+                method: 'GET',
+                route: `/characters/${characterId}`
+            });
+            expect(charResponse).to.have.status(200);
+            expect(charResponse.body).to.be.an('object');
+            expect(charResponse.body.userId).to.equal(anotherUserId);
+            const charsResponse = await Api.request({
+                method: 'GET',
+                route: `/characters?user=${Api.userId}`
+            });
+            expect(charsResponse).to.have.status(200);
+            expect(charResponse.body).to.be.an('object');
+            expect(charsResponse.body).to.have.property('characters');
+            expect(charsResponse.body.characters).to.be.an('array');
+            let containsChar = false;
+            charsResponse.body.characters.forEach(({ id }: any) => {
+                if (id === characterId) {
+                    containsChar = true;
+                }
+            });
+            expect(containsChar).to.be.false;
         });
     });
 });

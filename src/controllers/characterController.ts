@@ -3,7 +3,11 @@ import { Prisma as PrismaNS } from '@prisma/client';
 import Path from 'path';
 import Fs from 'fs';
 
-import { InternError, ValidationError } from '../services/errors';
+import {
+    ConflictError,
+    InternError,
+    ValidationError
+} from '../services/errors';
 import { Games, GameId, isValidGameId } from '../services/games';
 import { parseParamId } from '../services/api';
 import { Prisma } from '../services/prisma';
@@ -266,6 +270,46 @@ const characterController = async (app: FastifyInstance) => {
             } else {
                 rep.send(character);
             }
+        }
+    });
+
+    // transfer character ownership
+    app.route({
+        method: 'PUT',
+        url: '/characters/:characterId/transfer/:userId',
+        handler: async (
+            {
+                params,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    characterId: string;
+                    userId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const characterId = parseParamId(params, 'characterId');
+            const targetUserId = parseParamId(params, 'userId');
+            const [character, targetUser] = await Promise.all([
+                getCharacter(characterId),
+                getUser(targetUserId)
+            ]);
+            controlSelf(character.userId, user);
+            if (targetUser.id === user.id) {
+                throw new ConflictError(
+                    'You cannot transfer a character to yourself'
+                );
+            }
+            await Prisma.character.update({
+                data: {
+                    userId: targetUserId
+                },
+                where: {
+                    id: characterId
+                }
+            });
+            rep.send({});
         }
     });
 };
