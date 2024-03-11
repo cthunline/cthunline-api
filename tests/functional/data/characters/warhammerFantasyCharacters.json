@@ -802,7 +802,7 @@
             "spells": [
                 {
                     "name": "Dart",
-                    "targetNumber": 0,
+                    "castingNumber": 0,
                     "range": "43 yards",
                     "target": "1",
                     "duration": "Instant",
@@ -810,7 +810,7 @@
                 },
                 {
                     "name": "Light",
-                    "targetNumber": 0,
+                    "castingNumber": 0,
                     "range": "You",
                     "target": "You",
                     "duration": "43 mins",
@@ -818,7 +818,7 @@
                 },
                 {
                     "name": "Shock",
-                    "targetNumber": 0,
+                    "castingNumber": 0,
                     "range": "Touch",
                     "target": "1",
                     "duration": "Instant",
