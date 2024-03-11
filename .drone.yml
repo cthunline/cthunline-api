@@ -21,14 +21,14 @@ steps:
     - tcp://mariadb:3306
 # install dependencies & setup env
 - name: install
-  image: node:16-alpine
+  image: node:20-alpine
   pull: if-not-exists
   commands:
   - npm i
   - cp .env.ci .env.test
 # linters
 - name: lint
-  image: node:16-alpine
+  image: node:20-alpine
   pull: if-not-exists
   commands:
   - npm run lint
@@ -36,7 +36,7 @@ steps:
   - install
 # tests
 - name: test
-  image: node:16-alpine
+  image: node:20-alpine
   pull: if-not-exists
   commands:
   - npm run test
