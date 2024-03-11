@@ -44,6 +44,8 @@ export type SocketData = {
 } & (
     | {
           isMaster: true;
+          characterId: null;
+          character: null;
       }
     | {
           isMaster: false;
@@ -66,33 +68,46 @@ export type SocketIoSocket = Socket<
     SocketData
 >;
 
-type SocketBaseData = {
+export type SocketBaseData = {
     user: SafeUser;
     isMaster: boolean;
 };
 
-type SocketConnectData = SocketMeta<
+export type SocketSessionUser = SafeUser & {
+    socketId: string;
+} & (
+        | {
+              isMaster: true;
+              character: null;
+          }
+        | {
+              isMaster: false;
+              character: Character;
+          }
+    );
+
+export type SocketConnectData = SocketMeta<
     SocketBaseData & {
-        users: SafeUser[];
+        users: SocketSessionUser[];
     }
 >;
 
-type SocketSketchUpdateData = SocketMeta<
+export type SocketSketchUpdateData = SocketMeta<
     SocketBaseData & {
         sketch: SketchBody;
     }
 >;
 
-type SocketDiceResultData = SocketMeta<SocketDiceResult>;
+export type SocketDiceResultData = SocketMeta<SocketDiceResult>;
 
-type SocketAudioPlayData = SocketMeta<
+export type SocketAudioPlayData = SocketMeta<
     SocketBaseData & {
         asset: Asset;
         time?: number;
     }
 >;
 
-type SocketCharacterUpdateData = SocketMeta<
+export type SocketCharacterUpdateData = SocketMeta<
     SocketBaseData & {
         character: Character;
     }

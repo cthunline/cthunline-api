@@ -3,8 +3,12 @@ import { type ExtendedError } from 'socket.io/dist/namespace';
 
 import { decrypt, verifyJwt } from '../services/crypto';
 import { cacheGet, cacheSet } from '../services/cache';
-import { SocketIoServer, type SocketIoSocket } from '../types/socket';
 import { Prisma } from '../services/prisma';
+import {
+    type SocketIoServer,
+    type SocketSessionUser,
+    type SocketIoSocket
+} from '../types/socket';
 import {
     CustomError,
     AuthenticationError,
@@ -91,7 +95,9 @@ export const connectionMiddleware = async (
             socket.data = {
                 ...socket.data,
                 ...socketBaseData,
-                isMaster: true
+                isMaster: true,
+                character: null,
+                characterId: null
             };
         } else {
             const character = await verifyCharacter(socket, user.id);
@@ -142,16 +148,24 @@ export const disconnectCopycats = async (
     });
 };
 
-export const getSessionUsers = async (io: SocketIoServer) => {
+export const getSessionUsers = async (
+    io: SocketIoServer
+): Promise<SocketSessionUser[]> => {
     const allSockets = await io.fetchSockets();
-    return allSockets.map((socket) => ({
-        ...socket.data.user,
-        ...(!socket.data.isMaster
-            ? {
-                  character: socket.data.character
-              }
-            : {}),
-        isMaster: socket.data.isMaster,
-        socketId: socket.id
-    }));
+    return allSockets.map((socket) => {
+        if (socket.data.isMaster) {
+            return {
+                ...socket.data.user,
+                socketId: socket.id,
+                character: null,
+                isMaster: true
+            };
+        }
+        return {
+            ...socket.data.user,
+            socketId: socket.id,
+            character: socket.data.character,
+            isMaster: false
+        };
+    });
 };

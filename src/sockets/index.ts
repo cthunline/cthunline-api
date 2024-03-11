@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { Socket } from 'socket.io';
 
+import { type SocketIoSocket } from '../types/socket';
 import characterHandler from './characterHandler';
 import sketchHandler from './sketchHandler';
 import audioHandler from './audioHandler';
@@ -28,7 +29,7 @@ const socketRouter = (app: FastifyInstance) => {
         next();
     });
     io.use(connectionMiddleware);
-    io.on('connection', async (socket: Socket) => {
+    io.on('connection', async (socket: SocketIoSocket) => {
         disconnectCopycats(io, socket);
         const { user, sessionId, isMaster } = socket.data;
         const users = await getSessionUsers(io);
