@@ -1,4 +1,10 @@
-import { callOfCthulhu, dnd5, seventhSea, starWarsD6 } from '@cthunline/games';
+import {
+    callOfCthulhu,
+    dnd5,
+    seventhSea,
+    starWarsD6,
+    warhammerFantasy
+} from '@cthunline/games';
 
 // list of available games
 export const Games = {
@@ -17,6 +23,10 @@ export const Games = {
     starWarsD6: {
         name: 'Star Wars D6',
         schema: starWarsD6.schema
+    },
+    warhammerFantasy: {
+        name: 'Warhammer Fantasy',
+        schema: warhammerFantasy.schema
     }
 };
 

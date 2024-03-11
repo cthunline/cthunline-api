@@ -1,0 +1,831 @@
+[
+    {
+        "id": 10,
+        "userId": 1,
+        "gameId": "warhammerFantasy",
+        "name": "Molrella Brandysnap",
+        "portrait": null,
+        "data": {
+            "biography": {
+                "name": "Molrella Brandysnap",
+                "species": "Halfling",
+                "class": "Rogue",
+                "career": "Thief",
+                "careerLevel": "Thief",
+                "careerPath": "Pauper, Prowler, Thief",
+                "status": "Brass 3",
+                "age": "38",
+                "height": "3'1\"",
+                "hair": "Dark brown",
+                "eyes": "Chestnut"
+            },
+            "characteristics": {
+                "weaponSkill": {
+                    "initial": 23,
+                    "advances": 0,
+                    "current": 23
+                },
+                "ballisticSkill": {
+                    "initial": 39,
+                    "advances": 0,
+                    "current": 39
+                },
+                "strength": {
+                    "initial": 20,
+                    "advances": 0,
+                    "current": 20
+                },
+                "toughness": {
+                    "initial": 27,
+                    "advances": 5,
+                    "current": 32
+                },
+                "initiative": {
+                    "initial": 38,
+                    "advances": 5,
+                    "current": 43
+                },
+                "agility": {
+                    "initial": 39,
+                    "advances": 5,
+                    "current": 44
+                },
+                "dexterity": {
+                    "initial": 46,
+                    "advances": 0,
+                    "current": 46
+                },
+                "intelligence": {
+                    "initial": 26,
+                    "advances": 0,
+                    "current": 26
+                },
+                "willpower": {
+                    "initial": 43,
+                    "advances": 5,
+                    "current": 48
+                },
+                "fellowship": {
+                    "initial": 45,
+                    "advances": 5,
+                    "current": 50
+                }
+            },
+            "fate": {
+                "fate": 2,
+                "fortune": 3
+            },
+            "resilience": {
+                "resilience": 3,
+                "resolve": 3,
+                "motivation": 0
+            },
+            "experience": {
+                "current": 0,
+                "spent": 2200,
+                "total": 2200
+            },
+            "movement": {
+                "movement": 3,
+                "walk": 6,
+                "run": 12
+            },
+            "basicSkills": {
+                "art": {
+                    "characteristicName": "dexterity",
+                    "characteristicScore": 46,
+                    "advances": 0,
+                    "skill": 46
+                },
+                "athletics": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 44,
+                    "advances": 5,
+                    "skill": 49
+                },
+                "bribery": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 50,
+                    "advances": 0,
+                    "skill": 50
+                },
+                "charm": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 50,
+                    "advances": 0,
+                    "skill": 50
+                },
+                "charmAnimal": {
+                    "characteristicName": "willpower",
+                    "characteristicScore": 48,
+                    "advances": 0,
+                    "skill": 48
+                },
+                "climb": {
+                    "characteristicName": "strength",
+                    "characteristicScore": 20,
+                    "advances": 15,
+                    "skill": 35
+                },
+                "cool": {
+                    "characteristicName": "willpower",
+                    "characteristicScore": 48,
+                    "advances": 10,
+                    "skill": 58
+                },
+                "consumeAlcohol": {
+                    "characteristicName": "toughness",
+                    "characteristicScore": 32,
+                    "advances": 0,
+                    "skill": 32
+                },
+                "dodge": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 44,
+                    "advances": 10,
+                    "skill": 54
+                },
+                "drive": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 44,
+                    "advances": 0,
+                    "skill": 44
+                },
+                "endurance": {
+                    "characteristicName": "toughness",
+                    "characteristicScore": 32,
+                    "advances": 10,
+                    "skill": 42
+                },
+                "entertain": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 50,
+                    "advances": 0,
+                    "skill": 50
+                },
+                "gamble": {
+                    "characteristicName": "intelligence",
+                    "characteristicScore": 26,
+                    "advances": 0,
+                    "skill": 26
+                },
+                "gossip": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 50,
+                    "advances": 0,
+                    "skill": 50
+                },
+                "haggle": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 50,
+                    "advances": 0,
+                    "skill": 50
+                },
+                "intimidate": {
+                    "characteristicName": "strength",
+                    "characteristicScore": 20,
+                    "advances": 0,
+                    "skill": 20
+                },
+                "intuition": {
+                    "characteristicName": "initiative",
+                    "characteristicScore": 43,
+                    "advances": 5,
+                    "skill": 48
+                },
+                "leadership": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 50,
+                    "advances": 0,
+                    "skill": 50
+                },
+                "meleeBasic": {
+                    "characteristicName": "weaponSkill",
+                    "characteristicScore": 23,
+                    "advances": 0,
+                    "skill": 23
+                },
+                "melee": {
+                    "characteristicName": "weaponSkill",
+                    "characteristicScore": 23,
+                    "advances": 0,
+                    "skill": 23
+                },
+                "navigation": {
+                    "characteristicName": "initiative",
+                    "characteristicScore": 43,
+                    "advances": 0,
+                    "skill": 43
+                },
+                "outdoorSurvival": {
+                    "characteristicName": "intelligence",
+                    "characteristicScore": 26,
+                    "advances": 0,
+                    "skill": 26
+                },
+                "perception": {
+                    "characteristicName": "initiative",
+                    "characteristicScore": 43,
+                    "advances": 10,
+                    "skill": 53
+                },
+                "ride": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 44,
+                    "advances": 0,
+                    "skill": 44
+                },
+                "row": {
+                    "characteristicName": "strength",
+                    "characteristicScore": 20,
+                    "advances": 0,
+                    "skill": 20
+                },
+                "stealth": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 44,
+                    "advances": 10,
+                    "skill": 54
+                }
+            },
+            "otherSkills": [
+                {
+                    "name": "Entertain (comedy)",
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 50,
+                    "advances": 10,
+                    "skill": 60
+                },
+                {
+                    "name": "Pick lock",
+                    "characteristicName": "dexterity",
+                    "characteristicScore": 46,
+                    "advances": 5,
+                    "skill": 51
+                },
+                {
+                    "name": "Sleight of hand",
+                    "characteristicName": "dexterity",
+                    "characteristicScore": 46,
+                    "advances": 4,
+                    "skill": 50
+                }
+            ],
+            "talents": [
+                {
+                    "name": "Acute senses (Taste)",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Alley cat",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Criminals",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Etiquette (criminals)",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Fast hands",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Luck",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Night vision",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Orientation",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Panhandle",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Resistence (chaos)",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Size (small)",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Stone soup",
+                    "timesTaken": 1,
+                    "description": ""
+                }
+            ],
+            "ambitions": {
+                "shortTerm": "Random text",
+                "longTerm": "Another random text"
+            },
+            "party": {
+                "name": "Random name",
+                "shortTerm": "Random text",
+                "longTerm": "Another random text",
+                "members": "Some members"
+            },
+            "armour": [
+                {
+                    "name": "Leather jack",
+                    "locations": "Body",
+                    "encumbrance": "1/0",
+                    "armourPoints": 1,
+                    "qualities": ""
+                }
+            ],
+            "armourPoints": {
+                "head": 0,
+                "rightArm": 0,
+                "leftArm": 0,
+                "body": 1,
+                "rightLeg": 0,
+                "leftLeg": 0,
+                "shield": 0
+            },
+            "trappings": [
+                {
+                    "name": "Healing draught",
+                    "encumbrance": "0"
+                },
+                {
+                    "name": "Lock picks",
+                    "encumbrance": "0"
+                }
+            ],
+            "psychology": "Random text",
+            "corruptionMutation": "Another random text",
+            "wealth": {
+                "brassPennies": 10,
+                "silverShillings": 2,
+                "goldCrowns": 0
+            },
+            "encumbrance": {
+                "weapons": 1,
+                "armour": 0,
+                "trappings": 0,
+                "maximum": 5,
+                "total": 1
+            },
+            "wounds": {
+                "strengthBonus": 2,
+                "twiceToughnessBonus": 6,
+                "willpowerBonus": 4,
+                "hardy": 0,
+                "wounds": 12,
+                "description": ""
+            },
+            "weapons": [
+                {
+                    "name": "Short sword",
+                    "group": "Basic",
+                    "encumbrance": "1",
+                    "rangeReach": "Average",
+                    "damage": "+SB +4",
+                    "qualities": ""
+                },
+                {
+                    "name": "Sling",
+                    "group": "Sling",
+                    "encumbrance": "0",
+                    "rangeReach": "60 yards",
+                    "damage": "+6",
+                    "qualities": "Pummeling"
+                }
+            ],
+            "spells": [],
+            "sin": 0
+        }
+    },
+    {
+        "id": 11,
+        "userId": 3,
+        "gameId": "warhammerFantasy",
+        "name": "Ferdinand Gruber",
+        "portrait": null,
+        "data": {
+            "biography": {
+                "name": "Ferdinand Gruber",
+                "species": "Human",
+                "class": "Academic",
+                "career": "Wizard",
+                "careerLevel": "Wizard's Apprentice",
+                "careerPath": "Scion, Wizard's Apprentice",
+                "status": "Brass 3",
+                "age": "27",
+                "height": "6'3\"",
+                "hair": "None",
+                "eyes": "Brown"
+            },
+            "characteristics": {
+                "weaponSkill": {
+                    "initial": 32,
+                    "advances": 10,
+                    "current": 42
+                },
+                "ballisticSkill": {
+                    "initial": 24,
+                    "advances": 0,
+                    "current": 24
+                },
+                "strength": {
+                    "initial": 25,
+                    "advances": 0,
+                    "current": 25
+                },
+                "toughness": {
+                    "initial": 28,
+                    "advances": 0,
+                    "current": 28
+                },
+                "initiative": {
+                    "initial": 32,
+                    "advances": 0,
+                    "current": 32
+                },
+                "agility": {
+                    "initial": 31,
+                    "advances": 0,
+                    "current": 31
+                },
+                "dexterity": {
+                    "initial": 27,
+                    "advances": 0,
+                    "current": 27
+                },
+                "intelligence": {
+                    "initial": 40,
+                    "advances": 8,
+                    "current": 48
+                },
+                "willpower": {
+                    "initial": 33,
+                    "advances": 10,
+                    "current": 43
+                },
+                "fellowship": {
+                    "initial": 23,
+                    "advances": 0,
+                    "current": 23
+                }
+            },
+            "fate": {
+                "fate": 3,
+                "fortune": 3
+            },
+            "resilience": {
+                "resilience": 3,
+                "resolve": 3,
+                "motivation": 0
+            },
+            "experience": {
+                "current": 0,
+                "spent": 2200,
+                "total": 2200
+            },
+            "movement": {
+                "movement": 4,
+                "walk": 8,
+                "run": 16
+            },
+            "basicSkills": {
+                "art": {
+                    "characteristicName": "dexterity",
+                    "characteristicScore": 27,
+                    "advances": 0,
+                    "skill": 27
+                },
+                "athletics": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 31,
+                    "advances": 0,
+                    "skill": 31
+                },
+                "bribery": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 23,
+                    "advances": 10,
+                    "skill": 33
+                },
+                "charm": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 23,
+                    "advances": 0,
+                    "skill": 23
+                },
+                "charmAnimal": {
+                    "characteristicName": "willpower",
+                    "characteristicScore": 43,
+                    "advances": 0,
+                    "skill": 43
+                },
+                "climb": {
+                    "characteristicName": "strength",
+                    "characteristicScore": 25,
+                    "advances": 0,
+                    "skill": 25
+                },
+                "cool": {
+                    "characteristicName": "willpower",
+                    "characteristicScore": 43,
+                    "advances": 20,
+                    "skill": 63
+                },
+                "consumeAlcohol": {
+                    "characteristicName": "toughness",
+                    "characteristicScore": 28,
+                    "advances": 7,
+                    "skill": 35
+                },
+                "dodge": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 31,
+                    "advances": 0,
+                    "skill": 31
+                },
+                "drive": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 31,
+                    "advances": 0,
+                    "skill": 31
+                },
+                "endurance": {
+                    "characteristicName": "toughness",
+                    "characteristicScore": 28,
+                    "advances": 14,
+                    "skill": 42
+                },
+                "entertain": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 23,
+                    "advances": 0,
+                    "skill": 23
+                },
+                "gamble": {
+                    "characteristicName": "intelligence",
+                    "characteristicScore": 48,
+                    "advances": 5,
+                    "skill": 53
+                },
+                "gossip": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 23,
+                    "advances": 0,
+                    "skill": 23
+                },
+                "haggle": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 23,
+                    "advances": 0,
+                    "skill": 23
+                },
+                "intimidate": {
+                    "characteristicName": "strength",
+                    "characteristicScore": 25,
+                    "advances": 0,
+                    "skill": 25
+                },
+                "intuition": {
+                    "characteristicName": "initiative",
+                    "characteristicScore": 32,
+                    "advances": 11,
+                    "skill": 43
+                },
+                "leadership": {
+                    "characteristicName": "fellowship",
+                    "characteristicScore": 23,
+                    "advances": 0,
+                    "skill": 23
+                },
+                "meleeBasic": {
+                    "characteristicName": "weaponSkill",
+                    "characteristicScore": 42,
+                    "advances": 5,
+                    "skill": 47
+                },
+                "melee": {
+                    "characteristicName": "weaponSkill",
+                    "characteristicScore": 42,
+                    "advances": 0,
+                    "skill": 42
+                },
+                "navigation": {
+                    "characteristicName": "initiative",
+                    "characteristicScore": 32,
+                    "advances": 0,
+                    "skill": 32
+                },
+                "outdoorSurvival": {
+                    "characteristicName": "intelligence",
+                    "characteristicScore": 48,
+                    "advances": 0,
+                    "skill": 48
+                },
+                "perception": {
+                    "characteristicName": "initiative",
+                    "characteristicScore": 32,
+                    "advances": 0,
+                    "skill": 32
+                },
+                "ride": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 31,
+                    "advances": 0,
+                    "skill": 31
+                },
+                "row": {
+                    "characteristicName": "strength",
+                    "characteristicScore": 25,
+                    "advances": 0,
+                    "skill": 25
+                },
+                "stealth": {
+                    "characteristicName": "agility",
+                    "characteristicScore": 31,
+                    "advances": 0,
+                    "skill": 31
+                }
+            },
+            "otherSkills": [
+                {
+                    "name": "Channelling (Shyish)",
+                    "characteristicName": "willpower",
+                    "characteristicScore": 43,
+                    "advances": 10,
+                    "skill": 53
+                },
+                {
+                    "name": "Lore (Reikland)",
+                    "characteristicName": "intelligence",
+                    "characteristicScore": 48,
+                    "advances": 3,
+                    "skill": 51
+                },
+                {
+                    "name": "Heal",
+                    "characteristicName": "intelligence",
+                    "characteristicScore": 48,
+                    "advances": 1,
+                    "skill": 49
+                }
+            ],
+            "talents": [
+                {
+                    "name": "Aethyric Attunment",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Coolheaded",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Doomed",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Petty Magic",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Read/Write",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Savvy",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Secondsight",
+                    "timesTaken": 1,
+                    "description": ""
+                },
+                {
+                    "name": "Sixth Sense",
+                    "timesTaken": 1,
+                    "description": ""
+                }
+            ],
+            "ambitions": {
+                "shortTerm": "Random text",
+                "longTerm": "Another random text"
+            },
+            "party": {
+                "name": "Random name",
+                "shortTerm": "Random text",
+                "longTerm": "Another random text",
+                "members": "Some members"
+            },
+            "armour": [],
+            "armourPoints": {
+                "head": 0,
+                "rightArm": 0,
+                "leftArm": 0,
+                "body": 0,
+                "rightLeg": 0,
+                "leftLeg": 0,
+                "shield": 0
+            },
+            "trappings": [
+                {
+                    "name": "Grimoire",
+                    "encumbrance": "0"
+                },
+                {
+                    "name": "Amethyst Wizard's Uniform",
+                    "encumbrance": "2/1"
+                },
+                {
+                    "name": "6 sheets of Parchment",
+                    "encumbrance": "0"
+                },
+                {
+                    "name": "Quill and ink",
+                    "encumbrance": "0"
+                }
+            ],
+            "psychology": "Random text",
+            "corruptionMutation": "Another random text",
+            "wealth": {
+                "brassPennies": 10,
+                "silverShillings": 2,
+                "goldCrowns": 0
+            },
+            "encumbrance": {
+                "weapons": 2,
+                "armour": 0,
+                "trappings": 1,
+                "maximum": 4,
+                "total": 3
+            },
+            "wounds": {
+                "strengthBonus": 2,
+                "twiceToughnessBonus": 4,
+                "willpowerBonus": 4,
+                "hardy": 0,
+                "wounds": 10,
+                "description": ""
+            },
+            "weapons": [
+                {
+                    "name": "Scythe ",
+                    "group": "Polearm",
+                    "encumbrance": "2",
+                    "rangeReach": "Average",
+                    "damage": "+SB +6",
+                    "qualities": "Damaging"
+                }
+            ],
+            "spells": [
+                {
+                    "name": "Dart",
+                    "targetNumber": 0,
+                    "range": "43 yards",
+                    "target": "1",
+                    "duration": "Instant",
+                    "effect": "WFRP, Page 240"
+                },
+                {
+                    "name": "Light",
+                    "targetNumber": 0,
+                    "range": "You",
+                    "target": "You",
+                    "duration": "43 mins",
+                    "effect": "WFRP, Page 241"
+                },
+                {
+                    "name": "Shock",
+                    "targetNumber": 0,
+                    "range": "Touch",
+                    "target": "1",
+                    "duration": "Instant",
+                    "effect": "WFRP, Page 242"
+                }
+            ],
+            "sin": 0
+        }
+    }
+]

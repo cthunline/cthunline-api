@@ -14,6 +14,7 @@ import cocCharacters from '../data/characters/cocCharacters.json';
 import swd6Characters from '../data/characters/swd6Characters.json';
 import dnd5Characters from '../data/characters/dnd5Characters.json';
 import seventhSeaCharacters from '../data/characters/seventhSeaCharacters.json';
+import warhammerFantasyCharacters from '../data/characters/warhammerFantasyCharacters.json';
 
 export const usersData = users;
 export const sessionsData = sessions;
@@ -25,7 +26,8 @@ export const charactersData = [
     ...cocCharacters,
     ...swd6Characters,
     ...dnd5Characters,
-    ...seventhSeaCharacters
+    ...seventhSeaCharacters,
+    ...warhammerFantasyCharacters
 ];
 
 const Data = {

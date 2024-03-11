@@ -143,7 +143,8 @@ describe('[API] Characters', () => {
                 'callOfCthulhu',
                 'starWarsD6',
                 'dnd5',
-                'seventhSea'
+                'seventhSea',
+                'warhammerFantasy'
             ];
             for (const gameId of gameIds) {
                 const { data } = findCharacter(Api.userId, gameId);
