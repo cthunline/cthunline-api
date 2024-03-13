@@ -389,9 +389,10 @@
                 "strengthBonus": 2,
                 "twiceToughnessBonus": 6,
                 "willpowerBonus": 4,
-                "hardy": 0,
-                "wounds": 12,
-                "description": ""
+                "hardy": false,
+                "total": 12,
+                "current": 0,
+                "notes": ""
             },
             "weapons": [
                 {
@@ -785,9 +786,10 @@
                 "strengthBonus": 2,
                 "twiceToughnessBonus": 4,
                 "willpowerBonus": 4,
-                "hardy": 0,
-                "wounds": 10,
-                "description": ""
+                "hardy": false,
+                "total": 10,
+                "current": 0,
+                "notes": ""
             },
             "weapons": [
                 {
