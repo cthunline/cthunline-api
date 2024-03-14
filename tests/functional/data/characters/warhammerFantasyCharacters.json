@@ -93,157 +93,131 @@
             "basicSkills": {
                 "art": {
                     "characteristicName": "dexterity",
-                    "characteristicScore": 46,
                     "advances": 0,
                     "skill": 46
                 },
                 "athletics": {
                     "characteristicName": "agility",
-                    "characteristicScore": 44,
                     "advances": 5,
                     "skill": 49
                 },
                 "bribery": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 50,
                     "advances": 0,
                     "skill": 50
                 },
                 "charm": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 50,
                     "advances": 0,
                     "skill": 50
                 },
                 "charmAnimal": {
                     "characteristicName": "willpower",
-                    "characteristicScore": 48,
                     "advances": 0,
                     "skill": 48
                 },
                 "climb": {
                     "characteristicName": "strength",
-                    "characteristicScore": 20,
                     "advances": 15,
                     "skill": 35
                 },
                 "cool": {
                     "characteristicName": "willpower",
-                    "characteristicScore": 48,
                     "advances": 10,
                     "skill": 58
                 },
                 "consumeAlcohol": {
                     "characteristicName": "toughness",
-                    "characteristicScore": 32,
                     "advances": 0,
                     "skill": 32
                 },
                 "dodge": {
                     "characteristicName": "agility",
-                    "characteristicScore": 44,
                     "advances": 10,
                     "skill": 54
                 },
                 "drive": {
                     "characteristicName": "agility",
-                    "characteristicScore": 44,
                     "advances": 0,
                     "skill": 44
                 },
                 "endurance": {
                     "characteristicName": "toughness",
-                    "characteristicScore": 32,
                     "advances": 10,
                     "skill": 42
                 },
                 "entertain": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 50,
                     "advances": 0,
                     "skill": 50
                 },
                 "gamble": {
                     "characteristicName": "intelligence",
-                    "characteristicScore": 26,
                     "advances": 0,
                     "skill": 26
                 },
                 "gossip": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 50,
                     "advances": 0,
                     "skill": 50
                 },
                 "haggle": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 50,
                     "advances": 0,
                     "skill": 50
                 },
                 "intimidate": {
                     "characteristicName": "strength",
-                    "characteristicScore": 20,
                     "advances": 0,
                     "skill": 20
                 },
                 "intuition": {
                     "characteristicName": "initiative",
-                    "characteristicScore": 43,
                     "advances": 5,
                     "skill": 48
                 },
                 "leadership": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 50,
                     "advances": 0,
                     "skill": 50
                 },
                 "meleeBasic": {
                     "characteristicName": "weaponSkill",
-                    "characteristicScore": 23,
                     "advances": 0,
                     "skill": 23
                 },
                 "melee": {
                     "characteristicName": "weaponSkill",
-                    "characteristicScore": 23,
                     "advances": 0,
                     "skill": 23
                 },
                 "navigation": {
                     "characteristicName": "initiative",
-                    "characteristicScore": 43,
                     "advances": 0,
                     "skill": 43
                 },
                 "outdoorSurvival": {
                     "characteristicName": "intelligence",
-                    "characteristicScore": 26,
                     "advances": 0,
                     "skill": 26
                 },
                 "perception": {
                     "characteristicName": "initiative",
-                    "characteristicScore": 43,
                     "advances": 10,
                     "skill": 53
                 },
                 "ride": {
                     "characteristicName": "agility",
-                    "characteristicScore": 44,
                     "advances": 0,
                     "skill": 44
                 },
                 "row": {
                     "characteristicName": "strength",
-                    "characteristicScore": 20,
                     "advances": 0,
                     "skill": 20
                 },
                 "stealth": {
                     "characteristicName": "agility",
-                    "characteristicScore": 44,
                     "advances": 10,
                     "skill": 54
                 }
@@ -252,21 +226,18 @@
                 {
                     "name": "Entertain (comedy)",
                     "characteristicName": "fellowship",
-                    "characteristicScore": 50,
                     "advances": 10,
                     "skill": 60
                 },
                 {
                     "name": "Pick lock",
                     "characteristicName": "dexterity",
-                    "characteristicScore": 46,
                     "advances": 5,
                     "skill": 51
                 },
                 {
                     "name": "Sleight of hand",
                     "characteristicName": "dexterity",
-                    "characteristicScore": 46,
                     "advances": 4,
                     "skill": 50
                 }
@@ -347,7 +318,7 @@
                 {
                     "name": "Leather jack",
                     "locations": "Body",
-                    "encumbrance": "1/0",
+                    "encumbrance": 1,
                     "armourPoints": 1,
                     "qualities": ""
                 }
@@ -364,11 +335,11 @@
             "trappings": [
                 {
                     "name": "Healing draught",
-                    "encumbrance": "0"
+                    "encumbrance": 0
                 },
                 {
                     "name": "Lock picks",
-                    "encumbrance": "0"
+                    "encumbrance": 0
                 }
             ],
             "psychology": "Random text",
@@ -398,7 +369,7 @@
                 {
                     "name": "Short sword",
                     "group": "Basic",
-                    "encumbrance": "1",
+                    "encumbrance": 1,
                     "rangeReach": "Average",
                     "damage": "+SB +4",
                     "qualities": ""
@@ -406,7 +377,7 @@
                 {
                     "name": "Sling",
                     "group": "Sling",
-                    "encumbrance": "0",
+                    "encumbrance": 0,
                     "rangeReach": "60 yards",
                     "damage": "+6",
                     "qualities": "Pummeling"
@@ -510,157 +481,131 @@
             "basicSkills": {
                 "art": {
                     "characteristicName": "dexterity",
-                    "characteristicScore": 27,
                     "advances": 0,
                     "skill": 27
                 },
                 "athletics": {
                     "characteristicName": "agility",
-                    "characteristicScore": 31,
                     "advances": 0,
                     "skill": 31
                 },
                 "bribery": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 23,
                     "advances": 10,
                     "skill": 33
                 },
                 "charm": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 23,
                     "advances": 0,
                     "skill": 23
                 },
                 "charmAnimal": {
                     "characteristicName": "willpower",
-                    "characteristicScore": 43,
                     "advances": 0,
                     "skill": 43
                 },
                 "climb": {
                     "characteristicName": "strength",
-                    "characteristicScore": 25,
                     "advances": 0,
                     "skill": 25
                 },
                 "cool": {
                     "characteristicName": "willpower",
-                    "characteristicScore": 43,
                     "advances": 20,
                     "skill": 63
                 },
                 "consumeAlcohol": {
                     "characteristicName": "toughness",
-                    "characteristicScore": 28,
                     "advances": 7,
                     "skill": 35
                 },
                 "dodge": {
                     "characteristicName": "agility",
-                    "characteristicScore": 31,
                     "advances": 0,
                     "skill": 31
                 },
                 "drive": {
                     "characteristicName": "agility",
-                    "characteristicScore": 31,
                     "advances": 0,
                     "skill": 31
                 },
                 "endurance": {
                     "characteristicName": "toughness",
-                    "characteristicScore": 28,
                     "advances": 14,
                     "skill": 42
                 },
                 "entertain": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 23,
                     "advances": 0,
                     "skill": 23
                 },
                 "gamble": {
                     "characteristicName": "intelligence",
-                    "characteristicScore": 48,
                     "advances": 5,
                     "skill": 53
                 },
                 "gossip": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 23,
                     "advances": 0,
                     "skill": 23
                 },
                 "haggle": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 23,
                     "advances": 0,
                     "skill": 23
                 },
                 "intimidate": {
                     "characteristicName": "strength",
-                    "characteristicScore": 25,
                     "advances": 0,
                     "skill": 25
                 },
                 "intuition": {
                     "characteristicName": "initiative",
-                    "characteristicScore": 32,
                     "advances": 11,
                     "skill": 43
                 },
                 "leadership": {
                     "characteristicName": "fellowship",
-                    "characteristicScore": 23,
                     "advances": 0,
                     "skill": 23
                 },
                 "meleeBasic": {
                     "characteristicName": "weaponSkill",
-                    "characteristicScore": 42,
                     "advances": 5,
                     "skill": 47
                 },
                 "melee": {
                     "characteristicName": "weaponSkill",
-                    "characteristicScore": 42,
                     "advances": 0,
                     "skill": 42
                 },
                 "navigation": {
                     "characteristicName": "initiative",
-                    "characteristicScore": 32,
                     "advances": 0,
                     "skill": 32
                 },
                 "outdoorSurvival": {
                     "characteristicName": "intelligence",
-                    "characteristicScore": 48,
                     "advances": 0,
                     "skill": 48
                 },
                 "perception": {
                     "characteristicName": "initiative",
-                    "characteristicScore": 32,
                     "advances": 0,
                     "skill": 32
                 },
                 "ride": {
                     "characteristicName": "agility",
-                    "characteristicScore": 31,
                     "advances": 0,
                     "skill": 31
                 },
                 "row": {
                     "characteristicName": "strength",
-                    "characteristicScore": 25,
                     "advances": 0,
                     "skill": 25
                 },
                 "stealth": {
                     "characteristicName": "agility",
-                    "characteristicScore": 31,
                     "advances": 0,
                     "skill": 31
                 }
@@ -669,21 +614,18 @@
                 {
                     "name": "Channelling (Shyish)",
                     "characteristicName": "willpower",
-                    "characteristicScore": 43,
                     "advances": 10,
                     "skill": 53
                 },
                 {
                     "name": "Lore (Reikland)",
                     "characteristicName": "intelligence",
-                    "characteristicScore": 48,
                     "advances": 3,
                     "skill": 51
                 },
                 {
                     "name": "Heal",
                     "characteristicName": "intelligence",
-                    "characteristicScore": 48,
                     "advances": 1,
                     "skill": 49
                 }
@@ -753,19 +695,19 @@
             "trappings": [
                 {
                     "name": "Grimoire",
-                    "encumbrance": "0"
+                    "encumbrance": 0
                 },
                 {
                     "name": "Amethyst Wizard's Uniform",
-                    "encumbrance": "2/1"
+                    "encumbrance": 2
                 },
                 {
                     "name": "6 sheets of Parchment",
-                    "encumbrance": "0"
+                    "encumbrance": 0
                 },
                 {
                     "name": "Quill and ink",
-                    "encumbrance": "0"
+                    "encumbrance": 0
                 }
             ],
             "psychology": "Random text",
@@ -795,7 +737,7 @@
                 {
                     "name": "Scythe ",
                     "group": "Polearm",
-                    "encumbrance": "2",
+                    "encumbrance": 2,
                     "rangeReach": "Average",
                     "damage": "+SB +6",
                     "qualities": "Damaging"
