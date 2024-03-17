@@ -45,7 +45,7 @@ steps:
   - waiton
 # sonarqube scan
 - name: sonarqube
-  image: pitininja/drone-sonar-plugin:latest
+  image: plugins/sonarqube-scanner:v2.0.2-java17
   failure: ignore
   settings:
     sonar_host:
