@@ -1,6 +1,6 @@
 import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
 import ChaiDateTime from 'chai-datetime';
-import Chai, { expect } from 'chai';
+import { expect, use as chaiUse } from 'chai';
 
 import { AppErrorConstructor } from '../../../src/services/errors.js';
 import { locales } from '../../../src/services/locale.js';
@@ -11,11 +11,11 @@ import {
     ChaiHttpStatus
 } from './chai.helper.js';
 
-Chai.use(ChaiHttpStatus);
-Chai.use(DeepEqualInAnyOrder);
-Chai.use(ChaiDateTime);
-Chai.use(ChaiDateString);
-Chai.use(ChaiArrayOfType);
+chaiUse(ChaiHttpStatus);
+chaiUse(DeepEqualInAnyOrder);
+chaiUse(ChaiDateTime);
+chaiUse(ChaiDateString);
+chaiUse(ChaiArrayOfType);
 
 declare global {
     export namespace Chai {
