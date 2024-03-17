@@ -2,16 +2,16 @@ import { FastifyInstance, FastifyRequest } from 'fastify';
 import FastifyStatic from '@fastify/static';
 import Path from 'path';
 
-import configurationController from './configurationController.js';
-import registrationController from './registrationController.js';
-import characterController from './characterController.js';
-import sessionController from './sessionController.js';
-import sketchController from './sketchController.js';
-import assetController from './assetController.js';
-import authController from './authController.js';
-import userController from './userController.js';
-import gameController from './gameController.js';
-import noteController from './noteController.js';
+import { configurationController } from './configurationController.js';
+import { registrationController } from './registrationController.js';
+import { characterController } from './characterController.js';
+import { sessionController } from './sessionController.js';
+import { sketchController } from './sketchController.js';
+import { assetController } from './assetController.js';
+import { authController } from './authController.js';
+import { userController } from './userController.js';
+import { gameController } from './gameController.js';
+import { noteController } from './noteController.js';
 
 import { authMiddleware } from './helpers/auth.js';
 import { assetDir } from './helpers/asset.js';
@@ -20,11 +20,11 @@ import { importMetaUrlDirname } from '../services/tools.js';
 import { getFastifyHttpMethods } from '../services/api.js';
 import { NotFoundError } from '../services/errors.js';
 import { getEnv } from '../services/env.js';
-import Log from '../services/log.js';
+import { log } from '../services/log.js';
 
 const dirname = importMetaUrlDirname(import.meta.url);
 
-const mainController = async (app: FastifyInstance) => {
+export const mainController = async (app: FastifyInstance) => {
     app.decorateRequest('user', null);
 
     app.addHook('onRequest', async (req: FastifyRequest) => {
@@ -79,7 +79,7 @@ const mainController = async (app: FastifyInstance) => {
 
     // serve web client build in production
     if (getEnv('ENVIRONMENT') === 'prod') {
-        Log.info('Serving production web client build');
+        log.info('Serving production web client build');
         await app.register(FastifyStatic, {
             root: Path.join(dirname, '../web'),
             decorateReply: false,
@@ -96,5 +96,3 @@ const mainController = async (app: FastifyInstance) => {
         });
     }
 };
-
-export default mainController;

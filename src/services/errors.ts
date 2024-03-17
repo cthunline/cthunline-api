@@ -10,7 +10,7 @@ import type {
     SchemaErrorFormatter
 } from 'fastify/types/schema.js';
 
-import Log from './log.js';
+import { log } from './log.js';
 
 import { ErrorJsonResponse } from '../types/errors.js';
 
@@ -129,7 +129,7 @@ export const errorHandler = (
         rep.status(error.status).send(response);
     } else {
         // if error is not handled throw an intern error and logs stack
-        Log.error(error.stack);
+        log.error(error.stack);
         rep.status(500).send({
             error: 'Intern error'
         });

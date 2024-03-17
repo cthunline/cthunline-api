@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import Data, { sessionsData } from '../helpers/data.helper.js';
-import Sockets from '../helpers/sockets.helper.js';
+import { sessionsData, resetData } from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 
 import {
     assertUser,
@@ -14,11 +14,11 @@ const tokenData = sessionsData[0].sketch.tokens[0];
 
 describe('[Sockets] Sketch', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     it('Should fail to update sketch because of invalid data', async () => {
-        await Sockets.testError(
+        await socketHelper.testError(
             'sketchUpdate',
             'sketchUpdate',
             [
@@ -63,7 +63,7 @@ describe('[Sockets] Sketch', () => {
     });
 
     it('Should fail to update sketch because not game master', async () => {
-        await Sockets.testError(
+        await socketHelper.testError(
             'sketchUpdate',
             'sketchUpdate',
             sketchData,
@@ -74,7 +74,7 @@ describe('[Sockets] Sketch', () => {
 
     it('Should update sketch', async () => {
         const [masterSocket, player1Socket, player2Socket] =
-            await Sockets.setupSession();
+            await socketHelper.setupSession();
         await Promise.all([
             ...[player1Socket, player2Socket].map(
                 (socket) =>
@@ -101,7 +101,7 @@ describe('[Sockets] Sketch', () => {
     });
 
     it('Should fail to update sketch token because of invalid data', async () => {
-        await Sockets.testError(
+        await socketHelper.testError(
             'tokenUpdate',
             'tokenUpdate',
             [
@@ -120,7 +120,7 @@ describe('[Sockets] Sketch', () => {
 
     it('Should update sketch token', async () => {
         const [masterSocket, player1Socket, player2Socket] =
-            await Sockets.setupSession();
+            await socketHelper.setupSession();
         await Promise.all([
             ...[masterSocket, player1Socket].map(
                 (socket) =>

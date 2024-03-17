@@ -1,26 +1,26 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper.js';
-import Data, { sketchsData } from '../helpers/data.helper.js';
+import { sketchsData, resetData } from '../helpers/data.helper.js';
 import { assertSketchObject } from '../helpers/assert.helper.js';
+import { api } from '../helpers/api.helper.js';
 
 describe('[API] Sketchs', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
     beforeEach(async () => {
-        await Api.login();
+        await api.login();
     });
     afterEach(async () => {
-        await Api.logout();
+        await api.logout();
     });
 
     describe('GET /sketchs', () => {
         it('Should list all sketchs of the current user', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/sketchs',
                 listKey: 'sketchs',
-                data: sketchsData.filter(({ userId }) => Api.userId === userId),
+                data: sketchsData.filter(({ userId }) => api.userId === userId),
                 assert: assertSketchObject
             });
         });
@@ -40,7 +40,7 @@ describe('[API] Sketchs', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: '/sketchs',
@@ -52,7 +52,7 @@ describe('[API] Sketchs', () => {
         });
         it('Should save a sketch for the current user', async () => {
             const { sketch } = sketchsData[0];
-            await Api.testCreate({
+            await api.testCreate({
                 route: '/sketchs',
                 data: {
                     name: 'Test',
@@ -65,13 +65,13 @@ describe('[API] Sketchs', () => {
 
     describe('GET /sketchs/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'GET',
                 route: '/sketchs/:id'
             });
         });
         it('Should get a sketch belonging to the current user', async () => {
-            await Api.testGetOne({
+            await api.testGetOne({
                 route: '/sketchs/:id',
                 data: sketchsData[0],
                 assert: assertSketchObject
@@ -81,14 +81,14 @@ describe('[API] Sketchs', () => {
 
     describe('DELETE /sketchs/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/sketchs/:id'
             });
         });
         it('Should delete a sketch belonging to the current user', async () => {
             const { sketch } = sketchsData[0];
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/sketchs',
                 body: {
@@ -100,7 +100,7 @@ describe('[API] Sketchs', () => {
             const {
                 body: { id }
             } = response;
-            await Api.testDelete({
+            await api.testDelete({
                 route: `/sketchs/${id}`,
                 testGet: true
             });

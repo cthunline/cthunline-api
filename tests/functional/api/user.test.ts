@@ -1,23 +1,23 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper.js';
-import Data, { usersData } from '../helpers/data.helper.js';
+import { usersData, resetData } from '../helpers/data.helper.js';
 import { assertUser } from '../helpers/assert.helper.js';
+import { api } from '../helpers/api.helper.js';
 
 describe('[API] Users', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
     beforeEach(async () => {
-        await Api.login();
+        await api.login();
     });
     afterEach(async () => {
-        await Api.logout();
+        await api.logout();
     });
 
     describe('GET /users', () => {
         it('Should list users', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/users',
                 listKey: 'users',
                 data: usersData.filter(({ isEnabled }) => isEnabled),
@@ -25,7 +25,7 @@ describe('[API] Users', () => {
             });
         });
         it('Should list all users including disabled ones', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/users?disabled=true',
                 listKey: 'users',
                 data: usersData,
@@ -66,7 +66,7 @@ describe('[API] Users', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: '/users',
@@ -77,11 +77,11 @@ describe('[API] Users', () => {
             }
         });
         it('Should throw a forbidden error', async () => {
-            await Api.login({
+            await api.login({
                 email: usersData[0].email,
                 password: 'test'
             });
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/users',
@@ -95,7 +95,7 @@ describe('[API] Users', () => {
             );
         });
         it('Should throw a conflict error', async () => {
-            const createResponse = await Api.request({
+            const createResponse = await api.request({
                 method: 'POST',
                 route: '/users',
                 body: {
@@ -105,7 +105,7 @@ describe('[API] Users', () => {
                 }
             });
             expect(createResponse).to.have.status(200);
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/users',
@@ -146,7 +146,7 @@ describe('[API] Users', () => {
                 }
             ];
             for (const data of createData) {
-                await Api.testCreate({
+                await api.testCreate({
                     route: '/users',
                     data,
                     assert: assertUser
@@ -157,13 +157,13 @@ describe('[API] Users', () => {
 
     describe('GET /users/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'GET',
                 route: '/users/:id'
             });
         });
         it('Should get a user', async () => {
-            await Api.testGetOne({
+            await api.testGetOne({
                 route: '/users/:id',
                 data: usersData[0],
                 assert: assertUser
@@ -173,7 +173,7 @@ describe('[API] Users', () => {
 
     describe('POST /users/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'POST',
                 route: '/users/:id',
                 body: {
@@ -210,10 +210,10 @@ describe('[API] Users', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
-                        route: `/users/${Api.userId}`,
+                        route: `/users/${api.userId}`,
                         body
                     },
                     400
@@ -223,7 +223,7 @@ describe('[API] Users', () => {
         it('Should throw a forbidden error', async () => {
             const email = 'yyy@test.com';
             const password = 'testtest';
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/users',
                 body: {
@@ -236,7 +236,7 @@ describe('[API] Users', () => {
             const {
                 body: { id }
             } = response;
-            await Api.login({
+            await api.login({
                 email,
                 password
             });
@@ -249,7 +249,7 @@ describe('[API] Users', () => {
                 }
             ];
             for (const body of bodies) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: `/users/${id}`,
@@ -258,7 +258,7 @@ describe('[API] Users', () => {
                     403
                 );
             }
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: `/users/${usersData[0].id}`,
@@ -274,7 +274,7 @@ describe('[API] Users', () => {
             const newPassword1 = 'abc123';
             const newPassword2 = 'def456';
             const newPassword3 = 'oiu345';
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/users',
                 body: {
@@ -287,11 +287,11 @@ describe('[API] Users', () => {
             const {
                 body: { id }
             } = response;
-            await Api.login({
+            await api.login({
                 email: 'eee@test.com',
                 password: newPassword1
             });
-            await Api.testEdit({
+            await api.testEdit({
                 route: `/users/${id}`,
                 data: {
                     name: 'Test1',
@@ -303,7 +303,7 @@ describe('[API] Users', () => {
                 },
                 assert: assertUser
             });
-            await Api.login();
+            await api.login();
             const editData = [
                 {
                     name: 'Test1',
@@ -318,7 +318,7 @@ describe('[API] Users', () => {
                 }
             ];
             for (const data of editData) {
-                await Api.testEdit({
+                await api.testEdit({
                     route: `/users/${id}`,
                     data,
                     assert: assertUser

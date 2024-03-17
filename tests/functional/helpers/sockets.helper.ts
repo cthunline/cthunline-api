@@ -6,7 +6,7 @@ import { getEnv } from '../../../src/services/env.js';
 
 import { sessionsData, charactersData, usersData } from './data.helper.js';
 import { assertSocketMeta } from './assert.helper.js';
-import Api from './api.helper.js';
+import { api } from './api.helper.js';
 
 interface SocketsHelper {
     url: string;
@@ -36,12 +36,12 @@ export interface SocketConnectionData {
     characterId?: number;
 }
 
-const Sockets: SocketsHelper = {
+export const socketHelper: SocketsHelper = {
     url: `http://localhost:${getEnv('PORT')}`,
     connectedSockets: [],
 
     getSocketClient: ({ jwt, query }: GetSocketClientData) => {
-        const socketClient = io(Sockets.url, {
+        const socketClient = io(socketHelper.url, {
             query,
             autoConnect: false
         });
@@ -61,7 +61,7 @@ const Sockets: SocketsHelper = {
         const sessionId = connectionData?.sessionId ?? sessionsData[1].id;
         const characterId = connectionData?.characterId ?? charactersData[0].id;
         return new Promise((resolve, reject) => {
-            const socket = Sockets.getSocketClient({
+            const socket = socketHelper.getSocketClient({
                 jwt: connectionData?.jwt,
                 query: {
                     sessionId,
@@ -75,19 +75,19 @@ const Sockets: SocketsHelper = {
             socket.on('connect_error', (err: any) => {
                 reject(err);
             });
-            Sockets.connectedSockets.push(socket);
+            socketHelper.connectedSockets.push(socket);
         });
     },
 
     connectRole: async (isMaster: boolean) => {
-        const { id, jwt } = await Api.login();
+        const { id, jwt } = await api.login();
         const sessionId = sessionsData.find(({ masterId }) =>
             isMaster ? id === masterId : id !== masterId
         )?.id;
         const characterId = charactersData.find(
-            (char) => char.userId === Api.userId
+            (char) => char.userId === api.userId
         )?.id;
-        return Sockets.connect({
+        return socketHelper.connect({
             jwt,
             sessionId,
             characterId
@@ -100,7 +100,7 @@ const Sockets: SocketsHelper = {
         status
     }: FailSocketConnectionData): Promise<void> =>
         new Promise((resolve, reject) => {
-            const socket = Sockets.getSocketClient({
+            const socket = socketHelper.getSocketClient({
                 jwt,
                 query
             });
@@ -120,15 +120,15 @@ const Sockets: SocketsHelper = {
         const [masterEmail, player1Email, player2Email] = usersData.map(
             ({ email }) => email
         );
-        const masterJWTUser = await Api.login({
+        const masterJWTUser = await api.login({
             email: masterEmail,
             password: 'test'
         });
-        const player1JWTUser = await Api.login({
+        const player1JWTUser = await api.login({
             email: player1Email,
             password: 'test'
         });
-        const player2JWTUser = await Api.login({
+        const player2JWTUser = await api.login({
             email: player2Email,
             password: 'test'
         });
@@ -137,13 +137,13 @@ const Sockets: SocketsHelper = {
         )?.id;
         const sockets: Socket[] = [];
         sockets.push(
-            await Sockets.connect({
+            await socketHelper.connect({
                 jwt: masterJWTUser.jwt,
                 sessionId
             })
         );
         sockets.push(
-            await Sockets.connect({
+            await socketHelper.connect({
                 jwt: player1JWTUser.jwt,
                 sessionId,
                 characterId: charactersData.find(
@@ -152,7 +152,7 @@ const Sockets: SocketsHelper = {
             })
         );
         sockets.push(
-            await Sockets.connect({
+            await socketHelper.connect({
                 jwt: player2JWTUser.jwt,
                 sessionId,
                 characterId: charactersData.find(
@@ -172,7 +172,7 @@ const Sockets: SocketsHelper = {
     ) => {
         const invalidData = Array.isArray(data) ? data : [data];
         for (const emitData of invalidData) {
-            const socket = await Sockets.connectRole(isMaster);
+            const socket = await socketHelper.connectRole(isMaster);
             await new Promise<void>((resolve, reject) => {
                 socket.on(onEvent, () => {
                     socket.disconnect();
@@ -195,9 +195,7 @@ const Sockets: SocketsHelper = {
 };
 
 afterEach(() => {
-    Sockets.connectedSockets.forEach((socket) => {
+    socketHelper.connectedSockets.forEach((socket) => {
         socket.disconnect();
     });
 });
-
-export default Sockets;

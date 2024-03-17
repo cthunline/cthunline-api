@@ -21,6 +21,8 @@
         ],
         "import/extensions": ["error", "ignorePackages"],
         "import/no-commonjs": "error",
+        "import/no-default-export": "error",
+        "import/no-named-as-default-member": "error",
         "import/prefer-default-export": "off",
         "lines-between-class-members": "off",
         "no-param-reassign": [

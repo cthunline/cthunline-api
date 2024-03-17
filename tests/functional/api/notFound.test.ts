@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 
-import Api, { httpMethods } from '../helpers/api.helper.js';
+import { api, httpMethods } from '../helpers/api.helper.js';
 import { assertError } from '../helpers/assert.helper.js';
 
 describe('[API] Global', () => {
     beforeEach(async () => {
-        await Api.login();
+        await api.login();
     });
     it('Should throw not found error because routes are invalid', async () => {
         const invalidRoutes = [
@@ -16,7 +16,7 @@ describe('[API] Global', () => {
         ];
         for (const method of httpMethods) {
             for (const route of invalidRoutes) {
-                const response = await Api.request({
+                const response = await api.request({
                     method,
                     route
                 });

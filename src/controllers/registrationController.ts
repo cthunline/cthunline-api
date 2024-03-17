@@ -3,7 +3,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { registerRateLimiter } from '../services/rateLimiter.js';
 import { ForbiddenError } from '../services/errors.js';
 import { hashPassword } from '../services/crypto.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 import { getEnv } from '../services/env.js';
 
 import {
@@ -18,7 +18,7 @@ import {
 
 import { registerUserSchema, RegisterUserBody } from './schemas/user.js';
 
-const registrationController = async (app: FastifyInstance) => {
+export const registrationController = async (app: FastifyInstance) => {
     await app.register(async (routeApp: FastifyInstance) => {
         // rate limiter
         await registerRateLimiter(routeApp);
@@ -47,7 +47,7 @@ const registrationController = async (app: FastifyInstance) => {
                 await controlUniqueEmail(body.email);
                 const hashedPassword = await hashPassword(body.password);
                 const { password, invitationCode, ...cleanBody } = body;
-                const user = await Prisma.user.create({
+                const user = await prisma.user.create({
                     select: safeUserSelect,
                     data: {
                         ...defaultUserData,
@@ -76,12 +76,10 @@ const registrationController = async (app: FastifyInstance) => {
             if (!getEnv('INVITATION_ENABLED')) {
                 throw new ForbiddenError('Invitation codes are disabled');
             }
-            const { code } = await Prisma.invitation.create({
+            const { code } = await prisma.invitation.create({
                 data: generateInvitationCode()
             });
             rep.send({ code });
         }
     });
 };
-
-export default registrationController;

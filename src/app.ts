@@ -8,13 +8,13 @@ import FastifyHelmet from '@fastify/helmet';
 import FastifyQs from 'fastify-qs';
 import AjvFormats from 'ajv-formats';
 
-import mainController from './controllers/index.js';
-import socketRouter from './sockets/index.js';
+import { mainController } from './controllers/index.js';
+import { socketRouter } from './sockets/index.js';
 
 import { errorHandler, schemaErrorFormatter } from './services/errors.js';
 import { initDb } from './services/prisma.js';
 import { getEnv } from './services/env.js';
-import Log from './services/log.js';
+import { log } from './services/log.js';
 
 export const app = Fastify({
     trustProxy: getEnv('REVERSE_PROXY'),
@@ -29,11 +29,11 @@ export const app = Fastify({
 
 export const initApp = async () => {
     try {
-        Log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-        Log.info('~~~~~~~ Cthunline API Server ~~~~~~~');
-        Log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+        log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+        log.info('~~~~~~~ Cthunline API Server ~~~~~~~');
+        log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
 
-        Log.info('Registering middlewares');
+        log.info('Registering middlewares');
         // cookie parser
         await app.register(FastifyCookie, {
             secret: getEnv('COOKIE_SECRET')
@@ -53,19 +53,19 @@ export const initApp = async () => {
         // custom schema error formatter
         app.setSchemaErrorFormatter(schemaErrorFormatter);
 
-        Log.info('Initializing database');
+        log.info('Initializing database');
         await initDb();
 
-        Log.info('Registering routes');
+        log.info('Registering routes');
         await app.register(mainController);
 
-        Log.info('Initializing web sockets');
+        log.info('Initializing web sockets');
         socketRouter(app);
 
         // emit ready event
         app.ready();
     } catch (err: any) {
-        Log.error('Error while starting app');
-        Log.error(err.stack);
+        log.error('Error while starting app');
+        log.error(err.stack);
     }
 };

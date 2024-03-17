@@ -1,16 +1,16 @@
 import { expect } from 'chai';
 
-import Data from '../helpers/data.helper.js';
-import Sockets from '../helpers/sockets.helper.js';
+import { resetData } from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 import { assertSocketMeta, assertUser } from '../helpers/assert.helper.js';
 
 describe('[Sockets] Dice', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     it('Should fail to request dice because of invalid data', async () => {
-        await Sockets.testError(
+        await socketHelper.testError(
             'diceRequest',
             'diceResult',
             [
@@ -26,7 +26,7 @@ describe('[Sockets] Dice', () => {
     });
 
     it('Should fail to request private dice roll because not game master', async () => {
-        await Sockets.testError(
+        await socketHelper.testError(
             'dicePrivateRequest',
             'diceResult',
             { D4: 2 },
@@ -52,7 +52,7 @@ describe('[Sockets] Dice', () => {
         ];
         for (const data of requestData) {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
-                const socket = await Sockets.connectRole(true);
+                const socket = await socketHelper.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
                     socket.on('diceResult', (resultData: any) => {
                         const { user, isMaster, request, isPrivate, result } =
@@ -80,7 +80,7 @@ describe('[Sockets] Dice', () => {
 
     it('Should send dice roll result to all players in session', async () => {
         const [masterSocket, player1Socket, player2Socket] =
-            await Sockets.setupSession();
+            await socketHelper.setupSession();
         const diceRequest = {
             D6: 3
         };

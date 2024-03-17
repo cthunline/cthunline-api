@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { Prisma as PrismaNS } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import Path from 'path';
 import Fs from 'fs';
 
@@ -10,7 +10,7 @@ import {
 } from '../services/errors.js';
 import { Games, GameId, isValidGameId } from '../services/games.js';
 import { parseParamId } from '../services/api.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 
 import { assetDir, controlFile } from './helpers/asset.js';
 import { validateSchema } from '../services/typebox.js';
@@ -33,7 +33,7 @@ import {
     uploadPortraitSchema
 } from './schemas/character.js';
 
-const characterController = async (app: FastifyInstance) => {
+export const characterController = async (app: FastifyInstance) => {
     // get all characters
     // can filter on a userId by providing a 'user' query parameter
     app.route({
@@ -50,12 +50,12 @@ const characterController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const userId = query.user ? Number(query.user) : null;
-            const options: PrismaNS.CharacterFindManyArgs = {};
+            const options: Prisma.CharacterFindManyArgs = {};
             if (userId) {
                 await getUser(userId);
                 options.where = { userId };
             }
-            const characters = await Prisma.character.findMany(options);
+            const characters = await prisma.character.findMany(options);
             rep.send({ characters });
         }
     });
@@ -80,7 +80,7 @@ const characterController = async (app: FastifyInstance) => {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
             validateSchema(Games[gameId as GameId].schema, data);
-            const character = await Prisma.character.create({
+            const character = await prisma.character.create({
                 data: {
                     userId,
                     gameId,
@@ -136,7 +136,7 @@ const characterController = async (app: FastifyInstance) => {
             if (body.data) {
                 validateSchema(Games[gameId as GameId].schema, body.data);
             }
-            const character = await Prisma.character.update({
+            const character = await prisma.character.update({
                 data: body,
                 where: {
                     id: characterId
@@ -164,7 +164,7 @@ const characterController = async (app: FastifyInstance) => {
             const characterId = parseParamId(params, 'characterId');
             const { userId } = await getCharacter(characterId);
             controlSelf(userId, user);
-            await Prisma.character.delete({
+            await prisma.character.delete({
                 where: {
                     id: characterId
                 }
@@ -219,7 +219,7 @@ const characterController = async (app: FastifyInstance) => {
             );
             // save portrait on character
             const portrait = Path.join(portraitDirName, portraitFileName);
-            const updatedCharacter = await Prisma.character.update({
+            const updatedCharacter = await prisma.character.update({
                 data: {
                     portrait
                 },
@@ -256,7 +256,7 @@ const characterController = async (app: FastifyInstance) => {
             controlSelf(character.userId, user);
             if (character.portrait) {
                 const [updatedCharacter] = await Promise.all([
-                    Prisma.character.update({
+                    prisma.character.update({
                         data: {
                             portrait: null
                         },
@@ -301,7 +301,7 @@ const characterController = async (app: FastifyInstance) => {
                     'You cannot transfer a character to yourself'
                 );
             }
-            await Prisma.character.update({
+            await prisma.character.update({
                 data: {
                     userId: targetUserId
                 },
@@ -313,5 +313,3 @@ const characterController = async (app: FastifyInstance) => {
         }
     });
 };
-
-export default characterController;

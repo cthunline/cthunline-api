@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { getEnv } from '../services/env.js';
 
-const configurationController = async (app: FastifyInstance) => {
+export const configurationController = async (app: FastifyInstance) => {
     // public configuration
     app.route({
         method: 'GET',
@@ -17,5 +17,3 @@ const configurationController = async (app: FastifyInstance) => {
         }
     });
 };
-
-export default configurationController;

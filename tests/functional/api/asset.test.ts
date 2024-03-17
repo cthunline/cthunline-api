@@ -3,9 +3,14 @@ import Path from 'path';
 
 import { mockEnvVar } from '../../../src/services/env.js';
 
-import Data, { assetsData, directoriesData } from '../helpers/data.helper.js';
 import { assertAsset, assertDirectory } from '../helpers/assert.helper.js';
-import Api from '../helpers/api.helper.js';
+import { api } from '../helpers/api.helper.js';
+import {
+    assetsData,
+    directoriesData,
+    resetData,
+    getAssetBuffer
+} from '../helpers/data.helper.js';
 
 const { userId } = assetsData[0];
 const userAssets = assetsData.filter(
@@ -23,29 +28,29 @@ const forbiddenDirectory = directoriesData.find(
 
 describe('[API] Assets', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
     beforeEach(async () => {
-        await Api.login();
+        await api.login();
     });
     afterEach(async () => {
-        await Api.logout();
+        await api.logout();
     });
 
     describe('GET /assets', () => {
         it('Should list all assets', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/assets',
                 listKey: 'assets',
                 data: userAssets,
                 assert: assertAsset
             });
             for (const { path } of assetsData) {
-                await Api.testStaticFile(Path.join('/static', path));
+                await api.testStaticFile(Path.join('/static', path));
             }
         });
         it('Should list all assets including directory data', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/assets?include=true',
                 listKey: 'assets',
                 data: userAssets,
@@ -64,8 +69,8 @@ describe('[API] Assets', () => {
     describe('POST /assets', () => {
         it('Should throw a validation error because of wrong file type', async () => {
             for (const name of ['asset.pdf', 'asset.ico']) {
-                const buffer = await Data.getAssetBuffer(name);
-                await Api.testError(
+                const buffer = await getAssetBuffer(name);
+                await api.testError(
                     {
                         method: 'POST',
                         route: '/assets',
@@ -84,8 +89,8 @@ describe('[API] Assets', () => {
         it('Should throw a validation error because uploaded file is too big', async () => {
             mockEnvVar('ASSET_MAX_SIZE_MB_PER_FILE', 1);
             const name = 'too-big.png';
-            const buffer = await Data.getAssetBuffer(name);
-            await Api.testError(
+            const buffer = await getAssetBuffer(name);
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/assets',
@@ -103,7 +108,7 @@ describe('[API] Assets', () => {
         it('Should throw a validation error because payload is too big', async () => {
             mockEnvVar('ASSET_MAX_SIZE_MB', 3);
             const name = 'big.jpg';
-            const buffer = await Data.getAssetBuffer(name);
+            const buffer = await getAssetBuffer(name);
             const files = [];
             for (let i = 0; i < 10; i += 1) {
                 files.push({
@@ -112,7 +117,7 @@ describe('[API] Assets', () => {
                     name: `${name}-${i}`
                 });
             }
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/assets',
@@ -139,8 +144,8 @@ describe('[API] Assets', () => {
                 }
             ];
             for (const { name, directoryId } of uploadData) {
-                const buffer = await Data.getAssetBuffer(name);
-                const response = await Api.request({
+                const buffer = await getAssetBuffer(name);
+                const response = await api.request({
                     method: 'POST',
                     route: '/assets',
                     files: [
@@ -167,7 +172,7 @@ describe('[API] Assets', () => {
                     userId
                 });
                 const { path } = assets[0];
-                await Api.testStaticFile(Path.join('/static', path));
+                await api.testStaticFile(Path.join('/static', path));
             }
         });
         it('Should upload multiple assets', async () => {
@@ -181,11 +186,11 @@ describe('[API] Assets', () => {
             for (const name of assetNames) {
                 files.push({
                     field: 'assets',
-                    buffer: await Data.getAssetBuffer(name),
+                    buffer: await getAssetBuffer(name),
                     name
                 });
             }
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/assets',
                 files
@@ -204,20 +209,20 @@ describe('[API] Assets', () => {
                     name: assetName,
                     userId
                 });
-                await Api.testStaticFile(Path.join('/static', asset.path));
+                await api.testStaticFile(Path.join('/static', asset.path));
             }
         });
     });
 
     describe('GET /assets/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'GET',
                 route: '/assets/:id'
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'GET',
                     route: `/assets/${forbiddenAsset?.id}`
@@ -226,24 +231,24 @@ describe('[API] Assets', () => {
             );
         });
         it('Should get an asset', async () => {
-            await Api.testGetOne({
+            await api.testGetOne({
                 route: '/assets/:id',
                 data: userAssets[0],
                 assert: assertAsset
             });
-            await Api.testStaticFile(Path.join('/static', userAssets[0].path));
+            await api.testStaticFile(Path.join('/static', userAssets[0].path));
         });
     });
 
     describe('DELETE /assets/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/assets/:id'
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'DELETE',
                     route: `/assets/${forbiddenAsset?.id}`
@@ -252,11 +257,11 @@ describe('[API] Assets', () => {
             );
         });
         it('Should delete an asset', async () => {
-            await Api.testDelete({
+            await api.testDelete({
                 route: `/assets/${userAssets[2].id}`,
                 testGet: true
             });
-            await Api.testStaticFile(
+            await api.testStaticFile(
                 Path.join('/static', userAssets[2].path),
                 false
             );
@@ -265,7 +270,7 @@ describe('[API] Assets', () => {
 
     describe('GET /directories', () => {
         it('Should list all directories', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/directories',
                 listKey: 'directories',
                 data: userDirectories,
@@ -295,7 +300,7 @@ describe('[API] Assets', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: '/directories',
@@ -316,7 +321,7 @@ describe('[API] Assets', () => {
                 }
             ];
             for (const data of createData) {
-                await Api.testCreate({
+                await api.testCreate({
                     route: '/directories',
                     data,
                     assert: assertDirectory
@@ -327,13 +332,13 @@ describe('[API] Assets', () => {
 
     describe('GET /directories/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'GET',
                 route: '/directories/:id'
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'GET',
                     route: `/directories/${forbiddenDirectory?.id}`
@@ -342,7 +347,7 @@ describe('[API] Assets', () => {
             );
         });
         it('Should get an directory', async () => {
-            await Api.testGetOne({
+            await api.testGetOne({
                 route: '/directories/:id',
                 data: userDirectories[0],
                 assert: assertDirectory
@@ -367,7 +372,7 @@ describe('[API] Assets', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: `/directories/${userDirectories[0].id}`,
@@ -378,7 +383,7 @@ describe('[API] Assets', () => {
             }
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: `/directories/${forbiddenDirectory?.id}`,
@@ -390,7 +395,7 @@ describe('[API] Assets', () => {
             );
         });
         it('Should edit a directory', async () => {
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/directories',
                 body: {
@@ -401,7 +406,7 @@ describe('[API] Assets', () => {
             const {
                 body: { id }
             } = response;
-            await Api.testEdit({
+            await api.testEdit({
                 route: `/directories/${id}`,
                 data: {
                     name: 'Test1'
@@ -413,13 +418,13 @@ describe('[API] Assets', () => {
 
     describe('DELETE /directories/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/directories/:id'
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'DELETE',
                     route: `/directories/${forbiddenDirectory?.id}`
@@ -429,7 +434,7 @@ describe('[API] Assets', () => {
         });
         it('Should delete an directory', async () => {
             // create a directory
-            const dirResponse = await Api.request({
+            const dirResponse = await api.request({
                 method: 'POST',
                 route: '/directories',
                 body: {
@@ -439,7 +444,7 @@ describe('[API] Assets', () => {
             expect(dirResponse).to.have.status(200);
             const directory = dirResponse.body;
             // create a subdirectory
-            const subdirResponse = await Api.request({
+            const subdirResponse = await api.request({
                 method: 'POST',
                 route: '/directories',
                 body: {
@@ -450,8 +455,8 @@ describe('[API] Assets', () => {
             expect(subdirResponse).to.have.status(200);
             const subDirectory = subdirResponse.body;
             // upload asset in subdirectory
-            const buffer = await Data.getAssetBuffer('asset.png');
-            const response = await Api.request({
+            const buffer = await getAssetBuffer('asset.png');
+            const response = await api.request({
                 method: 'POST',
                 route: '/assets',
                 files: [
@@ -469,26 +474,26 @@ describe('[API] Assets', () => {
             const { assets } = response.body;
             const asset = assets[0];
             // delete main directory
-            await Api.testDelete({
+            await api.testDelete({
                 route: `/directories/${directory.id}`,
                 testGet: true
             });
             // check subdirectory and asset have also been deleted
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'GET',
                     route: `/directories/${subDirectory.id}`
                 },
                 404
             );
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'GET',
                     route: `/assets/${asset.id}`
                 },
                 404
             );
-            await Api.testStaticFile(
+            await api.testStaticFile(
                 Path.join('/static', asset.id.toString()),
                 false
             );

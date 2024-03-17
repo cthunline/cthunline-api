@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper.js';
-import Data from '../helpers/data.helper.js';
 import { compareDataWithExpected } from '../helpers/assert.helper.js';
 import { mockEnvVar } from '../../../src/services/env.js';
+import { resetData } from '../helpers/data.helper.js';
+import { api } from '../helpers/api.helper.js';
 
 const getConfiguration = async (expected: any) => {
-    const response = await Api.request({
+    const response = await api.request({
         method: 'GET',
         route: '/configuration'
     });
@@ -18,13 +18,13 @@ const getConfiguration = async (expected: any) => {
 
 describe('[API] Configuration', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     describe('GET /configuration', () => {
         it('Should get public configuration', async () => {
-            await Api.login();
-            await Api.logout();
+            await api.login();
+            await api.logout();
             for (const value of [true, false]) {
                 mockEnvVar('REGISTRATION_ENABLED', value);
                 mockEnvVar('INVITATION_ENABLED', value);

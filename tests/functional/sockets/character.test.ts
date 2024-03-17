@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import Data from '../helpers/data.helper.js';
-import Sockets from '../helpers/sockets.helper.js';
+import { resetData } from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 
 import {
     assertUser,
@@ -11,11 +11,11 @@ import {
 
 describe('[Sockets] Character', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     it('Should send character update to game master', async () => {
-        const [masterSocket, playerSocket] = await Sockets.setupSession();
+        const [masterSocket, playerSocket] = await socketHelper.setupSession();
         await Promise.all([
             new Promise<void>((resolve, reject) => {
                 masterSocket.on('characterUpdate', (data: any) => {

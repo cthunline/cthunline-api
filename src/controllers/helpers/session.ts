@@ -1,6 +1,6 @@
 import { Session } from '@prisma/client';
 
-import { Prisma } from '../../services/prisma.js';
+import { prisma } from '../../services/prisma.js';
 import { safeUserSelect } from './user.js';
 
 export const defaultSketchData = {
@@ -22,7 +22,7 @@ export const getInclude = (includeMaster: boolean) =>
         : undefined;
 
 export const getSession = async (sessionId: number): Promise<Session> =>
-    Prisma.session.findUniqueOrThrow({
+    prisma.session.findUniqueOrThrow({
         where: {
             id: sessionId
         }

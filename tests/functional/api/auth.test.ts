@@ -1,18 +1,18 @@
-import Api from '../helpers/api.helper.js';
-import Data, { usersData } from '../helpers/data.helper.js';
+import { usersData, resetData } from '../helpers/data.helper.js';
+import { api } from '../helpers/api.helper.js';
 
 describe('[API] Authentication', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     describe('GET /auth', () => {
         it('Should throw authentication error', async () => {
-            await Api.checkAuth(false);
+            await api.checkAuth(false);
         });
         it('Should check authentication successfully', async () => {
-            await Api.login();
-            await Api.checkAuth();
+            await api.login();
+            await api.checkAuth();
         });
     });
 
@@ -30,7 +30,7 @@ describe('[API] Authentication', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: '/auth',
@@ -52,10 +52,10 @@ describe('[API] Authentication', () => {
                 }
             ];
             for (const credentials of invalidCredentials) {
-                await Api.login(credentials, false);
+                await api.login(credentials, false);
             }
             const disabledUser = usersData.find(({ isEnabled }) => !isEnabled);
-            await Api.login(
+            await api.login(
                 {
                     email: disabledUser?.email ?? '',
                     password: 'test'
@@ -64,21 +64,21 @@ describe('[API] Authentication', () => {
             );
         });
         it('Should check authentication successfully', async () => {
-            await Api.login();
-            await Api.checkAuth();
+            await api.login();
+            await api.checkAuth();
         });
     });
 
     describe('DELETE /auth', () => {
         it('Should throw authentication error', async () => {
-            await Api.login();
-            await Api.logout();
-            await Api.logout(false);
+            await api.login();
+            await api.logout();
+            await api.logout(false);
         });
         it('Should check authentication successfully', async () => {
-            await Api.login();
-            await Api.logout();
-            await Api.checkAuth(false);
+            await api.login();
+            await api.logout();
+            await api.checkAuth(false);
         });
     });
 });

@@ -1,10 +1,13 @@
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 
 import { meta } from './helper.js';
 import { ForbiddenError } from '../services/errors.js';
 
-const characterHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
+export const characterHandler = (
+    io: SocketIoServer,
+    socket: SocketIoSocket
+) => {
     // notify game master when any character is updated during game
     // send character data to game master
     socket.on('characterUpdate', async () => {
@@ -13,7 +16,7 @@ const characterHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
                 throw new ForbiddenError();
             }
             const { user, isMaster, sessionId, characterId } = socket.data;
-            const character = await Prisma.character.findUniqueOrThrow({
+            const character = await prisma.character.findUniqueOrThrow({
                 where: {
                     id: characterId
                 }
@@ -40,5 +43,3 @@ const characterHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
         }
     });
 };
-
-export default characterHandler;

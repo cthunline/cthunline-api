@@ -12,7 +12,7 @@ export interface RequestOptions extends InjectOptions {
     parseJson?: boolean;
 }
 
-export default class Agent {
+export class Agent {
     app: FastifyInstance;
     cookies: { [k: string]: string };
 

@@ -1,25 +1,25 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper.js';
-import Data, { sessionsData } from '../helpers/data.helper.js';
 import { assertSession, assertUser } from '../helpers/assert.helper.js';
+import { sessionsData, resetData } from '../helpers/data.helper.js';
+import { api } from '../helpers/api.helper.js';
 
 const { gameId } = sessionsData[0];
 
 describe('[API] Sessions', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
     beforeEach(async () => {
-        await Api.login();
+        await api.login();
     });
     afterEach(async () => {
-        await Api.logout();
+        await api.logout();
     });
 
     describe('GET /sessions', () => {
         it('Should list all sessions', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/sessions',
                 listKey: 'sessions',
                 data: sessionsData,
@@ -27,7 +27,7 @@ describe('[API] Sessions', () => {
             });
         });
         it('Should list all sessions including master data', async () => {
-            await Api.testGetList({
+            await api.testGetList({
                 route: '/sessions?include=true',
                 listKey: 'sessions',
                 data: sessionsData,
@@ -53,7 +53,7 @@ describe('[API] Sessions', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: '/sessions',
@@ -64,7 +64,7 @@ describe('[API] Sessions', () => {
             }
         });
         it('Should create a session', async () => {
-            await Api.testCreate({
+            await api.testCreate({
                 route: '/sessions',
                 data: {
                     gameId,
@@ -73,7 +73,7 @@ describe('[API] Sessions', () => {
                 assert: assertSession
             });
             const { sketch } = sessionsData[0];
-            await Api.testCreate({
+            await api.testCreate({
                 route: '/sessions',
                 data: {
                     gameId,
@@ -87,13 +87,13 @@ describe('[API] Sessions', () => {
 
     describe('GET /sessions/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'GET',
                 route: '/sessions/:id'
             });
         });
         it('Should get a session', async () => {
-            await Api.testGetOne({
+            await api.testGetOne({
                 route: '/sessions/:id',
                 data: sessionsData[0],
                 assert: assertSession
@@ -103,7 +103,7 @@ describe('[API] Sessions', () => {
 
     describe('POST /sessions/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'POST',
                 route: '/sessions/:id',
                 body: {
@@ -112,7 +112,7 @@ describe('[API] Sessions', () => {
             });
         });
         it('Should throw a validation error', async () => {
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/sessions',
                 body: {
@@ -136,7 +136,7 @@ describe('[API] Sessions', () => {
                 {}
             ];
             for (const body of invalidData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: `/sessions/${id}`,
@@ -147,7 +147,7 @@ describe('[API] Sessions', () => {
             }
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: `/sessions/${sessionsData[1].id}`,
@@ -159,7 +159,7 @@ describe('[API] Sessions', () => {
             );
         });
         it('Should edit a session', async () => {
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/sessions',
                 body: {
@@ -171,7 +171,7 @@ describe('[API] Sessions', () => {
             const {
                 body: { id }
             } = response;
-            await Api.testEdit({
+            await api.testEdit({
                 route: `/sessions/${id}`,
                 data: {
                     name: 'Test1'
@@ -179,7 +179,7 @@ describe('[API] Sessions', () => {
                 assert: assertSession
             });
             const { sketch } = sessionsData[1];
-            await Api.testEdit({
+            await api.testEdit({
                 route: `/sessions/${id}`,
                 data: {
                     name: 'Test2',
@@ -192,13 +192,13 @@ describe('[API] Sessions', () => {
 
     describe('DELETE /sessions/:id', () => {
         it('Should throw error because of invalid ID', async () => {
-            await Api.testInvalidIdError({
+            await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/sessions/:id'
             });
         });
         it('Should throw a forbidden error', async () => {
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'DELETE',
                     route: `/sessions/${sessionsData[1].id}`
@@ -207,7 +207,7 @@ describe('[API] Sessions', () => {
             );
         });
         it('Should delete a session', async () => {
-            const response = await Api.request({
+            const response = await api.request({
                 method: 'POST',
                 route: '/sessions',
                 body: {
@@ -219,7 +219,7 @@ describe('[API] Sessions', () => {
             const {
                 body: { id }
             } = response;
-            await Api.testDelete({
+            await api.testDelete({
                 route: `/sessions/${id}`,
                 testGet: true
             });

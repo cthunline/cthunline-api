@@ -5,12 +5,12 @@ import { getCookieOptions } from './helpers/auth.js';
 import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
 import { AuthenticationError } from '../services/errors.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 import { getEnv } from '../services/env.js';
 
 import { loginSchema, LoginBody } from './schemas/auth.js';
 
-const authController = async (app: FastifyInstance) => {
+export const authController = async (app: FastifyInstance) => {
     // check authentication validity
     app.route({
         method: 'GET',
@@ -35,7 +35,7 @@ const authController = async (app: FastifyInstance) => {
                 rep: FastifyReply
             ) => {
                 const { email, password } = req.body;
-                const userWithPassword = await Prisma.user.findFirst({
+                const userWithPassword = await prisma.user.findFirst({
                     where: {
                         email,
                         isEnabled: true
@@ -66,5 +66,3 @@ const authController = async (app: FastifyInstance) => {
         }
     });
 };
-
-export default authController;

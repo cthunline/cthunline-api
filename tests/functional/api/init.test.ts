@@ -1,14 +1,14 @@
-import Api from '../helpers/api.helper.js';
-import Data from '../helpers/data.helper.js';
 import { assertUser } from '../helpers/assert.helper.js';
 import { initDb } from '../../../src/services/prisma.js';
 import { getEnv } from '../../../src/services/env.js';
+import { resetData } from '../helpers/data.helper.js';
+import { api } from '../helpers/api.helper.js';
 
 describe('[API] Initialization', () => {
     it('Should create a default user', async () => {
-        await Data.reset(false);
+        await resetData(false);
         await initDb();
-        await Api.login({
+        await api.login({
             email: getEnv('DEFAULT_ADMIN_EMAIL'),
             password: getEnv('DEFAULT_ADMIN_PASSWORD')
         });
@@ -20,7 +20,7 @@ describe('[API] Initialization', () => {
             isAdmin: true,
             isEnabled: true
         };
-        await Api.testGetList({
+        await api.testGetList({
             route: '/users',
             listKey: 'users',
             data: [defaultUser],

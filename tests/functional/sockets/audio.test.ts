@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import Data, { assetsData } from '../helpers/data.helper.js';
-import Sockets from '../helpers/sockets.helper.js';
+import { assetsData, resetData } from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 
 import {
     assertUser,
@@ -15,11 +15,11 @@ const imageAsset = assetsData.find(({ type }) => type === 'image');
 
 describe('[Sockets] Audio', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     it('Should fail to play audio because of invalid data', async () => {
-        await Sockets.testError(
+        await socketHelper.testError(
             'audioPlay',
             'audioPlay',
             [
@@ -37,7 +37,7 @@ describe('[Sockets] Audio', () => {
 
     it('Should fail to play or stop audio because not game master', async () => {
         for (const event of ['audioPlay', 'audioStop']) {
-            await Sockets.testError(
+            await socketHelper.testError(
                 event,
                 event,
                 event === 'audioPlay'
@@ -54,7 +54,7 @@ describe('[Sockets] Audio', () => {
     it('Should play or stop audio', async () => {
         for (const event of ['audioPlay', 'audioStop']) {
             const [masterSocket, player1Socket, player2Socket] =
-                await Sockets.setupSession();
+                await socketHelper.setupSession();
             await Promise.all([
                 ...[player1Socket, player2Socket].map(
                     (socket) =>

@@ -3,14 +3,14 @@ import Formidable from 'formidable';
 import Fs from 'fs';
 import Path from 'path';
 
-import { Prisma } from '../../services/prisma.js';
+import { prisma } from '../../services/prisma.js';
 import { getEnv } from '../../services/env.js';
 import { assetTempDir, getAssetDir } from './asset.js';
 
 export const portraitDirName = 'portraits';
 
 export const getCharacter = async (characterId: number): Promise<Character> =>
-    Prisma.character.findUniqueOrThrow({
+    prisma.character.findUniqueOrThrow({
         where: {
             id: characterId
         }

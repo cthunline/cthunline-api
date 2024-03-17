@@ -6,8 +6,8 @@ import Fs from 'fs';
 import { ValidationError } from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
 import { parseParamId } from '../services/api.js';
-import { Prisma } from '../services/prisma.js';
-import Log from '../services/log.js';
+import { prisma } from '../services/prisma.js';
+import { log } from '../services/log.js';
 
 import {
     controlFile,
@@ -39,13 +39,13 @@ import {
     try {
         await Fs.promises.access(tempDir, Fs.constants.F_OK);
     } catch {
-        Log.info(`Creating temporary upload directory ${tempDir}`);
+        log.info(`Creating temporary upload directory ${tempDir}`);
         await Fs.promises.mkdir(tempDir);
     }
     return tempDir;
 })();
 
-const assetController = async (app: FastifyInstance) => {
+export const assetController = async (app: FastifyInstance) => {
     // get all assets of the authenticated user
     app.route({
         method: 'GET',
@@ -63,7 +63,7 @@ const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const { type, include } = query;
-            const assets = await Prisma.asset.findMany({
+            const assets = await prisma.asset.findMany({
                 where: {
                     userId: user.id,
                     ...(type
@@ -136,12 +136,12 @@ const assetController = async (app: FastifyInstance) => {
                 )
             );
             // save assets in database
-            const assets = await Prisma.$transaction(
+            const assets = await prisma.$transaction(
                 typedAssetFiles.map(
                     ({ originalFilename, newFilename, type }) => {
                         const name = originalFilename ?? newFilename;
                         const path = Path.join(user.id.toString(), newFilename);
-                        return Prisma.asset.create({
+                        return prisma.asset.create({
                             data: {
                                 userId: user.id,
                                 directoryId,
@@ -197,7 +197,7 @@ const assetController = async (app: FastifyInstance) => {
             const assetId = parseParamId(params, 'assetId');
             const { path } = await getAsset(user.id, assetId);
             await Promise.all([
-                Prisma.asset.delete({
+                prisma.asset.delete({
                     where: {
                         id: assetId
                     }
@@ -246,7 +246,7 @@ const assetController = async (app: FastifyInstance) => {
             if (parentId) {
                 await getDirectory(user.id, parentId);
             }
-            const directory = await Prisma.directory.create({
+            const directory = await prisma.directory.create({
                 data: {
                     ...body,
                     userId: user.id
@@ -298,7 +298,7 @@ const assetController = async (app: FastifyInstance) => {
         ) => {
             const directoryId = parseParamId(params, 'directoryId');
             await getDirectory(user.id, directoryId);
-            const directory = await Prisma.directory.update({
+            const directory = await prisma.directory.update({
                 data: body,
                 where: {
                     id: directoryId
@@ -336,7 +336,7 @@ const assetController = async (app: FastifyInstance) => {
                 ({ id }) => id
             );
             // get assets within all children directories
-            const assets = await Prisma.asset.findMany({
+            const assets = await prisma.asset.findMany({
                 where: {
                     userId: user.id,
                     directoryId: {
@@ -346,9 +346,9 @@ const assetController = async (app: FastifyInstance) => {
             });
             // delete all children assets
             await Promise.all([
-                Prisma.$transaction(
+                prisma.$transaction(
                     assets.map(({ id }) =>
-                        Prisma.asset.delete({
+                        prisma.asset.delete({
                             where: { id }
                         })
                     )
@@ -358,7 +358,7 @@ const assetController = async (app: FastifyInstance) => {
                 )
             ]);
             // delete directory (children directories will cascade-deleted)
-            await Prisma.directory.delete({
+            await prisma.directory.delete({
                 where: {
                     id: directoryId
                 }
@@ -367,5 +367,3 @@ const assetController = async (app: FastifyInstance) => {
         }
     });
 };
-
-export default assetController;

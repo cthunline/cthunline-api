@@ -3,7 +3,7 @@ import { type ExtendedError } from 'socket.io/dist/namespace';
 
 import { decrypt, verifyJwt } from '../services/crypto.js';
 import { cacheGet, cacheSet } from '../services/cache.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 import {
     type SocketIoServer,
     type SocketSessionUser,
@@ -40,7 +40,7 @@ const verifySession = async (socket: SocketIoSocket): Promise<Session> => {
     if (!sessionId) {
         throw new ValidationError('Missing sessionId in handshare query');
     }
-    const session = await Prisma.session.findUnique({
+    const session = await prisma.session.findUnique({
         where: {
             id: sessionId
         }
@@ -60,7 +60,7 @@ const verifyCharacter = async (
     if (!characterId) {
         throw new ValidationError('Missing characterId in handshare query');
     }
-    const character = await Prisma.character.findUnique({
+    const character = await prisma.character.findUnique({
         where: {
             id: characterId
         }

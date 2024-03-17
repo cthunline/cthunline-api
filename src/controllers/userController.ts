@@ -8,7 +8,7 @@ import {
 } from './helpers/auth.js';
 import { ValidationError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 import {
     safeUserSelect,
     getUser,
@@ -27,7 +27,7 @@ import {
     UpdateUserBody
 } from './schemas/user.js';
 
-const userController = async (app: FastifyInstance) => {
+export const userController = async (app: FastifyInstance) => {
     // get all users
     app.route({
         method: 'GET',
@@ -43,7 +43,7 @@ const userController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const getDisabled = query.disabled === 'true';
-            const users = await Prisma.user.findMany({
+            const users = await prisma.user.findMany({
                 select: safeUserSelect,
                 where: getDisabled
                     ? {}
@@ -75,7 +75,7 @@ const userController = async (app: FastifyInstance) => {
             }
             const hashedPassword = await hashPassword(body.password);
             const { password, ...cleanBody } = body;
-            const createdUser = await Prisma.user.create({
+            const createdUser = await prisma.user.create({
                 select: safeUserSelect,
                 data: {
                     ...defaultUserData,
@@ -132,7 +132,7 @@ const userController = async (app: FastifyInstance) => {
                 controlSelf(userId, reqUser);
                 controlAdminFields<UpdateUserBody>(body);
             }
-            const userData = await Prisma.user.findUniqueOrThrow({
+            const userData = await prisma.user.findUniqueOrThrow({
                 where: {
                     id: userId
                 }
@@ -155,7 +155,7 @@ const userController = async (app: FastifyInstance) => {
                 data.password = await hashPassword(body.password);
                 delete data.oldPassword;
             }
-            const updatedUser = await Prisma.user.update({
+            const updatedUser = await prisma.user.update({
                 select: safeUserSelect,
                 data,
                 where: {
@@ -166,5 +166,3 @@ const userController = async (app: FastifyInstance) => {
         }
     });
 };
-
-export default userController;

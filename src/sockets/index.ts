@@ -2,10 +2,10 @@ import { FastifyInstance } from 'fastify';
 import { Socket } from 'socket.io';
 
 import { type SocketIoSocket } from '../types/socket.js';
-import characterHandler from './characterHandler.js';
-import sketchHandler from './sketchHandler.js';
-import audioHandler from './audioHandler.js';
-import diceHandler from './diceHandler.js';
+import { characterHandler } from './characterHandler.js';
+import { sketchHandler } from './sketchHandler.js';
+import { audioHandler } from './audioHandler.js';
+import { diceHandler } from './diceHandler.js';
 import {
     connectionMiddleware,
     disconnectCopycats,
@@ -14,7 +14,7 @@ import {
 
 import { meta } from './helper.js';
 
-const socketRouter = (app: FastifyInstance) => {
+export const socketRouter = (app: FastifyInstance) => {
     const { io } = app;
     io.use((socket: Socket, next: Function) => {
         if (socket.request.headers.cookie) {
@@ -58,5 +58,3 @@ const socketRouter = (app: FastifyInstance) => {
         sketchHandler(io, socket);
     });
 };
-
-export default socketRouter;

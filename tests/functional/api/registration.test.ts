@@ -5,12 +5,12 @@ import DayJs from 'dayjs';
 import { mockEnvVar } from '../../../src/services/env.js';
 
 import { assertUser } from '../helpers/assert.helper.js';
-import Data from '../helpers/data.helper.js';
-import Api from '../helpers/api.helper.js';
+import { resetData } from '../helpers/data.helper.js';
+import { api } from '../helpers/api.helper.js';
 
 const registerUser = async (data: any) => {
     const { invitationCode, ...expected } = data;
-    const response = await Api.request({
+    const response = await api.request({
         method: 'POST',
         route: '/register',
         body: data
@@ -22,7 +22,7 @@ const registerUser = async (data: any) => {
 };
 
 const generateInvitation = async () => {
-    const response = await Api.request({
+    const response = await api.request({
         method: 'POST',
         route: '/invitation'
     });
@@ -38,15 +38,15 @@ const generateInvitation = async () => {
 
 describe('[API] Registration', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     describe('POST /register', () => {
         it('Should throw a forbidden error because registration is disabled', async () => {
-            await Api.login();
-            await Api.logout();
+            await api.login();
+            await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', false);
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/register',
@@ -60,8 +60,8 @@ describe('[API] Registration', () => {
             );
         });
         it('Should throw a forbidden error because invitation code is invalid', async () => {
-            await Api.login();
-            await Api.logout();
+            await api.login();
+            await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);
             const registerData = [
@@ -78,7 +78,7 @@ describe('[API] Registration', () => {
                 }
             ];
             for (const data of registerData) {
-                await Api.testError(
+                await api.testError(
                     {
                         method: 'POST',
                         route: '/register',
@@ -89,9 +89,9 @@ describe('[API] Registration', () => {
             }
         });
         it('Should throw a forbidden error because invitation code is already used', async () => {
-            await Api.login();
+            await api.login();
             const code = await generateInvitation();
-            await Api.logout();
+            await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);
             await registerUser({
@@ -100,7 +100,7 @@ describe('[API] Registration', () => {
                 password: 'abc123',
                 invitationCode: code
             });
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/register',
@@ -115,14 +115,14 @@ describe('[API] Registration', () => {
             );
         });
         it('Should throw a forbidden error because invitation code is expired', async () => {
-            await Api.login();
+            await api.login();
             MockDate.set(DayJs().subtract(25, 'hours').toDate());
             const code = await generateInvitation();
             MockDate.reset();
-            await Api.logout();
+            await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/register',
@@ -137,8 +137,8 @@ describe('[API] Registration', () => {
             );
         });
         it('Should register a user', async () => {
-            await Api.login();
-            await Api.logout();
+            await api.login();
+            await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', false);
             await registerUser({
@@ -150,9 +150,9 @@ describe('[API] Registration', () => {
         it('Should register a user with an invitation code', async () => {
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);
-            await Api.login();
+            await api.login();
             const code = await generateInvitation();
-            await Api.logout();
+            await api.logout();
             await registerUser({
                 name: 'Test',
                 email: 'www@test.com',
@@ -164,10 +164,10 @@ describe('[API] Registration', () => {
 
     describe('POST /invitation', () => {
         it('Should throw a forbidden error', async () => {
-            await Api.login();
+            await api.login();
             mockEnvVar('REGISTRATION_ENABLED', false);
             mockEnvVar('INVITATION_ENABLED', true);
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/invitation'
@@ -176,7 +176,7 @@ describe('[API] Registration', () => {
             );
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', false);
-            await Api.testError(
+            await api.testError(
                 {
                     method: 'POST',
                     route: '/invitation'
@@ -185,7 +185,7 @@ describe('[API] Registration', () => {
             );
         });
         it('Should generate an invitation code', async () => {
-            await Api.login();
+            await api.login();
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);
             await generateInvitation();

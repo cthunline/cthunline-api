@@ -19,12 +19,16 @@
         ],
         "@typescript-eslint/no-unused-expressions": "off",
         "comma-dangle": "off",
+        "import/extensions": ["error", "ignorePackages"],
+        "import/no-commonjs": "error",
+        "import/no-default-export": "error",
         "import/no-extraneous-dependencies": [
             "error",
             {
                 "devDependencies": ["**/tests/**/*.ts"]
             }
         ],
+        "import/no-named-as-default-member": "error",
         "import/prefer-default-export": "off",
         "indent": "off",
         "no-await-in-loop": "off",

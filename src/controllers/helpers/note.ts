@@ -1,7 +1,7 @@
 import { Note } from '@prisma/client';
 
 import { ForbiddenError } from '../../services/errors.js';
-import { Prisma } from '../../services/prisma.js';
+import { prisma } from '../../services/prisma.js';
 import { safeUserSelect } from './user.js';
 
 // get notes of a user for a session ordered by position
@@ -11,7 +11,7 @@ export const getNotes = async (
     userId: number,
     includeUsers: boolean = false
 ): Promise<Note[]> =>
-    Prisma.note.findMany({
+    prisma.note.findMany({
         where: {
             AND: [
                 {
@@ -57,7 +57,7 @@ export const getNote = async (
     noteId: number,
     userId: number
 ): Promise<Note> => {
-    const note = await Prisma.note.findUniqueOrThrow({
+    const note = await prisma.note.findUniqueOrThrow({
         where: {
             id: noteId
         }
@@ -74,7 +74,7 @@ export const getMaxNotePosition = async (
     sessionId: number,
     userId: number
 ): Promise<number> => {
-    const note = await Prisma.note.findFirst({
+    const note = await prisma.note.findFirst({
         where: {
             sessionId,
             userId
@@ -102,7 +102,7 @@ export const switchNotePositions = async (
     position1: number,
     position2: number
 ): Promise<number> =>
-    Prisma.$executeRaw`UPDATE notes n1 INNER JOIN notes n2 
+    prisma.$executeRaw`UPDATE notes n1 INNER JOIN notes n2 
         ON (n1.position, n2.position) IN (
             (${position1}, ${position2}), 
             (${position2}, ${position1})

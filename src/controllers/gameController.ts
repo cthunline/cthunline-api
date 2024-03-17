@@ -3,7 +3,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { GamesData, isValidGameId } from '../services/games.js';
 import { NotFoundError } from '../services/errors.js';
 
-const gameController = async (app: FastifyInstance) => {
+export const gameController = async (app: FastifyInstance) => {
     // get all games
     app.route({
         method: 'GET',
@@ -36,5 +36,3 @@ const gameController = async (app: FastifyInstance) => {
         }
     });
 };
-
-export default gameController;

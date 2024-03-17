@@ -1,4 +1,4 @@
-import { Prisma } from '../../services/prisma.js';
+import { prisma } from '../../services/prisma.js';
 import {
     ForbiddenError,
     ConflictError,
@@ -31,7 +31,7 @@ export const safeUserSelect = {
 // check a user exists and return it
 // returned user data will not contain password
 export const getUser = async (userId: number): Promise<SafeUser> =>
-    Prisma.user.findUniqueOrThrow({
+    prisma.user.findUniqueOrThrow({
         select: safeUserSelect,
         where: {
             id: userId
@@ -50,7 +50,7 @@ export const controlAdminFields = <T extends object>(body: T) => {
 
 // check user email is unique
 export const controlUniqueEmail = async (email: string) => {
-    const checkEmail = await Prisma.user.findUnique({
+    const checkEmail = await prisma.user.findUnique({
         where: {
             email
         }

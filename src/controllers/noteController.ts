@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { ConflictError, InternError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 
 import { getSession } from './helpers/session.js';
 import { controlSelf } from './helpers/auth.js';
@@ -23,7 +23,7 @@ import {
     UpdateNoteBody
 } from './schemas/note.js';
 
-const noteController = async (app: FastifyInstance) => {
+export const noteController = async (app: FastifyInstance) => {
     // get current user's notes in a session
     // also returns shared notes in a separate list
     app.route({
@@ -79,7 +79,7 @@ const noteController = async (app: FastifyInstance) => {
             const sessionId = parseParamId(params, 'sessionId');
             await getSession(sessionId);
             const position = await getNextNotePosition(sessionId, user.id);
-            const note = await Prisma.note.create({
+            const note = await prisma.note.create({
                 data: {
                     position,
                     isShared: body.isShared ?? false,
@@ -135,7 +135,7 @@ const noteController = async (app: FastifyInstance) => {
             const noteId = parseParamId(params, 'noteId');
             const note = await getNote(noteId, user.id);
             controlSelf(note.userId, user);
-            const updatedNote = await Prisma.note.update({
+            const updatedNote = await prisma.note.update({
                 data: body,
                 where: {
                     id: noteId
@@ -219,13 +219,13 @@ const noteController = async (app: FastifyInstance) => {
             const noteId = parseParamId(params, 'noteId');
             const note = await getNote(noteId, user.id);
             controlSelf(note.userId, user);
-            await Prisma.note.delete({
+            await prisma.note.delete({
                 where: {
                     id: noteId
                 }
             });
             // re-order note positions
-            const notes = await Prisma.note.findMany({
+            const notes = await prisma.note.findMany({
                 where: {
                     sessionId: note.sessionId,
                     userId: user.id
@@ -237,9 +237,9 @@ const noteController = async (app: FastifyInstance) => {
                 ]
             });
             if (notes.length) {
-                await Prisma.$transaction(
+                await prisma.$transaction(
                     notes.map(({ id }, index) =>
-                        Prisma.note.update({
+                        prisma.note.update({
                             data: {
                                 position: index + 1
                             },
@@ -255,5 +255,3 @@ const noteController = async (app: FastifyInstance) => {
         }
     });
 };
-
-export default noteController;

@@ -39,7 +39,7 @@ const getDiceResult = (
     )
 });
 
-const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
+export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
     // dice roll request / result sent to every player in session
     socket.on('diceRequest', async (request: RequestDiceBody) => {
         try {
@@ -74,5 +74,3 @@ const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
         }
     });
 };
-
-export default diceHandler;

@@ -3,7 +3,7 @@ import Formidable from 'formidable';
 import Path from 'path';
 import Fs from 'fs';
 
-import { Prisma } from '../../services/prisma.js';
+import { prisma } from '../../services/prisma.js';
 import { getEnv } from '../../services/env.js';
 import {
     ForbiddenError,
@@ -92,7 +92,7 @@ export const getAsset = async (
     userId: number,
     assetId: number
 ): Promise<Asset> => {
-    const asset = await Prisma.asset.findFirstOrThrow({
+    const asset = await prisma.asset.findFirstOrThrow({
         where: {
             id: assetId
         }
@@ -104,7 +104,7 @@ export const getAsset = async (
 };
 
 export const getDirectories = async (userId: number): Promise<Directory[]> =>
-    Prisma.directory.findMany({
+    prisma.directory.findMany({
         where: {
             userId
         }
@@ -114,7 +114,7 @@ export const getDirectory = async (
     userId: number,
     directoryId: number
 ): Promise<Directory> => {
-    const directory = await Prisma.directory.findFirstOrThrow({
+    const directory = await prisma.directory.findFirstOrThrow({
         where: {
             id: directoryId
         }

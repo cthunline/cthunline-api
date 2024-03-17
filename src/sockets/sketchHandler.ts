@@ -2,7 +2,7 @@ import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
 import { cacheGet, cacheSave, cacheSet } from '../services/cache.js';
 import { validateSchema } from '../services/typebox.js';
 import { ForbiddenError } from '../services/errors.js';
-import { Prisma } from '../services/prisma.js';
+import { prisma } from '../services/prisma.js';
 
 import { meta } from './helper.js';
 
@@ -14,7 +14,7 @@ import {
 } from '../controllers/schemas/definitions.js';
 
 const sketchCacheSaver = (sessionId: number) => (data: SketchBody) =>
-    Prisma.session.update({
+    prisma.session.update({
         where: {
             id: sessionId
         },
@@ -23,7 +23,7 @@ const sketchCacheSaver = (sessionId: number) => (data: SketchBody) =>
         }
     });
 
-const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
+export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // updates sketch data (for game master only)
     // notifies other users in the room of the sketch update
     socket.on('sketchUpdate', async (sketch: SketchBody) => {
@@ -80,5 +80,3 @@ const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
         }
     });
 };
-
-export default sketchHandler;

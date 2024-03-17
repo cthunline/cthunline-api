@@ -1,12 +1,13 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper.js';
-import Data, {
+import { api } from '../helpers/api.helper.js';
+import {
     sessionsData,
     charactersData,
-    usersData
+    usersData,
+    resetData
 } from '../helpers/data.helper.js';
-import Sockets from '../helpers/sockets.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 import {
     assertUser,
     assertCharacter,
@@ -15,11 +16,11 @@ import {
 
 describe('[Sockets] Connection', () => {
     before(async () => {
-        await Data.reset();
+        await resetData();
     });
 
     it('Should fail to connect socket because of invalid handshake data', async () => {
-        const { jwt } = await Api.login();
+        const { jwt } = await api.login();
         const invalidData = [
             {
                 jwt,
@@ -39,7 +40,7 @@ describe('[Sockets] Connection', () => {
             }
         ];
         for (const data of invalidData) {
-            await Sockets.failConnect({
+            await socketHelper.failConnect({
                 jwt: data.jwt,
                 query: data.query,
                 status: 400
@@ -48,7 +49,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of invalid authentication JWT', async () => {
-        await Sockets.failConnect({
+        await socketHelper.failConnect({
             jwt: 'invalidJWT',
             query: {
                 sessionId: sessionsData[1].id,
@@ -59,7 +60,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of invalid sessionId or characterId', async () => {
-        const { jwt } = await Api.login();
+        const { jwt } = await api.login();
         const invalidQueries = [
             {
                 sessionId: 'invalid',
@@ -71,7 +72,7 @@ describe('[Sockets] Connection', () => {
             }
         ];
         for (const query of invalidQueries) {
-            await Sockets.failConnect({
+            await socketHelper.failConnect({
                 jwt,
                 query,
                 status: 400
@@ -80,7 +81,7 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of not found sessionId or characterId', async () => {
-        const { jwt } = await Api.login();
+        const { jwt } = await api.login();
         const notFoundQueries = [
             {
                 sessionId: 999,
@@ -92,7 +93,7 @@ describe('[Sockets] Connection', () => {
             }
         ];
         for (const query of notFoundQueries) {
-            await Sockets.failConnect({
+            await socketHelper.failConnect({
                 jwt,
                 query,
                 status: 404
@@ -101,8 +102,8 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should fail to connect socket because of forbidden characterId', async () => {
-        const { jwt } = await Api.login();
-        await Sockets.failConnect({
+        const { jwt } = await api.login();
+        await socketHelper.failConnect({
             jwt,
             query: {
                 sessionId: sessionsData[1].id,
@@ -113,8 +114,8 @@ describe('[Sockets] Connection', () => {
     });
 
     it('Should connect to socket', async () => {
-        const { jwt } = await Api.login();
-        await Sockets.connect({
+        const { jwt } = await api.login();
+        await socketHelper.connect({
             jwt,
             sessionId: sessionsData[1].id,
             characterId: charactersData[0].id
@@ -122,19 +123,19 @@ describe('[Sockets] Connection', () => {
         const masterUser = usersData.find(
             ({ id }) => id === sessionsData[1].masterId
         );
-        const { jwt: masterJWT } = await Api.login({
+        const { jwt: masterJWT } = await api.login({
             email: masterUser?.email ?? '',
             password: 'test'
         });
-        await Sockets.connect({
+        await socketHelper.connect({
             jwt: masterJWT,
             sessionId: sessionsData[1].id
         });
     });
 
     it('Should disconnect copycat socket on connection', async () => {
-        const { jwt } = await Api.login();
-        const copycatSocket = await Sockets.connect({
+        const { jwt } = await api.login();
+        const copycatSocket = await socketHelper.connect({
             jwt,
             sessionId: sessionsData[1].id,
             characterId: charactersData[0].id
@@ -149,7 +150,7 @@ describe('[Sockets] Connection', () => {
                     reject(err);
                 });
             }),
-            Sockets.connect({
+            socketHelper.connect({
                 jwt,
                 sessionId: sessionsData[2].id,
                 characterId: charactersData[0].id
@@ -161,7 +162,7 @@ describe('[Sockets] Connection', () => {
         const [masterEmail, playerEmail] = usersData.map(({ email }) => email);
         const [masterAuthUser, playerAuthUser] = await Promise.all(
             [masterEmail, playerEmail].map((email) =>
-                Api.login({
+                api.login({
                     email,
                     password: 'test'
                 })
@@ -192,7 +193,7 @@ describe('[Sockets] Connection', () => {
                 expect(sessionUser.isMaster).to.be.equal(isSessionUserMaster);
             });
         };
-        const masterSocket = await Sockets.connect({
+        const masterSocket = await socketHelper.connect({
             jwt: masterAuthUser.jwt,
             sessionId
         });
@@ -223,7 +224,7 @@ describe('[Sockets] Connection', () => {
                     reject(err);
                 });
             }),
-            Sockets.connect({
+            socketHelper.connect({
                 jwt: playerAuthUser.jwt,
                 sessionId,
                 characterId: charactersData.find(

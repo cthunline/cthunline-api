@@ -8,7 +8,7 @@ import { getEnv } from '../../../src/services/env.js';
 import { app, initApp } from '../../../src/app.js';
 
 import { assertError, assertUser } from './assert.helper.js';
-import Agent from './agent.helper.js';
+import { Agent } from './agent.helper.js';
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -92,7 +92,7 @@ export interface CredentialOptions {
     password: string;
 }
 
-const Api = {
+export const api = {
     agent: new Agent(app),
     apiPrefix: '/api',
     userId: 0,
@@ -146,19 +146,19 @@ const Api = {
         credentials?: CredentialOptions,
         expectSuccess: boolean = true
     ): Promise<any> {
-        const response = await Api.request({
+        const response = await api.request({
             method: 'POST',
             route: '/auth',
-            body: credentials ?? Api.credentials
+            body: credentials ?? api.credentials
         });
         const { body } = response;
         if (expectSuccess) {
             expect(response).to.have.status(200);
             assertUser(body);
-            Api.userId = body.id;
-            if (Api.agent.cookies.jwt) {
+            api.userId = body.id;
+            if (api.agent.cookies.jwt) {
                 const { value } = fastifyCookie.unsign(
-                    Api.agent.cookies.jwt,
+                    api.agent.cookies.jwt,
                     process.env.COOKIE_SECRET ?? ''
                 );
                 if (value) {
@@ -177,7 +177,7 @@ const Api = {
     },
 
     async logout(expectSuccess: boolean = true): Promise<void> {
-        const response = await Api.request({
+        const response = await api.request({
             method: 'DELETE',
             route: '/auth'
         });
@@ -185,7 +185,7 @@ const Api = {
             expect(response).to.have.status(200);
             expect(response.body).to.be.an('object');
             expect(response.body).to.be.an('object').and.be.empty;
-            Api.userId = 0;
+            api.userId = 0;
         } else {
             expect(response).to.have.status(401);
             expect(response.body).to.be.an('object');
@@ -194,7 +194,7 @@ const Api = {
     },
 
     async checkAuth(expectSuccess: boolean = true): Promise<void> {
-        const response = await Api.request({
+        const response = await api.request({
             method: 'GET',
             route: '/auth'
         });
@@ -213,7 +213,7 @@ const Api = {
         options: RequestOptions,
         expectedStatus: number
     ): Promise<void> {
-        const response = await Api.request(options);
+        const response = await api.request(options);
         expect(response).to.have.status(expectedStatus);
         expect(response.body).to.be.an('object');
         assertError(response.body);
@@ -224,7 +224,7 @@ const Api = {
         const dataById: Record<number, object> = Object.fromEntries(
             data.map((item: Record<string, any>) => [item.id, item])
         );
-        const response = await Api.request({
+        const response = await api.request({
             method: 'GET',
             route
         });
@@ -240,7 +240,7 @@ const Api = {
 
     async testGetOne(options: GetOneOptions): Promise<void> {
         const { route, data, assert } = options;
-        const response = await Api.request({
+        const response = await api.request({
             method: 'GET',
             route: route.replace(':id', data.id)
         });
@@ -252,7 +252,7 @@ const Api = {
 
     async testCreate(options: CreateOptions): Promise<void> {
         const { route, data, assert, expected, getRoute } = options;
-        const createResponse = await Api.request({
+        const createResponse = await api.request({
             method: 'POST',
             route,
             body: data
@@ -262,7 +262,7 @@ const Api = {
         const { body: createBody } = createResponse;
         const expectedData = expected ?? data;
         assert(createBody, expectedData);
-        const getResponse = await Api.request({
+        const getResponse = await api.request({
             method: 'GET',
             route: getRoute
                 ? getRoute.replace(':id', createBody.id)
@@ -276,7 +276,7 @@ const Api = {
 
     async testEdit(options: EditOptions): Promise<void> {
         const { route, data, assert, expected } = options;
-        const editResponse = await Api.request({
+        const editResponse = await api.request({
             method: 'POST',
             route,
             body: data
@@ -286,7 +286,7 @@ const Api = {
         const { body: editBody } = editResponse;
         const expectedData = expected ?? data;
         assert(editBody, expectedData);
-        const getResponse = await Api.request({
+        const getResponse = await api.request({
             method: 'GET',
             route
         });
@@ -298,7 +298,7 @@ const Api = {
 
     async testDelete(options: DeleteOptions): Promise<void> {
         const { route, testGet, data, assert } = options;
-        const deleteResponse = await Api.request({
+        const deleteResponse = await api.request({
             method: 'DELETE',
             route
         });
@@ -311,7 +311,7 @@ const Api = {
             expect(deleteBody).to.be.an('object').and.be.empty;
         }
         if (testGet !== false) {
-            const getResponse = await Api.request({
+            const getResponse = await api.request({
                 method: 'GET',
                 route
             });
@@ -335,7 +335,7 @@ const Api = {
         ];
         for (const id of invalidIds) {
             const isInvalid = !/^\d+$/.test(id);
-            const response = await Api.request({
+            const response = await api.request({
                 method,
                 route: route.split(':id').join(id),
                 body
@@ -350,7 +350,7 @@ const Api = {
         route: string,
         expectSuccess: boolean = true
     ): Promise<void> {
-        const response = await Api.request({
+        const response = await api.request({
             apiPrefix: false,
             method: 'GET',
             route,
@@ -363,5 +363,3 @@ const Api = {
         }
     }
 };
-
-export default Api;

@@ -58,16 +58,14 @@ if (logDir && !fileTransportError) {
 }
 
 // logging instance to use in code
-const Log = Winston.createLogger({
+export const log = Winston.createLogger({
     transports,
     exitOnError: false,
     silent: !getEnv('LOG_ENABLED')
 });
 
 if (fileTransportError) {
-    Log.warn(
+    log.warn(
         `Winston file transport could not be initialized (${fileTransportError})`
     );
 }
-
-export default Log;

@@ -2,7 +2,7 @@ import DayJs from 'dayjs';
 
 import { ForbiddenError } from '../../services/errors.js';
 import { generateToken } from '../../services/tools.js';
-import { Prisma } from '../../services/prisma.js';
+import { prisma } from '../../services/prisma.js';
 
 // control an invitation code is valid
 // if asked, updated the isUsed field to true on the invitation object
@@ -13,7 +13,7 @@ export const controlInvitationCode = async (
     if (!code) {
         throw new ForbiddenError('Missing invitation code');
     }
-    const invitation = await Prisma.invitation.findUnique({
+    const invitation = await prisma.invitation.findUnique({
         where: {
             code
         }
@@ -28,7 +28,7 @@ export const controlInvitationCode = async (
         throw new ForbiddenError('Invitation code is expired');
     }
     if (updateIsUsed) {
-        await Prisma.invitation.update({
+        await prisma.invitation.update({
             where: {
                 code
             },

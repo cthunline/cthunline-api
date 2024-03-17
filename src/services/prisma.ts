@@ -1,15 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
-import { getEnv } from './env.js';
-import Log from './log.js';
 import { hashPassword } from './crypto.js';
+import { getEnv } from './env.js';
+import { log } from './log.js';
 
-export const Prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 // database initialization tasks
 // create a default user if users collection is empty
 export const initDb = async () => {
-    const users = await Prisma.user.findMany();
+    const users = await prisma.user.findMany();
     if (!users.length) {
         const name = getEnv('DEFAULT_ADMIN_NAME');
         const email = getEnv('DEFAULT_ADMIN_EMAIL');
@@ -25,17 +25,17 @@ export const initDb = async () => {
                 locale,
                 isAdmin: true
             };
-            await Prisma.user.create({
+            await prisma.user.create({
                 data: {
                     ...defaultAdminUser,
                     password: await hashPassword(defaultAdminUser.password)
                 }
             });
-            Log.warn(
+            log.warn(
                 `Default user created (email: ${email} / password: ${password})`
             );
         } else {
-            Log.error('Environment file is missing default admin information');
+            log.error('Environment file is missing default admin information');
         }
     }
 };
