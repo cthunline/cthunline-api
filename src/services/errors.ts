@@ -28,11 +28,26 @@ export class CustomError extends Error {
 }
 
 /**
+Can be used as type for any custom app error object
+*/
+export type AppError =
+    | InternError
+    | NotFoundError
+    | ValidationError
+    | AuthenticationError
+    | ForbiddenError
+    | ConflictError;
+
+/**
 Can be used as type for any custom app error class
 */
-export interface AppErrorConstructor {
-    new (message?: string, data?: any): CustomError;
-}
+export type AppErrorConstructor =
+    | typeof InternError
+    | typeof NotFoundError
+    | typeof ValidationError
+    | typeof AuthenticationError
+    | typeof ForbiddenError
+    | typeof ConflictError;
 
 // specific custom error classes that should be used to throw errors
 export class InternError extends CustomError {
@@ -82,23 +97,6 @@ const handlePrismaError = (err: Error): Error => {
     }
     return err;
 };
-
-// TODO
-// handles payload too large errors thrown by bordy parser middleware
-// export const payloadTooLargeHandler = (
-//     err: Error,
-//     _req: Request,
-//     res: Response,
-//     next: NextFunction
-// ) => {
-//     if (err.constructor.name === 'PayloadTooLargeError') {
-//         res.status(413).json({
-//             error: 'Payload is too large'
-//         });
-//     } else {
-//         next();
-//     }
-// };
 
 /**
 Fastify schema error formatter

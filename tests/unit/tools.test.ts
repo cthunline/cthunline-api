@@ -1,18 +1,8 @@
 import { expect } from 'chai';
-import { trimChar, sum } from '../../src/services/tools';
+
+import { sum, isInteger } from '../../src/services/tools';
 
 describe('[Unit] Tools', () => {
-    describe('trimChar', () => {
-        it('Should trim char from a string', () => {
-            expect(trimChar('+++abc+++def+++', '+')).to.equal('abc+++def');
-            expect(trimChar('/abc/def/', '/')).to.equal('abc/def');
-            expect(trimChar('abc/def/', '/')).to.equal('abc/def');
-            expect(trimChar('/abc/def', '/')).to.equal('abc/def');
-            expect(trimChar('///', '/')).to.equal('');
-            expect(trimChar('/', '/')).to.equal('');
-        });
-    });
-
     describe('sum', () => {
         it('Should sum an array of numbers', () => {
             const data = [
@@ -31,6 +21,26 @@ describe('[Unit] Tools', () => {
             ];
             data.forEach(({ numbers, expected }) => {
                 expect(sum(numbers)).to.equal(expected);
+            });
+        });
+    });
+
+    describe('isInteger', () => {
+        it('Should check if a variable is an integer', () => {
+            const data = [
+                { value: '', expected: false },
+                { value: 'aze', expected: false },
+                { value: 'q1s2d', expected: false },
+                { value: '0', expected: true },
+                { value: '7', expected: true },
+                { value: '123', expected: true },
+                { value: 12.34, expected: false },
+                { value: 0, expected: true },
+                { value: 7, expected: true },
+                { value: 123, expected: true }
+            ];
+            data.forEach(({ value, expected }) => {
+                expect(isInteger(value)).to.equal(expected);
             });
         });
     });

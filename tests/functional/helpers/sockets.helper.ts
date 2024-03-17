@@ -1,10 +1,6 @@
 import { fastifyCookie } from '@fastify/cookie';
+import { io, Socket } from 'socket.io-client';
 import { expect } from 'chai';
-import Client, {
-    Socket,
-    ManagerOptions,
-    SocketOptions
-} from 'socket.io-client';
 
 import { getEnv } from '../../../src/services/env';
 
@@ -40,18 +36,12 @@ export interface SocketConnectionData {
     characterId?: number;
 }
 
-interface SocketClientConstructor {
-    new (uri: string, opts?: Partial<ManagerOptions & SocketOptions>): Socket;
-}
-
-const SocketClient = Client as unknown as SocketClientConstructor;
-
 const Sockets: SocketsHelper = {
     url: `http://localhost:${getEnv('PORT')}`,
     connectedSockets: [],
 
     getSocketClient: ({ jwt, query }: GetSocketClientData) => {
-        const socketClient = new SocketClient(Sockets.url, {
+        const socketClient = io(Sockets.url, {
             query,
             autoConnect: false
         });
@@ -171,22 +161,6 @@ const Sockets: SocketsHelper = {
             })
         );
         return sockets;
-        // TODO remove ? test
-        // return Promise.all([
-        //     Sockets.connect({
-        //         jwt: masterJWTUser.jwt,
-        //         sessionId
-        //     }),
-        //     ...[player1JWTUser, player2JWTUser].map(({ id, jwt }) =>
-        //         Sockets.connect({
-        //             jwt,
-        //             sessionId,
-        //             characterId: charactersData.find(
-        //                 (character) => character.userId === id
-        //             )?.id
-        //         })
-        //     )
-        // ]);
     },
 
     testError: async (

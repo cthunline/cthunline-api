@@ -31,8 +31,8 @@ export const cacheSave = (
         if (timeouts[key]) {
             clearTimeout(timeouts[key]);
         }
-        timeouts[key] = setTimeout(async () => {
-            await saver(data);
+        timeouts[key] = setTimeout(() => {
+            saver(data);
         }, timer);
     }
 };
