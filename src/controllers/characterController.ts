@@ -7,23 +7,23 @@ import {
     ConflictError,
     InternError,
     ValidationError
-} from '../services/errors';
-import { Games, GameId, isValidGameId } from '../services/games';
-import { parseParamId } from '../services/api';
-import { Prisma } from '../services/prisma';
+} from '../services/errors.js';
+import { Games, GameId, isValidGameId } from '../services/games.js';
+import { parseParamId } from '../services/api.js';
+import { Prisma } from '../services/prisma.js';
 
-import { assetDir, controlFile } from './helpers/asset';
-import { validateSchema } from '../services/typebox';
-import { controlSelf } from './helpers/auth';
-import { getUser } from './helpers/user';
+import { assetDir, controlFile } from './helpers/asset.js';
+import { validateSchema } from '../services/typebox.js';
+import { controlSelf } from './helpers/auth.js';
+import { getUser } from './helpers/user.js';
 import {
     getCharacter,
     getFormidablePortraitOptions,
     controlPortraitDir,
     portraitDirName
-} from './helpers/character';
+} from './helpers/character.js';
 
-import { QueryParam } from '../types/api';
+import { QueryParam } from '../types/api.js';
 
 import {
     createCharacterSchema,
@@ -31,7 +31,7 @@ import {
     updateCharacterSchema,
     UpdateCharacterBody,
     uploadPortraitSchema
-} from './schemas/character';
+} from './schemas/character.js';
 
 const characterController = async (app: FastifyInstance) => {
     // get all characters

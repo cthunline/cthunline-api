@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
-import { getEnv } from './env';
-import Log from './log';
-import { hashPassword } from './crypto';
+import { getEnv } from './env.js';
+import Log from './log.js';
+import { hashPassword } from './crypto.js';
 
 export const Prisma = new PrismaClient();
 

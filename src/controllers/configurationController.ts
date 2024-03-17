@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { getEnv } from '../services/env';
+import { getEnv } from '../services/env.js';
 
 const configurationController = async (app: FastifyInstance) => {
     // public configuration

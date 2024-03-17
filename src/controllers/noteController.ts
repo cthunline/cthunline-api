@@ -1,27 +1,27 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { ConflictError, InternError } from '../services/errors';
-import { parseParamId } from '../services/api';
-import { Prisma } from '../services/prisma';
+import { ConflictError, InternError } from '../services/errors.js';
+import { parseParamId } from '../services/api.js';
+import { Prisma } from '../services/prisma.js';
 
-import { getSession } from './helpers/session';
-import { controlSelf } from './helpers/auth';
+import { getSession } from './helpers/session.js';
+import { controlSelf } from './helpers/auth.js';
 import {
     getNotes,
     getNote,
     getMaxNotePosition,
     getNextNotePosition,
     switchNotePositions
-} from './helpers/note';
+} from './helpers/note.js';
 
-import { QueryParam } from '../types/api';
+import { QueryParam } from '../types/api.js';
 
 import {
     createNoteSchema,
     CreateNoteBody,
     updateNoteSchema,
     UpdateNoteBody
-} from './schemas/note';
+} from './schemas/note.js';
 
 const noteController = async (app: FastifyInstance) => {
     // get current user's notes in a session

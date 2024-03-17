@@ -1,8 +1,8 @@
-import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
-import { assertUser } from '../helpers/assert.helper';
-import { initDb } from '../../../src/services/prisma';
-import { getEnv } from '../../../src/services/env';
+import Api from '../helpers/api.helper.js';
+import Data from '../helpers/data.helper.js';
+import { assertUser } from '../helpers/assert.helper.js';
+import { initDb } from '../../../src/services/prisma.js';
+import { getEnv } from '../../../src/services/env.js';
 
 describe('[API] Initialization', () => {
     it('Should create a default user', async () => {

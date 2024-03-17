@@ -1,17 +1,17 @@
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket';
-import { cacheGet, cacheSave, cacheSet } from '../services/cache';
-import { validateSchema } from '../services/typebox';
-import { ForbiddenError } from '../services/errors';
-import { Prisma } from '../services/prisma';
+import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
+import { cacheGet, cacheSave, cacheSet } from '../services/cache.js';
+import { validateSchema } from '../services/typebox.js';
+import { ForbiddenError } from '../services/errors.js';
+import { Prisma } from '../services/prisma.js';
 
-import { meta } from './helper';
+import { meta } from './helper.js';
 
 import {
     sketchSchema,
     SketchBody,
     tokenSchema,
     TokenBody
-} from '../controllers/schemas/definitions';
+} from '../controllers/schemas/definitions.js';
 
 const sketchCacheSaver = (sessionId: number) => (data: SketchBody) =>
     Prisma.session.update({

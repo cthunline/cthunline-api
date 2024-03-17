@@ -1,20 +1,21 @@
 import Fs from 'fs';
 import Path from 'path';
 
-import { Prisma } from '../../../src/services/prisma';
-import { assetDir } from '../../../src/controllers/helpers/asset';
+import { assetDir } from '../../../src/controllers/helpers/asset.js';
+import { Prisma } from '../../../src/services/prisma.js';
 
-import users from '../data/users.json';
+import warhammerFantasyCharacters from '../data/characters/warhammerFantasyCharacters.json';
+import seventhSeaCharacters from '../data/characters/seventhSeaCharacters.json';
+import { importMetaUrlDirname } from '../../../src/services/tools.js';
+import swd6Characters from '../data/characters/swd6Characters.json';
+import dnd5Characters from '../data/characters/dnd5Characters.json';
+import cocCharacters from '../data/characters/cocCharacters.json';
+import directories from '../data/directories.json';
 import sessions from '../data/sessions.json';
 import sketchs from '../data/sketchs.json';
 import assets from '../data/assets.json';
-import directories from '../data/directories.json';
 import notes from '../data/notes.json';
-import cocCharacters from '../data/characters/cocCharacters.json';
-import swd6Characters from '../data/characters/swd6Characters.json';
-import dnd5Characters from '../data/characters/dnd5Characters.json';
-import seventhSeaCharacters from '../data/characters/seventhSeaCharacters.json';
-import warhammerFantasyCharacters from '../data/characters/warhammerFantasyCharacters.json';
+import users from '../data/users.json';
 
 export const usersData = users;
 export const sessionsData = sessions;
@@ -29,6 +30,8 @@ export const charactersData = [
     ...seventhSeaCharacters,
     ...warhammerFantasyCharacters
 ];
+
+const dirname = importMetaUrlDirname(import.meta.url);
 
 const Data = {
     async reset(insertData: boolean = true) {
@@ -81,7 +84,7 @@ const Data = {
         await Promise.all(
             assets.map(({ name, path }) =>
                 Fs.promises.copyFile(
-                    Path.join(__dirname, '../data/assets', name),
+                    Path.join(dirname, '../data/assets', name),
                     Path.join(assetDir, path)
                 )
             )
@@ -125,7 +128,7 @@ const Data = {
     },
 
     async getAssetBuffer(assetName: string) {
-        const localPath = Path.join(__dirname, '../data/assets', assetName);
+        const localPath = Path.join(dirname, '../data/assets', assetName);
         return Fs.promises.readFile(localPath);
     }
 };

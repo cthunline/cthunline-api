@@ -3,9 +3,9 @@ import Formidable from 'formidable';
 import Fs from 'fs';
 import Path from 'path';
 
-import { Prisma } from '../../services/prisma';
-import { getEnv } from '../../services/env';
-import { assetTempDir, getAssetDir } from './asset';
+import { Prisma } from '../../services/prisma.js';
+import { getEnv } from '../../services/env.js';
+import { assetTempDir, getAssetDir } from './asset.js';
 
 export const portraitDirName = 'portraits';
 

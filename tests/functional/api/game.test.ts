@@ -1,8 +1,8 @@
-import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
-import { assertGame } from '../helpers/assert.helper';
+import Api from '../helpers/api.helper.js';
+import Data from '../helpers/data.helper.js';
+import { assertGame } from '../helpers/assert.helper.js';
 
-import { GamesData } from '../../../src/services/games';
+import { GamesData } from '../../../src/services/games.js';
 
 const games = Object.values(GamesData);
 

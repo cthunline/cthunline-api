@@ -1,14 +1,14 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { getCookieOptions } from './helpers/auth';
+import { getCookieOptions } from './helpers/auth.js';
 
-import { verifyPassword, generateJwt, encrypt } from '../services/crypto';
-import { registerRateLimiter } from '../services/rateLimiter';
-import { AuthenticationError } from '../services/errors';
-import { Prisma } from '../services/prisma';
-import { getEnv } from '../services/env';
+import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
+import { registerRateLimiter } from '../services/rateLimiter.js';
+import { AuthenticationError } from '../services/errors.js';
+import { Prisma } from '../services/prisma.js';
+import { getEnv } from '../services/env.js';
 
-import { loginSchema, LoginBody } from './schemas/auth';
+import { loginSchema, LoginBody } from './schemas/auth.js';
 
 const authController = async (app: FastifyInstance) => {
     // check authentication validity

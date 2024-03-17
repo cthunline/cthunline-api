@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import Api, { httpMethods } from '../helpers/api.helper';
-import { assertError } from '../helpers/assert.helper';
+import Api, { httpMethods } from '../helpers/api.helper.js';
+import { assertError } from '../helpers/assert.helper.js';
 
 describe('[API] Global', () => {
     beforeEach(async () => {

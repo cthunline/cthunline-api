@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 
-import Data from '../helpers/data.helper';
-import Sockets from '../helpers/sockets.helper';
-import { assertSocketMeta, assertUser } from '../helpers/assert.helper';
+import Data from '../helpers/data.helper.js';
+import Sockets from '../helpers/sockets.helper.js';
+import { assertSocketMeta, assertUser } from '../helpers/assert.helper.js';
 
 describe('[Sockets] Dice', () => {
     before(async () => {

@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 
-import Data, { assetsData } from '../helpers/data.helper';
-import Sockets from '../helpers/sockets.helper';
+import Data, { assetsData } from '../helpers/data.helper.js';
+import Sockets from '../helpers/sockets.helper.js';
 
 import {
     assertUser,
     assertAsset,
     assertSocketMeta
-} from '../helpers/assert.helper';
+} from '../helpers/assert.helper.js';
 
 const audioAsset = assetsData.find(({ type }) => type === 'audio');
 

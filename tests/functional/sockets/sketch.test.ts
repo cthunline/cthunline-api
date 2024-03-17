@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 
-import Data, { sessionsData } from '../helpers/data.helper';
-import Sockets from '../helpers/sockets.helper';
+import Data, { sessionsData } from '../helpers/data.helper.js';
+import Sockets from '../helpers/sockets.helper.js';
 
 import {
     assertUser,
     assertSketch,
     assertSocketMeta
-} from '../helpers/assert.helper';
+} from '../helpers/assert.helper.js';
 
 const sketchData = sessionsData[0].sketch;
 const tokenData = sessionsData[0].sketch.tokens[0];

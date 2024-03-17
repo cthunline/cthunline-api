@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper';
-import Data, { sessionsData, notesData } from '../helpers/data.helper';
-import { assertNote } from '../helpers/assert.helper';
+import Api from '../helpers/api.helper.js';
+import Data, { sessionsData, notesData } from '../helpers/data.helper.js';
+import { assertNote } from '../helpers/assert.helper.js';
 
 const notesById: Record<number, Record<string, any>> = Object.fromEntries(
     notesData.map((note: Record<string, any>) => [note.id, note])

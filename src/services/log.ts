@@ -2,7 +2,7 @@ import Path from 'path';
 import Fs from 'fs';
 import Winston, { format } from 'winston';
 
-import { getEnv } from './env';
+import { getEnv } from './env.js';
 
 const printf = (i: Winston.Logform.TransformableInfo) =>
     `${i.timestamp} [${i.level}] ${i.message}`;

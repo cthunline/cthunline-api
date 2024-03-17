@@ -1,17 +1,17 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper';
+import Api from '../helpers/api.helper.js';
 import Data, {
     sessionsData,
     charactersData,
     usersData
-} from '../helpers/data.helper';
-import Sockets from '../helpers/sockets.helper';
+} from '../helpers/data.helper.js';
+import Sockets from '../helpers/sockets.helper.js';
 import {
     assertUser,
     assertCharacter,
     assertSocketMeta
-} from '../helpers/assert.helper';
+} from '../helpers/assert.helper.js';
 
 describe('[Sockets] Connection', () => {
     before(async () => {

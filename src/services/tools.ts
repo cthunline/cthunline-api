@@ -1,3 +1,5 @@
+import Url from 'url';
+import Path from 'path';
 import { customAlphabet } from 'nanoid';
 
 /**
@@ -37,3 +39,9 @@ export const generateToken = (size: 8 | 16 | 32 = 8) => {
     }
     return generateCode8();
 };
+
+/**
+Returns the current dirname from ESM's import.meta.url
+*/
+export const importMetaUrlDirname = (importMetaUrl: string) =>
+    Path.dirname(Url.fileURLToPath(importMetaUrl));

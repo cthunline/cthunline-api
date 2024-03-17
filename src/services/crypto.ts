@@ -2,10 +2,10 @@ import Jwt, { JwtPayload } from 'jsonwebtoken';
 import Crypto from 'crypto';
 import Bcrypt from 'bcrypt';
 
-import { AppErrorConstructor, AuthenticationError } from './errors';
-import { getEnv } from './env';
+import { AppErrorConstructor, AuthenticationError } from './errors.js';
+import { getEnv } from './env.js';
 
-import { SafeUser } from '../types/user';
+import { SafeUser } from '../types/user.js';
 
 // hash a string
 export const hashPassword = async (password: string): Promise<string> =>

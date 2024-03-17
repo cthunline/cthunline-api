@@ -4,12 +4,12 @@ import { type Session, type Character, type Asset } from '@prisma/client';
 import {
     type TokenBody,
     type SketchBody
-} from '../controllers/schemas/definitions';
-import { type RequestDiceBody } from '../sockets/schemas/dice';
-import { type PlayAudioBody } from '../sockets/schemas/audio';
-import { type SocketMeta } from '../sockets/helper';
-import { type SocketDiceResult } from './dice';
-import { type SafeUser } from './user';
+} from '../controllers/schemas/definitions.js';
+import { type RequestDiceBody } from '../sockets/schemas/dice.js';
+import { type PlayAudioBody } from '../sockets/schemas/audio.js';
+import { type SocketMeta } from '../sockets/helper.js';
+import { type SocketDiceResult } from './dice.js';
+import { type SafeUser } from './user.js';
 
 export interface ListenEvents {
     sketchUpdate: (data: SketchBody) => void;

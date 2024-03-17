@@ -8,13 +8,13 @@ import FastifyHelmet from '@fastify/helmet';
 import FastifyQs from 'fastify-qs';
 import AjvFormats from 'ajv-formats';
 
-import mainController from './controllers';
-import socketRouter from './sockets';
+import mainController from './controllers/index.js';
+import socketRouter from './sockets/index.js';
 
-import { errorHandler, schemaErrorFormatter } from './services/errors';
-import { initDb } from './services/prisma';
-import { getEnv } from './services/env';
-import Log from './services/log';
+import { errorHandler, schemaErrorFormatter } from './services/errors.js';
+import { initDb } from './services/prisma.js';
+import { getEnv } from './services/env.js';
+import Log from './services/log.js';
 
 export const app = Fastify({
     trustProxy: getEnv('REVERSE_PROXY'),

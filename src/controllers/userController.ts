@@ -1,14 +1,14 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { verifyPassword, hashPassword } from '../services/crypto';
+import { verifyPassword, hashPassword } from '../services/crypto.js';
 import {
     controlSelf,
     controlAdmin,
     controlAdminMiddleware
-} from './helpers/auth';
-import { ValidationError } from '../services/errors';
-import { parseParamId } from '../services/api';
-import { Prisma } from '../services/prisma';
+} from './helpers/auth.js';
+import { ValidationError } from '../services/errors.js';
+import { parseParamId } from '../services/api.js';
+import { Prisma } from '../services/prisma.js';
 import {
     safeUserSelect,
     getUser,
@@ -16,16 +16,16 @@ import {
     controlUniqueEmail,
     controlLocale,
     defaultUserData
-} from './helpers/user';
+} from './helpers/user.js';
 
-import { QueryParam } from '../types/api';
+import { QueryParam } from '../types/api.js';
 
 import {
     createUserSchema,
     CreateUserBody,
     updateUserSchema,
     UpdateUserBody
-} from './schemas/user';
+} from './schemas/user.js';
 
 const userController = async (app: FastifyInstance) => {
     // get all users

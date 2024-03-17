@@ -1,7 +1,7 @@
 import { HTTPMethods } from 'fastify';
 
-import { ValidationError } from './errors';
-import { isInteger } from './tools';
+import { ValidationError } from './errors.js';
+import { isInteger } from './tools.js';
 
 /**
 Parses IDs from Fastify params object.

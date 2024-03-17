@@ -3,11 +3,11 @@ import Formidable from 'formidable';
 import Path from 'path';
 import Fs from 'fs';
 
-import { ValidationError } from '../services/errors';
-import { validateSchema } from '../services/typebox';
-import { parseParamId } from '../services/api';
-import { Prisma } from '../services/prisma';
-import Log from '../services/log';
+import { ValidationError } from '../services/errors.js';
+import { validateSchema } from '../services/typebox.js';
+import { parseParamId } from '../services/api.js';
+import { Prisma } from '../services/prisma.js';
+import Log from '../services/log.js';
 
 import {
     controlFile,
@@ -19,10 +19,10 @@ import {
     getDirectories,
     getDirectory,
     getChildrenDirectories
-} from './helpers/asset';
+} from './helpers/asset.js';
 
-import { TypedFile } from '../types/asset';
-import { QueryParam } from '../types/api';
+import { TypedFile } from '../types/asset.js';
+import { QueryParam } from '../types/api.js';
 
 import {
     createDirectorySchema,
@@ -31,7 +31,7 @@ import {
     UpdateDirectoryBody,
     uploadAssetsSchema,
     UploadAssetsBody
-} from './schemas/asset';
+} from './schemas/asset.js';
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {

@@ -1,7 +1,7 @@
 import 'fastify';
 
-import { type SocketIoServer } from './socket';
-import { type SafeUser } from './user';
+import { type SocketIoServer } from './socket.js';
+import { type SafeUser } from './user.js';
 
 declare module 'fastify' {
     interface FastifyInstance {

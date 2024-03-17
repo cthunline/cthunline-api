@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import Path from 'path';
 
-import { mockEnvVar } from '../../../src/services/env';
+import { mockEnvVar } from '../../../src/services/env.js';
 
-import Data, { assetsData, directoriesData } from '../helpers/data.helper';
-import { assertAsset, assertDirectory } from '../helpers/assert.helper';
-import Api from '../helpers/api.helper';
+import Data, { assetsData, directoriesData } from '../helpers/data.helper.js';
+import { assertAsset, assertDirectory } from '../helpers/assert.helper.js';
+import Api from '../helpers/api.helper.js';
 
 const { userId } = assetsData[0];
 const userAssets = assetsData.filter(

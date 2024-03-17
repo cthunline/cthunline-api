@@ -1,4 +1,4 @@
-import { NotFoundError } from './errors';
+import { NotFoundError } from './errors.js';
 
 type CacheHandler = (previous: any) => any;
 type CacheSaver = (data: any) => any;

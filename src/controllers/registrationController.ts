@@ -1,22 +1,22 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { registerRateLimiter } from '../services/rateLimiter';
-import { ForbiddenError } from '../services/errors';
-import { hashPassword } from '../services/crypto';
-import { Prisma } from '../services/prisma';
-import { getEnv } from '../services/env';
+import { registerRateLimiter } from '../services/rateLimiter.js';
+import { ForbiddenError } from '../services/errors.js';
+import { hashPassword } from '../services/crypto.js';
+import { Prisma } from '../services/prisma.js';
+import { getEnv } from '../services/env.js';
 
 import {
     controlInvitationCode,
     generateInvitationCode
-} from './helpers/registration';
+} from './helpers/registration.js';
 import {
     safeUserSelect,
     controlUniqueEmail,
     defaultUserData
-} from './helpers/user';
+} from './helpers/user.js';
 
-import { registerUserSchema, RegisterUserBody } from './schemas/user';
+import { registerUserSchema, RegisterUserBody } from './schemas/user.js';
 
 const registrationController = async (app: FastifyInstance) => {
     await app.register(async (routeApp: FastifyInstance) => {

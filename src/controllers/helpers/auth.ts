@@ -2,11 +2,11 @@ import { FastifyRequest } from 'fastify';
 import { CookieSerializeOptions } from '@fastify/cookie';
 import DaysJs from 'dayjs';
 
-import { AuthenticationError, ForbiddenError } from '../../services/errors';
-import { decrypt, verifyJwt } from '../../services/crypto';
-import { parseParamId } from '../../services/api';
-import { getEnv } from '../../services/env';
-import { SafeUser } from '../../types/user';
+import { AuthenticationError, ForbiddenError } from '../../services/errors.js';
+import { decrypt, verifyJwt } from '../../services/crypto.js';
+import { parseParamId } from '../../services/api.js';
+import { getEnv } from '../../services/env.js';
+import { SafeUser } from '../../types/user.js';
 
 /**
 Returns options object for cookies

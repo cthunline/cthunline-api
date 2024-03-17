@@ -2,11 +2,11 @@ import { fastifyCookie } from '@fastify/cookie';
 import { io, Socket } from 'socket.io-client';
 import { expect } from 'chai';
 
-import { getEnv } from '../../../src/services/env';
+import { getEnv } from '../../../src/services/env.js';
 
-import { sessionsData, charactersData, usersData } from './data.helper';
-import { assertSocketMeta } from './assert.helper';
-import Api from './api.helper';
+import { sessionsData, charactersData, usersData } from './data.helper.js';
+import { assertSocketMeta } from './assert.helper.js';
+import Api from './api.helper.js';
 
 interface SocketsHelper {
     url: string;

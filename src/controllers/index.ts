@@ -2,24 +2,27 @@ import { FastifyInstance, FastifyRequest } from 'fastify';
 import FastifyStatic from '@fastify/static';
 import Path from 'path';
 
-import configurationController from './configurationController';
-import registrationController from './registrationController';
-import characterController from './characterController';
-import sessionController from './sessionController';
-import sketchController from './sketchController';
-import assetController from './assetController';
-import authController from './authController';
-import userController from './userController';
-import gameController from './gameController';
-import noteController from './noteController';
+import configurationController from './configurationController.js';
+import registrationController from './registrationController.js';
+import characterController from './characterController.js';
+import sessionController from './sessionController.js';
+import sketchController from './sketchController.js';
+import assetController from './assetController.js';
+import authController from './authController.js';
+import userController from './userController.js';
+import gameController from './gameController.js';
+import noteController from './noteController.js';
 
-import { authMiddleware } from './helpers/auth';
-import { assetDir } from './helpers/asset';
+import { authMiddleware } from './helpers/auth.js';
+import { assetDir } from './helpers/asset.js';
 
-import { getFastifyHttpMethods } from '../services/api';
-import { NotFoundError } from '../services/errors';
-import { getEnv } from '../services/env';
-import Log from '../services/log';
+import { importMetaUrlDirname } from '../services/tools.js';
+import { getFastifyHttpMethods } from '../services/api.js';
+import { NotFoundError } from '../services/errors.js';
+import { getEnv } from '../services/env.js';
+import Log from '../services/log.js';
+
+const dirname = importMetaUrlDirname(import.meta.url);
 
 const mainController = async (app: FastifyInstance) => {
     app.decorateRequest('user', null);
@@ -78,7 +81,7 @@ const mainController = async (app: FastifyInstance) => {
     if (getEnv('ENVIRONMENT') === 'prod') {
         Log.info('Serving production web client build');
         await app.register(FastifyStatic, {
-            root: Path.join(__dirname, '../web'),
+            root: Path.join(dirname, '../web'),
             decorateReply: false,
             index: 'index.html'
         });

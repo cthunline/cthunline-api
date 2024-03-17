@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { sum, isInteger } from '../../src/services/tools';
+import { sum, isInteger } from '../../src/services/tools.js';
 
 describe('[Unit] Tools', () => {
     describe('sum', () => {

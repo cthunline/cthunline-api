@@ -1,21 +1,25 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { ValidationError } from '../services/errors';
-import { isValidGameId } from '../services/games';
-import { parseParamId } from '../services/api';
-import { Prisma } from '../services/prisma';
+import { ValidationError } from '../services/errors.js';
+import { isValidGameId } from '../services/games.js';
+import { parseParamId } from '../services/api.js';
+import { Prisma } from '../services/prisma.js';
 
-import { defaultSketchData, getInclude, getSession } from './helpers/session';
-import { controlSelf } from './helpers/auth';
+import {
+    defaultSketchData,
+    getInclude,
+    getSession
+} from './helpers/session.js';
+import { controlSelf } from './helpers/auth.js';
 
-import { QueryParam } from '../types/api';
+import { QueryParam } from '../types/api.js';
 
 import {
     createSessionSchema,
     CreateSessionBody,
     updateSessionSchema,
     UpdateSessionBody
-} from './schemas/session';
+} from './schemas/session.js';
 
 const sessionController = async (app: FastifyInstance) => {
     // get all sessions

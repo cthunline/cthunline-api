@@ -1,24 +1,24 @@
 import { Session, Character } from '@prisma/client';
 import { type ExtendedError } from 'socket.io/dist/namespace';
 
-import { decrypt, verifyJwt } from '../services/crypto';
-import { cacheGet, cacheSet } from '../services/cache';
-import { Prisma } from '../services/prisma';
+import { decrypt, verifyJwt } from '../services/crypto.js';
+import { cacheGet, cacheSet } from '../services/cache.js';
+import { Prisma } from '../services/prisma.js';
 import {
     type SocketIoServer,
     type SocketSessionUser,
     type SocketIoSocket
-} from '../types/socket';
+} from '../types/socket.js';
 import {
     CustomError,
     AuthenticationError,
     NotFoundError,
     ValidationError,
     ForbiddenError
-} from '../services/errors';
+} from '../services/errors.js';
 
-import { SafeUser } from '../types/user';
-import { getEnv } from '../services/env';
+import { SafeUser } from '../types/user.js';
+import { getEnv } from '../services/env.js';
 
 // verify auth token
 const verifySocketJwt = async (socket: SocketIoSocket): Promise<SafeUser> => {

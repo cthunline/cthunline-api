@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper';
-import Data from '../helpers/data.helper';
-import { compareDataWithExpected } from '../helpers/assert.helper';
-import { mockEnvVar } from '../../../src/services/env';
+import Api from '../helpers/api.helper.js';
+import Data from '../helpers/data.helper.js';
+import { compareDataWithExpected } from '../helpers/assert.helper.js';
+import { mockEnvVar } from '../../../src/services/env.js';
 
 const getConfiguration = async (expected: any) => {
     const response = await Api.request({

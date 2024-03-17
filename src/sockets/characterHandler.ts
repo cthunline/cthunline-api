@@ -1,8 +1,8 @@
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket';
-import { Prisma } from '../services/prisma';
+import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
+import { Prisma } from '../services/prisma.js';
 
-import { meta } from './helper';
-import { ForbiddenError } from '../services/errors';
+import { meta } from './helper.js';
+import { ForbiddenError } from '../services/errors.js';
 
 const characterHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
     // notify game master when any character is updated during game

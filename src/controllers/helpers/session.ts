@@ -1,7 +1,7 @@
 import { Session } from '@prisma/client';
 
-import { Prisma } from '../../services/prisma';
-import { safeUserSelect } from './user';
+import { Prisma } from '../../services/prisma.js';
+import { safeUserSelect } from './user.js';
 
 export const defaultSketchData = {
     displayed: false,

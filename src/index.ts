@@ -1,6 +1,6 @@
-import { app, initApp } from './app';
-import { getEnv } from './services/env';
-import Log from './services/log';
+import { app, initApp } from './app.js';
+import { getEnv } from './services/env.js';
+import Log from './services/log.js';
 
 (async () => {
     await initApp();

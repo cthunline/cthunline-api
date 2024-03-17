@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import Path from 'path';
 
-import { mockEnvVar } from '../../../src/services/env';
+import { mockEnvVar } from '../../../src/services/env.js';
 
-import Data, { charactersData, usersData } from '../helpers/data.helper';
-import { assertCharacter } from '../helpers/assert.helper';
-import { Prisma } from '../../../src/services/prisma';
-import Api from '../helpers/api.helper';
+import Data, { charactersData, usersData } from '../helpers/data.helper.js';
+import { assertCharacter } from '../helpers/assert.helper.js';
+import { Prisma } from '../../../src/services/prisma.js';
+import Api from '../helpers/api.helper.js';
 
 const findCharacter = (userId: number, gameId?: string) => {
     const character = charactersData.find(

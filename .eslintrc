@@ -1,11 +1,14 @@
 {
+    "$schema": "https://json.schemastore.org/eslintrc.json",
     "root": true,
     "env": {
-        "node": true
+        "node": true,
+        "es2024": true
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": "tsconfig.json"
+        "project": "tsconfig.json",
+        "sourceType": "module"
     },
     "extends": ["airbnb-base", "airbnb-typescript/base", "prettier"],
     "rules": {
@@ -16,6 +19,8 @@
                 "exceptAfterSingleLine": true
             }
         ],
+        "import/extensions": ["error", "ignorePackages"],
+        "import/no-commonjs": "error",
         "import/prefer-default-export": "off",
         "lines-between-class-members": "off",
         "no-param-reassign": [

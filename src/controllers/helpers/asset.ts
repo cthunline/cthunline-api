@@ -3,15 +3,15 @@ import Formidable from 'formidable';
 import Path from 'path';
 import Fs from 'fs';
 
-import { Prisma } from '../../services/prisma';
-import { getEnv } from '../../services/env';
+import { Prisma } from '../../services/prisma.js';
+import { getEnv } from '../../services/env.js';
 import {
     ForbiddenError,
     InternError,
     ValidationError
-} from '../../services/errors';
+} from '../../services/errors.js';
 
-import { mimeTypes, FileType, MimeType } from '../../types/asset';
+import { mimeTypes, FileType, MimeType } from '../../types/asset.js';
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)

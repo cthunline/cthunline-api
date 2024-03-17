@@ -1,11 +1,11 @@
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket';
-import { ForbiddenError, ValidationError } from '../services/errors';
-import { validateSchema } from '../services/typebox';
-import { Prisma } from '../services/prisma';
+import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
+import { ForbiddenError, ValidationError } from '../services/errors.js';
+import { validateSchema } from '../services/typebox.js';
+import { Prisma } from '../services/prisma.js';
 
-import { meta } from './helper';
+import { meta } from './helper.js';
 
-import { playAudioSchema, PlayAudioBody } from './schemas/audio';
+import { playAudioSchema, PlayAudioBody } from './schemas/audio.js';
 
 const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // notify session players that game master started playing audio asset

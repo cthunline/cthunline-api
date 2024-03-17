@@ -1,11 +1,11 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { parseParamId } from '../services/api';
-import { Prisma } from '../services/prisma';
+import { parseParamId } from '../services/api.js';
+import { Prisma } from '../services/prisma.js';
 
-import { controlSelf } from './helpers/auth';
+import { controlSelf } from './helpers/auth.js';
 
-import { createSketchSchema, CreateSketchBody } from './schemas/sketch';
+import { createSketchSchema, CreateSketchBody } from './schemas/sketch.js';
 
 const sketchController = async (app: FastifyInstance) => {
     // get all sketchs belonging to current user

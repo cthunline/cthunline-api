@@ -7,18 +7,21 @@ import {
     verifyPassword,
     generateJwt,
     verifyJwt
-} from '../../src/services/crypto';
-import { AuthenticationError, ForbiddenError } from '../../src/services/errors';
+} from '../../src/services/crypto.js';
+import {
+    AuthenticationError,
+    ForbiddenError
+} from '../../src/services/errors.js';
 import {
     controlSelf,
     controlAdmin,
     controlSelfMiddleware,
     controlAdminMiddleware
-} from '../../src/controllers/helpers/auth';
+} from '../../src/controllers/helpers/auth.js';
 
-import { SafeUser } from '../../src/types/user';
+import { SafeUser } from '../../src/types/user.js';
 
-import { expectAsync } from '../functional/helpers/assert.helper';
+import { expectAsync } from '../functional/helpers/assert.helper.js';
 
 import users from '../functional/data/users.json';
 

@@ -1,6 +1,6 @@
-import { RequestDiceBody } from '../sockets/schemas/dice';
+import { RequestDiceBody } from '../sockets/schemas/dice.js';
 
-import { SafeUser } from './user';
+import { SafeUser } from './user.js';
 
 export enum DiceType {
     d4 = 'D4',

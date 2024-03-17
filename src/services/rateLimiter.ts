@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
 
-import { getEnv } from './env';
+import { getEnv } from './env.js';
 
 /**
 Register Fastify rate limiter plugin

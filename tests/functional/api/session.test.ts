@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 
-import Api from '../helpers/api.helper';
-import Data, { sessionsData } from '../helpers/data.helper';
-import { assertSession, assertUser } from '../helpers/assert.helper';
+import Api from '../helpers/api.helper.js';
+import Data, { sessionsData } from '../helpers/data.helper.js';
+import { assertSession, assertUser } from '../helpers/assert.helper.js';
 
 const { gameId } = sessionsData[0];
 

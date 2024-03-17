@@ -1,6 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
 
-import { sketchSchema } from './definitions';
+import { sketchSchema } from './definitions.js';
 
 export const createSketchSchema = Type.Object(
     {

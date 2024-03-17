@@ -4,9 +4,11 @@
         "files": true
     },
     "compilerOptions": {
-        "target": "esnext",
+        "target": "ESNext",
         "outDir": "./build",
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "moduleResolution": "Node",
+        "module": "ESNext"
     },
     "include": ["src", "tests"],
     "exclude": ["node_modules", "build"]

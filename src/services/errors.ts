@@ -1,17 +1,18 @@
 /* eslint-disable max-classes-per-file */
 import { FastifyReply, FastifyRequest } from 'fastify';
-import type {
-    FastifySchemaValidationError,
-    SchemaErrorFormatter
-} from 'fastify/types/schema';
 import {
     PrismaClientValidationError,
     PrismaClientKnownRequestError
 } from '@prisma/client/runtime/library';
 
-import Log from './log';
+import type {
+    FastifySchemaValidationError,
+    SchemaErrorFormatter
+} from 'fastify/types/schema.js';
 
-import { ErrorJsonResponse } from '../types/errors';
+import Log from './log.js';
+
+import { ErrorJsonResponse } from '../types/errors.js';
 
 // custom error class with additional http status and data
 // unless realy necessary do not throw error using this class

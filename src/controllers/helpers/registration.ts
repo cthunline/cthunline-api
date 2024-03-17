@@ -1,8 +1,8 @@
 import DayJs from 'dayjs';
 
-import { ForbiddenError } from '../../services/errors';
-import { generateToken } from '../../services/tools';
-import { Prisma } from '../../services/prisma';
+import { ForbiddenError } from '../../services/errors.js';
+import { generateToken } from '../../services/tools.js';
+import { Prisma } from '../../services/prisma.js';
 
 // control an invitation code is valid
 // if asked, updated the isUsed field to true on the invitation object

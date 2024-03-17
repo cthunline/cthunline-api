@@ -2,11 +2,11 @@ import MockDate from 'mockdate';
 import { expect } from 'chai';
 import DayJs from 'dayjs';
 
-import { mockEnvVar } from '../../../src/services/env';
+import { mockEnvVar } from '../../../src/services/env.js';
 
-import { assertUser } from '../helpers/assert.helper';
-import Data from '../helpers/data.helper';
-import Api from '../helpers/api.helper';
+import { assertUser } from '../helpers/assert.helper.js';
+import Data from '../helpers/data.helper.js';
+import Api from '../helpers/api.helper.js';
 
 const registerUser = async (data: any) => {
     const { invitationCode, ...expected } = data;

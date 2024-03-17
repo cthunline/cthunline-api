@@ -1,18 +1,18 @@
 import { FastifyInstance } from 'fastify';
 import { Socket } from 'socket.io';
 
-import { type SocketIoSocket } from '../types/socket';
-import characterHandler from './characterHandler';
-import sketchHandler from './sketchHandler';
-import audioHandler from './audioHandler';
-import diceHandler from './diceHandler';
+import { type SocketIoSocket } from '../types/socket.js';
+import characterHandler from './characterHandler.js';
+import sketchHandler from './sketchHandler.js';
+import audioHandler from './audioHandler.js';
+import diceHandler from './diceHandler.js';
 import {
     connectionMiddleware,
     disconnectCopycats,
     getSessionUsers
-} from './connectionHandler';
+} from './connectionHandler.js';
 
-import { meta } from './helper';
+import { meta } from './helper.js';
 
 const socketRouter = (app: FastifyInstance) => {
     const { io } = app;

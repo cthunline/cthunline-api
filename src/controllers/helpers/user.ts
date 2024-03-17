@@ -1,12 +1,12 @@
-import { Prisma } from '../../services/prisma';
+import { Prisma } from '../../services/prisma.js';
 import {
     ForbiddenError,
     ConflictError,
     ValidationError
-} from '../../services/errors';
-import { SafeUser } from '../../types/user';
-import { getEnv } from '../../services/env';
-import { locales } from '../../services/locale';
+} from '../../services/errors.js';
+import { SafeUser } from '../../types/user.js';
+import { getEnv } from '../../services/env.js';
+import { locales } from '../../services/locale.js';
 
 // default optional fields for a new user
 export const defaultUserData: Pick<SafeUser, 'theme' | 'locale' | 'isAdmin'> = {

@@ -2,10 +2,14 @@ import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
 import ChaiDateTime from 'chai-datetime';
 import Chai, { expect } from 'chai';
 
-import { AppErrorConstructor } from '../../../src/services/errors';
-import { locales } from '../../../src/services/locale';
+import { AppErrorConstructor } from '../../../src/services/errors.js';
+import { locales } from '../../../src/services/locale.js';
 
-import { ChaiDateString, ChaiArrayOfType, ChaiHttpStatus } from './chai.helper';
+import {
+    ChaiDateString,
+    ChaiArrayOfType,
+    ChaiHttpStatus
+} from './chai.helper.js';
 
 Chai.use(ChaiHttpStatus);
 Chai.use(DeepEqualInAnyOrder);

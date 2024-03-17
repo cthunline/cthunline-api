@@ -4,11 +4,11 @@ import FormData from 'form-data';
 import { expect } from 'chai';
 import Path from 'path';
 
-import { getEnv } from '../../../src/services/env';
-import { app, initApp } from '../../../src/app';
+import { getEnv } from '../../../src/services/env.js';
+import { app, initApp } from '../../../src/app.js';
 
-import { assertError, assertUser } from './assert.helper';
-import Agent from './agent.helper';
+import { assertError, assertUser } from './assert.helper.js';
+import Agent from './agent.helper.js';
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
