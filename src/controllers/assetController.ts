@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import Formidable from 'formidable';
-import Path from 'path';
-import Fs from 'fs';
+import { type File as FormidableFile } from 'formidable';
+import path from 'path';
+import fs from 'fs';
 
 import { ValidationError } from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
@@ -37,10 +37,10 @@ import {
 (async () => {
     const tempDir = assetTempDir;
     try {
-        await Fs.promises.access(tempDir, Fs.constants.F_OK);
+        await fs.promises.access(tempDir, fs.constants.F_OK);
     } catch {
         log.info(`Creating temporary upload directory ${tempDir}`);
-        await Fs.promises.mkdir(tempDir);
+        await fs.promises.mkdir(tempDir);
     }
     return tempDir;
 })();
@@ -113,7 +113,7 @@ export const assetController = async (app: FastifyInstance) => {
                 await getDirectory(user.id, directoryId);
             }
             // get files data
-            const assetFiles: Formidable.File[] = [];
+            const assetFiles: FormidableFile[] = [];
             if (files?.assets) {
                 if (Array.isArray(files.assets)) {
                     assetFiles.push(...files.assets);
@@ -129,9 +129,9 @@ export const assetController = async (app: FastifyInstance) => {
             await Promise.all(
                 typedAssetFiles.map(
                     ({ filepath: temporaryPath, newFilename }) =>
-                        Fs.promises.rename(
+                        fs.promises.rename(
                             temporaryPath,
-                            Path.join(userDir, newFilename)
+                            path.join(userDir, newFilename)
                         )
                 )
             );
@@ -140,14 +140,17 @@ export const assetController = async (app: FastifyInstance) => {
                 typedAssetFiles.map(
                     ({ originalFilename, newFilename, type }) => {
                         const name = originalFilename ?? newFilename;
-                        const path = Path.join(user.id.toString(), newFilename);
+                        const assetPath = path.join(
+                            user.id.toString(),
+                            newFilename
+                        );
                         return prisma.asset.create({
                             data: {
                                 userId: user.id,
                                 directoryId,
                                 type,
                                 name,
-                                path
+                                path: assetPath
                             }
                         });
                     }
@@ -195,14 +198,14 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const assetId = parseParamId(params, 'assetId');
-            const { path } = await getAsset(user.id, assetId);
+            const { path: assetPath } = await getAsset(user.id, assetId);
             await Promise.all([
                 prisma.asset.delete({
                     where: {
                         id: assetId
                     }
                 }),
-                Fs.promises.rm(Path.join(assetDir, path))
+                fs.promises.rm(path.join(assetDir, assetPath))
             ]);
             rep.send({});
         }
@@ -353,8 +356,8 @@ export const assetController = async (app: FastifyInstance) => {
                         })
                     )
                 ),
-                ...assets.map(({ path }) =>
-                    Fs.promises.rm(Path.join(assetDir, path))
+                ...assets.map(({ path: assetPath }) =>
+                    fs.promises.rm(path.join(assetDir, assetPath))
                 )
             ]);
             // delete directory (children directories will cascade-deleted)

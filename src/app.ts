@@ -6,7 +6,7 @@ import FastifySocketIo from 'fastify-socket.io';
 import FastifyCookie from '@fastify/cookie';
 import FastifyHelmet from '@fastify/helmet';
 import FastifyQs from 'fastify-qs';
-import AjvFormats from 'ajv-formats';
+import ajvFormats from 'ajv-formats';
 
 import { mainController } from './controllers/index.js';
 import { socketRouter } from './sockets/index.js';
@@ -19,7 +19,7 @@ import { log } from './services/log.js';
 export const app = Fastify({
     trustProxy: getEnv('REVERSE_PROXY'),
     ajv: {
-        plugins: [AjvFormats],
+        plugins: [ajvFormats],
         customOptions: {
             removeAdditional: false,
             coerceTypes: false

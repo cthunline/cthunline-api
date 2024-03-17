@@ -1,38 +1,6 @@
 {
-    "env": {
-        "mocha": true
-    },
-    "plugins": ["chai-friendly"],
-    "extends": [
-        "airbnb-base",
-        "airbnb-typescript/base",
-        "plugin:chai-friendly/recommended",
-        "prettier"
-    ],
     "rules": {
-        "@typescript-eslint/lines-between-class-members": [
-            "error",
-            "always",
-            {
-                "exceptAfterSingleLine": true
-            }
-        ],
-        "@typescript-eslint/no-unused-expressions": "off",
-        "comma-dangle": "off",
-        "import/extensions": ["error", "ignorePackages"],
-        "import/no-commonjs": "error",
-        "import/no-default-export": "error",
-        "import/no-extraneous-dependencies": [
-            "error",
-            {
-                "devDependencies": ["**/tests/**/*.ts"]
-            }
-        ],
-        "import/no-named-as-default-member": "error",
-        "import/prefer-default-export": "off",
-        "indent": "off",
         "no-await-in-loop": "off",
-        "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"],
-        "radix": "off"
+        "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"]
     }
 }

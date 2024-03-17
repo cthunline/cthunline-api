@@ -1,10 +1,10 @@
-import { expect } from 'chai';
+import { describe, test, expect } from 'vitest';
 
-import { sum, isInteger } from '../../src/services/tools.js';
+import { sum, isInteger, isObject } from '../../src/services/tools.js';
 
 describe('[Unit] Tools', () => {
     describe('sum', () => {
-        it('Should sum an array of numbers', () => {
+        test('Should sum an array of numbers', () => {
             const data = [
                 {
                     numbers: [],
@@ -26,7 +26,7 @@ describe('[Unit] Tools', () => {
     });
 
     describe('isInteger', () => {
-        it('Should check if a variable is an integer', () => {
+        test('Should check if a variable is an integer', () => {
             const data = [
                 { value: '', expected: false },
                 { value: 'aze', expected: false },
@@ -41,6 +41,23 @@ describe('[Unit] Tools', () => {
             ];
             data.forEach(({ value, expected }) => {
                 expect(isInteger(value)).to.equal(expected);
+            });
+        });
+    });
+
+    describe('isObject', () => {
+        test('Should check if a variable is an object', () => {
+            const data = [
+                { value: 123, expected: false },
+                { value: 'aze', expected: false },
+                { value: null, expected: false },
+                { value: [], expected: false },
+                { value: [1, 2, 3], expected: false },
+                { value: {}, expected: true },
+                { value: { a: 1, b: 2 }, expected: true }
+            ];
+            data.forEach(({ value, expected }) => {
+                expect(isObject(value)).to.equal(expected);
             });
         });
     });

@@ -1,4 +1,4 @@
-import Formidable from 'formidable';
+import { type File as FormidableFile } from 'formidable';
 
 // allowed mime types with their intern type and allowed extensions
 export const mimeTypes = {
@@ -25,6 +25,6 @@ export type MimeType = keyof typeof mimeTypes;
 // intern file type
 export type FileType = 'image' | 'audio';
 
-export interface TypedFile extends Formidable.File {
+export interface TypedFile extends FormidableFile {
     type: FileType;
 }

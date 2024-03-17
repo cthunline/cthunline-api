@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Prisma } from '@prisma/client';
-import Path from 'path';
-import Fs from 'fs';
+import path from 'path';
+import fs from 'fs';
 
 import {
     ConflictError,
@@ -213,12 +213,12 @@ export const characterController = async (app: FastifyInstance) => {
             // move temporary file to character's directory
             const { filepath: temporaryPath, newFilename } = typedFile;
             const portraitFileName = `${characterId}-${newFilename}`;
-            await Fs.promises.rename(
+            await fs.promises.rename(
                 temporaryPath,
-                Path.join(portraitDirPath, portraitFileName)
+                path.join(portraitDirPath, portraitFileName)
             );
             // save portrait on character
-            const portrait = Path.join(portraitDirName, portraitFileName);
+            const portrait = path.join(portraitDirName, portraitFileName);
             const updatedCharacter = await prisma.character.update({
                 data: {
                     portrait
@@ -229,7 +229,7 @@ export const characterController = async (app: FastifyInstance) => {
             });
             // if there was a portrait before then delete it
             if (character.portrait) {
-                await Fs.promises.rm(Path.join(assetDir, character.portrait));
+                await fs.promises.rm(path.join(assetDir, character.portrait));
             }
             //
             rep.send(updatedCharacter);
@@ -264,7 +264,7 @@ export const characterController = async (app: FastifyInstance) => {
                             id: characterId
                         }
                     }),
-                    Fs.promises.rm(Path.join(assetDir, character.portrait))
+                    fs.promises.rm(path.join(assetDir, character.portrait))
                 ]);
                 rep.send(updatedCharacter);
             } else {

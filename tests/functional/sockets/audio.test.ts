@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, test, beforeAll } from 'vitest';
 
 import { assetsData, resetData } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
@@ -14,15 +14,15 @@ const audioAsset = assetsData.find(({ type }) => type === 'audio');
 const imageAsset = assetsData.find(({ type }) => type === 'image');
 
 describe('[Sockets] Audio', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
 
-    it('Should fail to play audio because of invalid data', async () => {
-        await socketHelper.testError(
-            'audioPlay',
-            'audioPlay',
-            [
+    test('Should fail to play audio because of invalid data', async () => {
+        await socketHelper.testError({
+            emitEvent: 'audioPlay',
+            onEvent: 'audioPlay',
+            data: [
                 {},
                 undefined,
                 { assetId: audioAsset?.id, invalidKey: 'value' },
@@ -30,28 +30,29 @@ describe('[Sockets] Audio', () => {
                 { assetId: 'invalidId' },
                 { assetId: imageAsset?.id }
             ],
-            400,
-            true
-        );
+            expectedStatus: 400,
+            isMaster: true
+        });
     });
 
-    it('Should fail to play or stop audio because not game master', async () => {
+    test('Should fail to play or stop audio because not game master', async () => {
         for (const event of ['audioPlay', 'audioStop']) {
-            await socketHelper.testError(
-                event,
-                event,
-                event === 'audioPlay'
-                    ? {
-                          assetId: audioAsset?.id
-                      }
-                    : undefined,
-                403,
-                false
-            );
+            await socketHelper.testError({
+                emitEvent: event,
+                onEvent: event,
+                data:
+                    event === 'audioPlay'
+                        ? {
+                              assetId: audioAsset?.id
+                          }
+                        : undefined,
+                expectedStatus: 403,
+                isMaster: false
+            });
         }
     });
 
-    it('Should play or stop audio', async () => {
+    test('Should play or stop audio', async () => {
         for (const event of ['audioPlay', 'audioStop']) {
             const [masterSocket, player1Socket, player2Socket] =
                 await socketHelper.setupSession();
@@ -63,7 +64,7 @@ describe('[Sockets] Audio', () => {
                                 const { user, isMaster, asset } = data;
                                 assertSocketMeta(data);
                                 assertUser(user);
-                                expect(isMaster).to.be.true;
+                                expect(isMaster).toEqual(true);
                                 if (event === 'audioPlay') {
                                     assertAsset(asset);
                                 }

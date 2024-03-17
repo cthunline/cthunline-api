@@ -1,11 +1,18 @@
-import { expect } from 'chai';
+import {
+    describe,
+    expect,
+    test,
+    beforeAll,
+    beforeEach,
+    afterEach
+} from 'vitest';
 
 import { usersData, resetData } from '../helpers/data.helper.js';
 import { assertUser } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 describe('[API] Users', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
     beforeEach(async () => {
@@ -16,7 +23,7 @@ describe('[API] Users', () => {
     });
 
     describe('GET /users', () => {
-        it('Should list users', async () => {
+        test('Should list users', async () => {
             await api.testGetList({
                 route: '/users',
                 listKey: 'users',
@@ -24,7 +31,7 @@ describe('[API] Users', () => {
                 assert: assertUser
             });
         });
-        it('Should list all users including disabled ones', async () => {
+        test('Should list all users including disabled ones', async () => {
             await api.testGetList({
                 route: '/users?disabled=true',
                 listKey: 'users',
@@ -35,7 +42,7 @@ describe('[API] Users', () => {
     });
 
     describe('POST /users', () => {
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const invalidData = [
                 {
                     invalidProperty: 'Test'
@@ -76,7 +83,7 @@ describe('[API] Users', () => {
                 );
             }
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.login({
                 email: usersData[0].email,
                 password: 'test'
@@ -94,7 +101,7 @@ describe('[API] Users', () => {
                 403
             );
         });
-        it('Should throw a conflict error', async () => {
+        test('Should throw a conflict error', async () => {
             const createResponse = await api.request({
                 method: 'POST',
                 route: '/users',
@@ -104,7 +111,7 @@ describe('[API] Users', () => {
                     password: 'abc123'
                 }
             });
-            expect(createResponse).to.have.status(200);
+            expect(createResponse).toHaveStatus(200);
             await api.testError(
                 {
                     method: 'POST',
@@ -118,7 +125,7 @@ describe('[API] Users', () => {
                 409
             );
         });
-        it('Should create a user', async () => {
+        test('Should create a user', async () => {
             const createData = [
                 {
                     name: 'Test1',
@@ -156,13 +163,13 @@ describe('[API] Users', () => {
     });
 
     describe('GET /users/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'GET',
                 route: '/users/:id'
             });
         });
-        it('Should get a user', async () => {
+        test('Should get a user', async () => {
             await api.testGetOne({
                 route: '/users/:id',
                 data: usersData[0],
@@ -172,7 +179,7 @@ describe('[API] Users', () => {
     });
 
     describe('POST /users/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'POST',
                 route: '/users/:id',
@@ -181,7 +188,7 @@ describe('[API] Users', () => {
                 }
             });
         });
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const invalidData = [
                 {
                     invalidProperty: 'Test'
@@ -220,7 +227,7 @@ describe('[API] Users', () => {
                 );
             }
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             const email = 'yyy@test.com';
             const password = 'testtest';
             const response = await api.request({
@@ -232,7 +239,7 @@ describe('[API] Users', () => {
                     password
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;
@@ -269,7 +276,7 @@ describe('[API] Users', () => {
                 403
             );
         });
-        it('Should edit a user', async () => {
+        test('Should edit a user', async () => {
             const newEmail = 'fff@test.com';
             const newPassword1 = 'abc123';
             const newPassword2 = 'def456';
@@ -283,7 +290,7 @@ describe('[API] Users', () => {
                     password: newPassword1
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;

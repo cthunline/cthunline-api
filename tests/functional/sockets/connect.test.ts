@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { describe, expect, test, beforeAll } from 'vitest';
+import { type Socket } from 'socket.io-client';
 
 import { api } from '../helpers/api.helper.js';
 import {
@@ -15,11 +16,11 @@ import {
 } from '../helpers/assert.helper.js';
 
 describe('[Sockets] Connection', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
 
-    it('Should fail to connect socket because of invalid handshake data', async () => {
+    test('Should fail to connect socket because of invalid handshake data', async () => {
         const { jwt } = await api.login();
         const invalidData = [
             {
@@ -48,7 +49,7 @@ describe('[Sockets] Connection', () => {
         }
     });
 
-    it('Should fail to connect socket because of invalid authentication JWT', async () => {
+    test('Should fail to connect socket because of invalid authentication JWT', async () => {
         await socketHelper.failConnect({
             jwt: 'invalidJWT',
             query: {
@@ -59,7 +60,7 @@ describe('[Sockets] Connection', () => {
         });
     });
 
-    it('Should fail to connect socket because of invalid sessionId or characterId', async () => {
+    test('Should fail to connect socket because of invalid sessionId or characterId', async () => {
         const { jwt } = await api.login();
         const invalidQueries = [
             {
@@ -80,7 +81,7 @@ describe('[Sockets] Connection', () => {
         }
     });
 
-    it('Should fail to connect socket because of not found sessionId or characterId', async () => {
+    test('Should fail to connect socket because of not found sessionId or characterId', async () => {
         const { jwt } = await api.login();
         const notFoundQueries = [
             {
@@ -101,7 +102,7 @@ describe('[Sockets] Connection', () => {
         }
     });
 
-    it('Should fail to connect socket because of forbidden characterId', async () => {
+    test('Should fail to connect socket because of forbidden characterId', async () => {
         const { jwt } = await api.login();
         await socketHelper.failConnect({
             jwt,
@@ -113,7 +114,7 @@ describe('[Sockets] Connection', () => {
         });
     });
 
-    it('Should connect to socket', async () => {
+    test('Should connect to socket', async () => {
         const { jwt } = await api.login();
         await socketHelper.connect({
             jwt,
@@ -129,11 +130,12 @@ describe('[Sockets] Connection', () => {
         });
         await socketHelper.connect({
             jwt: masterJWT,
-            sessionId: sessionsData[1].id
+            sessionId: sessionsData[1].id,
+            isMaster: true
         });
     });
 
-    it('Should disconnect copycat socket on connection', async () => {
+    test('Should disconnect copycat socket on connection', async () => {
         const { jwt } = await api.login();
         const copycatSocket = await socketHelper.connect({
             jwt,
@@ -158,7 +160,7 @@ describe('[Sockets] Connection', () => {
         ]);
     });
 
-    it('Should emit join and leave events', async () => {
+    test('Should emit join and leave events', async () => {
         const [masterEmail, playerEmail] = usersData.map(({ email }) => email);
         const [masterAuthUser, playerAuthUser] = await Promise.all(
             [masterEmail, playerEmail].map((email) =>
@@ -186,37 +188,43 @@ describe('[Sockets] Connection', () => {
                     sessionUser.id === masterAuthUser.id;
                 assertUser(sessionUser);
                 if (isSessionUserMaster) {
-                    expect(sessionUser.character).to.be.null;
+                    expect(sessionUser.character).toBeNull();
                 } else {
                     assertCharacter(sessionUser.character);
                 }
                 expect(sessionUser.isMaster).to.be.equal(isSessionUserMaster);
             });
         };
-        const masterSocket = await socketHelper.connect({
-            jwt: masterAuthUser.jwt,
-            sessionId
-        });
-        const removeListeners = () => {
-            masterSocket.off('join');
-            masterSocket.off('error');
+        const removeListeners = (socket: Socket) => {
+            socket.off('join');
+            socket.off('error');
         };
-        await new Promise<void>((resolve, reject) => {
-            masterSocket.on('join', (data: any) => {
-                assertData(data, true, 1);
-                removeListeners();
-                resolve();
-            });
-            masterSocket.on('error', (err: any) => {
-                masterSocket.disconnect();
-                reject(err);
-            });
+        const masterSocket = socketHelper.getSocketClient({
+            jwt: masterAuthUser.jwt,
+            query: { sessionId }
         });
+        await Promise.all([
+            new Promise<void>((resolve, reject) => {
+                masterSocket.on('join', (data: any) => {
+                    assertData(data, true, 1);
+                    removeListeners(masterSocket);
+                    resolve();
+                });
+                masterSocket.on('error', (err: any) => {
+                    masterSocket.disconnect();
+                    reject(err);
+                });
+            }),
+            socketHelper.connect({
+                socket: masterSocket,
+                isMaster: true
+            })
+        ]);
         const [, playerSocket] = await Promise.all([
             new Promise<void>((resolve, reject) => {
                 masterSocket.on('join', (data: any) => {
                     assertData(data, false, 2);
-                    removeListeners();
+                    removeListeners(masterSocket);
                     resolve();
                 });
                 masterSocket.on('error', (err: any) => {
@@ -236,7 +244,7 @@ describe('[Sockets] Connection', () => {
             new Promise<void>((resolve, reject) => {
                 masterSocket.on('leave', (data: any) => {
                     assertData(data, false, 1);
-                    removeListeners();
+                    removeListeners(masterSocket);
                     resolve();
                 });
                 masterSocket.on('error', (err: any) => {

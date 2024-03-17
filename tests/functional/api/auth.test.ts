@@ -1,23 +1,25 @@
+import { describe, test, beforeAll } from 'vitest';
+
 import { usersData, resetData } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 describe('[API] Authentication', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
 
     describe('GET /auth', () => {
-        it('Should throw authentication error', async () => {
+        test('Should throw authentication error', async () => {
             await api.checkAuth(false);
         });
-        it('Should check authentication successfully', async () => {
+        test('Should check authentication successfully', async () => {
             await api.login();
             await api.checkAuth();
         });
     });
 
     describe('POST /auth', () => {
-        it('Should throw validation error', async () => {
+        test('Should throw validation error', async () => {
             const invalidData = [
                 {
                     invalidProperty: 'Test'
@@ -40,7 +42,7 @@ describe('[API] Authentication', () => {
                 );
             }
         });
-        it('Should throw authentication error', async () => {
+        test('Should throw authentication error', async () => {
             const invalidCredentials = [
                 {
                     email: 'admin@test.com',
@@ -63,19 +65,19 @@ describe('[API] Authentication', () => {
                 false
             );
         });
-        it('Should check authentication successfully', async () => {
+        test('Should check authentication successfully', async () => {
             await api.login();
             await api.checkAuth();
         });
     });
 
     describe('DELETE /auth', () => {
-        it('Should throw authentication error', async () => {
+        test('Should throw authentication error', async () => {
             await api.login();
             await api.logout();
             await api.logout(false);
         });
-        it('Should check authentication successfully', async () => {
+        test('Should check authentication successfully', async () => {
             await api.login();
             await api.logout();
             await api.checkAuth(false);

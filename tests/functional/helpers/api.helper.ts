@@ -1,8 +1,8 @@
 import { fastifyCookie } from '@fastify/cookie';
 import { OutgoingHttpHeaders } from 'http';
+import { expect, beforeAll, afterAll } from 'vitest';
 import FormData from 'form-data';
-import { expect } from 'chai';
-import Path from 'path';
+import path from 'path';
 
 import { getEnv } from '../../../src/services/env.js';
 import { app, initApp } from '../../../src/app.js';
@@ -14,12 +14,13 @@ export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
 export const httpMethods: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
-before(async () => {
+beforeAll(async () => {
     await initApp();
     await app.listen({ port: getEnv('PORT'), host: '0.0.0.0' });
+    await app.ready();
 });
 
-after(async () => {
+afterAll(async () => {
     await app.close();
 });
 
@@ -131,7 +132,7 @@ export const api = {
         }
         return (customAgent ?? this.agent).request({
             method,
-            url: apiPrefix ? Path.join(this.apiPrefix, route) : route,
+            url: apiPrefix ? path.join(this.apiPrefix, route) : route,
             payload: body ?? formData ?? undefined,
             parseJson,
             headers
@@ -153,7 +154,7 @@ export const api = {
         });
         const { body } = response;
         if (expectSuccess) {
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             assertUser(body);
             api.userId = body.id;
             if (api.agent.cookies.jwt) {
@@ -170,7 +171,7 @@ export const api = {
             }
             throw new Error('Could not get token from response cookie');
         }
-        expect(response).to.have.status(401);
+        expect(response).toHaveStatus(401);
         expect(body).to.be.an('object');
         assertError(body);
         return null;
@@ -182,12 +183,13 @@ export const api = {
             route: '/auth'
         });
         if (expectSuccess) {
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.be.an('object').and.be.empty;
+            expect(response.body).to.be.an('object');
+            expect(Object.keys(response.body)).toHaveLength(0);
             api.userId = 0;
         } else {
-            expect(response).to.have.status(401);
+            expect(response).toHaveStatus(401);
             expect(response.body).to.be.an('object');
             assertError(response.body);
         }
@@ -199,11 +201,11 @@ export const api = {
             route: '/auth'
         });
         if (expectSuccess) {
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             expect(response.body).to.be.an('object');
             assertUser(response.body);
         } else {
-            expect(response).to.have.status(401);
+            expect(response).toHaveStatus(401);
             expect(response.body).to.be.an('object');
             assertError(response.body);
         }
@@ -214,7 +216,7 @@ export const api = {
         expectedStatus: number
     ): Promise<void> {
         const response = await api.request(options);
-        expect(response).to.have.status(expectedStatus);
+        expect(response).toHaveStatus(expectedStatus);
         expect(response.body).to.be.an('object');
         assertError(response.body);
     },
@@ -228,7 +230,7 @@ export const api = {
             method: 'GET',
             route
         });
-        expect(response).to.have.status(200);
+        expect(response).toHaveStatus(200);
         expect(response.body).to.be.an('object');
         const { body } = response;
         expect(body[listKey]).to.be.an('array');
@@ -244,7 +246,7 @@ export const api = {
             method: 'GET',
             route: route.replace(':id', data.id)
         });
-        expect(response).to.have.status(200);
+        expect(response).toHaveStatus(200);
         expect(response.body).to.be.an('object');
         const { body } = response;
         assert(body, data);
@@ -257,7 +259,7 @@ export const api = {
             route,
             body: data
         });
-        expect(createResponse).to.have.status(200);
+        expect(createResponse).toHaveStatus(200);
         expect(createResponse.body).to.be.an('object');
         const { body: createBody } = createResponse;
         const expectedData = expected ?? data;
@@ -268,7 +270,7 @@ export const api = {
                 ? getRoute.replace(':id', createBody.id)
                 : `${route}/${createBody.id}`
         });
-        expect(getResponse).to.have.status(200);
+        expect(getResponse).toHaveStatus(200);
         expect(getResponse.body).to.be.an('object');
         const { body: getBody } = getResponse;
         assert(getBody, expectedData);
@@ -281,7 +283,7 @@ export const api = {
             route,
             body: data
         });
-        expect(editResponse).to.have.status(200);
+        expect(editResponse).toHaveStatus(200);
         expect(editResponse.body).to.be.an('object');
         const { body: editBody } = editResponse;
         const expectedData = expected ?? data;
@@ -290,7 +292,7 @@ export const api = {
             method: 'GET',
             route
         });
-        expect(getResponse).to.have.status(200);
+        expect(getResponse).toHaveStatus(200);
         expect(getResponse.body).to.be.an('object');
         const { body: getBody } = getResponse;
         assert(getBody, expectedData);
@@ -302,20 +304,21 @@ export const api = {
             method: 'DELETE',
             route
         });
-        expect(deleteResponse).to.have.status(200);
+        expect(deleteResponse).toHaveStatus(200);
         expect(deleteResponse.body).to.be.an('object');
         const { body: deleteBody } = deleteResponse;
         if (assert && data) {
             assert(deleteBody, data);
         } else {
-            expect(deleteBody).to.be.an('object').and.be.empty;
+            expect(deleteBody).to.be.an('object');
+            expect(Object.keys(deleteBody)).toHaveLength(0);
         }
         if (testGet !== false) {
             const getResponse = await api.request({
                 method: 'GET',
                 route
             });
-            expect(getResponse).to.have.status(404);
+            expect(getResponse).toHaveStatus(404);
             expect(getResponse.body).to.be.an('object');
             assertError(getResponse.body);
         }
@@ -340,7 +343,7 @@ export const api = {
                 route: route.split(':id').join(id),
                 body
             });
-            expect(response).to.have.status(isInvalid && isInteger ? 400 : 404);
+            expect(response).toHaveStatus(isInvalid && isInteger ? 400 : 404);
             expect(response.body).to.be.an('object');
             assertError(response.body);
         }
@@ -357,9 +360,9 @@ export const api = {
             parseJson: false
         });
         if (expectSuccess) {
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
         } else {
-            expect(response).to.have.status(404);
+            expect(response).toHaveStatus(404);
         }
     }
 };

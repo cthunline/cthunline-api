@@ -1,6 +1,6 @@
+import { io, type Socket } from 'socket.io-client';
 import { fastifyCookie } from '@fastify/cookie';
-import { io, Socket } from 'socket.io-client';
-import { expect } from 'chai';
+import { expect, afterEach } from 'vitest';
 
 import { getEnv } from '../../../src/services/env.js';
 
@@ -11,12 +11,12 @@ import { api } from './api.helper.js';
 interface SocketsHelper {
     url: string;
     connectedSockets: Socket[];
-    getSocketClient: Function;
-    connect: Function;
-    connectRole: Function;
-    failConnect: Function;
-    setupSession: Function;
-    testError: Function;
+    getSocketClient: (data: GetSocketClientData) => Socket;
+    connect: (connectionData?: SocketConnectionData) => Promise<Socket>;
+    connectRole: (isMaster: boolean) => Promise<Socket>;
+    failConnect: (data: FailSocketConnectionData) => Promise<void>;
+    setupSession: () => Promise<Socket[]>;
+    testError: (data: TestErrorData) => Promise<void>;
 }
 
 interface GetSocketClientData {
@@ -34,6 +34,16 @@ export interface SocketConnectionData {
     jwt?: string;
     sessionId?: number;
     characterId?: number;
+    isMaster?: boolean;
+    socket?: Socket;
+}
+
+export interface TestErrorData {
+    emitEvent: string;
+    onEvent: string;
+    data: any;
+    expectedStatus: number;
+    isMaster: boolean;
 }
 
 export const socketHelper: SocketsHelper = {
@@ -57,17 +67,19 @@ export const socketHelper: SocketsHelper = {
         return socketClient;
     },
 
-    connect: async (connectionData?: SocketConnectionData): Promise<Socket> => {
+    connect: async (connectionData?: SocketConnectionData) => {
         const sessionId = connectionData?.sessionId ?? sessionsData[1].id;
         const characterId = connectionData?.characterId ?? charactersData[0].id;
         return new Promise((resolve, reject) => {
-            const socket = socketHelper.getSocketClient({
-                jwt: connectionData?.jwt,
-                query: {
-                    sessionId,
-                    characterId
-                }
-            });
+            const socket =
+                connectionData?.socket ??
+                socketHelper.getSocketClient({
+                    jwt: connectionData?.jwt,
+                    query: {
+                        sessionId,
+                        ...(connectionData?.isMaster ? {} : { characterId })
+                    }
+                });
             socket.connect();
             socket.on('connect', () => {
                 resolve(socket);
@@ -94,11 +106,7 @@ export const socketHelper: SocketsHelper = {
         });
     },
 
-    failConnect: async ({
-        jwt,
-        query,
-        status
-    }: FailSocketConnectionData): Promise<void> =>
+    failConnect: async ({ jwt, query, status }: FailSocketConnectionData) =>
         new Promise((resolve, reject) => {
             const socket = socketHelper.getSocketClient({
                 jwt,
@@ -116,7 +124,7 @@ export const socketHelper: SocketsHelper = {
 
     // setup a session with a game master and 2 players
     // returns array with master socket, player1 socker and player2 socket
-    setupSession: async (): Promise<Socket[]> => {
+    setupSession: async () => {
         const [masterEmail, player1Email, player2Email] = usersData.map(
             ({ email }) => email
         );
@@ -163,13 +171,13 @@ export const socketHelper: SocketsHelper = {
         return sockets;
     },
 
-    testError: async (
-        emitEvent: string,
-        onEvent: string,
-        data: any,
-        expectedStatus: number,
-        isMaster: boolean = false
-    ) => {
+    testError: async ({
+        emitEvent,
+        onEvent,
+        data,
+        expectedStatus,
+        isMaster = false
+    }: TestErrorData) => {
         const invalidData = Array.isArray(data) ? data : [data];
         for (const emitData of invalidData) {
             const socket = await socketHelper.connectRole(isMaster);

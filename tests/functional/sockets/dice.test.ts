@@ -1,41 +1,41 @@
-import { expect } from 'chai';
+import { describe, expect, test, beforeAll } from 'vitest';
 
 import { resetData } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
 import { assertSocketMeta, assertUser } from '../helpers/assert.helper.js';
 
 describe('[Sockets] Dice', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
 
-    it('Should fail to request dice because of invalid data', async () => {
-        await socketHelper.testError(
-            'diceRequest',
-            'diceResult',
-            [
+    test('Should fail to request dice because of invalid data', async () => {
+        await socketHelper.testError({
+            emitEvent: 'diceRequest',
+            onEvent: 'diceResult',
+            data: [
                 {},
                 undefined,
                 { D4: 2, invalidKey: 3 },
                 { D8: 2, D12: 0 },
                 { D20: 2, D100: 'invalidValue' }
             ],
-            400,
-            true
-        );
+            expectedStatus: 400,
+            isMaster: true
+        });
     });
 
-    it('Should fail to request private dice roll because not game master', async () => {
-        await socketHelper.testError(
-            'dicePrivateRequest',
-            'diceResult',
-            { D4: 2 },
-            403,
-            false
-        );
+    test('Should fail to request private dice roll because not game master', async () => {
+        await socketHelper.testError({
+            emitEvent: 'dicePrivateRequest',
+            onEvent: 'diceResult',
+            data: { D4: 2 },
+            expectedStatus: 403,
+            isMaster: false
+        });
     });
 
-    it('Should request dice rolls', async () => {
+    test('Should request dice rolls', async () => {
         const requestData = [
             {
                 D4: 3
@@ -59,8 +59,8 @@ describe('[Sockets] Dice', () => {
                             resultData;
                         assertSocketMeta(resultData);
                         assertUser(user);
-                        expect(isMaster).to.be.true;
-                        expect(request).to.deep.equal(data);
+                        expect(isMaster).toEqual(true);
+                        expect(request).toEqual(data);
                         expect(isPrivate).to.equal(
                             event === 'dicePrivateRequest'
                         );
@@ -78,7 +78,7 @@ describe('[Sockets] Dice', () => {
         }
     });
 
-    it('Should send dice roll result to all players in session', async () => {
+    test('Should send dice roll result to all players in session', async () => {
         const [masterSocket, player1Socket, player2Socket] =
             await socketHelper.setupSession();
         const diceRequest = {
@@ -98,8 +98,8 @@ describe('[Sockets] Dice', () => {
                             } = resultData;
                             assertSocketMeta(resultData);
                             assertUser(user);
-                            expect(isMaster).to.be.false;
-                            expect(request).to.deep.equal(diceRequest);
+                            expect(isMaster).toEqual(false);
+                            expect(request).toEqual(diceRequest);
                             expect(isPrivate).to.equal(false);
                             expect(result).to.be.a('number');
                             socket.disconnect();

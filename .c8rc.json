@@ -1,7 +1,0 @@
-{
-    "extension": [".ts"],
-    "include": ["src/**/*.ts"],
-    "sourceMap": true,
-    "reporter": ["lcov", "text", "text-summary"],
-    "all": true
-}

@@ -1,10 +1,10 @@
-import Path from 'path';
-import Fs from 'fs';
-import Winston, { format } from 'winston';
+import winston, { format } from 'winston';
+import path from 'path';
+import fs from 'fs';
 
 import { getEnv } from './env.js';
 
-const printf = (i: Winston.Logform.TransformableInfo) =>
+const printf = (i: winston.Logform.TransformableInfo) =>
     `${i.timestamp} [${i.level}] ${i.message}`;
 
 const timestamp = {
@@ -12,8 +12,8 @@ const timestamp = {
 };
 
 // default log transport in console
-const transports: Winston.transport[] = [
-    new Winston.transports.Console({
+const transports: winston.transport[] = [
+    new winston.transports.Console({
         level: 'info',
         handleExceptions: false,
         format: format.combine(
@@ -31,8 +31,8 @@ if (!logDir) {
     fileTransportError = 'no log directory provided';
 } else {
     try {
-        Fs.accessSync(logDir, Fs.constants.F_OK);
-        Fs.accessSync(logDir, Fs.constants.W_OK);
+        fs.accessSync(logDir, fs.constants.F_OK);
+        fs.accessSync(logDir, fs.constants.W_OK);
     } catch (err) {
         fileTransportError = `log directory ${getEnv(
             'LOG_DIR'
@@ -43,9 +43,9 @@ if (!logDir) {
 if (logDir && !fileTransportError) {
     // log transport in file
     transports.push(
-        new Winston.transports.File({
+        new winston.transports.File({
             level: 'info',
-            filename: Path.join(logDir, 'cthunline.log'),
+            filename: path.join(logDir, 'cthunline.log'),
             handleExceptions: false,
             maxsize: 5242880,
             maxFiles: 5,
@@ -58,7 +58,7 @@ if (logDir && !fileTransportError) {
 }
 
 // logging instance to use in code
-export const log = Winston.createLogger({
+export const log = winston.createLogger({
     transports,
     exitOnError: false,
     silent: !getEnv('LOG_ENABLED')

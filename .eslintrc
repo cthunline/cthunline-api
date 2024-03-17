@@ -21,6 +21,15 @@
         ],
         "import/extensions": ["error", "ignorePackages"],
         "import/no-commonjs": "error",
+        "import/no-extraneous-dependencies": [
+            "error",
+            {
+                "devDependencies": [
+                    "./tests/**/*.ts",
+                    "./vitest.config.ts"
+                ]
+            }
+        ],
         "import/no-default-export": "error",
         "import/no-named-as-default-member": "error",
         "import/prefer-default-export": "off",

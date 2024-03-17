@@ -1,6 +1,6 @@
 import { FastifyRequest } from 'fastify';
 import { CookieSerializeOptions } from '@fastify/cookie';
-import DaysJs from 'dayjs';
+import dayjs from 'dayjs';
 
 import { AuthenticationError, ForbiddenError } from '../../services/errors.js';
 import { decrypt, verifyJwt } from '../../services/crypto.js';
@@ -16,7 +16,7 @@ export const getCookieOptions = (): CookieSerializeOptions => ({
     signed: true,
     secure: getEnv('COOKIE_SECURE'),
     sameSite: true,
-    expires: DaysJs().add(12, 'hours').toDate(),
+    expires: dayjs().add(12, 'hours').toDate(),
     path: '/'
 });
 

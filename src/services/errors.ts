@@ -5,9 +5,9 @@ import {
     PrismaClientKnownRequestError
 } from '@prisma/client/runtime/library';
 
-import type {
-    FastifySchemaValidationError,
-    SchemaErrorFormatter
+import {
+    type FastifySchemaValidationError,
+    type SchemaErrorFormatter
 } from 'fastify/types/schema.js';
 
 import { log } from './log.js';

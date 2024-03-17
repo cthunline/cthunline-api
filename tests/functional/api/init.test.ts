@@ -1,3 +1,5 @@
+import { describe, test } from 'vitest';
+
 import { assertUser } from '../helpers/assert.helper.js';
 import { initDb } from '../../../src/services/prisma.js';
 import { getEnv } from '../../../src/services/env.js';
@@ -5,7 +7,7 @@ import { resetData } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 describe('[API] Initialization', () => {
-    it('Should create a default user', async () => {
+    test('Should create a default user', async () => {
         await resetData(false);
         await initDb();
         await api.login({

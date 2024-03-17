@@ -1,11 +1,18 @@
-import { expect } from 'chai';
+import {
+    describe,
+    expect,
+    test,
+    beforeAll,
+    beforeEach,
+    afterEach
+} from 'vitest';
 
 import { sketchsData, resetData } from '../helpers/data.helper.js';
 import { assertSketchObject } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 describe('[API] Sketchs', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
     beforeEach(async () => {
@@ -16,7 +23,7 @@ describe('[API] Sketchs', () => {
     });
 
     describe('GET /sketchs', () => {
-        it('Should list all sketchs of the current user', async () => {
+        test('Should list all sketchs of the current user', async () => {
             await api.testGetList({
                 route: '/sketchs',
                 listKey: 'sketchs',
@@ -27,7 +34,7 @@ describe('[API] Sketchs', () => {
     });
 
     describe('POST /sketchs', () => {
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const invalidData = [
                 {
                     invalidProperty: 'Test'
@@ -50,7 +57,7 @@ describe('[API] Sketchs', () => {
                 );
             }
         });
-        it('Should save a sketch for the current user', async () => {
+        test('Should save a sketch for the current user', async () => {
             const { sketch } = sketchsData[0];
             await api.testCreate({
                 route: '/sketchs',
@@ -64,13 +71,13 @@ describe('[API] Sketchs', () => {
     });
 
     describe('GET /sketchs/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'GET',
                 route: '/sketchs/:id'
             });
         });
-        it('Should get a sketch belonging to the current user', async () => {
+        test('Should get a sketch belonging to the current user', async () => {
             await api.testGetOne({
                 route: '/sketchs/:id',
                 data: sketchsData[0],
@@ -80,13 +87,13 @@ describe('[API] Sketchs', () => {
     });
 
     describe('DELETE /sketchs/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/sketchs/:id'
             });
         });
-        it('Should delete a sketch belonging to the current user', async () => {
+        test('Should delete a sketch belonging to the current user', async () => {
             const { sketch } = sketchsData[0];
             const response = await api.request({
                 method: 'POST',
@@ -96,7 +103,7 @@ describe('[API] Sketchs', () => {
                     sketch
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;

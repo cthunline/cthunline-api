@@ -1,6 +1,6 @@
-import MockDate from 'mockdate';
-import { expect } from 'chai';
-import DayJs from 'dayjs';
+import mockDate from 'mockdate';
+import dayjs from 'dayjs';
+import { describe, expect, test, beforeAll } from 'vitest';
 
 import { mockEnvVar } from '../../../src/services/env.js';
 
@@ -15,7 +15,7 @@ const registerUser = async (data: any) => {
         route: '/register',
         body: data
     });
-    expect(response).to.have.status(200);
+    expect(response).toHaveStatus(200);
     expect(response.body).to.be.an('object');
     const { body } = response;
     assertUser(body, expected);
@@ -26,7 +26,7 @@ const generateInvitation = async () => {
         method: 'POST',
         route: '/invitation'
     });
-    expect(response).to.have.status(200);
+    expect(response).toHaveStatus(200);
     expect(response.body).to.be.an('object');
     const {
         body: { code }
@@ -37,12 +37,12 @@ const generateInvitation = async () => {
 };
 
 describe('[API] Registration', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
 
     describe('POST /register', () => {
-        it('Should throw a forbidden error because registration is disabled', async () => {
+        test('Should throw a forbidden error because registration is disabled', async () => {
             await api.login();
             await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', false);
@@ -59,7 +59,7 @@ describe('[API] Registration', () => {
                 403
             );
         });
-        it('Should throw a forbidden error because invitation code is invalid', async () => {
+        test('Should throw a forbidden error because invitation code is invalid', async () => {
             await api.login();
             await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', true);
@@ -88,7 +88,7 @@ describe('[API] Registration', () => {
                 );
             }
         });
-        it('Should throw a forbidden error because invitation code is already used', async () => {
+        test('Should throw a forbidden error because invitation code is already used', async () => {
             await api.login();
             const code = await generateInvitation();
             await api.logout();
@@ -114,11 +114,11 @@ describe('[API] Registration', () => {
                 403
             );
         });
-        it('Should throw a forbidden error because invitation code is expired', async () => {
+        test('Should throw a forbidden error because invitation code is expired', async () => {
             await api.login();
-            MockDate.set(DayJs().subtract(25, 'hours').toDate());
+            mockDate.set(dayjs().subtract(25, 'hours').toDate());
             const code = await generateInvitation();
-            MockDate.reset();
+            mockDate.reset();
             await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);
@@ -136,7 +136,7 @@ describe('[API] Registration', () => {
                 403
             );
         });
-        it('Should register a user', async () => {
+        test('Should register a user', async () => {
             await api.login();
             await api.logout();
             mockEnvVar('REGISTRATION_ENABLED', true);
@@ -147,7 +147,7 @@ describe('[API] Registration', () => {
                 password: 'abc123'
             });
         });
-        it('Should register a user with an invitation code', async () => {
+        test('Should register a user with an invitation code', async () => {
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);
             await api.login();
@@ -163,7 +163,7 @@ describe('[API] Registration', () => {
     });
 
     describe('POST /invitation', () => {
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.login();
             mockEnvVar('REGISTRATION_ENABLED', false);
             mockEnvVar('INVITATION_ENABLED', true);
@@ -184,7 +184,7 @@ describe('[API] Registration', () => {
                 403
             );
         });
-        it('Should generate an invitation code', async () => {
+        test('Should generate an invitation code', async () => {
             await api.login();
             mockEnvVar('REGISTRATION_ENABLED', true);
             mockEnvVar('INVITATION_ENABLED', true);

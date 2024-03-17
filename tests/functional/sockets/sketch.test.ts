@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, test, beforeAll } from 'vitest';
 
 import { sessionsData, resetData } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
@@ -13,15 +13,15 @@ const sketchData = sessionsData[0].sketch;
 const tokenData = sessionsData[0].sketch.tokens[0];
 
 describe('[Sockets] Sketch', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
 
-    it('Should fail to update sketch because of invalid data', async () => {
-        await socketHelper.testError(
-            'sketchUpdate',
-            'sketchUpdate',
-            [
+    test('Should fail to update sketch because of invalid data', async () => {
+        await socketHelper.testError({
+            emitEvent: 'sketchUpdate',
+            onEvent: 'sketchUpdate',
+            data: [
                 {},
                 undefined,
                 {
@@ -57,22 +57,22 @@ describe('[Sockets] Sketch', () => {
                     dislayed: false
                 }
             ],
-            400,
-            true
-        );
+            expectedStatus: 400,
+            isMaster: true
+        });
     });
 
-    it('Should fail to update sketch because not game master', async () => {
-        await socketHelper.testError(
-            'sketchUpdate',
-            'sketchUpdate',
-            sketchData,
-            403,
-            false
-        );
+    test('Should fail to update sketch because not game master', async () => {
+        await socketHelper.testError({
+            emitEvent: 'sketchUpdate',
+            onEvent: 'sketchUpdate',
+            data: sketchData,
+            expectedStatus: 403,
+            isMaster: false
+        });
     });
 
-    it('Should update sketch', async () => {
+    test('Should update sketch', async () => {
         const [masterSocket, player1Socket, player2Socket] =
             await socketHelper.setupSession();
         await Promise.all([
@@ -83,7 +83,7 @@ describe('[Sockets] Sketch', () => {
                             const { user, isMaster, sketch } = data;
                             assertSocketMeta(data);
                             assertUser(user);
-                            expect(isMaster).to.be.true;
+                            expect(isMaster).toEqual(true);
                             assertSketch(sketch, sketchData);
                             socket.disconnect();
                             resolve();
@@ -100,11 +100,11 @@ describe('[Sockets] Sketch', () => {
         ]);
     });
 
-    it('Should fail to update sketch token because of invalid data', async () => {
-        await socketHelper.testError(
-            'tokenUpdate',
-            'tokenUpdate',
-            [
+    test('Should fail to update sketch token because of invalid data', async () => {
+        await socketHelper.testError({
+            emitEvent: 'tokenUpdate',
+            onEvent: 'tokenUpdate',
+            data: [
                 {},
                 undefined,
                 {
@@ -113,12 +113,12 @@ describe('[Sockets] Sketch', () => {
                     color: 'test'
                 }
             ],
-            400,
-            true
-        );
+            expectedStatus: 400,
+            isMaster: true
+        });
     });
 
-    it('Should update sketch token', async () => {
+    test('Should update sketch token', async () => {
         const [masterSocket, player1Socket, player2Socket] =
             await socketHelper.setupSession();
         await Promise.all([
@@ -129,7 +129,7 @@ describe('[Sockets] Sketch', () => {
                             const { user, isMaster, sketch } = data;
                             assertSocketMeta(data);
                             assertUser(user);
-                            expect(isMaster).to.be.false;
+                            expect(isMaster).toEqual(false);
                             assertSketch(sketch, sketchData);
                             socket.disconnect();
                             resolve();

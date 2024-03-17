@@ -1,4 +1,11 @@
-import { expect } from 'chai';
+import {
+    describe,
+    expect,
+    test,
+    beforeAll,
+    beforeEach,
+    afterEach
+} from 'vitest';
 
 import { assertSession, assertUser } from '../helpers/assert.helper.js';
 import { sessionsData, resetData } from '../helpers/data.helper.js';
@@ -7,7 +14,7 @@ import { api } from '../helpers/api.helper.js';
 const { gameId } = sessionsData[0];
 
 describe('[API] Sessions', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
     beforeEach(async () => {
@@ -18,7 +25,7 @@ describe('[API] Sessions', () => {
     });
 
     describe('GET /sessions', () => {
-        it('Should list all sessions', async () => {
+        test('Should list all sessions', async () => {
             await api.testGetList({
                 route: '/sessions',
                 listKey: 'sessions',
@@ -26,7 +33,7 @@ describe('[API] Sessions', () => {
                 assert: assertSession
             });
         });
-        it('Should list all sessions including master data', async () => {
+        test('Should list all sessions including master data', async () => {
             await api.testGetList({
                 route: '/sessions?include=true',
                 listKey: 'sessions',
@@ -40,7 +47,7 @@ describe('[API] Sessions', () => {
     });
 
     describe('POST /sessions', () => {
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const invalidData = [
                 {
                     invalidProperty: 'Test'
@@ -63,7 +70,7 @@ describe('[API] Sessions', () => {
                 );
             }
         });
-        it('Should create a session', async () => {
+        test('Should create a session', async () => {
             await api.testCreate({
                 route: '/sessions',
                 data: {
@@ -86,13 +93,13 @@ describe('[API] Sessions', () => {
     });
 
     describe('GET /sessions/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'GET',
                 route: '/sessions/:id'
             });
         });
-        it('Should get a session', async () => {
+        test('Should get a session', async () => {
             await api.testGetOne({
                 route: '/sessions/:id',
                 data: sessionsData[0],
@@ -102,7 +109,7 @@ describe('[API] Sessions', () => {
     });
 
     describe('POST /sessions/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'POST',
                 route: '/sessions/:id',
@@ -111,7 +118,7 @@ describe('[API] Sessions', () => {
                 }
             });
         });
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const response = await api.request({
                 method: 'POST',
                 route: '/sessions',
@@ -120,7 +127,7 @@ describe('[API] Sessions', () => {
                     name: 'Test'
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;
@@ -146,7 +153,7 @@ describe('[API] Sessions', () => {
                 );
             }
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
                     method: 'POST',
@@ -158,7 +165,7 @@ describe('[API] Sessions', () => {
                 403
             );
         });
-        it('Should edit a session', async () => {
+        test('Should edit a session', async () => {
             const response = await api.request({
                 method: 'POST',
                 route: '/sessions',
@@ -167,7 +174,7 @@ describe('[API] Sessions', () => {
                     name: 'Test'
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;
@@ -191,13 +198,13 @@ describe('[API] Sessions', () => {
     });
 
     describe('DELETE /sessions/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/sessions/:id'
             });
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
                     method: 'DELETE',
@@ -206,7 +213,7 @@ describe('[API] Sessions', () => {
                 403
             );
         });
-        it('Should delete a session', async () => {
+        test('Should delete a session', async () => {
             const response = await api.request({
                 method: 'POST',
                 route: '/sessions',
@@ -215,7 +222,7 @@ describe('[API] Sessions', () => {
                     name: 'Test'
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;

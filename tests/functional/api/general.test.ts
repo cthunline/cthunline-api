@@ -1,13 +1,17 @@
-import { expect } from 'chai';
+import { describe, expect, test, beforeEach, beforeAll } from 'vitest';
 
 import { api, httpMethods } from '../helpers/api.helper.js';
 import { assertError } from '../helpers/assert.helper.js';
+import { resetData } from '../helpers/data.helper.js';
 
-describe('[API] Global', () => {
+describe('[API] General', () => {
+    beforeAll(async () => {
+        await resetData();
+    });
     beforeEach(async () => {
         await api.login();
     });
-    it('Should throw not found error because routes are invalid', async () => {
+    test('Should throw not found error because routes are invalid', async () => {
         const invalidRoutes = [
             '/12345',
             '/azeqsd',
@@ -20,7 +24,7 @@ describe('[API] Global', () => {
                     method,
                     route
                 });
-                expect(response).to.have.status(404);
+                expect(response).toHaveStatus(404);
                 expect(response.body).to.be.an('object');
                 assertError(response.body);
             }

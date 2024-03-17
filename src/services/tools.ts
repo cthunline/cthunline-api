@@ -1,5 +1,5 @@
-import Url from 'url';
-import Path from 'path';
+import url from 'url';
+import path from 'path';
 import { customAlphabet } from 'nanoid';
 
 /**
@@ -24,6 +24,12 @@ export const isInteger = (value: string | number) => {
     return (parsedFloat | 0) === parsedFloat;
 };
 
+/**
+Check if a variale is a JS object
+*/
+export const isObject = (val: any): val is object =>
+    typeof val === 'object' && val !== null && !Array.isArray(val);
+
 const generateCode32 = customAlphabet('1234567890abcdef', 32);
 const generateCode16 = customAlphabet('1234567890abcdef', 16);
 const generateCode8 = customAlphabet('1234567890abcdef', 8);
@@ -44,4 +50,4 @@ export const generateToken = (size: 8 | 16 | 32 = 8) => {
 Returns the current dirname from ESM's import.meta.url
 */
 export const importMetaUrlDirname = (importMetaUrl: string) =>
-    Path.dirname(Url.fileURLToPath(importMetaUrl));
+    path.dirname(url.fileURLToPath(importMetaUrl));

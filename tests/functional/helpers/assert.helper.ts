@@ -1,29 +1,7 @@
-import DeepEqualInAnyOrder from 'deep-equal-in-any-order';
-import ChaiDateTime from 'chai-datetime';
-import { expect, use as chaiUse } from 'chai';
+import { expect } from 'vitest';
 
 import { AppErrorConstructor } from '../../../src/services/errors.js';
 import { locales } from '../../../src/services/locale.js';
-
-import {
-    ChaiDateString,
-    ChaiArrayOfType,
-    ChaiHttpStatus
-} from './chai.helper.js';
-
-chaiUse(ChaiHttpStatus);
-chaiUse(DeepEqualInAnyOrder);
-chaiUse(ChaiDateTime);
-chaiUse(ChaiDateString);
-chaiUse(ChaiArrayOfType);
-
-declare global {
-    export namespace Chai {
-        interface Assertion {
-            dateString(): void;
-        }
-    }
-}
 
 export const expectAsync = async (
     promise: Promise<any>,
@@ -38,7 +16,7 @@ export const expectAsync = async (
     if (ErrorClassThatShouldBeThrown) {
         expect(error).to.be.an.instanceOf(ErrorClassThatShouldBeThrown);
     } else {
-        expect(error).to.be.null;
+        expect(error).toBeNull();
     }
 };
 
@@ -194,7 +172,7 @@ export const assertSketch = (
         assertSketchToken(token);
     });
     if (expected) {
-        expect(data).to.deep.equalInAnyOrder(expected);
+        expect(data).toEqual(expected);
     }
 };
 
@@ -280,12 +258,12 @@ export const assertCharacter = (
     if (data.portrait) {
         expect(data.portrait).to.be.a('string');
     } else {
-        expect(data.portrait).to.be.null;
+        expect(data.portrait).toBeNull();
     }
     if (expected) {
         Object.keys(expected).forEach((key) => {
             if (key === 'data') {
-                expect(data[key]).to.deep.equalInAnyOrder(expected[key]);
+                expect(data[key]).toEqual(expected[key]);
             } else {
                 expect(data).to.have.property(key);
                 expect(data[key]).to.equal(expected[key]);
@@ -302,5 +280,5 @@ export const assertError = (data: Record<string, any>) => {
 
 export const assertSocketMeta = (data: Record<string, any>) => {
     expect(data).to.have.property('dateTime');
-    expect(data.dateTime).to.be.a.dateString();
+    expect(data.dateTime).toBeDateString();
 };

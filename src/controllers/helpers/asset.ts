@@ -1,7 +1,10 @@
 import { Asset, Directory } from '@prisma/client';
-import Formidable from 'formidable';
-import Path from 'path';
-import Fs from 'fs';
+import path from 'path';
+import fs from 'fs';
+import {
+    type File as FormidableFile,
+    type Options as FormidableOptions
+} from 'formidable';
 
 import { prisma } from '../../services/prisma.js';
 import { getEnv } from '../../services/env.js';
@@ -16,7 +19,7 @@ import { mimeTypes, FileType, MimeType } from '../../types/asset.js';
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
 export const controlFile = (
-    file: Formidable.File,
+    file: FormidableFile,
     fileType?: FileType
 ): FileType => {
     const { mimetype, originalFilename } = file;
@@ -56,8 +59,8 @@ export const controlFile = (
 export const getAssetDir = (): string => {
     const dir = getEnv('ASSET_DIR');
     try {
-        Fs.accessSync(dir, Fs.constants.F_OK);
-        Fs.accessSync(dir, Fs.constants.W_OK);
+        fs.accessSync(dir, fs.constants.F_OK);
+        fs.accessSync(dir, fs.constants.W_OK);
         return dir;
     } catch {
         throw new InternError(
@@ -67,21 +70,21 @@ export const getAssetDir = (): string => {
 };
 
 export const assetDir = getAssetDir();
-export const assetTempDir = Path.join(assetDir, 'tmp');
+export const assetTempDir = path.join(assetDir, 'tmp');
 
 // create user subdirectory in asset dir if not exist and return its path
 export const controlUserDir = async (userId: number): Promise<string> => {
-    const userDir = Path.join(assetDir, userId.toString());
+    const userDir = path.join(assetDir, userId.toString());
     try {
-        await Fs.promises.access(userDir, Fs.constants.F_OK);
+        await fs.promises.access(userDir, fs.constants.F_OK);
     } catch {
-        await Fs.promises.mkdir(userDir);
+        await fs.promises.mkdir(userDir);
     }
     return userDir;
 };
 
 // formidable initialization options
-export const getFormidableOptions = (): Formidable.Options => ({
+export const getFormidableOptions = (): FormidableOptions => ({
     uploadDir: assetTempDir,
     keepExtensions: false,
     maxFileSize: getEnv('ASSET_MAX_SIZE_MB') * 1024 * 1024,

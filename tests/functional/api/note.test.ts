@@ -1,4 +1,11 @@
-import { expect } from 'chai';
+import {
+    describe,
+    expect,
+    test,
+    beforeAll,
+    beforeEach,
+    afterEach
+} from 'vitest';
 
 import { sessionsData, notesData, resetData } from '../helpers/data.helper.js';
 import { assertNote } from '../helpers/assert.helper.js';
@@ -49,7 +56,7 @@ const testNoteList = async (includeUsers: boolean = false) => {
         method: 'GET',
         route: `/sessions/${sessionsData[0].id}/notes${includeParam}`
     });
-    expect(response).to.have.status(200);
+    expect(response).toHaveStatus(200);
     expect(response.body).to.be.an('object');
     const { body } = response;
     expect(body).to.be.an('object');
@@ -64,7 +71,7 @@ const testNoteList = async (includeUsers: boolean = false) => {
 };
 
 describe('[API] Notes', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
     beforeEach(async () => {
@@ -75,16 +82,16 @@ describe('[API] Notes', () => {
     });
 
     describe('GET /sessions/:id/notes', () => {
-        it("Should get user's notes in a session", async () => {
+        test("Should get user's notes in a session", async () => {
             await testNoteList();
         });
-        it("Should get user's notes including user data", async () => {
+        test("Should get user's notes including user data", async () => {
             await testNoteList(true);
         });
     });
 
     describe('POST /sessions/:id/notes', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'POST',
                 route: '/sessions/:id/notes',
@@ -94,7 +101,7 @@ describe('[API] Notes', () => {
                 }
             });
         });
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const invalidData = [
                 {
                     invalidProperty: 'Test'
@@ -125,7 +132,7 @@ describe('[API] Notes', () => {
                 );
             }
         });
-        it('Should create a note in a session', async () => {
+        test('Should create a note in a session', async () => {
             const { notes } = getUserNotes(api.userId);
             const expectedPosition =
                 Math.max(
@@ -150,13 +157,13 @@ describe('[API] Notes', () => {
     });
 
     describe('GET /notes/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'GET',
                 route: '/notes/:id'
             });
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
                     method: 'GET',
@@ -165,7 +172,7 @@ describe('[API] Notes', () => {
                 403
             );
         });
-        it('Should get a note', async () => {
+        test('Should get a note', async () => {
             const { notes } = getUserNotes(api.userId);
             await api.testGetOne({
                 route: '/notes/:id',
@@ -173,7 +180,7 @@ describe('[API] Notes', () => {
                 assert: assertNote
             });
         });
-        it('Should get a shared note', async () => {
+        test('Should get a shared note', async () => {
             await api.testGetOne({
                 route: '/notes/:id',
                 data: sharedNote,
@@ -183,7 +190,7 @@ describe('[API] Notes', () => {
     });
 
     describe('POST /notes/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'POST',
                 route: '/notes/:id',
@@ -192,7 +199,7 @@ describe('[API] Notes', () => {
                 }
             });
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             for (const noteId of [sharedNote.id, unsharedNote.id]) {
                 await api.testError(
                     {
@@ -206,7 +213,7 @@ describe('[API] Notes', () => {
                 );
             }
         });
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const response = await api.request({
                 method: 'POST',
                 route: `/sessions/${sessionsData[0].id}/notes`,
@@ -215,7 +222,7 @@ describe('[API] Notes', () => {
                     text: 'Some test text'
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const { body: note } = response;
             const invalidData = [
                 {
@@ -243,7 +250,7 @@ describe('[API] Notes', () => {
                 );
             }
         });
-        it('Should update a note', async () => {
+        test('Should update a note', async () => {
             const response = await api.request({
                 method: 'POST',
                 route: `/sessions/${sessionsData[0].id}/notes`,
@@ -252,7 +259,7 @@ describe('[API] Notes', () => {
                     text: 'Some test text'
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const { body: note } = response;
             const editData = [
                 {
@@ -285,7 +292,7 @@ describe('[API] Notes', () => {
     });
 
     describe('PUT /notes/:id/(up|down)', () => {
-        it('Should throw a not found error', async () => {
+        test('Should throw a not found error', async () => {
             const { notes } = getUserNotes(api.userId);
             await api.testError(
                 {
@@ -295,7 +302,7 @@ describe('[API] Notes', () => {
                 404
             );
         });
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             for (const action of ['up', 'down']) {
                 await api.testInvalidIdError({
                     method: 'PUT',
@@ -303,7 +310,7 @@ describe('[API] Notes', () => {
                 });
             }
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             for (const noteId of [sharedNote.id, unsharedNote.id]) {
                 for (const action of ['up', 'down']) {
                     await api.testError(
@@ -316,7 +323,7 @@ describe('[API] Notes', () => {
                 }
             }
         });
-        it('Should throw a conflict error', async () => {
+        test('Should throw a conflict error', async () => {
             const { notes } = await getApiNotes(sessionsData[0].id);
             const notesByPosition = Object.fromEntries(
                 notes.map((note: any) => [note.position, note])
@@ -341,7 +348,7 @@ describe('[API] Notes', () => {
                 409
             );
         });
-        it('Should move position of a note', async () => {
+        test('Should move position of a note', async () => {
             const moveData = [
                 {
                     position: 1,
@@ -403,7 +410,7 @@ describe('[API] Notes', () => {
                     method: 'PUT',
                     route: `/notes/${note.id}/${action}`
                 });
-                expect(moveUpResponse).to.have.status(200);
+                expect(moveUpResponse).toHaveStatus(200);
                 expect(moveUpResponse.body).to.be.an('object');
                 assertNote(moveUpResponse.body, expectedNotes[0]);
                 for (const expectedNote of expectedNotes) {
@@ -418,13 +425,13 @@ describe('[API] Notes', () => {
     });
 
     describe('DELETE /notes/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/notes/:id'
             });
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             for (const noteId of [sharedNote.id, unsharedNote.id]) {
                 await api.testError(
                     {
@@ -435,7 +442,7 @@ describe('[API] Notes', () => {
                 );
             }
         });
-        it('Should delete a note', async () => {
+        test('Should delete a note', async () => {
             const { notes } = getUserNotes(api.userId);
             await api.testDelete({
                 route: `/notes/${notes[0].id}`,

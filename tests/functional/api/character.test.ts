@@ -1,5 +1,12 @@
-import { expect } from 'chai';
-import Path from 'path';
+import path from 'path';
+import {
+    describe,
+    expect,
+    test,
+    beforeAll,
+    beforeEach,
+    afterEach
+} from 'vitest';
 
 import { mockEnvVar } from '../../../src/services/env.js';
 
@@ -49,7 +56,7 @@ const getAnotherUser = (selfUserId: number, mustBeEnabled: boolean = true) => {
 };
 
 describe('[API] Characters', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
     beforeEach(async () => {
@@ -60,7 +67,7 @@ describe('[API] Characters', () => {
     });
 
     describe('GET /characters', () => {
-        it('Should list all characters', async () => {
+        test('Should list all characters', async () => {
             await api.testGetList({
                 route: '/characters',
                 listKey: 'characters',
@@ -68,7 +75,7 @@ describe('[API] Characters', () => {
                 assert: assertCharacter
             });
         });
-        it('Should list all characters belonging to a user', async () => {
+        test('Should list all characters belonging to a user', async () => {
             const { userId } = charactersData[0];
             await api.testGetList({
                 route: `/characters?user=${userId}`,
@@ -82,7 +89,7 @@ describe('[API] Characters', () => {
     });
 
     describe('POST /characters', () => {
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const { gameId, name, data } = findCharacter(
                 api.userId,
                 'callOfCthulhu'
@@ -143,7 +150,7 @@ describe('[API] Characters', () => {
                 );
             }
         });
-        it('Should create a character', async () => {
+        test('Should create a character', async () => {
             const gameIds = [
                 'callOfCthulhu',
                 'starWarsD6',
@@ -167,13 +174,13 @@ describe('[API] Characters', () => {
     });
 
     describe('GET /characters/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'GET',
                 route: '/characters/:id'
             });
         });
-        it('Should get a character', async () => {
+        test('Should get a character', async () => {
             await api.testGetOne({
                 route: '/characters/:id',
                 data: charactersData[0],
@@ -183,7 +190,7 @@ describe('[API] Characters', () => {
     });
 
     describe('POST /characters/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'POST',
                 route: '/characters/:id',
@@ -192,7 +199,7 @@ describe('[API] Characters', () => {
                 }
             });
         });
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const { gameId, name, data } = findCharacter(
                 api.userId,
                 'callOfCthulhu'
@@ -206,7 +213,7 @@ describe('[API] Characters', () => {
                     data
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;
@@ -259,7 +266,7 @@ describe('[API] Characters', () => {
                 );
             }
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
                     method: 'POST',
@@ -271,7 +278,7 @@ describe('[API] Characters', () => {
                 403
             );
         });
-        it('Should edit a character', async () => {
+        test('Should edit a character', async () => {
             const { id, gameId, data } = findCharacter(
                 api.userId,
                 'callOfCthulhu'
@@ -285,7 +292,7 @@ describe('[API] Characters', () => {
                     data
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id: createdId }
             } = response;
@@ -309,13 +316,13 @@ describe('[API] Characters', () => {
     });
 
     describe('DELETE /characters/:id', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/characters/:id'
             });
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
                     method: 'DELETE',
@@ -324,7 +331,7 @@ describe('[API] Characters', () => {
                 403
             );
         });
-        it('Should delete a character', async () => {
+        test('Should delete a character', async () => {
             const { gameId, data } = findCharacter(api.userId, 'callOfCthulhu');
             const response = await api.request({
                 method: 'POST',
@@ -335,7 +342,7 @@ describe('[API] Characters', () => {
                     data
                 }
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const {
                 body: { id }
             } = response;
@@ -347,7 +354,7 @@ describe('[API] Characters', () => {
     });
 
     describe('POST /characters/:id/portrait', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             const invalidData = [
                 {
                     id: 'invalid',
@@ -377,7 +384,7 @@ describe('[API] Characters', () => {
                 );
             }
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             const name = 'asset.png';
             const buffer = await getAssetBuffer(name);
             await api.testError(
@@ -395,7 +402,7 @@ describe('[API] Characters', () => {
                 403
             );
         });
-        it('Should throw a validation error', async () => {
+        test('Should throw a validation error', async () => {
             const { id: characterId } = findCharacter(
                 api.userId,
                 'callOfCthulhu'
@@ -417,7 +424,7 @@ describe('[API] Characters', () => {
                 400
             );
         });
-        it('Should throw a validation error because of wrong file type', async () => {
+        test('Should throw a validation error because of wrong file type', async () => {
             const { id: characterId } = findCharacter(
                 api.userId,
                 'callOfCthulhu'
@@ -439,7 +446,7 @@ describe('[API] Characters', () => {
                 400
             );
         });
-        it('Should throw a validation error because uploaded file is too big', async () => {
+        test('Should throw a validation error because uploaded file is too big', async () => {
             mockEnvVar('PORTRAIT_MAX_SIZE_MB', 1);
             const { id: characterId } = findCharacter(
                 api.userId,
@@ -462,7 +469,7 @@ describe('[API] Characters', () => {
                 400
             );
         });
-        it('Should upload a portrait', async () => {
+        test('Should upload a portrait', async () => {
             const character = findCharacter(api.userId, 'callOfCthulhu');
             const { id: characterId } = character;
             const uploadData = ['asset.jpg', 'asset.png'];
@@ -479,7 +486,7 @@ describe('[API] Characters', () => {
                         }
                     ]
                 });
-                expect(response).to.have.status(200);
+                expect(response).toHaveStatus(200);
                 expect(response.body).to.be.an('object');
                 const updatedCharacter = response.body;
                 assertCharacter(updatedCharacter, {
@@ -487,20 +494,20 @@ describe('[API] Characters', () => {
                     portrait: updatedCharacter.portrait
                 });
                 await api.testStaticFile(
-                    Path.join('/static', updatedCharacter.portrait)
+                    path.join('/static', updatedCharacter.portrait)
                 );
             }
         });
     });
 
     describe('DELETE /characters/:id/portrait', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
                 method: 'DELETE',
                 route: '/characters/:id/portrait'
             });
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
                     method: 'DELETE',
@@ -509,7 +516,7 @@ describe('[API] Characters', () => {
                 403
             );
         });
-        it('Should delete an asset', async () => {
+        test('Should delete an asset', async () => {
             const character = findCharacter(api.userId, 'callOfCthulhu');
             const { id: characterId } = character;
             const name = 'asset.png';
@@ -525,27 +532,27 @@ describe('[API] Characters', () => {
                     }
                 ]
             });
-            expect(response).to.have.status(200);
+            expect(response).toHaveStatus(200);
             const updatedCharacter = response.body;
             await api.testStaticFile(
-                Path.join('/static', updatedCharacter.portrait)
+                path.join('/static', updatedCharacter.portrait)
             );
             const deleteResponse = await api.request({
                 method: 'DELETE',
                 route: `/characters/${characterId}/portrait`
             });
-            expect(deleteResponse).to.have.status(200);
+            expect(deleteResponse).toHaveStatus(200);
             expect(deleteResponse.body).to.be.an('object');
             assertCharacter(deleteResponse.body);
             await api.testStaticFile(
-                Path.join('/static', updatedCharacter.portrait),
+                path.join('/static', updatedCharacter.portrait),
                 false
             );
         });
     });
 
     describe('PUT /characters/:id/transfer/:userId', () => {
-        it('Should throw error because of invalid ID', async () => {
+        test('Should throw error because of invalid ID', async () => {
             const { id: characterId } = await findCharacterFromDb(api.userId);
             const anotherUserId = getAnotherUser(api.userId).id;
             const invalidData = [
@@ -580,7 +587,7 @@ describe('[API] Characters', () => {
                 );
             }
         });
-        it('Should throw a forbidden error', async () => {
+        test('Should throw a forbidden error', async () => {
             const anotherUserId = getAnotherUser(api.userId).id;
             const { id: characterId } =
                 await findCharacterFromDb(anotherUserId);
@@ -592,7 +599,7 @@ describe('[API] Characters', () => {
                 403
             );
         });
-        it('Should throw a conflict error because transfering to self', async () => {
+        test('Should throw a conflict error because transfering to self', async () => {
             const { id: characterId } = await findCharacterFromDb(api.userId);
             await api.testError(
                 {
@@ -602,28 +609,28 @@ describe('[API] Characters', () => {
                 409
             );
         });
-        it('Should transfer a character to another user', async () => {
+        test('Should transfer a character to another user', async () => {
             const { id: characterId } = await findCharacterFromDb(api.userId);
             const anotherUserId = getAnotherUser(api.userId).id;
             const transferResponse = await api.request({
                 method: 'PUT',
                 route: `/characters/${characterId}/transfer/${anotherUserId}`
             });
-            expect(transferResponse).to.have.status(200);
+            expect(transferResponse).toHaveStatus(200);
             expect(transferResponse.body).to.be.an('object');
-            expect(transferResponse.body).to.be.empty;
+            expect(Object.keys(transferResponse.body)).toHaveLength(0);
             const charResponse = await api.request({
                 method: 'GET',
                 route: `/characters/${characterId}`
             });
-            expect(charResponse).to.have.status(200);
+            expect(charResponse).toHaveStatus(200);
             expect(charResponse.body).to.be.an('object');
             expect(charResponse.body.userId).to.equal(anotherUserId);
             const charsResponse = await api.request({
                 method: 'GET',
                 route: `/characters?user=${api.userId}`
             });
-            expect(charsResponse).to.have.status(200);
+            expect(charsResponse).toHaveStatus(200);
             expect(charResponse.body).to.be.an('object');
             expect(charsResponse.body).to.have.property('characters');
             expect(charsResponse.body.characters).to.be.an('array');
@@ -633,7 +640,7 @@ describe('[API] Characters', () => {
                     containsChar = true;
                 }
             });
-            expect(containsChar).to.be.false;
+            expect(containsChar).toEqual(false);
         });
     });
 });

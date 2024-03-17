@@ -1,6 +1,6 @@
-import Jwt, { JwtPayload } from 'jsonwebtoken';
-import Crypto from 'crypto';
-import Bcrypt from 'bcrypt';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 import { AppErrorConstructor, AuthenticationError } from './errors.js';
 import { getEnv } from './env.js';
@@ -9,23 +9,23 @@ import { SafeUser } from '../types/user.js';
 
 // hash a string
 export const hashPassword = async (password: string): Promise<string> =>
-    Bcrypt.hash(password, 10);
+    bcrypt.hash(password, 10);
 
 // validate hash against string
 export const verifyPassword = async (
     password: string,
     hash: string
 ): Promise<boolean> => {
-    const verify = await Bcrypt.compare(password, hash);
+    const verify = await bcrypt.compare(password, hash);
     return !!verify;
 };
 
 export const generateJwt = (user: SafeUser) =>
-    Jwt.sign(user, getEnv('JWT_SECRET'), { expiresIn: '12h' });
+    jwt.sign(user, getEnv('JWT_SECRET'), { expiresIn: '12h' });
 
-export const verifyJwt = (jwt: string): SafeUser & JwtPayload => {
+export const verifyJwt = (token: string): SafeUser & JwtPayload => {
     try {
-        return Jwt.verify(jwt, getEnv('JWT_SECRET')) as SafeUser & JwtPayload;
+        return jwt.verify(token, getEnv('JWT_SECRET')) as SafeUser & JwtPayload;
     } catch {
         throw new AuthenticationError();
     }
@@ -45,9 +45,9 @@ export const encrypt = (
     ErrorClass?: AppErrorConstructor
 ): string => {
     try {
-        const initVectorBuffer = Crypto.randomBytes(cryptoIvLength);
+        const initVectorBuffer = crypto.randomBytes(cryptoIvLength);
         const secretBuffer = Buffer.from(secret);
-        const cipher = Crypto.createCipheriv(
+        const cipher = crypto.createCipheriv(
             cryptoAlgo,
             secretBuffer,
             initVectorBuffer
@@ -83,7 +83,7 @@ export const decrypt = (
             buffer.length - 16
         );
         const initVectorBuffer = buffer.subarray(buffer.length - 12);
-        const decipher = Crypto.createDecipheriv(
+        const decipher = crypto.createDecipheriv(
             cryptoAlgo,
             secretBuffer,
             initVectorBuffer

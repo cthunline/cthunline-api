@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import FastifyStatic from '@fastify/static';
-import Path from 'path';
+import path from 'path';
 
 import { configurationController } from './configurationController.js';
 import { registrationController } from './registrationController.js';
@@ -81,7 +81,7 @@ export const mainController = async (app: FastifyInstance) => {
     if (getEnv('ENVIRONMENT') === 'prod') {
         log.info('Serving production web client build');
         await app.register(FastifyStatic, {
-            root: Path.join(dirname, '../web'),
+            root: path.join(dirname, '../web'),
             decorateReply: false,
             index: 'index.html'
         });

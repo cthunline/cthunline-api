@@ -1,4 +1,4 @@
-import DayJs from 'dayjs';
+import dayjs from 'dayjs';
 
 import { ForbiddenError } from '../../services/errors.js';
 import { generateToken } from '../../services/tools.js';
@@ -24,7 +24,7 @@ export const controlInvitationCode = async (
     if (invitation.isUsed) {
         throw new ForbiddenError('Invitation code has already been used');
     }
-    if (DayJs(invitation.expire).isBefore(DayJs())) {
+    if (dayjs(invitation.expire).isBefore(dayjs())) {
         throw new ForbiddenError('Invitation code is expired');
     }
     if (updateIsUsed) {
@@ -42,6 +42,6 @@ export const controlInvitationCode = async (
 // generate a new invitation code
 export const generateInvitationCode = () => ({
     code: generateToken(16),
-    expire: DayJs().add(24, 'hours').toDate(),
+    expire: dayjs().add(24, 'hours').toDate(),
     isUsed: false
 });

@@ -1,7 +1,7 @@
+import { type Options as FormidableOptions } from 'formidable';
 import { Character } from '@prisma/client';
-import Formidable from 'formidable';
-import Fs from 'fs';
-import Path from 'path';
+import path from 'path';
+import fs from 'fs';
 
 import { prisma } from '../../services/prisma.js';
 import { getEnv } from '../../services/env.js';
@@ -16,7 +16,7 @@ export const getCharacter = async (characterId: number): Promise<Character> =>
         }
     });
 
-export const getFormidablePortraitOptions = (): Formidable.Options => ({
+export const getFormidablePortraitOptions = (): FormidableOptions => ({
     uploadDir: assetTempDir,
     keepExtensions: false,
     maxFileSize: getEnv('PORTRAIT_MAX_SIZE_MB') * 1024 * 1024,
@@ -25,11 +25,11 @@ export const getFormidablePortraitOptions = (): Formidable.Options => ({
 
 // create user subdirectory in asset dir if not exist and return its path
 export const controlPortraitDir = async (): Promise<string> => {
-    const dir = Path.join(getAssetDir(), portraitDirName);
+    const dir = path.join(getAssetDir(), portraitDirName);
     try {
-        await Fs.promises.access(dir, Fs.constants.F_OK);
+        await fs.promises.access(dir, fs.constants.F_OK);
     } catch {
-        await Fs.promises.mkdir(dir);
+        await fs.promises.mkdir(dir);
     }
     return dir;
 };

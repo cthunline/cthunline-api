@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, test, beforeAll } from 'vitest';
 
 import { resetData } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
@@ -10,11 +10,11 @@ import {
 } from '../helpers/assert.helper.js';
 
 describe('[Sockets] Character', () => {
-    before(async () => {
+    beforeAll(async () => {
         await resetData();
     });
 
-    it('Should send character update to game master', async () => {
+    test('Should send character update to game master', async () => {
         const [masterSocket, playerSocket] = await socketHelper.setupSession();
         await Promise.all([
             new Promise<void>((resolve, reject) => {
@@ -22,7 +22,7 @@ describe('[Sockets] Character', () => {
                     const { user, isMaster, character } = data;
                     assertSocketMeta(data);
                     assertUser(user);
-                    expect(isMaster).to.be.false;
+                    expect(isMaster).toEqual(false);
                     assertCharacter(character);
                     masterSocket.disconnect();
                     resolve();

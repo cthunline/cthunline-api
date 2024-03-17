@@ -1,5 +1,5 @@
-import Fs from 'fs';
-import Path from 'path';
+import path from 'path';
+import fs from 'fs';
 
 import { assetDir } from '../../../src/controllers/helpers/asset.js';
 import { prisma } from '../../../src/services/prisma.js';
@@ -37,20 +37,20 @@ export const copyAssetFiles = async () => {
     await Promise.all(
         [...new Set(assets.map(({ userId }) => userId))].map((userId) =>
             (async () => {
-                const userDir = Path.join(assetDir, userId.toString());
+                const userDir = path.join(assetDir, userId.toString());
                 try {
-                    await Fs.promises.access(userDir, Fs.constants.F_OK);
+                    await fs.promises.access(userDir, fs.constants.F_OK);
                 } catch {
-                    await Fs.promises.mkdir(userDir);
+                    await fs.promises.mkdir(userDir);
                 }
             })()
         )
     );
     await Promise.all(
-        assets.map(({ name, path }) =>
-            Fs.promises.copyFile(
-                Path.join(dirname, '../data/assets', name),
-                Path.join(assetDir, path)
+        assets.map(({ name, path: assetPath }) =>
+            fs.promises.copyFile(
+                path.join(dirname, '../data/assets', name),
+                path.join(assetDir, assetPath)
             )
         )
     );
@@ -59,12 +59,12 @@ export const copyAssetFiles = async () => {
 export const deleteAssetFiles = async () => {
     const dbAssets = await prisma.asset.findMany();
     await Promise.all(
-        dbAssets.map(({ path }) =>
+        dbAssets.map(({ path: assetPath }) =>
             (async () => {
                 try {
-                    const filePath = Path.join(assetDir, path);
-                    await Fs.promises.access(filePath, Fs.constants.F_OK);
-                    await Fs.promises.rm(filePath);
+                    const filePath = path.join(assetDir, assetPath);
+                    await fs.promises.access(filePath, fs.constants.F_OK);
+                    await fs.promises.rm(filePath);
                 } catch {
                     //
                 }
@@ -77,9 +77,9 @@ export const deleteAssetFiles = async () => {
             (async () => {
                 try {
                     if (portrait) {
-                        const filePath = Path.join(assetDir, portrait);
-                        await Fs.promises.access(filePath, Fs.constants.F_OK);
-                        await Fs.promises.rm(filePath);
+                        const filePath = path.join(assetDir, portrait);
+                        await fs.promises.access(filePath, fs.constants.F_OK);
+                        await fs.promises.rm(filePath);
                     }
                 } catch {
                     //
@@ -90,8 +90,8 @@ export const deleteAssetFiles = async () => {
 };
 
 export const getAssetBuffer = async (assetName: string) => {
-    const localPath = Path.join(dirname, '../data/assets', assetName);
-    return Fs.promises.readFile(localPath);
+    const localPath = path.join(dirname, '../data/assets', assetName);
+    return fs.promises.readFile(localPath);
 };
 
 export const deleteAllData = async () => {
