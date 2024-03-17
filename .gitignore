@@ -3,6 +3,7 @@ build
 coverage
 web
 .nyc_output
+.scannerwork
 
 .env*
 !.env.sample
