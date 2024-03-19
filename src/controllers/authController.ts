@@ -1,6 +1,10 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { getCookieOptions } from './helpers/auth.js';
+import {
+    deleteCacheJwt,
+    getCookieOptions,
+    storeCacheJwt
+} from './helpers/auth.js';
 
 import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
@@ -50,6 +54,8 @@ export const authController = async (app: FastifyInstance) => {
                     throw new AuthenticationError();
                 }
                 const jwt = generateJwt(user);
+                deleteCacheJwt(user);
+                storeCacheJwt(user, jwt);
                 const encryptedJwt = encrypt(jwt, getEnv('CRYPTO_SECRET'));
                 rep.cookie('jwt', encryptedJwt, getCookieOptions()).send(user);
             }
@@ -60,7 +66,8 @@ export const authController = async (app: FastifyInstance) => {
     app.route({
         method: 'DELETE',
         url: '/auth',
-        handler: async (req: FastifyRequest, rep: FastifyReply) => {
+        handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
+            deleteCacheJwt(user);
             // delete jwt cookie on client
             rep.clearCookie('jwt').send({});
         }

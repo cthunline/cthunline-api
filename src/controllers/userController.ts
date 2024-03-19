@@ -1,14 +1,15 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { verifyPassword, hashPassword } from '../services/crypto.js';
-import {
-    controlSelf,
-    controlAdmin,
-    controlAdminMiddleware
-} from './helpers/auth.js';
 import { ValidationError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
 import { prisma } from '../services/prisma.js';
+import {
+    controlSelf,
+    controlAdmin,
+    controlAdminMiddleware,
+    updateCacheJwtUser
+} from './helpers/auth.js';
 import {
     safeUserSelect,
     getUser,
@@ -162,6 +163,9 @@ export const userController = async (app: FastifyInstance) => {
                     id: userData.id
                 }
             });
+            if (updatedUser.id === reqUser.id) {
+                updateCacheJwtUser(updatedUser);
+            }
             rep.send(updatedUser);
         }
     });

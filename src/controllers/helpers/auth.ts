@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { AuthenticationError, ForbiddenError } from '../../services/errors.js';
 import { decrypt, verifyJwt } from '../../services/crypto.js';
 import { parseParamId } from '../../services/api.js';
+import { cacheDelete, cacheGet, cacheSet } from '../../services/cache.js';
 import { getEnv } from '../../services/env.js';
 import { SafeUser } from '../../types/user.js';
 
@@ -19,6 +20,53 @@ export const getCookieOptions = (): CookieSerializeOptions => ({
     expires: dayjs().add(12, 'hours').toDate(),
     path: '/'
 });
+
+interface CacheJwtData {
+    jwt: string;
+    user: SafeUser;
+}
+
+/**
+Build the cache key for JWT data
+*/
+export const buildCacheJwtKey = (user: SafeUser) => `jwt-${user.id}`;
+
+/**
+Stores JWT in cache so it can be verified later.
+Set expiration time to the JWT duration.
+*/
+export const storeCacheJwt = (user: SafeUser, jwt: string) =>
+    cacheSet<CacheJwtData>(buildCacheJwtKey(user), {
+        jwt,
+        user
+    });
+
+/**
+Verifies that the given JWT is well registered in cache
+*/
+export const verifyCacheJwt = (user: SafeUser, jwt: string): SafeUser => {
+    const jwtData = cacheGet<CacheJwtData>(buildCacheJwtKey(user));
+    if (jwtData && jwtData.jwt === jwt) {
+        return jwtData.user;
+    }
+    throw new AuthenticationError('JWT is not valid');
+};
+
+/**
+Revokes a user JWT by deleting it from cache
+*/
+export const deleteCacheJwt = (user: SafeUser) =>
+    cacheDelete(buildCacheJwtKey(user));
+
+/**
+Updates JWT user data in cache
+*/
+export const updateCacheJwtUser = (user: SafeUser) => {
+    cacheSet<CacheJwtData>(buildCacheJwtKey(user), (prev) => ({
+        ...prev,
+        user
+    }));
+};
 
 /**
 Control that the given userId is the same as the currently authenticated user's id.
@@ -79,5 +127,6 @@ export const authMiddleware = async (req: FastifyRequest) => {
         AuthenticationError
     );
     const jwtData = verifyJwt(jwt);
-    req.user = jwtData;
+    const user = verifyCacheJwt(jwtData, jwt);
+    req.user = user;
 };

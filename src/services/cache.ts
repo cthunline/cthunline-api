@@ -1,38 +1,64 @@
 import { NotFoundError } from './errors.js';
 
-type CacheHandler = (previous: any) => any;
-type CacheSaver = (data: any) => any;
-
-const cache: Record<string, any> = {};
+const cacheMap: Map<string, any> = new Map();
 const timeouts: Record<string, ReturnType<typeof setTimeout>> = {};
 
-export const cacheGet = (key: string, throwNotFound: boolean = false): any => {
-    if (Object.hasOwn(cache, key)) {
-        return cache[key];
+interface CacheGetOptions {
+    throwNotFound?: boolean;
+}
+
+export const cacheGet = <T = any>(
+    key: string,
+    options?: CacheGetOptions
+): T | undefined => {
+    const val = cacheMap.get(key);
+    if (val) {
+        return val as T;
     }
-    if (throwNotFound) {
+    if (options?.throwNotFound) {
         throw new NotFoundError(`Could not get Id ${key} from cache`);
     }
-    return null;
+    return undefined;
 };
 
-export const cacheSet = (key: string, handler: CacheHandler): any => {
-    cache[key] = handler(cache[key]);
-    return cache[key];
-};
+type CacheSetHandler<T> = (prev: T) => T;
+type CachetSetValueOrHandler<T> = T | CacheSetHandler<T>;
 
-export const cacheSave = (
+const isHandler = <T>(
+    valueOrHandler: CachetSetValueOrHandler<T>
+): valueOrHandler is CacheSetHandler<T> => typeof valueOrHandler === 'function';
+
+export const cacheSet = <T = any>(
     key: string,
-    saver: CacheSaver,
-    timer: number = 0
+    valueOrHandler: CachetSetValueOrHandler<T>
+): T => {
+    if (isHandler<T>(valueOrHandler)) {
+        const prev = cacheMap.get(key);
+        if (prev) {
+            cacheMap.set(key, valueOrHandler(prev));
+        }
+    } else {
+        cacheMap.set(key, valueOrHandler);
+    }
+    return cacheMap.get(key);
+};
+
+type CacheSaver<T> = (data: T) => void | Promise<void>;
+
+export const cacheSave = <T = any>(
+    key: string,
+    saver: CacheSaver<T>,
+    timerMs: number = 0
 ) => {
-    const data = cacheGet(key);
+    const data = cacheGet<T>(key);
     if (data) {
         if (timeouts[key]) {
             clearTimeout(timeouts[key]);
         }
         timeouts[key] = setTimeout(() => {
             saver(data);
-        }, timer);
+        }, timerMs);
     }
 };
+
+export const cacheDelete = (key: string): boolean => cacheMap.delete(key);

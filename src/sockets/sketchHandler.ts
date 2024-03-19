@@ -13,8 +13,8 @@ import {
     TokenBody
 } from '../controllers/schemas/definitions.js';
 
-const sketchCacheSaver = (sessionId: number) => (data: SketchBody) =>
-    prisma.session.update({
+const sketchCacheSaver = (sessionId: number) => async (data: SketchBody) => {
+    await prisma.session.update({
         where: {
             id: sessionId
         },
@@ -22,6 +22,7 @@ const sketchCacheSaver = (sessionId: number) => (data: SketchBody) =>
             sketch: data
         }
     });
+};
 
 export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // updates sketch data (for game master only)
@@ -34,10 +35,12 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 throw new ForbiddenError();
             }
             const cacheId = `sketch-${sessionId}`;
-            cacheGet(cacheId, true);
-            cacheSet(cacheId, () => sketch);
+            cacheGet<SketchBody>(cacheId, {
+                throwNotFound: true
+            });
+            cacheSet<SketchBody>(cacheId, sketch);
             const saver = sketchCacheSaver(sessionId);
-            cacheSave(cacheId, saver, 1000);
+            cacheSave<SketchBody>(cacheId, saver, 1000);
             socket.to(String(sessionId)).emit(
                 'sketchUpdate',
                 meta({
@@ -58,7 +61,9 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
             validateSchema(tokenSchema, token);
             const { user, sessionId, isMaster } = socket.data;
             const cacheId = `sketch-${sessionId}`;
-            cacheGet(cacheId, true);
+            cacheGet(cacheId, {
+                throwNotFound: true
+            });
             const sketch = cacheSet(cacheId, (previous) => ({
                 ...previous,
                 tokens: previous.tokens.map((tok: TokenBody) =>

@@ -17,6 +17,7 @@ import {
     ForbiddenError
 } from '../services/errors.js';
 
+import { type SketchBody } from '../controllers/schemas/definitions.js';
 import { SafeUser } from '../types/user.js';
 import { getEnv } from '../services/env.js';
 
@@ -111,8 +112,8 @@ export const connectionMiddleware = async (
         }
         // stores sketch data in cache if not set already
         const cacheId = `sketch-${session.id}`;
-        if (!cacheGet(cacheId)) {
-            cacheSet(cacheId, () => session.sketch);
+        if (!cacheGet<SketchBody>(cacheId)) {
+            cacheSet<SketchBody>(cacheId, session.sketch as SketchBody);
         }
         // join session room
         socket.join(session.id.toString());
