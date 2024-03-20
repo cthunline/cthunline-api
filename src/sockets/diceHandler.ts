@@ -30,11 +30,12 @@ const getDiceResult = (
     isPrivate,
     result: sum(
         // sum results of all dice types
-        Object.entries(request).map(([diceType, diceCount]) =>
-            sum(
-                // sum results of one dice type
-                [...Array(diceCount)].map(() => rollDice(diceType as DiceType))
-            )
+        (Object.entries(request) as [DiceType, number | undefined][]).map(
+            ([diceType, diceCount]) =>
+                sum(
+                    // sum results of one dice type
+                    [...Array(diceCount)].map(() => rollDice(diceType))
+                )
         )
     )
 });
