@@ -17,7 +17,6 @@ import { authMiddleware } from './helpers/auth.js';
 import { assetDir } from './helpers/asset.js';
 
 import { importMetaUrlDirname } from '../services/tools.js';
-import { getFastifyHttpMethods } from '../services/api.js';
 import { NotFoundError } from '../services/errors.js';
 import { getEnv } from '../services/env.js';
 import { log } from '../services/log.js';
@@ -66,33 +65,37 @@ export const mainController = async (app: FastifyInstance) => {
         )
     );
 
-    // throw 404 on unknown api routes
-    app.all('/api/*', () => {
-        throw new NotFoundError('Route does not exist');
-    });
+    const isProd = getEnv('ENVIRONMENT') === 'prod';
 
     // serve static assets
     await app.register(FastifyStatic, {
         root: assetDir,
-        prefix: '/static'
+        prefix: '/static/',
+        decorateReply: !isProd
     });
 
-    // serve web client build in production
-    if (getEnv('ENVIRONMENT') === 'prod') {
+    // serve web client build assets in production
+    if (isProd) {
         log.info('Serving production web client build');
         await app.register(FastifyStatic, {
             root: path.join(dirname, '../web'),
-            decorateReply: false,
-            index: 'index.html'
-        });
-    } else {
-        // any other request falls in 404
-        app.route({
-            method: getFastifyHttpMethods({ exclude: 'OPTIONS' }),
-            url: '*',
-            handler: () => {
-                throw new NotFoundError();
-            }
+            prefix: '/',
+            decorateReply: true
         });
     }
+
+    // not found requests
+    app.setNotFoundHandler((req, res) => {
+        const { url } = req.raw;
+        if (url?.startsWith('/api')) {
+            // not found api routes
+            throw new NotFoundError('API route does not exist');
+        } else if (isProd) {
+            // serve web client build assets in production
+            res.sendFile('index.html');
+        } else {
+            // fallback
+            throw new NotFoundError();
+        }
+    });
 };
