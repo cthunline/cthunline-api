@@ -17,6 +17,7 @@
 
 - NodeJS >= 16
 - MySQL / MariaDB
+- KeyDB / Redis
 
 ## Configuration
 
