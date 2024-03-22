@@ -51,3 +51,21 @@ Returns the current dirname from ESM's import.meta.url
 */
 export const importMetaUrlDirname = (importMetaUrl: string) =>
     path.dirname(url.fileURLToPath(importMetaUrl));
+
+const timeouts: Map<string, ReturnType<typeof setTimeout>> = new Map();
+/**
+Set a timeout with a given key. If a timeout with the same key
+already exists clear it and replace it.
+*/
+export const resetTimeout = (
+    key: string,
+    task: () => void | Promise<void>,
+    timerMs: number = 0
+) => {
+    const timeout = timeouts.get(key);
+    if (timeout) {
+        clearTimeout(timeout);
+        timeouts.delete(key);
+    }
+    timeouts.set(key, setTimeout(task, timerMs));
+};

@@ -2,8 +2,8 @@ import { Session, Character } from '@prisma/client';
 import { type ExtendedError } from 'socket.io/dist/namespace';
 
 import { decrypt, verifyJwt } from '../services/crypto.js';
-import { cacheGet, cacheSet } from '../services/cache.js';
 import { prisma } from '../services/prisma.js';
+import { cache } from '../services/cache.js';
 import {
     type SocketIoServer,
     type SocketSessionUser,
@@ -18,6 +18,7 @@ import {
 } from '../services/errors.js';
 
 import { type SketchBody } from '../controllers/schemas/definitions.js';
+import { getSketchCacheKey } from './sketchHandler.js';
 import { SafeUser } from '../types/user.js';
 import { getEnv } from '../services/env.js';
 
@@ -111,9 +112,13 @@ export const connectionMiddleware = async (
             };
         }
         // stores sketch data in cache if not set already
-        const cacheId = `sketch-${session.id}`;
-        if (!cacheGet<SketchBody>(cacheId)) {
-            cacheSet<SketchBody>(cacheId, session.sketch as SketchBody);
+        const cacheKey = getSketchCacheKey(session.id);
+        const cachedSketch = await cache.getJson<SketchBody>(cacheKey);
+        if (!cachedSketch) {
+            await cache.setJson<SketchBody>(
+                cacheKey,
+                session.sketch as SketchBody
+            );
         }
         // join session room
         socket.join(session.id.toString());

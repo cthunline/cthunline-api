@@ -11,6 +11,17 @@ trigger:
   - push
   - pull_request
 
+services:
+- name: mariadb
+  image: mariadb
+  environment:
+    MARIADB_RANDOM_ROOT_PASSWORD: yes
+    MARIADB_USER: cthunline
+    MARIADB_PASSWORD: cthunline
+    MARIADB_DATABASE: cthunline_ci
+- name: keydb
+  image: eqalpha/keydb
+
 steps:
 # wait for database
 - name: waiton
@@ -59,16 +70,6 @@ steps:
     - dev
     event:
     - push
-
-services:
-# mariadb service
-- name: mariadb
-  image: mariadb
-  environment:
-    MARIADB_RANDOM_ROOT_PASSWORD: yes
-    MARIADB_USER: cthunline
-    MARIADB_PASSWORD: cthunline
-    MARIADB_DATABASE: cthunline_ci
 
 ---
 kind: pipeline

@@ -1,11 +1,14 @@
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
-import { cacheGet, cacheSave, cacheSet } from '../services/cache.js';
+import {
+    ForbiddenError,
+    InternError,
+    NotFoundError
+} from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
-import { ForbiddenError } from '../services/errors.js';
+import { resetTimeout } from '../services/tools.js';
 import { prisma } from '../services/prisma.js';
-
+import { cache } from '../services/cache.js';
 import { meta } from './helper.js';
-
 import {
     sketchSchema,
     SketchBody,
@@ -13,15 +16,28 @@ import {
     TokenBody
 } from '../controllers/schemas/definitions.js';
 
-const sketchCacheSaver = (sessionId: number) => async (data: SketchBody) => {
-    await prisma.session.update({
-        where: {
-            id: sessionId
-        },
-        data: {
-            sketch: data
-        }
-    });
+/**
+Builds the cache key for play sketch
+*/
+export const getSketchCacheKey = (sessionId: number) => `sketch-${sessionId}`;
+
+const saveCachedSketch = async (sessionId: number) => {
+    const cacheKey = getSketchCacheKey(sessionId);
+    const sketch = await cache.getJson<SketchBody>(cacheKey);
+    if (sketch) {
+        await prisma.session.update({
+            where: {
+                id: sessionId
+            },
+            data: {
+                sketch
+            }
+        });
+    } else {
+        throw new InternError(
+            `Could not retreive sketch with sessionId ${sessionId} from cache while trying to save it`
+        );
+    }
 };
 
 export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
@@ -34,13 +50,21 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
             if (!isMaster) {
                 throw new ForbiddenError();
             }
-            const cacheId = `sketch-${sessionId}`;
-            cacheGet<SketchBody>(cacheId, {
-                throwNotFound: true
-            });
-            cacheSet<SketchBody>(cacheId, sketch);
-            const saver = sketchCacheSaver(sessionId);
-            cacheSave<SketchBody>(cacheId, saver, 1000);
+            const cacheKey = getSketchCacheKey(sessionId);
+            const cachedSketch = await cache.getJson<SketchBody>(cacheKey);
+            if (!cachedSketch) {
+                throw new NotFoundError(
+                    'Could not retreive sketch data from cache'
+                );
+            }
+            await cache.setJson<SketchBody>(cacheKey, sketch);
+            resetTimeout(
+                cacheKey,
+                async () => {
+                    await saveCachedSketch(sessionId);
+                },
+                1000
+            );
             socket.to(String(sessionId)).emit(
                 'sketchUpdate',
                 meta({
@@ -60,18 +84,27 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
         try {
             validateSchema(tokenSchema, token);
             const { user, sessionId, isMaster } = socket.data;
-            const cacheId = `sketch-${sessionId}`;
-            cacheGet(cacheId, {
-                throwNotFound: true
-            });
-            const sketch = cacheSet(cacheId, (previous) => ({
-                ...previous,
-                tokens: previous.tokens.map((tok: TokenBody) =>
+            const cacheKey = getSketchCacheKey(sessionId);
+            const cachedSketch = await cache.getJson<SketchBody>(cacheKey);
+            if (!cachedSketch) {
+                throw new NotFoundError(
+                    'Could not retreive sketch data from cache'
+                );
+            }
+            const sketch: SketchBody = {
+                ...cachedSketch,
+                tokens: cachedSketch.tokens?.map((tok: TokenBody) =>
                     tok.id === token.id ? token : tok
                 )
-            }));
-            const saver = sketchCacheSaver(sessionId);
-            cacheSave(cacheId, saver, 1000);
+            };
+            await cache.setJson<SketchBody>(cacheKey, sketch);
+            resetTimeout(
+                cacheKey,
+                async () => {
+                    await saveCachedSketch(sessionId);
+                },
+                1000
+            );
             socket.to(String(sessionId)).emit(
                 'sketchUpdate',
                 meta({

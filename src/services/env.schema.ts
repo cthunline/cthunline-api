@@ -24,6 +24,11 @@ export const envSchema = Type.Object({
     RL_MAX_REQUESTS: Type.Integer({ minimum: 1 }),
     // database
     DATABASE_URL: Type.String({ minLength: 1 }),
+    // cache
+    CACHE_HOST: Type.String({ minLength: 1 }),
+    CACHE_PORT: Type.Integer({ minimum: 1 }),
+    CACHE_DATABASE: Type.Integer({ minimum: 0 }),
+    CACHE_PASSWORD: Type.Optional(Type.String({ minLength: 1 })),
     // assets
     ASSET_DIR: Type.String({ minLength: 1 }),
     ASSET_MAX_SIZE_MB: Type.Integer({ minimum: 1 }),

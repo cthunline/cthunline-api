@@ -1,18 +1,17 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import {
-    deleteCacheJwt,
-    getCookieOptions,
-    storeCacheJwt
-} from './helpers/auth.js';
-
 import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
 import { AuthenticationError } from '../services/errors.js';
-import { prisma } from '../services/prisma.js';
-import { getEnv } from '../services/env.js';
-
 import { loginSchema, LoginBody } from './schemas/auth.js';
+import { prisma } from '../services/prisma.js';
+import { cache } from '../services/cache.js';
+import { getEnv } from '../services/env.js';
+import {
+    type CacheJwtData,
+    getJwtCacheKey,
+    getCookieOptions
+} from './helpers/auth.js';
 
 export const authController = async (app: FastifyInstance) => {
     // check authentication validity
@@ -54,8 +53,12 @@ export const authController = async (app: FastifyInstance) => {
                     throw new AuthenticationError();
                 }
                 const jwt = generateJwt(user);
-                deleteCacheJwt(user);
-                storeCacheJwt(user, jwt);
+                const cacheKey = getJwtCacheKey(user.id);
+                await cache.del(cacheKey);
+                await cache.setJson<CacheJwtData>(cacheKey, {
+                    jwt,
+                    user
+                });
                 const encryptedJwt = encrypt(jwt, getEnv('CRYPTO_SECRET'));
                 rep.cookie('jwt', encryptedJwt, getCookieOptions()).send(user);
             }
@@ -67,7 +70,8 @@ export const authController = async (app: FastifyInstance) => {
         method: 'DELETE',
         url: '/auth',
         handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
-            deleteCacheJwt(user);
+            const cacheKey = getJwtCacheKey(user.id);
+            await cache.del(cacheKey);
             // delete jwt cookie on client
             rep.clearCookie('jwt').send({});
         }

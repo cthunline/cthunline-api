@@ -1,64 +1,65 @@
-import { NotFoundError } from './errors.js';
+import { Redis as IoRedis, type RedisOptions as IoRedisOptions } from 'ioredis';
 
-const cacheMap: Map<string, any> = new Map();
-const timeouts: Record<string, ReturnType<typeof setTimeout>> = {};
+import { InternError } from './errors.js';
+import { getEnv } from './env.js';
 
-interface CacheGetOptions {
-    throwNotFound?: boolean;
+interface CacheSetJsonOptions {
+    /** Expiration time in seconds */
+    expire?: number;
 }
 
-export const cacheGet = <T = any>(
-    key: string,
-    options?: CacheGetOptions
-): T | undefined => {
-    const val = cacheMap.get(key);
-    if (val) {
-        return val as T;
-    }
-    if (options?.throwNotFound) {
-        throw new NotFoundError(`Could not get Id ${key} from cache`);
-    }
-    return undefined;
-};
-
-type CacheSetHandler<T> = (prev: T) => T;
-type CachetSetValueOrHandler<T> = T | CacheSetHandler<T>;
-
-const isHandler = <T>(
-    valueOrHandler: CachetSetValueOrHandler<T>
-): valueOrHandler is CacheSetHandler<T> => typeof valueOrHandler === 'function';
-
-export const cacheSet = <T = any>(
-    key: string,
-    valueOrHandler: CachetSetValueOrHandler<T>
-): T => {
-    if (isHandler<T>(valueOrHandler)) {
-        const prev = cacheMap.get(key);
-        if (prev) {
-            cacheMap.set(key, valueOrHandler(prev));
+class CacheClient extends IoRedis {
+    async getJson<T = any>(key: string): Promise<T | null> {
+        try {
+            const jsonString = await this.get(key);
+            if (jsonString) {
+                return JSON.parse(jsonString);
+            }
+            return null;
+        } catch {
+            return null;
         }
-    } else {
-        cacheMap.set(key, valueOrHandler);
     }
-    return cacheMap.get(key);
-};
 
-type CacheSaver<T> = (data: T) => void | Promise<void>;
-
-export const cacheSave = <T = any>(
-    key: string,
-    saver: CacheSaver<T>,
-    timerMs: number = 0
-) => {
-    const data = cacheGet<T>(key);
-    if (data) {
-        if (timeouts[key]) {
-            clearTimeout(timeouts[key]);
+    async setJson<T = any>(
+        key: string,
+        data: T,
+        options?: CacheSetJsonOptions
+    ): Promise<boolean> {
+        try {
+            if (options?.expire) {
+                await this.set(key, JSON.stringify(data), 'EX', options.expire);
+            } else {
+                await this.set(key, JSON.stringify(data));
+            }
+            return true;
+        } catch {
+            return false;
         }
-        timeouts[key] = setTimeout(() => {
-            saver(data);
-        }, timerMs);
     }
-};
+}
 
-export const cacheDelete = (key: string): boolean => cacheMap.delete(key);
+const createCacheClient = async (
+    options?: IoRedisOptions
+): Promise<CacheClient> =>
+    new Promise((resolve, reject) => {
+        const client = new CacheClient({
+            host: getEnv('CACHE_HOST'),
+            port: getEnv('CACHE_PORT'),
+            db: getEnv('CACHE_DATABASE'),
+            password: getEnv('CACHE_PASSWORD'),
+            ...options
+        });
+        client.on('ready', () => {
+            resolve(client);
+        });
+        client.on('error', (err) => {
+            reject(
+                new InternError(
+                    `Error while connecting to the cache server (KeyDB or Redis) : ${err.message}`
+                )
+            );
+        });
+    });
+
+export const cache = await createCacheClient();

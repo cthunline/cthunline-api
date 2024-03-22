@@ -8,7 +8,8 @@ import {
     controlSelf,
     controlAdmin,
     controlAdminMiddleware,
-    updateCacheJwtUser
+    CacheJwtData,
+    getJwtCacheKey
 } from './helpers/auth.js';
 import {
     safeUserSelect,
@@ -27,6 +28,7 @@ import {
     updateUserSchema,
     UpdateUserBody
 } from './schemas/user.js';
+import { cache } from '../services/cache.js';
 
 export const userController = async (app: FastifyInstance) => {
     // get all users
@@ -164,7 +166,15 @@ export const userController = async (app: FastifyInstance) => {
                 }
             });
             if (updatedUser.id === reqUser.id) {
-                updateCacheJwtUser(updatedUser);
+                const cacheKey = getJwtCacheKey(updatedUser.id);
+                const cacheJwtData =
+                    await cache.getJson<CacheJwtData>(cacheKey);
+                if (cacheJwtData) {
+                    await cache.setJson<CacheJwtData>(cacheKey, {
+                        ...cacheJwtData,
+                        user: updatedUser
+                    });
+                }
             }
             rep.send(updatedUser);
         }
