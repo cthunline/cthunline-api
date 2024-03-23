@@ -1,12 +1,18 @@
 import { io, type Socket } from 'socket.io-client';
 import { fastifyCookie } from '@fastify/cookie';
 import { expect, afterEach } from 'vitest';
+import { type Session } from '@prisma/client';
 
 import { getEnv } from '../../../src/services/env.js';
 
 import { sessionsData, charactersData, usersData } from './data.helper.js';
 import { assertSocketMeta } from './assert.helper.js';
 import { api } from './api.helper.js';
+
+interface SetupSessionReturn {
+    sockets: Socket[];
+    session: Omit<Session, 'createdAt' | 'updatedAt'>;
+}
 
 interface SocketsHelper {
     url: string;
@@ -15,7 +21,7 @@ interface SocketsHelper {
     connect: (connectionData?: SocketConnectionData) => Promise<Socket>;
     connectRole: (isMaster: boolean) => Promise<Socket>;
     failConnect: (data: FailSocketConnectionData) => Promise<void>;
-    setupSession: () => Promise<Socket[]>;
+    setupSession: () => Promise<SetupSessionReturn>;
     testError: (data: TestErrorData) => Promise<void>;
 }
 
@@ -140,20 +146,23 @@ export const socketHelper: SocketsHelper = {
             email: player2Email,
             password: 'test'
         });
-        const sessionId = sessionsData.find(
+        const session = sessionsData.find(
             ({ masterId }) => masterJWTUser.id === masterId
-        )?.id;
+        );
+        if (!session) {
+            throw new Error('Could not find session to setup');
+        }
         const sockets: Socket[] = [];
         sockets.push(
             await socketHelper.connect({
                 jwt: masterJWTUser.jwt,
-                sessionId
+                sessionId: session.id
             })
         );
         sockets.push(
             await socketHelper.connect({
                 jwt: player1JWTUser.jwt,
-                sessionId,
+                sessionId: session.id,
                 characterId: charactersData.find(
                     (character) => character.userId === player1JWTUser.id
                 )?.id
@@ -162,13 +171,16 @@ export const socketHelper: SocketsHelper = {
         sockets.push(
             await socketHelper.connect({
                 jwt: player2JWTUser.jwt,
-                sessionId,
+                sessionId: session.id,
                 characterId: charactersData.find(
                     (character) => character.userId === player2JWTUser.id
                 )?.id
             })
         );
-        return sockets;
+        return {
+            sockets,
+            session
+        };
     },
 
     testError: async ({

@@ -1,11 +1,14 @@
-import { describe, test, beforeAll } from 'vitest';
+import { describe, test, beforeAll, beforeEach } from 'vitest';
 
-import { usersData, resetData } from '../helpers/data.helper.js';
+import { usersData, resetData, resetCache } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 describe('[API] Authentication', () => {
     beforeAll(async () => {
         await resetData();
+    });
+    beforeEach(async () => {
+        await resetCache();
     });
 
     describe('GET /auth', () => {

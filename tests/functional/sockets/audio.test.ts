@@ -1,8 +1,7 @@
-import { describe, expect, test, beforeAll } from 'vitest';
+import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
 
-import { assetsData, resetData } from '../helpers/data.helper.js';
+import { assetsData, resetData, resetCache } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
-
 import {
     assertUser,
     assertAsset,
@@ -16,6 +15,9 @@ const imageAsset = assetsData.find(({ type }) => type === 'image');
 describe('[Sockets] Audio', () => {
     beforeAll(async () => {
         await resetData();
+    });
+    beforeEach(async () => {
+        await resetCache();
     });
 
     test('Should fail to play audio because of invalid data', async () => {
@@ -54,8 +56,9 @@ describe('[Sockets] Audio', () => {
 
     test('Should play or stop audio', async () => {
         for (const event of ['audioPlay', 'audioStop']) {
-            const [masterSocket, player1Socket, player2Socket] =
-                await socketHelper.setupSession();
+            const {
+                sockets: [masterSocket, player1Socket, player2Socket]
+            } = await socketHelper.setupSession();
             await Promise.all([
                 ...[player1Socket, player2Socket].map(
                     (socket) =>

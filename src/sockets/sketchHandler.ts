@@ -1,9 +1,6 @@
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
-import {
-    ForbiddenError,
-    InternError,
-    NotFoundError
-} from '../services/errors.js';
+import { getSketchCacheKey } from '../controllers/helpers/session.js';
+import { ForbiddenError, NotFoundError } from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
 import { resetTimeout } from '../services/tools.js';
 import { prisma } from '../services/prisma.js';
@@ -16,10 +13,7 @@ import {
     TokenBody
 } from '../controllers/schemas/definitions.js';
 
-/**
-Builds the cache key for play sketch
-*/
-export const getSketchCacheKey = (sessionId: number) => `sketch-${sessionId}`;
+const sketchSaveTimerMs = 1000;
 
 const saveCachedSketch = async (sessionId: number) => {
     const cacheKey = getSketchCacheKey(sessionId);
@@ -33,10 +27,6 @@ const saveCachedSketch = async (sessionId: number) => {
                 sketch
             }
         });
-    } else {
-        throw new InternError(
-            `Could not retreive sketch with sessionId ${sessionId} from cache while trying to save it`
-        );
     }
 };
 
@@ -63,7 +53,7 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 async () => {
                     await saveCachedSketch(sessionId);
                 },
-                1000
+                sketchSaveTimerMs
             );
             socket.to(String(sessionId)).emit(
                 'sketchUpdate',
@@ -103,7 +93,7 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 async () => {
                     await saveCachedSketch(sessionId);
                 },
-                1000
+                sketchSaveTimerMs
             );
             socket.to(String(sessionId)).emit(
                 'sketchUpdate',

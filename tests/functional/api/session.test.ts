@@ -8,7 +8,7 @@ import {
 } from 'vitest';
 
 import { assertSession, assertUser } from '../helpers/assert.helper.js';
-import { sessionsData, resetData } from '../helpers/data.helper.js';
+import { sessionsData, resetData, resetCache } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 const { gameId } = sessionsData[0];
@@ -18,6 +18,7 @@ describe('[API] Sessions', () => {
         await resetData();
     });
     beforeEach(async () => {
+        await resetCache();
         await api.login();
     });
     afterEach(async () => {

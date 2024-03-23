@@ -7,7 +7,12 @@ import {
     afterEach
 } from 'vitest';
 
-import { sessionsData, notesData, resetData } from '../helpers/data.helper.js';
+import {
+    sessionsData,
+    notesData,
+    resetData,
+    resetCache
+} from '../helpers/data.helper.js';
 import { assertNote } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
 
@@ -75,6 +80,7 @@ describe('[API] Notes', () => {
         await resetData();
     });
     beforeEach(async () => {
+        await resetCache();
         await api.login();
     });
     afterEach(async () => {

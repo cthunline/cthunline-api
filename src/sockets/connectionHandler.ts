@@ -17,8 +17,9 @@ import {
     ForbiddenError
 } from '../services/errors.js';
 
+import { getCharacterCacheKey } from '../controllers/helpers/character.js';
 import { type SketchBody } from '../controllers/schemas/definitions.js';
-import { getSketchCacheKey } from './sketchHandler.js';
+import { getSketchCacheKey } from '../controllers/helpers/session.js';
 import { SafeUser } from '../types/user.js';
 import { getEnv } from '../services/env.js';
 
@@ -110,13 +111,15 @@ export const connectionMiddleware = async (
                 character,
                 characterId: character.id
             };
+            const charCacheKey = getCharacterCacheKey(character.id);
+            await cache.setJson<Character>(charCacheKey, character);
         }
         // stores sketch data in cache if not set already
-        const cacheKey = getSketchCacheKey(session.id);
-        const cachedSketch = await cache.getJson<SketchBody>(cacheKey);
+        const sketchCacheKey = getSketchCacheKey(session.id);
+        const cachedSketch = await cache.getJson<SketchBody>(sketchCacheKey);
         if (!cachedSketch) {
             await cache.setJson<SketchBody>(
-                cacheKey,
+                sketchCacheKey,
                 session.sketch as SketchBody
             );
         }

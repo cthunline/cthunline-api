@@ -3,9 +3,15 @@ import { Character } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 
+import { assetTempDir, getAssetDir } from './asset.js';
 import { prisma } from '../../services/prisma.js';
 import { getEnv } from '../../services/env.js';
-import { assetTempDir, getAssetDir } from './asset.js';
+
+/**
+Builds the cache key for character
+*/
+export const getCharacterCacheKey = (characterId: number) =>
+    `character-${characterId}`;
 
 export const portraitDirName = 'portraits';
 

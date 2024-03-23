@@ -1,11 +1,11 @@
 import mockDate from 'mockdate';
 import dayjs from 'dayjs';
-import { describe, expect, test, beforeAll } from 'vitest';
+import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
 
 import { mockEnvVar } from '../../../src/services/env.js';
 
 import { assertUser } from '../helpers/assert.helper.js';
-import { resetData } from '../helpers/data.helper.js';
+import { resetCache, resetData } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 const registerUser = async (data: any) => {
@@ -39,6 +39,9 @@ const generateInvitation = async () => {
 describe('[API] Registration', () => {
     beforeAll(async () => {
         await resetData();
+    });
+    beforeEach(async () => {
+        await resetCache();
     });
 
     describe('POST /register', () => {

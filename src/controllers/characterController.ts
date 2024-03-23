@@ -1,30 +1,29 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { Prisma } from '@prisma/client';
+import { Character, Prisma } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 
+import { Games, GameId, isValidGameId } from '../services/games.js';
+import { assetDir, controlFile } from './helpers/asset.js';
+import { validateSchema } from '../services/typebox.js';
+import { type QueryParam } from '../types/api.js';
+import { parseParamId } from '../services/api.js';
+import { controlSelf } from './helpers/auth.js';
+import { prisma } from '../services/prisma.js';
+import { cache } from '../services/cache.js';
+import { getUser } from './helpers/user.js';
 import {
     ConflictError,
     InternError,
     ValidationError
 } from '../services/errors.js';
-import { Games, GameId, isValidGameId } from '../services/games.js';
-import { parseParamId } from '../services/api.js';
-import { prisma } from '../services/prisma.js';
-
-import { assetDir, controlFile } from './helpers/asset.js';
-import { validateSchema } from '../services/typebox.js';
-import { controlSelf } from './helpers/auth.js';
-import { getUser } from './helpers/user.js';
 import {
     getCharacter,
     getFormidablePortraitOptions,
     controlPortraitDir,
-    portraitDirName
+    portraitDirName,
+    getCharacterCacheKey
 } from './helpers/character.js';
-
-import { QueryParam } from '../types/api.js';
-
 import {
     createCharacterSchema,
     CreateCharacterBody,
@@ -142,6 +141,11 @@ export const characterController = async (app: FastifyInstance) => {
                     id: characterId
                 }
             });
+            const cacheKey = getCharacterCacheKey(character.id);
+            const cachedChar = await cache.getJson<Character>(cacheKey);
+            if (cachedChar) {
+                await cache.setJson<Character>(cacheKey, character);
+            }
             rep.send(character);
         }
     });
@@ -169,6 +173,8 @@ export const characterController = async (app: FastifyInstance) => {
                     id: characterId
                 }
             });
+            const cacheKey = getCharacterCacheKey(characterId);
+            await cache.del(cacheKey);
             rep.send({});
         }
     });
@@ -227,6 +233,11 @@ export const characterController = async (app: FastifyInstance) => {
                     id: characterId
                 }
             });
+            const cacheKey = getCharacterCacheKey(updatedCharacter.id);
+            const cachedChar = await cache.getJson<Character>(cacheKey);
+            if (cachedChar) {
+                await cache.setJson<Character>(cacheKey, updatedCharacter);
+            }
             // if there was a portrait before then delete it
             if (character.portrait) {
                 await fs.promises.rm(path.join(assetDir, character.portrait));

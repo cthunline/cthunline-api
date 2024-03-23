@@ -17,7 +17,8 @@ import {
     charactersData,
     usersData,
     resetData,
-    getAssetBuffer
+    getAssetBuffer,
+    resetCache
 } from '../helpers/data.helper.js';
 
 const findCharacter = (userId: number, gameId?: string) => {
@@ -60,6 +61,7 @@ describe('[API] Characters', () => {
         await resetData();
     });
     beforeEach(async () => {
+        await resetCache();
         await api.login();
     });
     afterEach(async () => {

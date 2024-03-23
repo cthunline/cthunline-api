@@ -1,14 +1,15 @@
-import { describe, expect, test, beforeAll } from 'vitest';
+import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
 import { type Socket } from 'socket.io-client';
 
+import { socketHelper } from '../helpers/sockets.helper.js';
 import { api } from '../helpers/api.helper.js';
 import {
     sessionsData,
     charactersData,
     usersData,
-    resetData
+    resetData,
+    resetCache
 } from '../helpers/data.helper.js';
-import { socketHelper } from '../helpers/sockets.helper.js';
 import {
     assertUser,
     assertCharacter,
@@ -18,6 +19,9 @@ import {
 describe('[Sockets] Connection', () => {
     beforeAll(async () => {
         await resetData();
+    });
+    beforeEach(async () => {
+        await resetCache();
     });
 
     test('Should fail to connect socket because of invalid handshake data', async () => {

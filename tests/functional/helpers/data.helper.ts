@@ -16,6 +16,7 @@ import sketchs from '../data/sketchs.json';
 import assets from '../data/assets.json';
 import notes from '../data/notes.json';
 import users from '../data/users.json';
+import { cache } from '../../../src/services/cache.js';
 
 export const usersData = users;
 export const sessionsData = sessions;
@@ -126,4 +127,8 @@ export const resetData = async (insertData: boolean = true) => {
     if (insertData) {
         await insertAllData();
     }
+};
+
+export const resetCache = async () => {
+    await cache.flushall();
 };

@@ -1,7 +1,7 @@
 import { describe, test, beforeAll, beforeEach, afterEach } from 'vitest';
 
 import { assertGame } from '../helpers/assert.helper.js';
-import { resetData } from '../helpers/data.helper.js';
+import { resetCache, resetData } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
 
 import { GamesData } from '../../../src/services/games.js';
@@ -13,6 +13,7 @@ describe('[API] Games', () => {
         await resetData();
     });
     beforeEach(async () => {
+        await resetCache();
         await api.login();
     });
     afterEach(async () => {

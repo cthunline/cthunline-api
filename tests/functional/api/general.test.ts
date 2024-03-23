@@ -2,13 +2,14 @@ import { describe, expect, test, beforeEach, beforeAll } from 'vitest';
 
 import { api, httpMethods } from '../helpers/api.helper.js';
 import { assertError } from '../helpers/assert.helper.js';
-import { resetData } from '../helpers/data.helper.js';
+import { resetCache, resetData } from '../helpers/data.helper.js';
 
 describe('[API] General', () => {
     beforeAll(async () => {
         await resetData();
     });
     beforeEach(async () => {
+        await resetCache();
         await api.login();
     });
     test('Should throw not found error because routes are invalid', async () => {

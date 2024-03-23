@@ -6,13 +6,12 @@ import { characterHandler } from './characterHandler.js';
 import { sketchHandler } from './sketchHandler.js';
 import { audioHandler } from './audioHandler.js';
 import { diceHandler } from './diceHandler.js';
+import { meta } from './helper.js';
 import {
     connectionMiddleware,
     disconnectCopycats,
     getSessionUsers
 } from './connectionHandler.js';
-
-import { meta } from './helper.js';
 
 export const socketRouter = (app: FastifyInstance) => {
     const { io } = app;
@@ -41,7 +40,7 @@ export const socketRouter = (app: FastifyInstance) => {
                 isMaster
             })
         );
-        socket.on('disconnect', async (/* reason: string */) => {
+        socket.on('disconnect', async () => {
             const sessionUsers = await getSessionUsers(io);
             socket.to(String(sessionId)).emit(
                 'leave',

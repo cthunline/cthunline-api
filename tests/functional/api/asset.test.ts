@@ -16,7 +16,8 @@ import {
     assetsData,
     directoriesData,
     resetData,
-    getAssetBuffer
+    getAssetBuffer,
+    resetCache
 } from '../helpers/data.helper.js';
 
 const { userId } = assetsData[0];
@@ -38,6 +39,7 @@ describe('[API] Assets', () => {
         await resetData();
     });
     beforeEach(async () => {
+        await resetCache();
         await api.login();
     });
     afterEach(async () => {

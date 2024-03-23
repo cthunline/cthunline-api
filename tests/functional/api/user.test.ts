@@ -7,7 +7,7 @@ import {
     afterEach
 } from 'vitest';
 
-import { usersData, resetData } from '../helpers/data.helper.js';
+import { usersData, resetData, resetCache } from '../helpers/data.helper.js';
 import { assertUser } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
 
@@ -16,6 +16,7 @@ describe('[API] Users', () => {
         await resetData();
     });
     beforeEach(async () => {
+        await resetCache();
         await api.login();
     });
     afterEach(async () => {

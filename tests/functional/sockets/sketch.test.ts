@@ -1,20 +1,20 @@
-import { describe, expect, test, beforeAll } from 'vitest';
+import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
 
-import { sessionsData, resetData } from '../helpers/data.helper.js';
+import { type SketchBody } from '../../../src/controllers/schemas/definitions.js';
+import { sessionsData, resetData, resetCache } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
-
 import {
     assertUser,
     assertSketch,
     assertSocketMeta
 } from '../helpers/assert.helper.js';
 
-const sketchData = sessionsData[0].sketch;
-const tokenData = sessionsData[0].sketch.tokens[0];
-
 describe('[Sockets] Sketch', () => {
     beforeAll(async () => {
         await resetData();
+    });
+    beforeEach(async () => {
+        await resetCache();
     });
 
     test('Should fail to update sketch because of invalid data', async () => {
@@ -63,6 +63,7 @@ describe('[Sockets] Sketch', () => {
     });
 
     test('Should fail to update sketch because not game master', async () => {
+        const sketchData = sessionsData[0].sketch;
         await socketHelper.testError({
             emitEvent: 'sketchUpdate',
             onEvent: 'sketchUpdate',
@@ -73,8 +74,10 @@ describe('[Sockets] Sketch', () => {
     });
 
     test('Should update sketch', async () => {
-        const [masterSocket, player1Socket, player2Socket] =
-            await socketHelper.setupSession();
+        const sketchData = sessionsData[0].sketch;
+        const {
+            sockets: [masterSocket, player1Socket, player2Socket]
+        } = await socketHelper.setupSession();
         await Promise.all([
             ...[player1Socket, player2Socket].map(
                 (socket) =>
@@ -119,8 +122,24 @@ describe('[Sockets] Sketch', () => {
     });
 
     test('Should update sketch token', async () => {
-        const [masterSocket, player1Socket, player2Socket] =
-            await socketHelper.setupSession();
+        const {
+            sockets: [masterSocket, player1Socket, player2Socket],
+            session
+        } = await socketHelper.setupSession();
+        const sketchData = session.sketch as SketchBody;
+        const token = sketchData.tokens?.[0];
+        const anotherToken = sessionsData[1].sketch.tokens[0];
+        const updatedTokenData = {
+            ...token,
+            x: anotherToken.x,
+            y: anotherToken.y
+        };
+        const expectedSketchData = {
+            ...sketchData,
+            tokens: sketchData.tokens?.map((tok) =>
+                tok.id === updatedTokenData.id ? updatedTokenData : tok
+            )
+        };
         await Promise.all([
             ...[masterSocket, player1Socket].map(
                 (socket) =>
@@ -130,7 +149,7 @@ describe('[Sockets] Sketch', () => {
                             assertSocketMeta(data);
                             assertUser(user);
                             expect(isMaster).toEqual(false);
-                            assertSketch(sketch, sketchData);
+                            assertSketch(sketch, expectedSketchData);
                             socket.disconnect();
                             resolve();
                         });
@@ -141,7 +160,7 @@ describe('[Sockets] Sketch', () => {
                     })
             ),
             (async () => {
-                player2Socket.emit('tokenUpdate', tokenData);
+                player2Socket.emit('tokenUpdate', updatedTokenData);
             })()
         ]);
     });

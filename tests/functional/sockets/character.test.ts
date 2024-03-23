@@ -1,6 +1,6 @@
-import { describe, expect, test, beforeAll } from 'vitest';
+import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
 
-import { resetData } from '../helpers/data.helper.js';
+import { resetData, resetCache } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
 
 import {
@@ -13,9 +13,14 @@ describe('[Sockets] Character', () => {
     beforeAll(async () => {
         await resetData();
     });
+    beforeEach(async () => {
+        await resetCache();
+    });
 
     test('Should send character update to game master', async () => {
-        const [masterSocket, playerSocket] = await socketHelper.setupSession();
+        const {
+            sockets: [masterSocket, playerSocket]
+        } = await socketHelper.setupSession();
         await Promise.all([
             new Promise<void>((resolve, reject) => {
                 masterSocket.on('characterUpdate', (data: any) => {
