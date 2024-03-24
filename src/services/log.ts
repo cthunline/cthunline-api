@@ -11,7 +11,9 @@ const timestamp = {
     format: 'YYYY-MM-DD HH:mm:ss'
 };
 
-// default log transport in console
+/**
+Default log transport in console.
+*/
 const transports: winston.transport[] = [
     new winston.transports.Console({
         level: 'info',
@@ -24,7 +26,9 @@ const transports: winston.transport[] = [
     })
 ];
 
-// control log file directory exists and is writable
+/**
+Control log file directory exists and is writable
+*/
 let fileTransportError = null;
 const logDir = getEnv('LOG_DIR');
 if (!logDir) {
@@ -57,7 +61,9 @@ if (logDir && !fileTransportError) {
     );
 }
 
-// logging instance to use in code
+/**
+Logging instance to use in code.
+*/
 export const log = winston.createLogger({
     transports,
     exitOnError: false,

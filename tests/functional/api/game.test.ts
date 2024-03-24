@@ -1,12 +1,11 @@
 import { describe, test, beforeAll, beforeEach, afterEach } from 'vitest';
 
-import { assertGame } from '../helpers/assert.helper.js';
 import { resetCache, resetData } from '../helpers/data.helper.js';
+import { gamesData } from '../../../src/services/games.js';
+import { assertGame } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
 
-import { GamesData } from '../../../src/services/games.js';
-
-const games = Object.values(GamesData);
+const games = Object.values(gamesData);
 
 describe('[API] Games', () => {
     beforeAll(async () => {

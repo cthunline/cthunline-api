@@ -1,5 +1,5 @@
-import { FastifyInstance } from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
+import { FastifyInstance } from 'fastify';
 
 import { getEnv } from './env.js';
 

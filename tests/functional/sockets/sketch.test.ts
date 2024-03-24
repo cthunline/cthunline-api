@@ -2,13 +2,13 @@ import { describe, expect, test, beforeAll, beforeEach, vi } from 'vitest';
 
 import { type SketchBody } from '../../../src/controllers/schemas/definitions.js';
 import { sessionsData, resetData, resetCache } from '../helpers/data.helper.js';
+import { getSessionOrThrow } from '../../../src/controllers/helpers/session.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
 import {
     assertUser,
-    assertSketch,
+    assertSketchData,
     assertSocketMeta
 } from '../helpers/assert.helper.js';
-import { prisma } from '../../../src/services/prisma.js';
 
 describe('[Sockets] Sketch', () => {
     beforeAll(async () => {
@@ -93,7 +93,7 @@ describe('[Sockets] Sketch', () => {
                             assertSocketMeta(data);
                             assertUser(user);
                             expect(isMaster).toEqual(true);
-                            assertSketch(sketch, anotherSketch);
+                            assertSketchData(sketch, anotherSketch);
                             socket.disconnect();
                             resolve();
                         });
@@ -109,12 +109,8 @@ describe('[Sockets] Sketch', () => {
         ]);
         await vi.waitFor(
             async () => {
-                const updatedSession = await prisma.session.findUniqueOrThrow({
-                    where: {
-                        id: session.id
-                    }
-                });
-                assertSketch(
+                const updatedSession = await getSessionOrThrow(session.id);
+                assertSketchData(
                     updatedSession.sketch as SketchBody,
                     anotherSketch
                 );
@@ -175,7 +171,7 @@ describe('[Sockets] Sketch', () => {
                             assertSocketMeta(data);
                             assertUser(user);
                             expect(isMaster).toEqual(false);
-                            assertSketch(sketch, expectedSketchData);
+                            assertSketchData(sketch, expectedSketchData);
                             socket.disconnect();
                             resolve();
                         });
@@ -191,12 +187,8 @@ describe('[Sockets] Sketch', () => {
         ]);
         await vi.waitFor(
             async () => {
-                const updatedSession = await prisma.session.findUniqueOrThrow({
-                    where: {
-                        id: session.id
-                    }
-                });
-                assertSketch(
+                const updatedSession = await getSessionOrThrow(session.id);
+                assertSketchData(
                     updatedSession.sketch as SketchBody,
                     expectedSketchData
                 );

@@ -1,11 +1,14 @@
+import { eq } from 'drizzle-orm';
 import dayjs from 'dayjs';
 
 import { ForbiddenError } from '../../services/errors.js';
 import { generateToken } from '../../services/tools.js';
-import { prisma } from '../../services/prisma.js';
+import { db, tables } from '../../services/db.js';
 
-// control an invitation code is valid
-// if asked, updated the isUsed field to true on the invitation object
+/**
+Checks that an invitation code is valid.
+If asked, updated the isUsed field to true on the invitation object.
+*/
 export const controlInvitationCode = async (
     code: string,
     updateIsUsed: boolean
@@ -13,11 +16,11 @@ export const controlInvitationCode = async (
     if (!code) {
         throw new ForbiddenError('Missing invitation code');
     }
-    const invitation = await prisma.invitation.findUnique({
-        where: {
-            code
-        }
-    });
+    const invitations = await db
+        .select()
+        .from(tables.invitations)
+        .where(eq(tables.invitations.code, code));
+    const invitation = invitations[0];
     if (!invitation) {
         throw new ForbiddenError('Invalid invitation code');
     }
@@ -28,18 +31,18 @@ export const controlInvitationCode = async (
         throw new ForbiddenError('Invitation code is expired');
     }
     if (updateIsUsed) {
-        await prisma.invitation.update({
-            where: {
-                code
-            },
-            data: {
+        await db
+            .update(tables.invitations)
+            .set({
                 isUsed: true
-            }
-        });
+            })
+            .where(eq(tables.invitations.code, code));
     }
 };
 
-// generate a new invitation code
+/**
+Generates a new invitation code.
+*/
 export const generateInvitationCode = () => ({
     code: generateToken(16),
     expire: dayjs().add(24, 'hours').toDate(),

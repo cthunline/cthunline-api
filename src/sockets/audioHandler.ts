@@ -1,11 +1,9 @@
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
 import { ForbiddenError, ValidationError } from '../services/errors.js';
-import { validateSchema } from '../services/typebox.js';
-import { prisma } from '../services/prisma.js';
-
-import { meta } from './helper.js';
-
 import { playAudioSchema, PlayAudioBody } from './schemas/audio.js';
+import { getAssetOrThrow } from '../controllers/helpers/asset.js';
+import { validateSchema } from '../services/typebox.js';
+import { meta } from './helper.js';
 
 export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // notify session players that game master started playing audio asset
@@ -17,11 +15,7 @@ export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 throw new ForbiddenError();
             }
             const { assetId, time } = request;
-            const asset = await prisma.asset.findUniqueOrThrow({
-                where: {
-                    id: Number(assetId)
-                }
-            });
+            const asset = await getAssetOrThrow(Number(assetId));
             if (asset.type !== 'audio') {
                 throw new ValidationError('Asset type is not audio');
             }

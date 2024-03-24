@@ -1,6 +1,6 @@
 # Cthunline API
 
-> Cthunline API (REST + WebSockets) made with Fastify, Prisma, Socket.io and more
+> Cthunline API (REST + WebSockets) made with Fastify, Drizzle, Socket.io and more
 
 - [Useful resources](#useful-resources)
 - [Requirements](#requirements)
@@ -42,12 +42,8 @@ npm run lint
 # Run tests
 npm run test
 
-# Generate Prisma models
-npx prisma generate
-# Push Prisma schema to database
-npx prisma db push
-# When modifying the database structure it is necessary to create Prisma migrations
-npx prisma migrate dev --name <name_of_the_migration>
+# When modifying the database structure it is necessary to create Drizzle ORM migrations
+npm run drizzle:generate
 ```
 
 ### Production

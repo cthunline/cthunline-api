@@ -1,11 +1,12 @@
-import { type Character } from '@prisma/client';
-
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
-import { getCharacterCacheKey } from '../controllers/helpers/character.js';
 import { ForbiddenError } from '../services/errors.js';
-import { prisma } from '../services/prisma.js';
+import { type Character } from '../drizzle/schema.js';
 import { cache } from '../services/cache.js';
 import { meta } from './helper.js';
+import {
+    getCharacterByIdOrThrow,
+    getCharacterCacheKey
+} from '../controllers/helpers/character.js';
 
 export const characterHandler = (
     io: SocketIoServer,
@@ -23,12 +24,7 @@ export const characterHandler = (
                 getCharacterCacheKey(characterId)
             );
             const character =
-                cachedCharacter ??
-                (await prisma.character.findUniqueOrThrow({
-                    where: {
-                        id: characterId
-                    }
-                }));
+                cachedCharacter ?? (await getCharacterByIdOrThrow(characterId));
             socket.data.character = character;
             const sessionSockets = await io
                 .in(String(sessionId))

@@ -1,15 +1,19 @@
 import { type Server, type Socket } from 'socket.io';
-import { type Session, type Character, type Asset } from '@prisma/client';
 
-import {
-    type TokenBody,
-    type SketchBody
-} from '../controllers/schemas/definitions.js';
 import { type RequestDiceBody } from '../sockets/schemas/dice.js';
 import { type PlayAudioBody } from '../sockets/schemas/audio.js';
 import { type SocketMeta } from '../sockets/helper.js';
 import { type SocketDiceResult } from './dice.js';
-import { type SafeUser } from './user.js';
+import {
+    type TokenBody,
+    type SketchBody
+} from '../controllers/schemas/definitions.js';
+import {
+    type Character,
+    type Session,
+    type Asset,
+    type SafeUser
+} from '../drizzle/schema.js';
 
 export interface ListenEvents {
     sketchUpdate: (data: SketchBody) => void;

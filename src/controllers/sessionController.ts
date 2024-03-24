@@ -1,24 +1,19 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { eq, getTableColumns } from 'drizzle-orm';
 
-import { ValidationError } from '../services/errors.js';
+import { InternError, ValidationError } from '../services/errors.js';
+import { getSessionOrThrow } from './helpers/session.js';
+import { defaultSketchData } from './helpers/sketch.js';
 import { isValidGameId } from '../services/games.js';
+import { safeUserSelect } from './helpers/user.js';
 import { parseParamId } from '../services/api.js';
-import { prisma } from '../services/prisma.js';
-
-import {
-    defaultSketchData,
-    getInclude,
-    getSession
-} from './helpers/session.js';
 import { controlSelf } from './helpers/auth.js';
-
-import { QueryParam } from '../types/api.js';
-
+import { db, tables } from '../services/db.js';
 import {
     createSessionSchema,
-    CreateSessionBody,
+    type CreateSessionBody,
     updateSessionSchema,
-    UpdateSessionBody
+    type UpdateSessionBody
 } from './schemas/session.js';
 
 export const sessionController = async (app: FastifyInstance) => {
@@ -27,22 +22,23 @@ export const sessionController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/sessions',
         handler: async (
-            {
-                query
-            }: FastifyRequest<{
+            req: FastifyRequest<{
                 Params: {
                     sessionId: string;
-                };
-                Querystring: {
-                    include?: QueryParam;
                 };
             }>,
             rep: FastifyReply
         ) => {
-            const { include } = query;
-            const sessions = await prisma.session.findMany({
-                ...getInclude(include === 'true')
-            });
+            const sessions = await db
+                .select({
+                    ...getTableColumns(tables.sessions),
+                    master: safeUserSelect
+                })
+                .from(tables.sessions)
+                .innerJoin(
+                    tables.users,
+                    eq(tables.sessions.masterId, tables.users.id)
+                );
             rep.send({ sessions });
         }
     });
@@ -65,14 +61,19 @@ export const sessionController = async (app: FastifyInstance) => {
             if (!isValidGameId(gameId)) {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
-            const session = await prisma.session.create({
-                data: {
+            const createdSessions = await db
+                .insert(tables.sessions)
+                .values({
                     ...body,
                     sketch: sketch ?? defaultSketchData,
                     masterId: user.id
-                }
-            });
-            rep.send(session);
+                })
+                .returning();
+            const createdSession = createdSessions[0];
+            if (!createdSession) {
+                throw new InternError('Could not retreive inserted session');
+            }
+            rep.send(createdSession);
         }
     });
 
@@ -91,7 +92,7 @@ export const sessionController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sessionId = parseParamId(params, 'sessionId');
-            const session = await getSession(sessionId);
+            const session = await getSessionOrThrow(sessionId);
             rep.send(session);
         }
     });
@@ -115,14 +116,17 @@ export const sessionController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sessionId = parseParamId(params, 'sessionId');
-            const session = await getSession(sessionId);
+            const session = await getSessionOrThrow(sessionId);
             controlSelf(session.masterId, user);
-            const updatedSession = await prisma.session.update({
-                data: body,
-                where: {
-                    id: session.id
-                }
-            });
+            const updatedSessions = await db
+                .update(tables.sessions)
+                .set(body)
+                .where(eq(tables.sessions.id, session.id))
+                .returning();
+            const updatedSession = updatedSessions[0];
+            if (!updatedSession) {
+                throw new InternError('Could not retreive updated session');
+            }
             rep.send(updatedSession);
         }
     });
@@ -143,13 +147,11 @@ export const sessionController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sessionId = parseParamId(params, 'sessionId');
-            const session = await getSession(sessionId);
+            const session = await getSessionOrThrow(sessionId);
             controlSelf(session.masterId, user);
-            await prisma.session.delete({
-                where: {
-                    id: sessionId
-                }
-            });
+            await db
+                .delete(tables.sessions)
+                .where(eq(tables.sessions.id, sessionId));
             rep.send({});
         }
     });

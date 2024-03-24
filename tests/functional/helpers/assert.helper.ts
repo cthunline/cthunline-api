@@ -149,7 +149,7 @@ export const assertSketchToken = (data: Record<string, any>) => {
     expect(data.y).to.be.a('number');
 };
 
-export const assertSketch = (
+export const assertSketchData = (
     data: Record<string, any>,
     expected?: Record<string, any>
 ) => {
@@ -185,17 +185,17 @@ export const assertSketchObject = (
     expect(data.id).to.be.a('number');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
-    expect(data).to.have.property('sketch');
-    expect(data.sketch).to.be.an('object');
+    expect(data).to.have.property('data');
+    expect(data.data).to.be.an('object');
     if (expected) {
         Object.keys(expected).forEach((key) => {
-            if (key !== 'sketch') {
+            if (key !== 'data') {
                 expect(data).to.have.property(key);
                 expect(data[key]).to.equal(expected[key]);
             }
         });
     }
-    assertSketch(data.sketch, expected?.sketch);
+    assertSketchData(data.data, expected?.data);
 };
 
 export const assertSession = (
@@ -207,7 +207,7 @@ export const assertSession = (
     expect(data.gameId).to.be.a('string');
     expect(data).to.have.property('masterId');
     expect(data.masterId).to.be.a('number');
-    assertSketchObject(data, expected);
+    assertSketchData(data.sketch, expected?.sketch);
 };
 
 export const assertNote = (

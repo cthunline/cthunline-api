@@ -1,5 +1,5 @@
-import { TSchema } from '@sinclair/typebox';
 import { Value } from '@sinclair/typebox/value';
+import { TSchema } from '@sinclair/typebox';
 
 import { ValidationError } from './errors.js';
 

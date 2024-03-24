@@ -1,22 +1,22 @@
+import { sql } from 'drizzle-orm';
 import path from 'path';
 import fs from 'fs';
 
-import { assetDir } from '../../../src/controllers/helpers/asset.js';
-import { prisma } from '../../../src/services/prisma.js';
-
-import warhammerFantasyCharacters from '../data/characters/warhammerFantasyCharacters.json';
-import seventhSeaCharacters from '../data/characters/seventhSeaCharacters.json';
+import { warhammerFantasyCharacters } from '../data/characters/warhammerFantasyCharacters.data.js';
+import { seventhSeaCharacters } from '../data/characters/seventhSeaCharacters.data.js';
+import { swd6Characters } from '../data/characters/swd6Characters.data.js';
+import { dnd5Characters } from '../data/characters/dnd5Characters.data.js';
+import { cocCharacters } from '../data/characters/cocCharacters.data.js';
 import { importMetaUrlDirname } from '../../../src/services/tools.js';
-import swd6Characters from '../data/characters/swd6Characters.json';
-import dnd5Characters from '../data/characters/dnd5Characters.json';
-import cocCharacters from '../data/characters/cocCharacters.json';
-import directories from '../data/directories.json';
-import sessions from '../data/sessions.json';
-import sketchs from '../data/sketchs.json';
-import assets from '../data/assets.json';
-import notes from '../data/notes.json';
-import users from '../data/users.json';
+import { assetDir } from '../../../src/controllers/helpers/asset.js';
+import { directories } from '../data/directories.data.js';
+import { db, tables } from '../../../src/services/db.js';
 import { cache } from '../../../src/services/cache.js';
+import { sessions } from '../data/sessions.data.js';
+import { sketchs } from '../data/sketchs.data.js';
+import { assets } from '../data/assets.data.js';
+import { notes } from '../data/notes.data.js';
+import { users } from '../data/users.data.js';
 
 export const usersData = users;
 export const sessionsData = sessions;
@@ -58,7 +58,7 @@ export const copyAssetFiles = async () => {
 };
 
 export const deleteAssetFiles = async () => {
-    const dbAssets = await prisma.asset.findMany();
+    const dbAssets = await db.select().from(tables.assets);
     await Promise.all(
         dbAssets.map(({ path: assetPath }) =>
             (async () => {
@@ -72,7 +72,7 @@ export const deleteAssetFiles = async () => {
             })()
         )
     );
-    const characters = await prisma.character.findMany();
+    const characters = await db.select().from(tables.characters);
     await Promise.all(
         characters.map(({ portrait }) =>
             (async () => {
@@ -97,29 +97,34 @@ export const getAssetBuffer = async (assetName: string) => {
 
 export const deleteAllData = async () => {
     await deleteAssetFiles();
-    await prisma.character.deleteMany();
-    await prisma.note.deleteMany();
-    await prisma.session.deleteMany();
-    await prisma.sketch.deleteMany();
-    await prisma.asset.deleteMany();
-    await prisma.directory.deleteMany();
-    await prisma.user.deleteMany();
+    for (const table of Object.keys(tables)) {
+        const query = `TRUNCATE ${table} RESTART IDENTITY CASCADE;`;
+        await db.execute(sql.raw(query));
+    }
+};
+
+const resetAutoIncrement = async () => {
+    for (const table of Object.keys(tables)) {
+        const query = `SELECT SETVAL(pg_get_serial_sequence('${table}', 'id'), (SELECT MAX(id) FROM ${table}));`;
+        await db.execute(sql.raw(query));
+    }
 };
 
 export const insertAllData = async () => {
-    await prisma.user.createMany({ data: usersData });
+    await db.insert(tables.users).values(usersData);
     // must not be inserted simultaneously because of relation id constraint
     for (const data of directoriesData) {
-        await prisma.directory.create({ data });
+        await db.insert(tables.directories).values(data);
     }
     await Promise.all([
-        prisma.asset.createMany({ data: assetsData }),
+        db.insert(tables.assets).values(assetsData),
         copyAssetFiles()
     ]);
-    await prisma.session.createMany({ data: sessionsData });
-    await prisma.sketch.createMany({ data: sketchsData });
-    await prisma.note.createMany({ data: notesData });
-    await prisma.character.createMany({ data: charactersData });
+    await db.insert(tables.sessions).values(sessionsData);
+    await db.insert(tables.sketchs).values(sketchsData);
+    await db.insert(tables.notes).values(notesData);
+    await db.insert(tables.characters).values(charactersData);
+    await resetAutoIncrement();
 };
 
 export const resetData = async (insertData: boolean = true) => {

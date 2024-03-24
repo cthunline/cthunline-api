@@ -6,8 +6,12 @@ import {
     warhammerFantasy
 } from '@cthunline/games';
 
-// list of available games
-export const Games = {
+export type GameId = keyof typeof games;
+
+/**
+List of available games.
+*/
+export const games = {
     callOfCthulhu: {
         name: 'Call of Cthulhu',
         schema: callOfCthulhu.schema
@@ -30,13 +34,15 @@ export const Games = {
     }
 };
 
-// games data without fields not needed for api endpoints
-export const GamesData = Object.fromEntries(
-    Object.entries(Games).map(([id, { name }]) => [id, { id, name }])
+/**
+Games data without fields not needed for api endpoints.
+*/
+export const gamesData = Object.fromEntries(
+    Object.entries(games).map(([id, { name }]) => [id, { id, name }])
 );
 
-// check a gameId exists
-export const isValidGameId = (gameId: string) =>
-    Object.keys(Games).includes(gameId);
-
-export type GameId = keyof typeof Games;
+/**
+Check a gameId exists.
+*/
+export const isValidGameId = (gameId: string): gameId is GameId =>
+    Object.keys(games).includes(gameId);

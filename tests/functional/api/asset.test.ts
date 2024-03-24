@@ -8,9 +8,8 @@ import {
     afterEach
 } from 'vitest';
 
-import { mockEnvVar } from '../../../src/services/env.js';
-
 import { assertAsset, assertDirectory } from '../helpers/assert.helper.js';
+import { mockEnvVar } from '../../../src/services/env.js';
 import { api } from '../helpers/api.helper.js';
 import {
     assetsData,

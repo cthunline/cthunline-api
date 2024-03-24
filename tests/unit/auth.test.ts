@@ -1,7 +1,13 @@
-import { FastifyRequest } from 'fastify';
-import { User } from '@prisma/client';
 import { describe, test, expect } from 'vitest';
+import { FastifyRequest } from 'fastify';
 
+import { type SafeUser, type User } from '../../src/drizzle/schema.js';
+import { expectAsync } from '../functional/helpers/assert.helper.js';
+import { users } from '../functional/data/users.data.js';
+import {
+    AuthenticationError,
+    ForbiddenError
+} from '../../src/services/errors.js';
 import {
     hashPassword,
     verifyPassword,
@@ -9,21 +15,11 @@ import {
     verifyJwt
 } from '../../src/services/crypto.js';
 import {
-    AuthenticationError,
-    ForbiddenError
-} from '../../src/services/errors.js';
-import {
     controlSelf,
     controlAdmin,
     controlSelfMiddleware,
     controlAdminMiddleware
 } from '../../src/controllers/helpers/auth.js';
-
-import { SafeUser } from '../../src/types/user.js';
-
-import { expectAsync } from '../functional/helpers/assert.helper.js';
-
-import users from '../functional/data/users.json';
 
 describe('[Unit] Auth', () => {
     describe('hashPassword + verifyPassword', () => {

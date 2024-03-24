@@ -1,29 +1,16 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { type File as FormidableFile } from 'formidable';
+import { and, eq, getTableColumns, inArray } from 'drizzle-orm';
 import path from 'path';
 import fs from 'fs';
 
-import { ValidationError } from '../services/errors.js';
+import { InternError, ValidationError } from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
+import { type TypedFile } from '../types/asset.js';
+import { type QueryParam } from '../types/api.js';
 import { parseParamId } from '../services/api.js';
-import { prisma } from '../services/prisma.js';
+import { db, tables } from '../services/db.js';
 import { log } from '../services/log.js';
-
-import {
-    controlFile,
-    assetDir,
-    assetTempDir,
-    controlUserDir,
-    getFormidableOptions,
-    getAsset,
-    getDirectories,
-    getDirectory,
-    getChildrenDirectories
-} from './helpers/asset.js';
-
-import { TypedFile } from '../types/asset.js';
-import { QueryParam } from '../types/api.js';
-
 import {
     createDirectorySchema,
     CreateDirectoryBody,
@@ -32,6 +19,17 @@ import {
     uploadAssetsSchema,
     UploadAssetsBody
 } from './schemas/asset.js';
+import {
+    controlFile,
+    assetDir,
+    assetTempDir,
+    controlUserDir,
+    getFormidableOptions,
+    getUserAssetOrThrow,
+    getUserDirectories,
+    getChildrenDirectories,
+    getUserDirectoryOrThrow
+} from './helpers/asset.js';
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {
@@ -57,25 +55,27 @@ export const assetController = async (app: FastifyInstance) => {
             }: FastifyRequest<{
                 Querystring: {
                     type?: QueryParam;
-                    include?: QueryParam;
                 };
             }>,
             rep: FastifyReply
         ) => {
-            const { type, include } = query;
-            const assets = await prisma.asset.findMany({
-                where: {
-                    userId: user.id,
-                    ...(type
-                        ? {
-                              type: String(type)
-                          }
-                        : {})
-                },
-                include: {
-                    directory: include === 'true'
-                }
-            });
+            const { type } = query;
+            const assets = await db
+                .select({
+                    ...getTableColumns(tables.assets),
+                    directory: getTableColumns(tables.directories)
+                })
+                .from(tables.assets)
+                .where(
+                    and(
+                        eq(tables.assets.userId, user.id),
+                        type ? eq(tables.assets.type, String(type)) : undefined
+                    )
+                )
+                .leftJoin(
+                    tables.directories,
+                    eq(tables.assets.directoryId, tables.directories.id)
+                );
             rep.send({ assets });
         }
     });
@@ -110,7 +110,7 @@ export const assetController = async (app: FastifyInstance) => {
                 ? Number(body.directoryId)
                 : null;
             if (directoryId !== null) {
-                await getDirectory(user.id, directoryId);
+                await getUserDirectoryOrThrow(directoryId, user.id);
             }
             // get files data
             const assetFiles: FormidableFile[] = [];
@@ -136,26 +136,27 @@ export const assetController = async (app: FastifyInstance) => {
                 )
             );
             // save assets in database
-            const assets = await prisma.$transaction(
-                typedAssetFiles.map(
-                    ({ originalFilename, newFilename, type }) => {
-                        const name = originalFilename ?? newFilename;
-                        const assetPath = path.join(
-                            user.id.toString(),
-                            newFilename
-                        );
-                        return prisma.asset.create({
-                            data: {
+            const assets = await db
+                .insert(tables.assets)
+                .values(
+                    typedAssetFiles.map(
+                        ({ originalFilename, newFilename, type }) => {
+                            const name = originalFilename ?? newFilename;
+                            const assetPath = path.join(
+                                user.id.toString(),
+                                newFilename
+                            );
+                            return {
                                 userId: user.id,
                                 directoryId,
                                 type,
                                 name,
                                 path: assetPath
-                            }
-                        });
-                    }
+                            };
+                        }
+                    )
                 )
-            );
+                .returning();
             //
             rep.send({ assets });
         }
@@ -177,7 +178,7 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const assetId = parseParamId(params, 'assetId');
-            const asset = await getAsset(user.id, assetId);
+            const asset = await getUserAssetOrThrow(assetId, user.id);
             rep.send(asset);
         }
     });
@@ -198,13 +199,12 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const assetId = parseParamId(params, 'assetId');
-            const { path: assetPath } = await getAsset(user.id, assetId);
+            const { path: assetPath } = await getUserAssetOrThrow(
+                assetId,
+                user.id
+            );
             await Promise.all([
-                prisma.asset.delete({
-                    where: {
-                        id: assetId
-                    }
-                }),
+                db.delete(tables.assets).where(eq(tables.assets.id, assetId)),
                 fs.promises.rm(path.join(assetDir, assetPath))
             ]);
             rep.send({});
@@ -226,7 +226,7 @@ export const assetController = async (app: FastifyInstance) => {
             }>,
             rep: FastifyReply
         ) => {
-            const directories = await getDirectories(user.id);
+            const directories = await getUserDirectories(user.id);
             rep.send({ directories });
         }
     });
@@ -247,14 +247,19 @@ export const assetController = async (app: FastifyInstance) => {
         ) => {
             const { parentId } = body;
             if (parentId) {
-                await getDirectory(user.id, parentId);
+                await getUserDirectoryOrThrow(parentId, user.id);
             }
-            const directory = await prisma.directory.create({
-                data: {
+            const createdDirectories = await db
+                .insert(tables.directories)
+                .values({
                     ...body,
                     userId: user.id
-                }
-            });
+                })
+                .returning();
+            const directory = createdDirectories[0];
+            if (!directory) {
+                throw new InternError('Could not retreive inserted directory');
+            }
             rep.send(directory);
         }
     });
@@ -276,7 +281,10 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const directoryId = parseParamId(params, 'directoryId');
-            const directory = await getDirectory(user.id, directoryId);
+            const directory = await getUserDirectoryOrThrow(
+                directoryId,
+                user.id
+            );
             rep.send(directory);
         }
     });
@@ -300,13 +308,16 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const directoryId = parseParamId(params, 'directoryId');
-            await getDirectory(user.id, directoryId);
-            const directory = await prisma.directory.update({
-                data: body,
-                where: {
-                    id: directoryId
-                }
-            });
+            await getUserDirectoryOrThrow(directoryId, user.id);
+            const updatedDirectories = await db
+                .update(tables.directories)
+                .set(body)
+                .where(eq(tables.directories.id, directoryId))
+                .returning();
+            const directory = updatedDirectories[0];
+            if (!directory) {
+                throw new InternError('Could not retreive updated directory');
+            }
             rep.send(directory);
         }
     });
@@ -327,9 +338,9 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const directoryId = parseParamId(params, 'directoryId');
-            await getDirectory(user.id, directoryId);
+            await getUserDirectoryOrThrow(directoryId, user.id);
             // get all directories of the user
-            const directories = await getDirectories(user.id);
+            const directories = await getUserDirectories(user.id);
             // get all children directories
             const childrenDirectories = getChildrenDirectories(
                 directoryId,
@@ -338,34 +349,39 @@ export const assetController = async (app: FastifyInstance) => {
             const childrenDirectoryIds = childrenDirectories.map(
                 ({ id }) => id
             );
-            // get assets within all children directories
-            const assets = await prisma.asset.findMany({
-                where: {
-                    userId: user.id,
-                    directoryId: {
-                        in: childrenDirectoryIds
-                    }
+            if (childrenDirectoryIds.length) {
+                // get assets within all children directories
+                const assets = await db
+                    .select()
+                    .from(tables.assets)
+                    .where(
+                        and(
+                            eq(tables.assets.userId, user.id),
+                            inArray(
+                                tables.assets.directoryId,
+                                childrenDirectoryIds
+                            )
+                        )
+                    );
+                if (assets.length) {
+                    // delete all children assets
+                    await Promise.all([
+                        db.delete(tables.assets).where(
+                            inArray(
+                                tables.assets.id,
+                                assets.map(({ id }) => id)
+                            )
+                        ),
+                        ...assets.map(({ path: assetPath }) =>
+                            fs.promises.rm(path.join(assetDir, assetPath))
+                        )
+                    ]);
                 }
-            });
-            // delete all children assets
-            await Promise.all([
-                prisma.$transaction(
-                    assets.map(({ id }) =>
-                        prisma.asset.delete({
-                            where: { id }
-                        })
-                    )
-                ),
-                ...assets.map(({ path: assetPath }) =>
-                    fs.promises.rm(path.join(assetDir, assetPath))
-                )
-            ]);
+            }
             // delete directory (children directories will cascade-deleted)
-            await prisma.directory.delete({
-                where: {
-                    id: directoryId
-                }
-            });
+            await db
+                .delete(tables.directories)
+                .where(eq(tables.directories.id, directoryId));
             rep.send({});
         }
     });

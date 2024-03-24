@@ -1,16 +1,13 @@
 import { randomInt } from 'crypto';
 
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
+import { requestDiceSchema, type RequestDiceBody } from './schemas/dice.js';
+import { type DiceType, type SocketDiceResult } from '../types/dice.js';
 import { validateSchema } from '../services/typebox.js';
 import { ForbiddenError } from '../services/errors.js';
+import { type SafeUser } from '../drizzle/schema.js';
 import { sum } from '../services/tools.js';
-
 import { meta } from './helper.js';
-
-import { DiceType, SocketDiceResult } from '../types/dice.js';
-import { SafeUser } from '../types/user.js';
-
-import { requestDiceSchema, RequestDiceBody } from './schemas/dice.js';
 
 const getDiceMax = (diceType: DiceType): number =>
     parseInt(diceType.replace('D', ''));

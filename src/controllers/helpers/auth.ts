@@ -1,16 +1,16 @@
-import { FastifyRequest } from 'fastify';
 import { CookieSerializeOptions } from '@fastify/cookie';
+import { FastifyRequest } from 'fastify';
 import dayjs from 'dayjs';
 
 import { AuthenticationError, ForbiddenError } from '../../services/errors.js';
 import { decrypt, verifyJwt } from '../../services/crypto.js';
+import { type SafeUser } from '../../drizzle/schema.js';
 import { parseParamId } from '../../services/api.js';
 import { cache } from '../../services/cache.js';
 import { getEnv } from '../../services/env.js';
-import { SafeUser } from '../../types/user.js';
 
 /**
-Returns options object for cookies
+Returns options object for cookies.
 */
 export const getCookieOptions = (): CookieSerializeOptions => ({
     httpOnly: true,
@@ -27,12 +27,12 @@ export interface CacheJwtData {
 }
 
 /**
-Build the cache key for JWT data
+Builds the cache key for JWT data.
 */
 export const getJwtCacheKey = (userId: number) => `jwt-${userId}`;
 
 /**
-Control that the given userId is the same as the currently authenticated user's id.
+Checks that the given userId is the same as the currently authenticated user's id.
 */
 export const controlSelf = (userId: number, currentUser: SafeUser) => {
     if (userId !== currentUser.id) {
@@ -54,7 +54,7 @@ export const controlSelfMiddleware = async ({
 };
 
 /**
-Check that the given user is an admin
+Checks that the given user is an admin.
 */
 export const controlAdmin = (user: SafeUser) => {
     if (!user.isAdmin) {
@@ -63,7 +63,7 @@ export const controlAdmin = (user: SafeUser) => {
 };
 
 /**
-Middleware checking that the currently authenticated user is an admin
+Middleware checking that the currently authenticated user is an admin.
 */
 export const controlAdminMiddleware = async ({ user }: FastifyRequest) => {
     controlAdmin(user);
@@ -71,7 +71,7 @@ export const controlAdminMiddleware = async ({ user }: FastifyRequest) => {
 
 /**
 Fastify middleware controling the cookie JWT validity.
-Injects user data in Fastify Request object
+Injects user data in Fastify Request object.
 */
 export const authMiddleware = async (req: FastifyRequest) => {
     if (!req.cookies.jwt) {

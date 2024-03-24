@@ -1,6 +1,6 @@
-import url from 'url';
-import path from 'path';
 import { customAlphabet } from 'nanoid';
+import path from 'path';
+import url from 'url';
 
 /**
 Return sum of an array of numbers

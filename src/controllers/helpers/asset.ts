@@ -1,4 +1,4 @@
-import { Asset, Directory } from '@prisma/client';
+import { eq } from 'drizzle-orm';
 import path from 'path';
 import fs from 'fs';
 import {
@@ -6,15 +6,16 @@ import {
     type Options as FormidableOptions
 } from 'formidable';
 
-import { prisma } from '../../services/prisma.js';
+import { mimeTypes, FileType, MimeType } from '../../types/asset.js';
+import { Directory } from '../../drizzle/schema.js';
+import { db, tables } from '../../services/db.js';
 import { getEnv } from '../../services/env.js';
 import {
     ForbiddenError,
     InternError,
+    NotFoundError,
     ValidationError
 } from '../../services/errors.js';
-
-import { mimeTypes, FileType, MimeType } from '../../types/asset.js';
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
@@ -91,44 +92,88 @@ export const getFormidableOptions = (): FormidableOptions => ({
     multiples: true
 });
 
-export const getAsset = async (
-    userId: number,
-    assetId: number
-): Promise<Asset> => {
-    const asset = await prisma.asset.findFirstOrThrow({
-        where: {
-            id: assetId
-        }
-    });
+/**
+Gets an asset.
+*/
+export const getAsset = async (assetId: number) => {
+    const assets = await db
+        .select()
+        .from(tables.assets)
+        .where(eq(tables.assets.id, assetId))
+        .limit(1);
+    return assets[0] ?? null;
+};
+
+/**
+Gets an asset.
+If asset does not exist throws a not found error.
+*/
+export const getAssetOrThrow = async (assetId: number) => {
+    const asset = await getAsset(assetId);
+    if (!asset) {
+        throw new NotFoundError('Asset not found');
+    }
+    return asset;
+};
+
+/**
+Gets an asset.
+Checks that the asset belongs to the given user, throws a forbidden error otherwise.
+If asset does not exist throws a not found error.
+*/
+export const getUserAssetOrThrow = async (assetId: number, userId: number) => {
+    const asset = await getAssetOrThrow(assetId);
     if (asset.userId !== userId) {
         throw new ForbiddenError('Asset does not belong to you');
     }
     return asset;
 };
 
-export const getDirectories = async (userId: number): Promise<Directory[]> =>
-    prisma.directory.findMany({
-        where: {
-            userId
-        }
-    });
+/**
+Gets all directories belonging to a user.
+*/
+export const getUserDirectories = async (userId: number) =>
+    db
+        .select()
+        .from(tables.directories)
+        .where(eq(tables.directories.userId, userId));
 
-export const getDirectory = async (
-    userId: number,
-    directoryId: number
-): Promise<Directory> => {
-    const directory = await prisma.directory.findFirstOrThrow({
-        where: {
-            id: directoryId
-        }
-    });
-    if (directory.userId !== userId) {
-        throw new ForbiddenError('Directory does not belong to you');
+/**
+Gets an directory.
+Checks that the directory belongs to the given user, throws a forbidden error otherwise.
+*/
+export const getUserDirectory = async (directoryId: number, userId: number) => {
+    const directories = await db
+        .select()
+        .from(tables.directories)
+        .where(eq(tables.directories.id, directoryId))
+        .limit(1);
+    const directory = directories[0];
+    if (directory && directory.userId !== userId) {
+        throw new ForbiddenError('Directory does not belong to the user');
+    }
+    return directory ?? null;
+};
+
+/**
+Gets an directory.
+Checks that the directory belongs to the given user, throws a forbidden error otherwise.
+If directory does not exist throws a not found error.
+*/
+export const getUserDirectoryOrThrow = async (
+    directoryId: number,
+    userId: number
+) => {
+    const directory = await getUserDirectory(directoryId, userId);
+    if (!directory) {
+        throw new NotFoundError('Directory not found');
     }
     return directory;
 };
 
-// recursivly searches all children directories of a given directoryId
+/**
+Recursivly searches all children directories of a given directoryId.
+*/
 export const getChildrenDirectories = (
     directoryId: number,
     directories: Directory[]

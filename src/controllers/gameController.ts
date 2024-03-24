@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { GamesData, isValidGameId } from '../services/games.js';
+import { gamesData, isValidGameId } from '../services/games.js';
 import { NotFoundError } from '../services/errors.js';
 
 export const gameController = async (app: FastifyInstance) => {
@@ -9,7 +9,7 @@ export const gameController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/games',
         handler: async (req: FastifyRequest, rep: FastifyReply) => {
-            const games = Object.values(GamesData);
+            const games = Object.values(gamesData);
             rep.send({ games });
         }
     });
@@ -32,7 +32,7 @@ export const gameController = async (app: FastifyInstance) => {
             if (!isValidGameId(gameId)) {
                 throw new NotFoundError('Game not found');
             }
-            rep.send(GamesData[gameId]);
+            rep.send(gamesData[gameId]);
         }
     });
 };

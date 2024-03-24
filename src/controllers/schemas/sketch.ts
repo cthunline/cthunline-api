@@ -5,7 +5,7 @@ import { sketchSchema } from './definitions.js';
 export const createSketchSchema = Type.Object(
     {
         name: Type.String({ minLength: 1 }),
-        sketch: sketchSchema
+        data: sketchSchema
     },
     {
         additionalProperties: false

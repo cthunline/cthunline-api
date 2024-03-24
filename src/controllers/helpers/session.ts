@@ -1,34 +1,21 @@
-import { Session } from '@prisma/client';
+import { eq } from 'drizzle-orm';
 
-import { prisma } from '../../services/prisma.js';
-import { safeUserSelect } from './user.js';
+import { NotFoundError } from '../../services/errors.js';
+import { db, tables } from '../../services/db.js';
 
-/**
-Builds the cache key for play sketch
-*/
-export const getSketchCacheKey = (sessionId: number) => `sketch-${sessionId}`;
-
-export const defaultSketchData = {
-    displayed: false,
-    paths: [],
-    images: [],
-    tokens: []
+export const getSession = async (sessionId: number) => {
+    const sessions = await db
+        .select()
+        .from(tables.sessions)
+        .where(eq(tables.sessions.id, sessionId))
+        .limit(1);
+    return sessions[0] ?? null;
 };
 
-export const getInclude = (includeMaster: boolean) =>
-    includeMaster
-        ? {
-              include: {
-                  master: {
-                      select: safeUserSelect
-                  }
-              }
-          }
-        : undefined;
-
-export const getSession = async (sessionId: number): Promise<Session> =>
-    prisma.session.findUniqueOrThrow({
-        where: {
-            id: sessionId
-        }
-    });
+export const getSessionOrThrow = async (sessionId: number) => {
+    const session = await getSession(sessionId);
+    if (!session) {
+        throw new NotFoundError('Session not found');
+    }
+    return session;
+};

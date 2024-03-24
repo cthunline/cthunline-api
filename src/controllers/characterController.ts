@@ -1,24 +1,26 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { Character, Prisma } from '@prisma/client';
+import { type Character as CharacterData } from '@cthunline/games';
+import { eq } from 'drizzle-orm';
 import path from 'path';
 import fs from 'fs';
 
-import { Games, GameId, isValidGameId } from '../services/games.js';
+import { games, GameId, isValidGameId } from '../services/games.js';
 import { assetDir, controlFile } from './helpers/asset.js';
 import { validateSchema } from '../services/typebox.js';
+import { getUserByIdOrThrow } from './helpers/user.js';
+import { type Character } from '../drizzle/schema.js';
 import { type QueryParam } from '../types/api.js';
 import { parseParamId } from '../services/api.js';
 import { controlSelf } from './helpers/auth.js';
-import { prisma } from '../services/prisma.js';
+import { db, tables } from '../services/db.js';
 import { cache } from '../services/cache.js';
-import { getUser } from './helpers/user.js';
 import {
     ConflictError,
     InternError,
     ValidationError
 } from '../services/errors.js';
 import {
-    getCharacter,
+    getCharacterByIdOrThrow,
     getFormidablePortraitOptions,
     controlPortraitDir,
     portraitDirName,
@@ -49,12 +51,15 @@ export const characterController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const userId = query.user ? Number(query.user) : null;
-            const options: Prisma.CharacterFindManyArgs = {};
             if (userId) {
-                await getUser(userId);
-                options.where = { userId };
+                await getUserByIdOrThrow(userId);
             }
-            const characters = await prisma.character.findMany(options);
+            const characters = await db
+                .select()
+                .from(tables.characters)
+                .where(
+                    userId ? eq(tables.characters.userId, userId) : undefined
+                );
             rep.send({ characters });
         }
     });
@@ -78,15 +83,20 @@ export const characterController = async (app: FastifyInstance) => {
             if (!isValidGameId(gameId)) {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
-            validateSchema(Games[gameId as GameId].schema, data);
-            const character = await prisma.character.create({
-                data: {
+            validateSchema(games[gameId].schema, data);
+            const insertedCharacters = await db
+                .insert(tables.characters)
+                .values({
                     userId,
                     gameId,
                     name,
-                    data
-                }
-            });
+                    data: data as CharacterData
+                })
+                .returning();
+            const character = insertedCharacters[0];
+            if (!character) {
+                throw new InternError('Could not retreive inserted character');
+            }
             rep.send(character);
         }
     });
@@ -106,7 +116,7 @@ export const characterController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const characterId = parseParamId(params, 'characterId');
-            const character = await getCharacter(characterId);
+            const character = await getCharacterByIdOrThrow(characterId);
             rep.send(character);
         }
     });
@@ -130,17 +140,21 @@ export const characterController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const characterId = parseParamId(params, 'characterId');
-            const { gameId, userId } = await getCharacter(characterId);
+            const { gameId, userId } =
+                await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
             if (body.data) {
-                validateSchema(Games[gameId as GameId].schema, body.data);
+                validateSchema(games[gameId as GameId].schema, body.data);
             }
-            const character = await prisma.character.update({
-                data: body,
-                where: {
-                    id: characterId
-                }
-            });
+            const updatedCharacters = await db
+                .update(tables.characters)
+                .set(body as typeof body & { data?: CharacterData })
+                .where(eq(tables.characters.id, characterId))
+                .returning();
+            const character = updatedCharacters[0];
+            if (!character) {
+                throw new InternError('Could not retreive updated character');
+            }
             const cacheKey = getCharacterCacheKey(character.id);
             const cachedChar = await cache.getJson<Character>(cacheKey);
             if (cachedChar) {
@@ -166,13 +180,11 @@ export const characterController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const characterId = parseParamId(params, 'characterId');
-            const { userId } = await getCharacter(characterId);
+            const { userId } = await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
-            await prisma.character.delete({
-                where: {
-                    id: characterId
-                }
-            });
+            await db
+                .delete(tables.characters)
+                .where(eq(tables.characters.id, characterId));
             const cacheKey = getCharacterCacheKey(characterId);
             await cache.del(cacheKey);
             rep.send({});
@@ -199,7 +211,7 @@ export const characterController = async (app: FastifyInstance) => {
             }
             const { user, files } = req;
             const characterId = parseParamId(req.params, 'characterId');
-            const character = await getCharacter(characterId);
+            const character = await getCharacterByIdOrThrow(characterId);
             controlSelf(character.userId, user);
             // get portraits directory
             const portraitDirPath = await controlPortraitDir();
@@ -225,14 +237,15 @@ export const characterController = async (app: FastifyInstance) => {
             );
             // save portrait on character
             const portrait = path.join(portraitDirName, portraitFileName);
-            const updatedCharacter = await prisma.character.update({
-                data: {
-                    portrait
-                },
-                where: {
-                    id: characterId
-                }
-            });
+            const updatedCharacters = await db
+                .update(tables.characters)
+                .set({ portrait })
+                .where(eq(tables.characters.id, characterId))
+                .returning();
+            const updatedCharacter = updatedCharacters[0];
+            if (!updatedCharacter) {
+                throw new InternError('Could not retreive updated character');
+            }
             const cacheKey = getCharacterCacheKey(updatedCharacter.id);
             const cachedChar = await cache.getJson<Character>(cacheKey);
             if (cachedChar) {
@@ -263,20 +276,23 @@ export const characterController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const characterId = parseParamId(params, 'characterId');
-            const character = await getCharacter(characterId);
+            const character = await getCharacterByIdOrThrow(characterId);
             controlSelf(character.userId, user);
             if (character.portrait) {
-                const [updatedCharacter] = await Promise.all([
-                    prisma.character.update({
-                        data: {
-                            portrait: null
-                        },
-                        where: {
-                            id: characterId
-                        }
-                    }),
+                const [updatedCharacters] = await Promise.all([
+                    db
+                        .update(tables.characters)
+                        .set({ portrait: null })
+                        .where(eq(tables.characters.id, characterId))
+                        .returning(),
                     fs.promises.rm(path.join(assetDir, character.portrait))
                 ]);
+                const updatedCharacter = updatedCharacters[0];
+                if (!updatedCharacter) {
+                    throw new InternError(
+                        'Could not retreive updated character'
+                    );
+                }
                 rep.send(updatedCharacter);
             } else {
                 rep.send(character);
@@ -303,8 +319,8 @@ export const characterController = async (app: FastifyInstance) => {
             const characterId = parseParamId(params, 'characterId');
             const targetUserId = parseParamId(params, 'userId');
             const [character, targetUser] = await Promise.all([
-                getCharacter(characterId),
-                getUser(targetUserId)
+                getCharacterByIdOrThrow(characterId),
+                getUserByIdOrThrow(targetUserId)
             ]);
             controlSelf(character.userId, user);
             if (targetUser.id === user.id) {
@@ -312,14 +328,12 @@ export const characterController = async (app: FastifyInstance) => {
                     'You cannot transfer a character to yourself'
                 );
             }
-            await prisma.character.update({
-                data: {
+            await db
+                .update(tables.characters)
+                .set({
                     userId: targetUserId
-                },
-                where: {
-                    id: characterId
-                }
-            });
+                })
+                .where(eq(tables.characters.id, characterId));
             rep.send({});
         }
     });

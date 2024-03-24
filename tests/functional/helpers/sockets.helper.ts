@@ -1,13 +1,13 @@
 import { io, type Socket } from 'socket.io-client';
 import { fastifyCookie } from '@fastify/cookie';
 import { expect, afterEach } from 'vitest';
-import { type Session } from '@prisma/client';
-
-import { getEnv } from '../../../src/services/env.js';
+import { eq } from 'drizzle-orm';
 
 import { sessionsData, charactersData, usersData } from './data.helper.js';
-import { prisma } from '../../../src/services/prisma.js';
+import { type Session } from '../../../src/drizzle/schema.js';
+import { db, tables } from '../../../src/services/db.js';
 import { assertSocketMeta } from './assert.helper.js';
+import { getEnv } from '../../../src/services/env.js';
 import { api } from './api.helper.js';
 
 interface SetupSessionReturn {
@@ -147,11 +147,11 @@ export const socketHelper: SocketsHelper = {
             email: player2Email,
             password: 'test'
         });
-        const session = await prisma.session.findFirst({
-            where: {
-                masterId: masterJWTUser.id
-            }
-        });
+        const sessions = await db
+            .select()
+            .from(tables.sessions)
+            .where(eq(tables.sessions.masterId, masterJWTUser.id));
+        const session = sessions[0];
         if (!session) {
             throw new Error('Could not find session to setup');
         }

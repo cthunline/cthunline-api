@@ -1,9 +1,20 @@
-import { Session, Character } from '@prisma/client';
 import { type ExtendedError } from 'socket.io/dist/namespace';
 
+import { type SketchBody } from '../controllers/schemas/definitions.js';
+import { getSessionOrThrow } from '../controllers/helpers/session.js';
+import { getSketchCacheKey } from '../controllers/helpers/sketch.js';
 import { decrypt, verifyJwt } from '../services/crypto.js';
-import { prisma } from '../services/prisma.js';
 import { cache } from '../services/cache.js';
+import { getEnv } from '../services/env.js';
+import {
+    getCharacterById,
+    getCharacterCacheKey
+} from '../controllers/helpers/character.js';
+import {
+    type Character,
+    type Session,
+    type SafeUser
+} from '../drizzle/schema.js';
 import {
     type SocketIoServer,
     type SocketSessionUser,
@@ -16,12 +27,6 @@ import {
     ValidationError,
     ForbiddenError
 } from '../services/errors.js';
-
-import { getCharacterCacheKey } from '../controllers/helpers/character.js';
-import { type SketchBody } from '../controllers/schemas/definitions.js';
-import { getSketchCacheKey } from '../controllers/helpers/session.js';
-import { SafeUser } from '../types/user.js';
-import { getEnv } from '../services/env.js';
 
 // verify auth token
 const verifySocketJwt = async (socket: SocketIoSocket): Promise<SafeUser> => {
@@ -43,14 +48,7 @@ const verifySession = async (socket: SocketIoSocket): Promise<Session> => {
     if (!sessionId) {
         throw new ValidationError('Missing sessionId in handshare query');
     }
-    const session = await prisma.session.findUnique({
-        where: {
-            id: sessionId
-        }
-    });
-    if (!session) {
-        throw new NotFoundError(`Session ${sessionId} does not exist`);
-    }
+    const session = await getSessionOrThrow(sessionId);
     return session;
 };
 
@@ -63,11 +61,7 @@ const verifyCharacter = async (
     if (!characterId) {
         throw new ValidationError('Missing characterId in handshare query');
     }
-    const character = await prisma.character.findUnique({
-        where: {
-            id: characterId
-        }
-    });
+    const character = await getCharacterById(characterId);
     if (!character) {
         throw new NotFoundError(`Character ${characterId} does not exist`);
     }

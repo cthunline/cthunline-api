@@ -5,14 +5,13 @@ import FastifyFormidable from 'fastify-formidable';
 import FastifySocketIo from 'fastify-socket.io';
 import FastifyCookie from '@fastify/cookie';
 import FastifyHelmet from '@fastify/helmet';
-import FastifyQs from 'fastify-qs';
 import ajvFormats from 'ajv-formats';
-
-import { mainController } from './controllers/index.js';
-import { socketRouter } from './sockets/index.js';
+import FastifyQs from 'fastify-qs';
 
 import { errorHandler, schemaErrorFormatter } from './services/errors.js';
-import { initDb } from './services/prisma.js';
+import { mainController } from './controllers/index.js';
+import { initDb, migrateDb } from './services/db.js';
+import { socketRouter } from './sockets/index.js';
 import { getEnv } from './services/env.js';
 import { log } from './services/log.js';
 
@@ -53,6 +52,8 @@ export const initApp = async () => {
         // custom schema error formatter
         app.setSchemaErrorFormatter(schemaErrorFormatter);
 
+        log.info('Migrating database');
+        await migrateDb();
         log.info('Initializing database');
         await initDb();
 

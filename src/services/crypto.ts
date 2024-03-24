@@ -3,15 +3,18 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
 import { AppErrorConstructor, AuthenticationError } from './errors.js';
+import { SafeUser } from '../drizzle/schema.js';
 import { getEnv } from './env.js';
 
-import { SafeUser } from '../types/user.js';
-
-// hash a string
+/**
+Hashes a string.
+*/
 export const hashPassword = async (password: string): Promise<string> =>
     bcrypt.hash(password, 10);
 
-// validate hash against string
+/**
+Validate hash against string.
+*/
 export const verifyPassword = async (
     password: string,
     hash: string

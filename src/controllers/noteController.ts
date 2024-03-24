@@ -1,27 +1,25 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { eq, sql } from 'drizzle-orm';
 
 import { ConflictError, InternError } from '../services/errors.js';
+import { getSessionOrThrow } from './helpers/session.js';
 import { parseParamId } from '../services/api.js';
-import { prisma } from '../services/prisma.js';
-
-import { getSession } from './helpers/session.js';
+import { type Note } from '../drizzle/schema.js';
 import { controlSelf } from './helpers/auth.js';
-import {
-    getNotes,
-    getNote,
-    getMaxNotePosition,
-    getNextNotePosition,
-    switchNotePositions
-} from './helpers/note.js';
-
-import { QueryParam } from '../types/api.js';
-
+import { db, tables } from '../services/db.js';
 import {
     createNoteSchema,
-    CreateNoteBody,
+    type CreateNoteBody,
     updateNoteSchema,
-    UpdateNoteBody
+    type UpdateNoteBody
 } from './schemas/note.js';
+import {
+    getNotes,
+    getMaxNotePosition,
+    getNextNotePosition,
+    switchNotePositions,
+    getNoteOrThrow
+} from './helpers/note.js';
 
 export const noteController = async (app: FastifyInstance) => {
     // get current user's notes in a session
@@ -32,28 +30,29 @@ export const noteController = async (app: FastifyInstance) => {
         handler: async (
             {
                 params,
-                user,
-                query
+                user
             }: FastifyRequest<{
                 Params: {
                     sessionId: string;
-                };
-                Querystring: {
-                    include?: QueryParam;
                 };
             }>,
             rep: FastifyReply
         ) => {
             const sessionId = parseParamId(params, 'sessionId');
-            await getSession(sessionId);
-            const notes = await getNotes(
-                sessionId,
-                user.id,
-                query.include === 'true'
-            );
+            await getSessionOrThrow(sessionId);
+            const notes = await getNotes(sessionId, user.id);
+            const userNotes: Note[] = [];
+            const sharedNotes: Note[] = [];
+            notes.forEach((note) => {
+                if (note.userId === user.id) {
+                    userNotes.push(note);
+                } else {
+                    sharedNotes.push(note);
+                }
+            });
             rep.send({
-                notes: notes.filter(({ userId }) => userId === user.id),
-                sharedNotes: notes.filter(({ userId }) => userId !== user.id)
+                notes: userNotes,
+                sharedNotes
             });
         }
     });
@@ -77,18 +76,23 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sessionId = parseParamId(params, 'sessionId');
-            await getSession(sessionId);
+            await getSessionOrThrow(sessionId);
             const position = await getNextNotePosition(sessionId, user.id);
-            const note = await prisma.note.create({
-                data: {
+            const createdNotes = await db
+                .insert(tables.notes)
+                .values({
                     position,
                     isShared: body.isShared ?? false,
                     title: body.title,
                     text: body.text ?? '',
                     sessionId,
                     userId: user.id
-                }
-            });
+                })
+                .returning();
+            const note = createdNotes[0];
+            if (!note) {
+                throw new InternError('Could not retreive inserted note');
+            }
             rep.send(note);
         }
     });
@@ -109,7 +113,7 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNote(noteId, user.id);
+            const note = await getNoteOrThrow(noteId, user.id);
             rep.send(note);
         }
     });
@@ -133,14 +137,17 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNote(noteId, user.id);
+            const note = await getNoteOrThrow(noteId, user.id);
             controlSelf(note.userId, user);
-            const updatedNote = await prisma.note.update({
-                data: body,
-                where: {
-                    id: noteId
-                }
-            });
+            const updatedNotes = await db
+                .update(tables.notes)
+                .set(body)
+                .where(eq(tables.notes.id, noteId))
+                .returning();
+            const updatedNote = updatedNotes[0];
+            if (!updatedNote) {
+                throw new InternError('Could not retreive updated note');
+            }
             rep.send(updatedNote);
         }
     });
@@ -165,7 +172,7 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNote(noteId, user.id);
+            const note = await getNoteOrThrow(noteId, user.id);
             controlSelf(note.userId, user);
             let positionToSwitch: number;
             if (params.action === 'down') {
@@ -195,7 +202,7 @@ export const noteController = async (app: FastifyInstance) => {
                 note.position,
                 positionToSwitch
             );
-            const updatedNote = await getNote(noteId, user.id);
+            const updatedNote = await getNoteOrThrow(noteId, user.id);
             rep.send(updatedNote);
         }
     });
@@ -217,39 +224,19 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNote(noteId, user.id);
+            const note = await getNoteOrThrow(noteId, user.id);
             controlSelf(note.userId, user);
-            await prisma.note.delete({
-                where: {
-                    id: noteId
-                }
-            });
+            await db.delete(tables.notes).where(eq(tables.notes.id, noteId));
             // re-order note positions
-            const notes = await prisma.note.findMany({
-                where: {
-                    sessionId: note.sessionId,
-                    userId: user.id
-                },
-                orderBy: [
-                    {
-                        position: 'asc'
-                    }
-                ]
-            });
-            if (notes.length) {
-                await prisma.$transaction(
-                    notes.map(({ id }, index) =>
-                        prisma.note.update({
-                            data: {
-                                position: index + 1
-                            },
-                            where: {
-                                id
-                            }
-                        })
-                    )
-                );
-            }
+            await db.execute(sql`with ordered_notes as (
+                select id, row_number() over (order by position) as new_position
+                from notes
+                where session_id = ${note.sessionId} and user_id = ${user.id}
+            )
+            update notes
+            set position = ordered_notes.new_position
+            from ordered_notes
+            where notes.id = ordered_notes.id;`);
             //
             rep.send({});
         }

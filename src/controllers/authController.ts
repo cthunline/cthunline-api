@@ -1,10 +1,11 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { and, eq } from 'drizzle-orm';
 
 import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
 import { AuthenticationError } from '../services/errors.js';
 import { loginSchema, LoginBody } from './schemas/auth.js';
-import { prisma } from '../services/prisma.js';
+import { db, tables } from '../services/db.js';
 import { cache } from '../services/cache.js';
 import { getEnv } from '../services/env.js';
 import {
@@ -38,12 +39,17 @@ export const authController = async (app: FastifyInstance) => {
                 rep: FastifyReply
             ) => {
                 const { email, password } = req.body;
-                const userWithPassword = await prisma.user.findFirst({
-                    where: {
-                        email,
-                        isEnabled: true
-                    }
-                });
+                const usersWithPassword = await db
+                    .select()
+                    .from(tables.users)
+                    .where(
+                        and(
+                            eq(tables.users.email, email),
+                            eq(tables.users.isEnabled, true)
+                        )
+                    )
+                    .limit(1);
+                const userWithPassword = usersWithPassword[0];
                 if (!userWithPassword) {
                     throw new AuthenticationError();
                 }

@@ -59,12 +59,12 @@ describe('[API] Sketchs', () => {
             }
         });
         test('Should save a sketch for the current user', async () => {
-            const { sketch } = sketchsData[0];
+            const { data } = sketchsData[0];
             await api.testCreate({
                 route: '/sketchs',
                 data: {
                     name: 'Test',
-                    sketch
+                    data
                 },
                 assert: assertSketchObject
             });
@@ -95,13 +95,13 @@ describe('[API] Sketchs', () => {
             });
         });
         test('Should delete a sketch belonging to the current user', async () => {
-            const { sketch } = sketchsData[0];
+            const { data } = sketchsData[0];
             const response = await api.request({
                 method: 'POST',
                 route: '/sketchs',
                 body: {
                     name: 'Test',
-                    sketch
+                    data
                 }
             });
             expect(response).toHaveStatus(200);

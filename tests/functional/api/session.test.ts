@@ -31,14 +31,6 @@ describe('[API] Sessions', () => {
                 route: '/sessions',
                 listKey: 'sessions',
                 data: sessionsData,
-                assert: assertSession
-            });
-        });
-        test('Should list all sessions including master data', async () => {
-            await api.testGetList({
-                route: '/sessions?include=true',
-                listKey: 'sessions',
-                data: sessionsData,
                 assert: (data: any) => {
                     assertSession(data);
                     assertUser(data.master);

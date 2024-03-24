@@ -59,7 +59,8 @@ export const sketchSchema = Type.Object(
         displayed: Type.Boolean(),
         paths: Type.Array(Type.String({ minLength: 1 })),
         images: Type.Array(imageSchema),
-        tokens: Type.Optional(Type.Array(tokenSchema))
+        // tokens: Type.Optional(Type.Array(tokenSchema)),
+        tokens: Type.Array(tokenSchema)
     },
     {
         additionalProperties: false
@@ -67,3 +68,4 @@ export const sketchSchema = Type.Object(
 );
 
 export type SketchBody = Static<typeof sketchSchema>;
+export type Sketch = SketchBody;

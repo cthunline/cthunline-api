@@ -10,7 +10,11 @@
         "project": "tsconfig.json",
         "sourceType": "module"
     },
-    "extends": ["airbnb-base", "airbnb-typescript/base", "prettier"],
+    "extends": [
+        "airbnb-base",
+        "airbnb-typescript/base",
+        "prettier"
+    ],
     "rules": {
         "@typescript-eslint/lines-between-class-members": [
             "error",

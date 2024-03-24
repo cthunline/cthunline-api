@@ -10,6 +10,6 @@
         "moduleResolution": "Node",
         "module": "ESNext"
     },
-    "include": ["src", "tests", "./vitest.config.ts"],
+    "include": ["src", "tests", "./vitest.config.ts", "./drizzle.config.ts"],
     "exclude": ["node_modules", "build"]
 }

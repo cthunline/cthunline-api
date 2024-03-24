@@ -1,9 +1,9 @@
 import { describe, test } from 'vitest';
 
-import { assertUser } from '../helpers/assert.helper.js';
-import { initDb } from '../../../src/services/prisma.js';
-import { getEnv } from '../../../src/services/env.js';
 import { resetCache, resetData } from '../helpers/data.helper.js';
+import { assertUser } from '../helpers/assert.helper.js';
+import { getEnv } from '../../../src/services/env.js';
+import { initDb } from '../../../src/services/db.js';
 import { api } from '../helpers/api.helper.js';
 
 describe('[API] Initialization', () => {

@@ -1,9 +1,5 @@
 /* eslint-disable max-classes-per-file */
 import { FastifyReply, FastifyRequest } from 'fastify';
-import {
-    PrismaClientValidationError,
-    PrismaClientKnownRequestError
-} from '@prisma/client/runtime/library';
 
 import {
     type FastifySchemaValidationError,
@@ -14,8 +10,10 @@ import { log } from './log.js';
 
 import { ErrorJsonResponse } from '../types/errors.js';
 
-// custom error class with additional http status and data
-// unless realy necessary do not throw error using this class
+/**
+Custom error class with additional http status and data
+unless realy necessary do not throw error using this class.
+*/
 export class CustomError extends Error {
     status: number;
     data: any;
@@ -50,7 +48,9 @@ export type AppErrorConstructor =
     | typeof ForbiddenError
     | typeof ConflictError;
 
-// specific custom error classes that should be used to throw errors
+/**
+Specific custom error classes that should be used to throw errors.
+*/
 export class InternError extends CustomError {
     constructor(message: string = 'Intern error', data?: any) {
         super(message, 500, data);
@@ -82,23 +82,6 @@ export class ConflictError extends CustomError {
     }
 }
 
-// if the given error is a prisma error and is handled then
-// returns the matching custom error
-const handlePrismaError = (err: Error): Error => {
-    if (err instanceof PrismaClientValidationError) {
-        return new ValidationError();
-    }
-    if (err instanceof PrismaClientKnownRequestError) {
-        if (err.code === 'P2023') {
-            return new ValidationError();
-        }
-        if (err.code === 'P2025') {
-            return new NotFoundError();
-        }
-    }
-    return err;
-};
-
 /**
 Fastify schema error formatter
 */
@@ -116,20 +99,18 @@ export const errorHandler = (
     _req: FastifyRequest,
     rep: FastifyReply
 ): void => {
-    // handles prisma errors by "converting" them into custom errors
-    const error = handlePrismaError(err);
-    if (error instanceof CustomError) {
+    if (err instanceof CustomError) {
         // handles custom errors
         const response: ErrorJsonResponse = {
-            error: error.message
+            error: err.message
         };
-        if (error.data) {
-            response.data = error.data;
+        if (err.data) {
+            response.data = err.data;
         }
-        rep.status(error.status).send(response);
+        rep.status(err.status).send(response);
     } else {
         // if error is not handled throw an intern error and logs stack
-        log.error(error.stack);
+        log.error(err.stack);
         rep.status(500).send({
             error: 'Intern error'
         });

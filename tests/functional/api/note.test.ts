@@ -7,14 +7,14 @@ import {
     afterEach
 } from 'vitest';
 
+import { assertNote } from '../helpers/assert.helper.js';
+import { api } from '../helpers/api.helper.js';
 import {
     sessionsData,
     notesData,
     resetData,
     resetCache
 } from '../helpers/data.helper.js';
-import { assertNote } from '../helpers/assert.helper.js';
-import { api } from '../helpers/api.helper.js';
 
 const notesById: Record<number, Record<string, any>> = Object.fromEntries(
     notesData.map((note: Record<string, any>) => [note.id, note])
@@ -54,27 +54,6 @@ const getApiNotes = async (sessionId: number) => {
     return response.body as Record<string, Record<string, any>[]>;
 };
 
-const testNoteList = async (includeUsers: boolean = false) => {
-    const expected = getUserNotes(api.userId);
-    const includeParam = includeUsers ? '?include=true' : '';
-    const response = await api.request({
-        method: 'GET',
-        route: `/sessions/${sessionsData[0].id}/notes${includeParam}`
-    });
-    expect(response).toHaveStatus(200);
-    expect(response.body).to.be.an('object');
-    const { body } = response;
-    expect(body).to.be.an('object');
-    ['notes', 'sharedNotes'].forEach((key: string) => {
-        expect(body).to.haveOwnProperty(key);
-        expect(body[key]).to.be.an('array');
-        expect(body[key]).to.have.lengthOf(expected[key].length);
-        body[key].forEach((note: Record<string, any>) => {
-            assertNote(note, notesById[note.id], includeUsers);
-        });
-    });
-};
-
 describe('[API] Notes', () => {
     beforeAll(async () => {
         await resetData();
@@ -89,10 +68,23 @@ describe('[API] Notes', () => {
 
     describe('GET /sessions/:id/notes', () => {
         test("Should get user's notes in a session", async () => {
-            await testNoteList();
-        });
-        test("Should get user's notes including user data", async () => {
-            await testNoteList(true);
+            const expected = getUserNotes(api.userId);
+            const response = await api.request({
+                method: 'GET',
+                route: `/sessions/${sessionsData[0].id}/notes`
+            });
+            expect(response).toHaveStatus(200);
+            expect(response.body).to.be.an('object');
+            const { body } = response;
+            expect(body).to.be.an('object');
+            ['notes', 'sharedNotes'].forEach((key: string) => {
+                expect(body).to.haveOwnProperty(key);
+                expect(body[key]).to.be.an('array');
+                expect(body[key]).to.have.lengthOf(expected[key].length);
+                body[key].forEach((note: Record<string, any>) => {
+                    assertNote(note, notesById[note.id], true);
+                });
+            });
         });
     });
 
@@ -418,13 +410,15 @@ describe('[API] Notes', () => {
                 });
                 expect(moveUpResponse).toHaveStatus(200);
                 expect(moveUpResponse.body).to.be.an('object');
-                assertNote(moveUpResponse.body, expectedNotes[0]);
+                const { user, ...expected } = expectedNotes[0];
+                assertNote(moveUpResponse.body, expected);
                 for (const expectedNote of expectedNotes) {
+                    const { user: noteUser, ...rest } = expectedNote;
                     const { body } = await api.request({
                         method: 'GET',
                         route: `/notes/${expectedNote.id}`
                     });
-                    assertNote(body, expectedNote);
+                    assertNote(body, rest);
                 }
             }
         });

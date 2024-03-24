@@ -1,3 +1,4 @@
+import { eq, and } from 'drizzle-orm';
 import path from 'path';
 import {
     describe,
@@ -8,10 +9,9 @@ import {
     afterEach
 } from 'vitest';
 
-import { mockEnvVar } from '../../../src/services/env.js';
-
 import { assertCharacter } from '../helpers/assert.helper.js';
-import { prisma } from '../../../src/services/prisma.js';
+import { mockEnvVar } from '../../../src/services/env.js';
+import { db, tables } from '../../../src/services/db.js';
 import { api } from '../helpers/api.helper.js';
 import {
     charactersData,
@@ -33,14 +33,18 @@ const findCharacter = (userId: number, gameId?: string) => {
 };
 
 const findCharacterFromDb = async (userId: number, gameId?: string) => {
-    const character = await prisma.character.findFirst({
-        where: {
-            userId,
-            ...(gameId ? { gameId } : {})
-        }
-    });
-    if (character) {
-        return character as any;
+    const characters = await db
+        .select()
+        .from(tables.characters)
+        .where(
+            and(
+                eq(tables.characters.userId, userId),
+                gameId ? eq(tables.characters.gameId, gameId) : undefined
+            )
+        )
+        .limit(1);
+    if (characters[0]) {
+        return characters[0];
     }
     throw new Error(`Could not find character for user ${userId}`);
 };

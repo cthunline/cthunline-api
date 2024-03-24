@@ -1,16 +1,18 @@
+import { eq } from 'drizzle-orm';
+
+import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
+import { getSketchCacheKey } from '../controllers/helpers/sketch.js';
+import { validateSchema } from '../services/typebox.js';
+import { resetTimeout } from '../services/tools.js';
+import { db, tables } from '../services/db.js';
+import { cache } from '../services/cache.js';
+import { getEnv } from '../services/env.js';
+import { meta } from './helper.js';
 import {
     ForbiddenError,
     InternError,
     NotFoundError
 } from '../services/errors.js';
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
-import { getSketchCacheKey } from '../controllers/helpers/session.js';
-import { validateSchema } from '../services/typebox.js';
-import { resetTimeout } from '../services/tools.js';
-import { prisma } from '../services/prisma.js';
-import { cache } from '../services/cache.js';
-import { getEnv } from '../services/env.js';
-import { meta } from './helper.js';
 import {
     sketchSchema,
     SketchBody,
@@ -24,14 +26,12 @@ const saveCachedSketch = async (sessionId: number) => {
     const cacheKey = getSketchCacheKey(sessionId);
     const sketch = await cache.getJson<SketchBody>(cacheKey);
     if (sketch) {
-        await prisma.session.update({
-            where: {
-                id: sessionId
-            },
-            data: {
+        await db
+            .update(tables.sessions)
+            .set({
                 sketch
-            }
-        });
+            })
+            .where(eq(tables.sessions.id, sessionId));
     } else {
         throw new InternError(
             `Could not retreive sketch with sessionId ${sessionId} from cache while trying to save it`

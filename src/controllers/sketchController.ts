@@ -1,11 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { eq } from 'drizzle-orm';
 
+import { createSketchSchema, type CreateSketchBody } from './schemas/sketch.js';
+import { getUserSketchOrThrow } from './helpers/sketch.js';
+import { InternError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
-import { prisma } from '../services/prisma.js';
-
 import { controlSelf } from './helpers/auth.js';
-
-import { createSketchSchema, CreateSketchBody } from './schemas/sketch.js';
+import { db, tables } from '../services/db.js';
 
 export const sketchController = async (app: FastifyInstance) => {
     // get all sketchs belonging to current user
@@ -14,11 +15,10 @@ export const sketchController = async (app: FastifyInstance) => {
         url: '/sketchs',
         handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
             const userId = user.id;
-            const sketchs = await prisma.sketch.findMany({
-                where: {
-                    userId
-                }
-            });
+            const sketchs = await db
+                .select()
+                .from(tables.sketchs)
+                .where(eq(tables.sketchs.userId, userId));
             rep.send({ sketchs });
         }
     });
@@ -37,13 +37,18 @@ export const sketchController = async (app: FastifyInstance) => {
             }>,
             rep: FastifyReply
         ) => {
-            const sketch = await prisma.sketch.create({
-                data: {
+            const createdSketchs = await db
+                .insert(tables.sketchs)
+                .values({
                     ...body,
                     userId: user.id
-                }
-            });
-            rep.send(sketch);
+                })
+                .returning();
+            const createdSketch = createdSketchs[0];
+            if (!createdSketch) {
+                throw new InternError('Could not retreive inserted sketch');
+            }
+            rep.send(createdSketch);
         }
     });
 
@@ -63,12 +68,7 @@ export const sketchController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sketchId = parseParamId(params, 'sketchId');
-            const sketch = await prisma.sketch.findFirstOrThrow({
-                where: {
-                    id: sketchId,
-                    userId: user.id
-                }
-            });
+            const sketch = await getUserSketchOrThrow(sketchId, user.id);
             rep.send(sketch);
         }
     });
@@ -89,17 +89,11 @@ export const sketchController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sketchId = parseParamId(params, 'sketchId');
-            const sketch = await prisma.sketch.findFirstOrThrow({
-                where: {
-                    id: sketchId
-                }
-            });
+            const sketch = await getUserSketchOrThrow(sketchId, user.id);
             controlSelf(sketch.userId, user);
-            await prisma.sketch.delete({
-                where: {
-                    id: sketchId
-                }
-            });
+            await db
+                .delete(tables.sketchs)
+                .where(eq(tables.sketchs.id, sketchId));
             rep.send({});
         }
     });

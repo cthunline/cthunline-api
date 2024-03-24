@@ -1,9 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { eq } from 'drizzle-orm';
 
 import { verifyPassword, hashPassword } from '../services/crypto.js';
-import { ValidationError } from '../services/errors.js';
+import { InternError, ValidationError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
-import { prisma } from '../services/prisma.js';
+import { db, tables } from '../services/db.js';
+import { QueryParam } from '../types/api.js';
+import { cache } from '../services/cache.js';
 import {
     controlSelf,
     controlAdmin,
@@ -13,22 +16,19 @@ import {
 } from './helpers/auth.js';
 import {
     safeUserSelect,
-    getUser,
+    getUserByIdOrThrow,
     controlAdminFields,
     controlUniqueEmail,
     controlLocale,
-    defaultUserData
+    defaultUserData,
+    getUnsafeUserByIdOrThrow
 } from './helpers/user.js';
-
-import { QueryParam } from '../types/api.js';
-
 import {
     createUserSchema,
-    CreateUserBody,
+    type CreateUserBody,
     updateUserSchema,
-    UpdateUserBody
+    type UpdateUserBody
 } from './schemas/user.js';
-import { cache } from '../services/cache.js';
 
 export const userController = async (app: FastifyInstance) => {
     // get all users
@@ -46,14 +46,12 @@ export const userController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const getDisabled = query.disabled === 'true';
-            const users = await prisma.user.findMany({
-                select: safeUserSelect,
-                where: getDisabled
-                    ? {}
-                    : {
-                          isEnabled: true
-                      }
-            });
+            const users = await db
+                .select(safeUserSelect)
+                .from(tables.users)
+                .where(
+                    getDisabled ? undefined : eq(tables.users.isEnabled, true)
+                );
             rep.send({ users });
         }
     });
@@ -78,14 +76,18 @@ export const userController = async (app: FastifyInstance) => {
             }
             const hashedPassword = await hashPassword(body.password);
             const { password, ...cleanBody } = body;
-            const createdUser = await prisma.user.create({
-                select: safeUserSelect,
-                data: {
+            const createdUsers = await db
+                .insert(tables.users)
+                .values({
                     ...defaultUserData,
                     ...cleanBody,
                     password: hashedPassword
-                }
-            });
+                })
+                .returning(safeUserSelect);
+            const createdUser = createdUsers[0];
+            if (!createdUser) {
+                throw new InternError('Could not retreive inserted user');
+            }
             rep.send(createdUser);
         }
     });
@@ -105,7 +107,7 @@ export const userController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const userId = parseParamId(params, 'userId');
-            const user = await getUser(userId);
+            const user = await getUserByIdOrThrow(userId);
             rep.send(user);
         }
     });
@@ -135,11 +137,7 @@ export const userController = async (app: FastifyInstance) => {
                 controlSelf(userId, reqUser);
                 controlAdminFields<UpdateUserBody>(body);
             }
-            const userData = await prisma.user.findUniqueOrThrow({
-                where: {
-                    id: userId
-                }
-            });
+            const userData = await getUnsafeUserByIdOrThrow(userId);
             if (body.locale) {
                 controlLocale(body.locale);
             }
@@ -158,13 +156,15 @@ export const userController = async (app: FastifyInstance) => {
                 data.password = await hashPassword(body.password);
                 delete data.oldPassword;
             }
-            const updatedUser = await prisma.user.update({
-                select: safeUserSelect,
-                data,
-                where: {
-                    id: userData.id
-                }
-            });
+            const updatedUsers = await db
+                .update(tables.users)
+                .set(data)
+                .where(eq(tables.users.id, userData.id))
+                .returning(safeUserSelect);
+            const updatedUser = updatedUsers[0];
+            if (!updatedUser) {
+                throw new InternError('Could not retreive updated user');
+            }
             if (updatedUser.id === reqUser.id) {
                 const cacheKey = getJwtCacheKey(updatedUser.id);
                 const cacheJwtData =
