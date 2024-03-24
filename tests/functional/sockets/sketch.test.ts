@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
+import { describe, expect, test, beforeAll, beforeEach, vi } from 'vitest';
 
 import { type SketchBody } from '../../../src/controllers/schemas/definitions.js';
 import { sessionsData, resetData, resetCache } from '../helpers/data.helper.js';
@@ -8,6 +8,7 @@ import {
     assertSketch,
     assertSocketMeta
 } from '../helpers/assert.helper.js';
+import { prisma } from '../../../src/services/prisma.js';
 
 describe('[Sockets] Sketch', () => {
     beforeAll(async () => {
@@ -74,10 +75,15 @@ describe('[Sockets] Sketch', () => {
     });
 
     test('Should update sketch', async () => {
-        const sketchData = sessionsData[0].sketch;
         const {
-            sockets: [masterSocket, player1Socket, player2Socket]
+            sockets: [masterSocket, player1Socket, player2Socket],
+            session
         } = await socketHelper.setupSession();
+        const anotherSession = sessionsData.find(({ id }) => id !== session.id);
+        const anotherSketch = anotherSession?.sketch;
+        if (!anotherSketch) {
+            throw new Error('Could not find another sketch to run test');
+        }
         await Promise.all([
             ...[player1Socket, player2Socket].map(
                 (socket) =>
@@ -87,7 +93,7 @@ describe('[Sockets] Sketch', () => {
                             assertSocketMeta(data);
                             assertUser(user);
                             expect(isMaster).toEqual(true);
-                            assertSketch(sketch, sketchData);
+                            assertSketch(sketch, anotherSketch);
                             socket.disconnect();
                             resolve();
                         });
@@ -98,9 +104,25 @@ describe('[Sockets] Sketch', () => {
                     })
             ),
             (async () => {
-                masterSocket.emit('sketchUpdate', sketchData);
+                masterSocket.emit('sketchUpdate', anotherSketch);
             })()
         ]);
+        await vi.waitFor(
+            async () => {
+                const updatedSession = await prisma.session.findUniqueOrThrow({
+                    where: {
+                        id: session.id
+                    }
+                });
+                assertSketch(
+                    updatedSession.sketch as SketchBody,
+                    anotherSketch
+                );
+            },
+            {
+                interval: 100
+            }
+        );
     });
 
     test('Should fail to update sketch token because of invalid data', async () => {
@@ -128,7 +150,11 @@ describe('[Sockets] Sketch', () => {
         } = await socketHelper.setupSession();
         const sketchData = session.sketch as SketchBody;
         const token = sketchData.tokens?.[0];
-        const anotherToken = sessionsData[1].sketch.tokens[0];
+        const anotherSession = sessionsData.find(({ id }) => id !== session.id);
+        const anotherToken = anotherSession?.sketch.tokens[0];
+        if (!anotherToken) {
+            throw new Error('Could not find another sketch to run test');
+        }
         const updatedTokenData = {
             ...token,
             x: anotherToken.x,
@@ -163,5 +189,21 @@ describe('[Sockets] Sketch', () => {
                 player2Socket.emit('tokenUpdate', updatedTokenData);
             })()
         ]);
+        await vi.waitFor(
+            async () => {
+                const updatedSession = await prisma.session.findUniqueOrThrow({
+                    where: {
+                        id: session.id
+                    }
+                });
+                assertSketch(
+                    updatedSession.sketch as SketchBody,
+                    expectedSketchData
+                );
+            },
+            {
+                interval: 100
+            }
+        );
     });
 });

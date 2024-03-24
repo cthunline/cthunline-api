@@ -6,6 +6,7 @@ import { type Session } from '@prisma/client';
 import { getEnv } from '../../../src/services/env.js';
 
 import { sessionsData, charactersData, usersData } from './data.helper.js';
+import { prisma } from '../../../src/services/prisma.js';
 import { assertSocketMeta } from './assert.helper.js';
 import { api } from './api.helper.js';
 
@@ -146,9 +147,11 @@ export const socketHelper: SocketsHelper = {
             email: player2Email,
             password: 'test'
         });
-        const session = sessionsData.find(
-            ({ masterId }) => masterJWTUser.id === masterId
-        );
+        const session = await prisma.session.findFirst({
+            where: {
+                masterId: masterJWTUser.id
+            }
+        });
         if (!session) {
             throw new Error('Could not find session to setup');
         }

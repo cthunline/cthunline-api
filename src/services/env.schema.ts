@@ -29,6 +29,7 @@ export const envSchema = Type.Object({
     CACHE_PORT: Type.Integer({ minimum: 1 }),
     CACHE_DATABASE: Type.Integer({ minimum: 0 }),
     CACHE_PASSWORD: Type.Optional(Type.String({ minLength: 1 })),
+    CACHE_SKETCH_SAVE_MS: Type.Optional(Type.Integer({ minimum: 0 })),
     // assets
     ASSET_DIR: Type.String({ minLength: 1 }),
     ASSET_MAX_SIZE_MB: Type.Integer({ minimum: 1 }),

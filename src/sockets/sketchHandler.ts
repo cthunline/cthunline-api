@@ -1,10 +1,15 @@
+import {
+    ForbiddenError,
+    InternError,
+    NotFoundError
+} from '../services/errors.js';
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
 import { getSketchCacheKey } from '../controllers/helpers/session.js';
-import { ForbiddenError, NotFoundError } from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
 import { resetTimeout } from '../services/tools.js';
 import { prisma } from '../services/prisma.js';
 import { cache } from '../services/cache.js';
+import { getEnv } from '../services/env.js';
 import { meta } from './helper.js';
 import {
     sketchSchema,
@@ -13,7 +18,7 @@ import {
     TokenBody
 } from '../controllers/schemas/definitions.js';
 
-const sketchSaveTimerMs = 1000;
+const sketchSaveTimerMs = getEnv('CACHE_SKETCH_SAVE_MS') ?? 1000;
 
 const saveCachedSketch = async (sessionId: number) => {
     const cacheKey = getSketchCacheKey(sessionId);
@@ -27,6 +32,10 @@ const saveCachedSketch = async (sessionId: number) => {
                 sketch
             }
         });
+    } else {
+        throw new InternError(
+            `Could not retreive sketch with sessionId ${sessionId} from cache while trying to save it`
+        );
     }
 };
 
