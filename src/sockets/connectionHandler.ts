@@ -1,5 +1,9 @@
 import { type ExtendedError } from 'socket.io/dist/namespace';
 
+import {
+    type CacheJwtData,
+    getJwtCacheKey
+} from '../controllers/helpers/auth.js';
 import { type SketchBody } from '../controllers/schemas/definitions.js';
 import { getSessionOrThrow } from '../controllers/helpers/session.js';
 import { getSketchCacheKey } from '../controllers/helpers/sketch.js';
@@ -34,12 +38,19 @@ const verifySocketJwt = async (socket: SocketIoSocket): Promise<SafeUser> => {
     if (!jwt) {
         throw new AuthenticationError('Missing authentication cookie');
     }
-    try {
-        const decryptedJwt = decrypt(jwt, getEnv('CRYPTO_SECRET'));
-        return verifyJwt(decryptedJwt);
-    } catch {
-        throw new AuthenticationError('Could not verify JWT');
+    const decryptedJwt = decrypt(
+        jwt,
+        getEnv('CRYPTO_SECRET'),
+        AuthenticationError
+    );
+    const jwtUser = verifyJwt(decryptedJwt);
+    const cacheJwtData = await cache.getJson<CacheJwtData>(
+        getJwtCacheKey(jwtUser.id)
+    );
+    if (!cacheJwtData || cacheJwtData.jwt !== decryptedJwt) {
+        throw new AuthenticationError('JWT is not valid');
     }
+    return cacheJwtData.user;
 };
 
 // verify session
