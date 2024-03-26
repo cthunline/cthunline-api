@@ -12,24 +12,16 @@ trigger:
   - pull_request
 
 services:
-- name: mariadb
-  image: mariadb
+- name: postgres
+  image: postgres:bookworm
   environment:
-    MARIADB_RANDOM_ROOT_PASSWORD: yes
-    MARIADB_USER: cthunline
-    MARIADB_PASSWORD: cthunline
-    MARIADB_DATABASE: cthunline_ci
+    POSTGRES_USER: cthunline
+    POSTGRES_PASSWORD: cthunline
+    POSTGRES_DB: cthunline_ci
 - name: keydb
   image: eqalpha/keydb
 
 steps:
-# wait for database
-- name: waiton
-  image: akhenakh/drone-waiton:1.0
-  settings:
-    globaltimeout: 60s
-    urls:
-    - tcp://mariadb:3306
 # install dependencies & setup env
 - name: install
   image: node:20-alpine
