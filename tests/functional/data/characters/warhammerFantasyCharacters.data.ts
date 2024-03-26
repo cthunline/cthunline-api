@@ -80,7 +80,7 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
             resilience: {
                 resilience: 3,
                 resolve: 3,
-                motivation: 0
+                motivation: 'Some motivation'
             },
             experience: {
                 current: 0,
@@ -468,7 +468,7 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
             resilience: {
                 resilience: 3,
                 resolve: 3,
-                motivation: 0
+                motivation: 'Another kind of motivation'
             },
             experience: {
                 current: 0,
