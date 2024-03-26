@@ -1,13 +1,13 @@
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
+import pg from 'pg';
 
 import * as schema from '../drizzle/schema.js';
 import { hashPassword } from './crypto.js';
 import { getEnv } from './env.js';
 import { log } from './log.js';
 
-export const pool = new Pool({
+export const pool = new pg.Pool({
     connectionString: getEnv('DATABASE_URL')
 });
 await pool.connect();
