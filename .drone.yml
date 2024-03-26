@@ -45,7 +45,6 @@ steps:
   - npm run test
   depends_on:
   - install
-  - waiton
 # sonarqube scan
 - name: sonarqube
   image: plugins/sonarqube-scanner:v2.0.2-java17
