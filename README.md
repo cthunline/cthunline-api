@@ -16,7 +16,7 @@
 ## Requirements
 
 - NodeJS >= 16
-- MySQL / MariaDB
+- PostgreSQL
 - KeyDB / Redis
 
 ## Configuration

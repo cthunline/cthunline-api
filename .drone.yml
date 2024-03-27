@@ -6,7 +6,6 @@ name: cthunline-api-ci
 trigger:
   branch:
   - master
-  - dev
   event:
   - push
   - pull_request
@@ -58,7 +57,7 @@ steps:
   - test
   when:
     branch:
-    - dev
+    - master
     event:
     - push
 
