@@ -65,7 +65,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: cthunline-api-cd
+name: cthunline-cd
 
 # when to execute pipeline
 trigger:
