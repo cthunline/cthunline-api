@@ -386,7 +386,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 }
             ],
             spells: [],
-            sin: 0
+            sin: 0,
+            advantage: 0
         }
     },
     {
@@ -771,7 +772,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                     effect: 'WFRP, Page 242'
                 }
             ],
-            sin: 0
+            sin: 0,
+            advantage: 0
         }
     }
 ];
