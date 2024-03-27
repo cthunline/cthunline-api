@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "type": "module",
     "scripts": {
         "dev": "cross-env nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"tsx src/index.ts\"",
@@ -11,7 +11,7 @@
         "prepare": "[ -d '.husky' ] && husky || true",
         "lint": "npx eslint . --ext=.ts --max-warnings=0 && npx prettier --check . && npx tsc --noEmit && npx markdownlint **/*.md",
         "format": "npx eslint . --fix --ext=.ts --max-warnings=0 && npx prettier --write . && npx tsc --noEmit && npx markdownlint --fix **/*.md",
-        "drizzle:generate": "npx drizzle-kit generate:pg"
+        "drizzle:generate": "npx drizzle-kit generate:pg --config=src/drizzle/config.ts"
     },
     "dependencies": {
         "@cthunline/games": "^2.5.0",
