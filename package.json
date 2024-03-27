@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.4.1",
+    "version": "1.5.0",
     "type": "module",
     "scripts": {
         "dev": "cross-env nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"tsx src/index.ts\"",
@@ -8,7 +8,7 @@
         "build": "tsc --build --clean tsconfig.build.json && tsc --project tsconfig.build.json",
         "test": "dotenv -e .env.test -- vitest --run",
         "test:watch": "dotenv -e .env.test -- vitest --watch",
-        "prepare": "[ -d '.husky' ] && husky install || true",
+        "prepare": "[ -d '.husky' ] && husky || true",
         "lint": "npx eslint . --ext=.ts --max-warnings=0 && npx prettier --check . && npx tsc --noEmit && npx markdownlint **/*.md",
         "format": "npx eslint . --fix --ext=.ts --max-warnings=0 && npx prettier --write . && npx tsc --noEmit && npx markdownlint --fix **/*.md",
         "drizzle:generate": "npx drizzle-kit generate:pg"
@@ -42,7 +42,7 @@
         "winston": "^3.13.0"
     },
     "devDependencies": {
-        "@tsconfig/recommended": "^1.0.4",
+        "@tsconfig/recommended": "^1.0.5",
         "@types/bcrypt": "^5.0.2",
         "@types/deep-equal-in-any-order": "^1.0.3",
         "@types/jsonwebtoken": "^9.0.6",
