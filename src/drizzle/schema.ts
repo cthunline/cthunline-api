@@ -47,7 +47,7 @@ export const characters = pgTable('characters', {
     userId: integer('user_id')
         .references(() => users.id)
         .notNull(),
-    gameId: varchar('gameId', { length: 32 }).notNull(),
+    gameId: varchar('game_id', { length: 32 }).notNull(),
     name: varchar('name', { length: 256 }).notNull(),
     portrait: varchar('portrait', { length: 256 }),
     data: json('data').$type<CharacterData>().notNull(),

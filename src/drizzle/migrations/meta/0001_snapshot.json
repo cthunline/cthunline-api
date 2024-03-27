@@ -1,0 +1,570 @@
+{
+    "id": "bdf6afc1-da3e-4fea-a10d-e0fcb1394933",
+    "prevId": "30b34ede-3d2d-490b-90e6-6ce0e798249b",
+    "version": "5",
+    "dialect": "pg",
+    "tables": {
+        "assets": {
+            "name": "assets",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "directory_id": {
+                    "name": "directory_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "type": {
+                    "name": "type",
+                    "type": "varchar(32)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "path": {
+                    "name": "path",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "assets_user_id_users_id_fk": {
+                    "name": "assets_user_id_users_id_fk",
+                    "tableFrom": "assets",
+                    "tableTo": "users",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                },
+                "assets_directory_id_directories_id_fk": {
+                    "name": "assets_directory_id_directories_id_fk",
+                    "tableFrom": "assets",
+                    "tableTo": "directories",
+                    "columnsFrom": ["directory_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "characters": {
+            "name": "characters",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "game_id": {
+                    "name": "game_id",
+                    "type": "varchar(32)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "portrait": {
+                    "name": "portrait",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "data": {
+                    "name": "data",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "characters_user_id_users_id_fk": {
+                    "name": "characters_user_id_users_id_fk",
+                    "tableFrom": "characters",
+                    "tableTo": "users",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "directories": {
+            "name": "directories",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "parent_id": {
+                    "name": "parent_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "directories_user_id_users_id_fk": {
+                    "name": "directories_user_id_users_id_fk",
+                    "tableFrom": "directories",
+                    "tableTo": "users",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                },
+                "directories_parent_id_directories_id_fk": {
+                    "name": "directories_parent_id_directories_id_fk",
+                    "tableFrom": "directories",
+                    "tableTo": "directories",
+                    "columnsFrom": ["parent_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "invitations": {
+            "name": "invitations",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "code": {
+                    "name": "code",
+                    "type": "varchar(128)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expire": {
+                    "name": "expire",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "is_used": {
+                    "name": "is_used",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {
+                "code_index": {
+                    "name": "code_index",
+                    "columns": ["code"],
+                    "isUnique": true
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "notes": {
+            "name": "notes",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "session_id": {
+                    "name": "session_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "position": {
+                    "name": "position",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "is_shared": {
+                    "name": "is_shared",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "title": {
+                    "name": "title",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "text": {
+                    "name": "text",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "notes_user_id_users_id_fk": {
+                    "name": "notes_user_id_users_id_fk",
+                    "tableFrom": "notes",
+                    "tableTo": "users",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                },
+                "notes_session_id_sessions_id_fk": {
+                    "name": "notes_session_id_sessions_id_fk",
+                    "tableFrom": "notes",
+                    "tableTo": "sessions",
+                    "columnsFrom": ["session_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "sessions": {
+            "name": "sessions",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "master_id": {
+                    "name": "master_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "gameId": {
+                    "name": "gameId",
+                    "type": "varchar(32)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "data": {
+                    "name": "data",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "sessions_master_id_users_id_fk": {
+                    "name": "sessions_master_id_users_id_fk",
+                    "tableFrom": "sessions",
+                    "tableTo": "users",
+                    "columnsFrom": ["master_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "sketchs": {
+            "name": "sketchs",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "data": {
+                    "name": "data",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "sketchs_user_id_users_id_fk": {
+                    "name": "sketchs_user_id_users_id_fk",
+                    "tableFrom": "sketchs",
+                    "tableTo": "users",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "users": {
+            "name": "users",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "password": {
+                    "name": "password",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "theme": {
+                    "name": "theme",
+                    "type": "varchar(32)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "locale": {
+                    "name": "locale",
+                    "type": "varchar(8)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "is_admin": {
+                    "name": "is_admin",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "is_enabled": {
+                    "name": "is_enabled",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {
+                "email_index": {
+                    "name": "email_index",
+                    "columns": ["email"],
+                    "isUnique": true
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        }
+    },
+    "enums": {},
+    "schemas": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
+}

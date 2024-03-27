@@ -1,0 +1,1 @@
+ALTER TABLE "characters" RENAME COLUMN "gameId" TO "game_id";
