@@ -14,6 +14,7 @@ import { initDb, migrateDb } from './services/db.js';
 import { socketRouter } from './sockets/index.js';
 import { getEnv } from './services/env.js';
 import { log } from './services/log.js';
+import { migrateData } from './migrations/index.js';
 
 export const app = Fastify({
     trustProxy: getEnv('REVERSE_PROXY'),
@@ -31,7 +32,6 @@ export const initApp = async () => {
         log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
         log.info('~~~~~~~ Cthunline API Server ~~~~~~~');
         log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-
         log.info('Registering middlewares');
         // cookie parser
         await app.register(FastifyCookie, {
@@ -45,24 +45,24 @@ export const initApp = async () => {
         await app.register(FastifyFormidable);
         // socket.io middleware
         await app.register(FastifySocketIo);
-        // handler for too large payloads
-        // app.use(payloadTooLargeHandler);
         // custom error handler
         app.setErrorHandler(errorHandler);
         // custom schema error formatter
         app.setSchemaErrorFormatter(schemaErrorFormatter);
-
-        log.info('Migrating database');
+        // database
+        log.info('Migrating database schema');
         await migrateDb();
         log.info('Initializing database');
         await initDb();
-
+        // data migrations
+        log.info('Migrating data');
+        await migrateData();
+        // api routes
         log.info('Registering routes');
         await app.register(mainController);
-
+        // web sockets
         log.info('Initializing web sockets');
         socketRouter(app);
-
         // emit ready event
         app.ready();
     } catch (err: any) {
