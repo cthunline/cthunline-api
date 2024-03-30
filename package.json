@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.5.3",
+    "version": "1.5.4",
     "type": "module",
     "scripts": {
         "dev": "cross-env nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"tsx src/index.ts\"",
@@ -21,7 +21,7 @@
         "@fastify/static": "^7.0.2",
         "@pitininja/envious": "^1.0.6",
         "@sinclair/typebox": "^0.32.20",
-        "ajv-formats": "^2.1.1",
+        "ajv-formats": "^3.0.1",
         "bcrypt": "^5.1.1",
         "cross-env": "^7.0.3",
         "dayjs": "^1.11.10",
