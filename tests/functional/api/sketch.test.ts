@@ -8,8 +8,31 @@ import {
 } from 'vitest';
 
 import { sketchsData, resetData, resetCache } from '../helpers/data.helper.js';
-import { assertSketchObject } from '../helpers/assert.helper.js';
+import { assertSketch } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
+
+const getUserSketchs = (userId: number) =>
+    sketchsData.filter(({ userId: sketchUserId }) => sketchUserId === userId);
+
+const getUserSketch = (userId: number) => {
+    const sketch = sketchsData.find(
+        ({ userId: sketchUserId }) => sketchUserId === userId
+    );
+    if (!sketch) {
+        throw new Error('Could not find sketch to run test');
+    }
+    return sketch;
+};
+
+const getAnotherUserSketch = (userId: number) => {
+    const sketch = sketchsData.find(
+        ({ userId: sketchUserId }) => sketchUserId !== userId
+    );
+    if (!sketch) {
+        throw new Error('Could not find sketch to run test');
+    }
+    return sketch;
+};
 
 describe('[API] Sketchs', () => {
     beforeAll(async () => {
@@ -28,8 +51,8 @@ describe('[API] Sketchs', () => {
             await api.testGetList({
                 route: '/sketchs',
                 listKey: 'sketchs',
-                data: sketchsData.filter(({ userId }) => api.userId === userId),
-                assert: assertSketchObject
+                data: getUserSketchs(api.userId),
+                assert: assertSketch
             });
         });
     });
@@ -66,7 +89,7 @@ describe('[API] Sketchs', () => {
                     name: 'Test',
                     data
                 },
-                assert: assertSketchObject
+                assert: assertSketch
             });
         });
     });
@@ -82,7 +105,85 @@ describe('[API] Sketchs', () => {
             await api.testGetOne({
                 route: '/sketchs/:id',
                 data: sketchsData[0],
-                assert: assertSketchObject
+                assert: assertSketch
+            });
+        });
+    });
+
+    describe('POST /sketchs/:id', () => {
+        test('Should throw error because of invalid ID', async () => {
+            await api.testInvalidIdError({
+                method: 'POST',
+                route: '/sketchs/:id',
+                body: {
+                    name: 'test'
+                }
+            });
+        });
+        test('Should throw a not found error because sketch belong to another user', async () => {
+            const anotherUserSketch = getAnotherUserSketch(api.userId);
+            await api.testError(
+                {
+                    method: 'POST',
+                    route: `/sketchs/${anotherUserSketch.id}`,
+                    body: { name: 'test' }
+                },
+                404
+            );
+        });
+        test('Should throw a validation error', async () => {
+            const sketch = getUserSketch(api.userId);
+            const invalidData = [
+                {
+                    invalidProperty: 'Test'
+                },
+                {
+                    name: 'Test',
+                    invalidProperty: 'Test'
+                },
+                {
+                    name: 1234
+                },
+                {
+                    data: {
+                        invalidProperty: 'test'
+                    }
+                },
+                {}
+            ];
+            for (const body of invalidData) {
+                await api.testError(
+                    {
+                        method: 'POST',
+                        route: `/sketchs/${sketch.id}`,
+                        body
+                    },
+                    400
+                );
+            }
+        });
+        test('Should update a sketch belonging to the current user', async () => {
+            const userSketch = getUserSketch(api.userId);
+            const anotherUserSketch = getAnotherUserSketch(api.userId);
+            const response = await api.request({
+                method: 'POST',
+                route: '/sketchs',
+                body: {
+                    name: userSketch.name,
+                    data: userSketch.data
+                }
+            });
+            expect(response).toHaveStatus(200);
+            const {
+                body: { id }
+            } = response;
+            await api.testEdit({
+                route: `/sketchs/${id}`,
+                data: {
+                    name: anotherUserSketch.name,
+                    data: anotherUserSketch.data
+                },
+                assert: assertSketch
             });
         });
     });

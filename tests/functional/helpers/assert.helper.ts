@@ -176,7 +176,7 @@ export const assertSketchData = (
     }
 };
 
-export const assertSketchObject = (
+export const assertSketch = (
     data: Record<string, any>,
     expected?: Record<string, any>
 ) => {

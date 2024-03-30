@@ -1,12 +1,17 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { eq } from 'drizzle-orm';
 
-import { createSketchSchema, type CreateSketchBody } from './schemas/sketch.js';
 import { getUserSketchOrThrow } from './helpers/sketch.js';
 import { InternError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
 import { controlSelf } from './helpers/auth.js';
 import { db, tables } from '../services/db.js';
+import {
+    createSketchSchema,
+    type CreateSketchBody,
+    updateSketchSchema,
+    type UpdateSketchBody
+} from './schemas/sketch.js';
 
 export const sketchController = async (app: FastifyInstance) => {
     // get all sketchs belonging to current user
@@ -49,6 +54,39 @@ export const sketchController = async (app: FastifyInstance) => {
                 throw new InternError('Could not retreive inserted sketch');
             }
             rep.send(createdSketch);
+        }
+    });
+
+    // save a sketch for current user
+    app.route({
+        method: 'POST',
+        url: '/sketchs/:sketchId',
+        schema: { body: updateSketchSchema },
+        handler: async (
+            {
+                params,
+                body,
+                user
+            }: FastifyRequest<{
+                Params: {
+                    sketchId: string;
+                };
+                Body: UpdateSketchBody;
+            }>,
+            rep: FastifyReply
+        ) => {
+            const sketchId = parseParamId(params, 'sketchId');
+            await getUserSketchOrThrow(sketchId, user.id);
+            const updatedSketchs = await db
+                .update(tables.sketchs)
+                .set(body)
+                .where(eq(tables.sketchs.id, sketchId))
+                .returning();
+            const updatedSketch = updatedSketchs[0];
+            if (!updatedSketch) {
+                throw new InternError('Could not retreive updated sketch');
+            }
+            rep.send(updatedSketch);
         }
     });
 

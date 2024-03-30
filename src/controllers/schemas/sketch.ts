@@ -13,3 +13,10 @@ export const createSketchSchema = Type.Object(
 );
 
 export type CreateSketchBody = Static<typeof createSketchSchema>;
+
+export const updateSketchSchema = Type.Partial(createSketchSchema, {
+    additionalProperties: false,
+    minProperties: 1
+});
+
+export type UpdateSketchBody = Static<typeof updateSketchSchema>;
