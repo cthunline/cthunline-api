@@ -349,7 +349,8 @@ export const assetController = async (app: FastifyInstance) => {
             const childrenDirectoryIds = childrenDirectories.map(
                 ({ id }) => id
             );
-            if (childrenDirectoryIds.length) {
+            const assetDirectoryIds = [directoryId, ...childrenDirectoryIds];
+            if (assetDirectoryIds.length) {
                 // get assets within all children directories
                 const assets = await db
                     .select()
@@ -359,7 +360,7 @@ export const assetController = async (app: FastifyInstance) => {
                             eq(tables.assets.userId, user.id),
                             inArray(
                                 tables.assets.directoryId,
-                                childrenDirectoryIds
+                                assetDirectoryIds
                             )
                         )
                     );

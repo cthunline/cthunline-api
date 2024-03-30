@@ -451,6 +451,25 @@ describe('[API] Assets', () => {
             });
             expect(dirResponse).toHaveStatus(200);
             const directory = dirResponse.body;
+            // upload asset in directory
+            const dirAssetBuffer = await getAssetBuffer('asset.png');
+            const dirAssetResponse = await api.request({
+                method: 'POST',
+                route: '/assets',
+                files: [
+                    {
+                        field: 'assets',
+                        buffer: dirAssetBuffer,
+                        name: 'asset.png'
+                    }
+                ],
+                fields: {
+                    directoryId: directory.id
+                }
+            });
+            expect(dirAssetResponse).toHaveStatus(200);
+            const { assets: dirAssets } = dirAssetResponse.body;
+            const dirAsset = dirAssets[0];
             // create a subdirectory
             const subdirResponse = await api.request({
                 method: 'POST',
@@ -463,14 +482,14 @@ describe('[API] Assets', () => {
             expect(subdirResponse).toHaveStatus(200);
             const subDirectory = subdirResponse.body;
             // upload asset in subdirectory
-            const buffer = await getAssetBuffer('asset.png');
-            const response = await api.request({
+            const subDirAssetBuffer = await getAssetBuffer('asset.png');
+            const subDirAssetResponse = await api.request({
                 method: 'POST',
                 route: '/assets',
                 files: [
                     {
                         field: 'assets',
-                        buffer,
+                        buffer: subDirAssetBuffer,
                         name: 'asset.png'
                     }
                 ],
@@ -478,9 +497,9 @@ describe('[API] Assets', () => {
                     directoryId: subDirectory.id
                 }
             });
-            expect(response).toHaveStatus(200);
-            const { assets } = response.body;
-            const asset = assets[0];
+            expect(subDirAssetResponse).toHaveStatus(200);
+            const { assets: subDirAssets } = subDirAssetResponse.body;
+            const subDirAsset = subDirAssets[0];
             // delete main directory
             await api.testDelete({
                 route: `/directories/${directory.id}`,
@@ -497,12 +516,23 @@ describe('[API] Assets', () => {
             await api.testError(
                 {
                     method: 'GET',
-                    route: `/assets/${asset.id}`
+                    route: `/assets/${dirAsset.id}`
                 },
                 404
             );
             await api.testStaticFile(
-                path.join('/static', asset.id.toString()),
+                path.join('/static', dirAsset.id.toString()),
+                false
+            );
+            await api.testError(
+                {
+                    method: 'GET',
+                    route: `/assets/${subDirAsset.id}`
+                },
+                404
+            );
+            await api.testStaticFile(
+                path.join('/static', subDirAsset.id.toString()),
                 false
             );
         });
