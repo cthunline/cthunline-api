@@ -355,8 +355,9 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 weapons: 1,
                 armour: 0,
                 trappings: 0,
-                maximum: 5,
-                total: 1
+                total: 1,
+                maximumBonus: 0,
+                maximum: 5
             },
             wounds: {
                 strengthBonus: 2,
@@ -724,8 +725,9 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 weapons: 2,
                 armour: 0,
                 trappings: 1,
-                maximum: 4,
-                total: 3
+                total: 3,
+                maximumBonus: 0,
+                maximum: 4
             },
             wounds: {
                 strengthBonus: 2,
