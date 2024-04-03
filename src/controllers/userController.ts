@@ -1,12 +1,17 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { eq } from 'drizzle-orm';
 
 import { verifyPassword, hashPassword } from '../services/crypto.js';
-import { InternError, ValidationError } from '../services/errors.js';
+import { ValidationError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
-import { db, tables } from '../services/db.js';
 import { QueryParam } from '../types/api.js';
 import { cache } from '../services/cache.js';
+import {
+    createUser,
+    getUnsafeUserByIdOrThrow,
+    getUserByIdOrThrow,
+    getUsers,
+    updateUserById
+} from '../services/queries/user.js';
 import {
     controlSelf,
     controlAdmin,
@@ -15,13 +20,10 @@ import {
     getJwtCacheKey
 } from './helpers/auth.js';
 import {
-    safeUserSelect,
-    getUserByIdOrThrow,
     controlAdminFields,
     controlUniqueEmail,
     controlLocale,
-    defaultUserData,
-    getUnsafeUserByIdOrThrow
+    defaultUserData
 } from './helpers/user.js';
 import {
     createUserSchema,
@@ -46,12 +48,7 @@ export const userController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const getDisabled = query.disabled === 'true';
-            const users = await db
-                .select(safeUserSelect)
-                .from(tables.users)
-                .where(
-                    getDisabled ? undefined : eq(tables.users.isEnabled, true)
-                );
+            const users = await getUsers(getDisabled);
             rep.send({ users });
         }
     });
@@ -76,18 +73,11 @@ export const userController = async (app: FastifyInstance) => {
             }
             const hashedPassword = await hashPassword(body.password);
             const { password, ...cleanBody } = body;
-            const createdUsers = await db
-                .insert(tables.users)
-                .values({
-                    ...defaultUserData,
-                    ...cleanBody,
-                    password: hashedPassword
-                })
-                .returning(safeUserSelect);
-            const createdUser = createdUsers[0];
-            if (!createdUser) {
-                throw new InternError('Could not retreive inserted user');
-            }
+            const createdUser = await createUser({
+                ...defaultUserData,
+                ...cleanBody,
+                password: hashedPassword
+            });
             rep.send(createdUser);
         }
     });
@@ -156,15 +146,7 @@ export const userController = async (app: FastifyInstance) => {
                 data.password = await hashPassword(body.password);
                 delete data.oldPassword;
             }
-            const updatedUsers = await db
-                .update(tables.users)
-                .set(data)
-                .where(eq(tables.users.id, userData.id))
-                .returning(safeUserSelect);
-            const updatedUser = updatedUsers[0];
-            if (!updatedUser) {
-                throw new InternError('Could not retreive updated user');
-            }
+            const updatedUser = await updateUserById(userData.id, data);
             if (updatedUser.id === reqUser.id) {
                 const cacheKey = getJwtCacheKey(updatedUser.id);
                 const cacheJwtData =

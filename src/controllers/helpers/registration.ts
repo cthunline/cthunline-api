@@ -1,9 +1,11 @@
-import { eq } from 'drizzle-orm';
 import dayjs from 'dayjs';
 
 import { ForbiddenError } from '../../services/errors.js';
 import { generateToken } from '../../services/tools.js';
-import { db, tables } from '../../services/db.js';
+import {
+    getInvitationByCode,
+    updateInvitationByCode
+} from '../../services/queries/invitation.js';
 
 /**
 Checks that an invitation code is valid.
@@ -16,11 +18,7 @@ export const controlInvitationCode = async (
     if (!code) {
         throw new ForbiddenError('Missing invitation code');
     }
-    const invitations = await db
-        .select()
-        .from(tables.invitations)
-        .where(eq(tables.invitations.code, code));
-    const invitation = invitations[0];
+    const invitation = await getInvitationByCode(code);
     if (!invitation) {
         throw new ForbiddenError('Invalid invitation code');
     }
@@ -31,12 +29,9 @@ export const controlInvitationCode = async (
         throw new ForbiddenError('Invitation code is expired');
     }
     if (updateIsUsed) {
-        await db
-            .update(tables.invitations)
-            .set({
-                isUsed: true
-            })
-            .where(eq(tables.invitations.code, code));
+        await updateInvitationByCode(code, {
+            isUsed: true
+        });
     }
 };
 

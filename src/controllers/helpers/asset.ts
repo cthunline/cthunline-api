@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm';
 import path from 'path';
 import fs from 'fs';
 import {
@@ -6,16 +5,10 @@ import {
     type Options as FormidableOptions
 } from 'formidable';
 
+import { InternError, ValidationError } from '../../services/errors.js';
 import { mimeTypes, FileType, MimeType } from '../../types/asset.js';
 import { Directory } from '../../drizzle/schema.js';
-import { db, tables } from '../../services/db.js';
 import { getEnv } from '../../services/env.js';
-import {
-    ForbiddenError,
-    InternError,
-    NotFoundError,
-    ValidationError
-} from '../../services/errors.js';
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
@@ -91,85 +84,6 @@ export const getFormidableOptions = (): FormidableOptions => ({
     maxFileSize: getEnv('ASSET_MAX_SIZE_MB') * 1024 * 1024,
     multiples: true
 });
-
-/**
-Gets an asset.
-*/
-export const getAsset = async (assetId: number) => {
-    const assets = await db
-        .select()
-        .from(tables.assets)
-        .where(eq(tables.assets.id, assetId))
-        .limit(1);
-    return assets[0] ?? null;
-};
-
-/**
-Gets an asset.
-If asset does not exist throws a not found error.
-*/
-export const getAssetOrThrow = async (assetId: number) => {
-    const asset = await getAsset(assetId);
-    if (!asset) {
-        throw new NotFoundError('Asset not found');
-    }
-    return asset;
-};
-
-/**
-Gets an asset.
-Checks that the asset belongs to the given user, throws a forbidden error otherwise.
-If asset does not exist throws a not found error.
-*/
-export const getUserAssetOrThrow = async (assetId: number, userId: number) => {
-    const asset = await getAssetOrThrow(assetId);
-    if (asset.userId !== userId) {
-        throw new ForbiddenError('Asset does not belong to you');
-    }
-    return asset;
-};
-
-/**
-Gets all directories belonging to a user.
-*/
-export const getUserDirectories = async (userId: number) =>
-    db
-        .select()
-        .from(tables.directories)
-        .where(eq(tables.directories.userId, userId));
-
-/**
-Gets an directory.
-Checks that the directory belongs to the given user, throws a forbidden error otherwise.
-*/
-export const getUserDirectory = async (directoryId: number, userId: number) => {
-    const directories = await db
-        .select()
-        .from(tables.directories)
-        .where(eq(tables.directories.id, directoryId))
-        .limit(1);
-    const directory = directories[0];
-    if (directory && directory.userId !== userId) {
-        throw new ForbiddenError('Directory does not belong to the user');
-    }
-    return directory ?? null;
-};
-
-/**
-Gets an directory.
-Checks that the directory belongs to the given user, throws a forbidden error otherwise.
-If directory does not exist throws a not found error.
-*/
-export const getUserDirectoryOrThrow = async (
-    directoryId: number,
-    userId: number
-) => {
-    const directory = await getUserDirectory(directoryId, userId);
-    if (!directory) {
-        throw new NotFoundError('Directory not found');
-    }
-    return directory;
-};
 
 /**
 Recursivly searches all children directories of a given directoryId.

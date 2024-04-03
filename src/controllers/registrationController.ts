@@ -1,20 +1,17 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { registerUserSchema, type RegisterUserBody } from './schemas/user.js';
-import { ForbiddenError, InternError } from '../services/errors.js';
+import { controlUniqueEmail, defaultUserData } from './helpers/user.js';
+import { createInvitation } from '../services/queries/invitation.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
+import { createUser } from '../services/queries/user.js';
+import { ForbiddenError } from '../services/errors.js';
 import { hashPassword } from '../services/crypto.js';
-import { db, tables } from '../services/db.js';
 import { getEnv } from '../services/env.js';
 import {
     controlInvitationCode,
     generateInvitationCode
 } from './helpers/registration.js';
-import {
-    safeUserSelect,
-    controlUniqueEmail,
-    defaultUserData
-} from './helpers/user.js';
 
 export const registrationController = async (app: FastifyInstance) => {
     await app.register(async (routeApp: FastifyInstance) => {
@@ -45,19 +42,12 @@ export const registrationController = async (app: FastifyInstance) => {
                 await controlUniqueEmail(body.email);
                 const hashedPassword = await hashPassword(body.password);
                 const { password, invitationCode, ...cleanBody } = body;
-                const createdUsers = await db
-                    .insert(tables.users)
-                    .values({
-                        ...defaultUserData,
-                        ...cleanBody,
-                        password: hashedPassword
-                    })
-                    .returning(safeUserSelect);
-                const user = createdUsers[0];
-                if (!user) {
-                    throw new InternError('Could not retreive inserted user');
-                }
-                rep.send(user);
+                const createdUser = await createUser({
+                    ...defaultUserData,
+                    ...cleanBody,
+                    password: hashedPassword
+                });
+                rep.send(createdUser);
             }
         });
     });
@@ -78,15 +68,8 @@ export const registrationController = async (app: FastifyInstance) => {
             if (!getEnv('INVITATION_ENABLED')) {
                 throw new ForbiddenError('Invitation codes are disabled');
             }
-            const createdInvitations = await db
-                .insert(tables.invitations)
-                .values(generateInvitationCode())
-                .returning();
-            const invitation = createdInvitations[0];
-            if (!invitation) {
-                throw new InternError('Could not retreive inserted invitation');
-            }
-            rep.send({ code: invitation.code });
+            const { code } = await createInvitation(generateInvitationCode());
+            rep.send({ code });
         }
     });
 };

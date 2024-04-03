@@ -1,12 +1,10 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { eq, sql } from 'drizzle-orm';
 
+import { getSessionByIdOrThrow } from '../services/queries/session.js';
 import { ConflictError, InternError } from '../services/errors.js';
-import { getSessionOrThrow } from './helpers/session.js';
 import { parseParamId } from '../services/api.js';
 import { type Note } from '../drizzle/schema.js';
 import { controlSelf } from './helpers/auth.js';
-import { db, tables } from '../services/db.js';
 import {
     createNoteSchema,
     type CreateNoteBody,
@@ -14,12 +12,16 @@ import {
     type UpdateNoteBody
 } from './schemas/note.js';
 import {
-    getNotes,
-    getMaxNotePosition,
-    getNextNotePosition,
-    switchNotePositions,
-    getNoteOrThrow
-} from './helpers/note.js';
+    createNote,
+    deleteNoteById,
+    getUserNoteByIdOrThrow,
+    getUserSessionNoteMaxPosition,
+    getUserSessionNoteNextPosition,
+    getUserSessionNotes,
+    reorderUserSessionNotes,
+    switchUserSessionNotesPositions,
+    updateNoteById
+} from '../services/queries/note.js';
 
 export const noteController = async (app: FastifyInstance) => {
     // get current user's notes in a session
@@ -39,8 +41,8 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sessionId = parseParamId(params, 'sessionId');
-            await getSessionOrThrow(sessionId);
-            const notes = await getNotes(sessionId, user.id);
+            await getSessionByIdOrThrow(sessionId);
+            const notes = await getUserSessionNotes(user.id, sessionId);
             const userNotes: Note[] = [];
             const sharedNotes: Note[] = [];
             notes.forEach((note) => {
@@ -76,24 +78,20 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sessionId = parseParamId(params, 'sessionId');
-            await getSessionOrThrow(sessionId);
-            const position = await getNextNotePosition(sessionId, user.id);
-            const createdNotes = await db
-                .insert(tables.notes)
-                .values({
-                    position,
-                    isShared: body.isShared ?? false,
-                    title: body.title,
-                    text: body.text ?? '',
-                    sessionId,
-                    userId: user.id
-                })
-                .returning();
-            const note = createdNotes[0];
-            if (!note) {
-                throw new InternError('Could not retreive inserted note');
-            }
-            rep.send(note);
+            await getSessionByIdOrThrow(sessionId);
+            const position = await getUserSessionNoteNextPosition(
+                user.id,
+                sessionId
+            );
+            const createdNote = await createNote({
+                position,
+                isShared: body.isShared ?? false,
+                title: body.title,
+                text: body.text ?? '',
+                sessionId,
+                userId: user.id
+            });
+            rep.send(createdNote);
         }
     });
 
@@ -113,7 +111,7 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNoteOrThrow(noteId, user.id);
+            const note = await getUserNoteByIdOrThrow(user.id, noteId);
             rep.send(note);
         }
     });
@@ -137,17 +135,9 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNoteOrThrow(noteId, user.id);
+            const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
-            const updatedNotes = await db
-                .update(tables.notes)
-                .set(body)
-                .where(eq(tables.notes.id, noteId))
-                .returning();
-            const updatedNote = updatedNotes[0];
-            if (!updatedNote) {
-                throw new InternError('Could not retreive updated note');
-            }
+            const updatedNote = await updateNoteById(noteId, body);
             rep.send(updatedNote);
         }
     });
@@ -172,13 +162,13 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNoteOrThrow(noteId, user.id);
+            const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
             let positionToSwitch: number;
             if (params.action === 'down') {
-                const maxPosition = await getMaxNotePosition(
-                    note.sessionId,
-                    user.id
+                const maxPosition = await getUserSessionNoteMaxPosition(
+                    user.id,
+                    note.sessionId
                 );
                 if (note.position < maxPosition) {
                     positionToSwitch = note.position + 1;
@@ -196,13 +186,13 @@ export const noteController = async (app: FastifyInstance) => {
                     `Unexpected ${params.action} action parameter`
                 );
             }
-            await switchNotePositions(
-                note.sessionId,
+            await switchUserSessionNotesPositions(
                 user.id,
+                note.sessionId,
                 note.position,
                 positionToSwitch
             );
-            const updatedNote = await getNoteOrThrow(noteId, user.id);
+            const updatedNote = await getUserNoteByIdOrThrow(user.id, noteId);
             rep.send(updatedNote);
         }
     });
@@ -224,19 +214,11 @@ export const noteController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const noteId = parseParamId(params, 'noteId');
-            const note = await getNoteOrThrow(noteId, user.id);
+            const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
-            await db.delete(tables.notes).where(eq(tables.notes.id, noteId));
+            await deleteNoteById(noteId);
             // re-order note positions
-            await db.execute(sql`with ordered_notes as (
-                select id, row_number() over (order by position) as new_position
-                from notes
-                where session_id = ${note.sessionId} and user_id = ${user.id}
-            )
-            update notes
-            set position = ordered_notes.new_position
-            from ordered_notes
-            where notes.id = ordered_notes.id;`);
+            await reorderUserSessionNotes(user.id, note.sessionId);
             //
             rep.send({});
         }

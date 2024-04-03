@@ -1,17 +1,20 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { eq } from 'drizzle-orm';
 
-import { getUserSketchOrThrow } from './helpers/sketch.js';
-import { InternError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
 import { controlSelf } from './helpers/auth.js';
-import { db, tables } from '../services/db.js';
 import {
     createSketchSchema,
     type CreateSketchBody,
     updateSketchSchema,
     type UpdateSketchBody
 } from './schemas/sketch.js';
+import {
+    createSketch,
+    deleteSketchById,
+    getUserSketchByIdOrThrow,
+    getUserSketchs,
+    updateSketchById
+} from '../services/queries/sketch.js';
 
 export const sketchController = async (app: FastifyInstance) => {
     // get all sketchs belonging to current user
@@ -20,10 +23,7 @@ export const sketchController = async (app: FastifyInstance) => {
         url: '/sketchs',
         handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
             const userId = user.id;
-            const sketchs = await db
-                .select()
-                .from(tables.sketchs)
-                .where(eq(tables.sketchs.userId, userId));
+            const sketchs = await getUserSketchs(userId);
             rep.send({ sketchs });
         }
     });
@@ -42,17 +42,10 @@ export const sketchController = async (app: FastifyInstance) => {
             }>,
             rep: FastifyReply
         ) => {
-            const createdSketchs = await db
-                .insert(tables.sketchs)
-                .values({
-                    ...body,
-                    userId: user.id
-                })
-                .returning();
-            const createdSketch = createdSketchs[0];
-            if (!createdSketch) {
-                throw new InternError('Could not retreive inserted sketch');
-            }
+            const createdSketch = await createSketch({
+                ...body,
+                userId: user.id
+            });
             rep.send(createdSketch);
         }
     });
@@ -76,16 +69,8 @@ export const sketchController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sketchId = parseParamId(params, 'sketchId');
-            await getUserSketchOrThrow(sketchId, user.id);
-            const updatedSketchs = await db
-                .update(tables.sketchs)
-                .set(body)
-                .where(eq(tables.sketchs.id, sketchId))
-                .returning();
-            const updatedSketch = updatedSketchs[0];
-            if (!updatedSketch) {
-                throw new InternError('Could not retreive updated sketch');
-            }
+            await getUserSketchByIdOrThrow(user.id, sketchId);
+            const updatedSketch = await updateSketchById(sketchId, body);
             rep.send(updatedSketch);
         }
     });
@@ -106,7 +91,7 @@ export const sketchController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sketchId = parseParamId(params, 'sketchId');
-            const sketch = await getUserSketchOrThrow(sketchId, user.id);
+            const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
             rep.send(sketch);
         }
     });
@@ -127,11 +112,9 @@ export const sketchController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const sketchId = parseParamId(params, 'sketchId');
-            const sketch = await getUserSketchOrThrow(sketchId, user.id);
+            const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
             controlSelf(sketch.userId, user);
-            await db
-                .delete(tables.sketchs)
-                .where(eq(tables.sketchs.id, sketchId));
+            await deleteSketchById(sketchId);
             rep.send({});
         }
     });

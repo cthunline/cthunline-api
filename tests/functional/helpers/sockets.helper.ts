@@ -1,11 +1,10 @@
 import { io, type Socket } from 'socket.io-client';
 import { fastifyCookie } from '@fastify/cookie';
 import { expect, afterEach } from 'vitest';
-import { eq } from 'drizzle-orm';
 
+import { getMasterUserSessions } from '../../../src/services/queries/session.js';
 import { sessionsData, charactersData, usersData } from './data.helper.js';
 import { type Session } from '../../../src/drizzle/schema.js';
-import { db, tables } from '../../../src/services/db.js';
 import { assertSocketMeta } from './assert.helper.js';
 import { getEnv } from '../../../src/services/env.js';
 import { api } from './api.helper.js';
@@ -147,10 +146,7 @@ export const socketHelper: SocketsHelper = {
             email: player2Email,
             password: 'test'
         });
-        const sessions = await db
-            .select()
-            .from(tables.sessions)
-            .where(eq(tables.sessions.masterId, masterJWTUser.id));
+        const sessions = await getMasterUserSessions(masterJWTUser.id);
         const session = sessions[0];
         if (!session) {
             throw new Error('Could not find session to setup');

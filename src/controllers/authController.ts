@@ -1,11 +1,10 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { and, eq } from 'drizzle-orm';
 
 import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
+import { getUnsafeUserByEmail } from '../services/queries/user.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
 import { AuthenticationError } from '../services/errors.js';
 import { loginSchema, LoginBody } from './schemas/auth.js';
-import { db, tables } from '../services/db.js';
 import { cache } from '../services/cache.js';
 import { getEnv } from '../services/env.js';
 import {
@@ -39,21 +38,11 @@ export const authController = async (app: FastifyInstance) => {
                 rep: FastifyReply
             ) => {
                 const { email, password } = req.body;
-                const usersWithPassword = await db
-                    .select()
-                    .from(tables.users)
-                    .where(
-                        and(
-                            eq(tables.users.email, email),
-                            eq(tables.users.isEnabled, true)
-                        )
-                    )
-                    .limit(1);
-                const userWithPassword = usersWithPassword[0];
-                if (!userWithPassword) {
+                const unsafeUser = await getUnsafeUserByEmail(email);
+                if (!unsafeUser || !unsafeUser.isEnabled) {
                     throw new AuthenticationError();
                 }
-                const { password: hash, ...user } = userWithPassword;
+                const { password: hash, ...user } = unsafeUser;
                 const verified = await verifyPassword(password, hash);
                 if (!verified) {
                     throw new AuthenticationError();

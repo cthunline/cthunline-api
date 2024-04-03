@@ -1,19 +1,17 @@
 import { type ExtendedError } from 'socket.io/dist/namespace';
 
-import {
-    type CacheJwtData,
-    getJwtCacheKey
-} from '../controllers/helpers/auth.js';
+import { getCharacterCacheKey } from '../controllers/helpers/character.js';
 import { type SketchBody } from '../controllers/schemas/definitions.js';
-import { getSessionOrThrow } from '../controllers/helpers/session.js';
+import { getSessionByIdOrThrow } from '../services/queries/session.js';
 import { getSketchCacheKey } from '../controllers/helpers/sketch.js';
+import { getCharacterById } from '../services/queries/character.js';
 import { decrypt, verifyJwt } from '../services/crypto.js';
 import { cache } from '../services/cache.js';
 import { getEnv } from '../services/env.js';
 import {
-    getCharacterById,
-    getCharacterCacheKey
-} from '../controllers/helpers/character.js';
+    type CacheJwtData,
+    getJwtCacheKey
+} from '../controllers/helpers/auth.js';
 import {
     type Character,
     type Session,
@@ -59,7 +57,7 @@ const verifySession = async (socket: SocketIoSocket): Promise<Session> => {
     if (!sessionId) {
         throw new ValidationError('Missing sessionId in handshare query');
     }
-    const session = await getSessionOrThrow(sessionId);
+    const session = await getSessionByIdOrThrow(sessionId);
     return session;
 };
 

@@ -120,7 +120,7 @@ describe('[API] Sketchs', () => {
                 }
             });
         });
-        test('Should throw a not found error because sketch belong to another user', async () => {
+        test('Should throw a forbidden error because sketch belongs to another user', async () => {
             const anotherUserSketch = getAnotherUserSketch(api.userId);
             await api.testError(
                 {
@@ -128,7 +128,7 @@ describe('[API] Sketchs', () => {
                     route: `/sketchs/${anotherUserSketch.id}`,
                     body: { name: 'test' }
                 },
-                404
+                403
             );
         });
         test('Should throw a validation error', async () => {

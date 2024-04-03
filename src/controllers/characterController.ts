@@ -1,18 +1,16 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { type Character as CharacterData } from '@cthunline/games';
-import { eq } from 'drizzle-orm';
 import path from 'path';
 import fs from 'fs';
 
 import { games, GameId, isValidGameId } from '../services/games.js';
+import { getUserByIdOrThrow } from '../services/queries/user.js';
 import { assetDir, controlFile } from './helpers/asset.js';
 import { validateSchema } from '../services/typebox.js';
-import { getUserByIdOrThrow } from './helpers/user.js';
 import { type Character } from '../drizzle/schema.js';
 import { type QueryParam } from '../types/api.js';
 import { parseParamId } from '../services/api.js';
 import { controlSelf } from './helpers/auth.js';
-import { db, tables } from '../services/db.js';
 import { cache } from '../services/cache.js';
 import {
     ConflictError,
@@ -20,7 +18,6 @@ import {
     ValidationError
 } from '../services/errors.js';
 import {
-    getCharacterByIdOrThrow,
     getFormidablePortraitOptions,
     controlPortraitDir,
     portraitDirName,
@@ -33,6 +30,13 @@ import {
     UpdateCharacterBody,
     uploadPortraitSchema
 } from './schemas/character.js';
+import {
+    createCharacter,
+    deleteCharacterById,
+    getCharacterByIdOrThrow,
+    getCharacters,
+    updateCharacterById
+} from '../services/queries/character.js';
 
 export const characterController = async (app: FastifyInstance) => {
     // get all characters
@@ -50,16 +54,11 @@ export const characterController = async (app: FastifyInstance) => {
             }>,
             rep: FastifyReply
         ) => {
-            const userId = query.user ? Number(query.user) : null;
+            const userId = query.user ? Number(query.user) : undefined;
             if (userId) {
                 await getUserByIdOrThrow(userId);
             }
-            const characters = await db
-                .select()
-                .from(tables.characters)
-                .where(
-                    userId ? eq(tables.characters.userId, userId) : undefined
-                );
+            const characters = await getCharacters(userId);
             rep.send({ characters });
         }
     });
@@ -84,19 +83,12 @@ export const characterController = async (app: FastifyInstance) => {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
             validateSchema(games[gameId].schema, data);
-            const insertedCharacters = await db
-                .insert(tables.characters)
-                .values({
-                    userId,
-                    gameId,
-                    name,
-                    data: data as CharacterData
-                })
-                .returning();
-            const character = insertedCharacters[0];
-            if (!character) {
-                throw new InternError('Could not retreive inserted character');
-            }
+            const character = await createCharacter({
+                userId,
+                gameId,
+                name,
+                data: data as CharacterData
+            });
             rep.send(character);
         }
     });
@@ -146,15 +138,10 @@ export const characterController = async (app: FastifyInstance) => {
             if (body.data) {
                 validateSchema(games[gameId as GameId].schema, body.data);
             }
-            const updatedCharacters = await db
-                .update(tables.characters)
-                .set(body as typeof body & { data?: CharacterData })
-                .where(eq(tables.characters.id, characterId))
-                .returning();
-            const character = updatedCharacters[0];
-            if (!character) {
-                throw new InternError('Could not retreive updated character');
-            }
+            const character = await updateCharacterById(
+                characterId,
+                body as typeof body & { data?: CharacterData }
+            );
             const cacheKey = getCharacterCacheKey(character.id);
             const cachedChar = await cache.getJson<Character>(cacheKey);
             if (cachedChar) {
@@ -182,9 +169,7 @@ export const characterController = async (app: FastifyInstance) => {
             const characterId = parseParamId(params, 'characterId');
             const { userId } = await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
-            await db
-                .delete(tables.characters)
-                .where(eq(tables.characters.id, characterId));
+            await deleteCharacterById(characterId);
             const cacheKey = getCharacterCacheKey(characterId);
             await cache.del(cacheKey);
             rep.send({});
@@ -237,15 +222,9 @@ export const characterController = async (app: FastifyInstance) => {
             );
             // save portrait on character
             const portrait = path.join(portraitDirName, portraitFileName);
-            const updatedCharacters = await db
-                .update(tables.characters)
-                .set({ portrait })
-                .where(eq(tables.characters.id, characterId))
-                .returning();
-            const updatedCharacter = updatedCharacters[0];
-            if (!updatedCharacter) {
-                throw new InternError('Could not retreive updated character');
-            }
+            const updatedCharacter = await updateCharacterById(characterId, {
+                portrait
+            });
             const cacheKey = getCharacterCacheKey(updatedCharacter.id);
             const cachedChar = await cache.getJson<Character>(cacheKey);
             if (cachedChar) {
@@ -279,20 +258,10 @@ export const characterController = async (app: FastifyInstance) => {
             const character = await getCharacterByIdOrThrow(characterId);
             controlSelf(character.userId, user);
             if (character.portrait) {
-                const [updatedCharacters] = await Promise.all([
-                    db
-                        .update(tables.characters)
-                        .set({ portrait: null })
-                        .where(eq(tables.characters.id, characterId))
-                        .returning(),
+                const [updatedCharacter] = await Promise.all([
+                    updateCharacterById(characterId, { portrait: null }),
                     fs.promises.rm(path.join(assetDir, character.portrait))
                 ]);
-                const updatedCharacter = updatedCharacters[0];
-                if (!updatedCharacter) {
-                    throw new InternError(
-                        'Could not retreive updated character'
-                    );
-                }
                 rep.send(updatedCharacter);
             } else {
                 rep.send(character);
@@ -328,12 +297,9 @@ export const characterController = async (app: FastifyInstance) => {
                     'You cannot transfer a character to yourself'
                 );
             }
-            await db
-                .update(tables.characters)
-                .set({
-                    userId: targetUserId
-                })
-                .where(eq(tables.characters.id, characterId));
+            await updateCharacterById(characterId, {
+                userId: targetUserId
+            });
             rep.send({});
         }
     });

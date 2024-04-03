@@ -1,6 +1,11 @@
 import { getTableColumns, and, eq, ne, or, asc, desc, sql } from 'drizzle-orm';
 
-import { ForbiddenError, NotFoundError } from '../../services/errors.js';
+import {
+    ForbiddenError,
+    InternError,
+    NotFoundError
+} from '../../services/errors.js';
+import { type NoteUpdate, type NoteInsert } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
 import { safeUserSelect } from './user.js';
 
@@ -8,7 +13,7 @@ import { safeUserSelect } from './user.js';
 Gets notes of a user for a session ordered by position.
 Also returns the other user's shared notes in the session.
 */
-export const getNotes = async (sessionId: number, userId: number) =>
+export const getUserSessionNotes = async (userId: number, sessionId: number) =>
     db
         .select({
             ...getTableColumns(tables.notes),
@@ -34,12 +39,11 @@ export const getNotes = async (sessionId: number, userId: number) =>
 Gets a note.
 If user is not the owner and the note is not shared throws a forbidden error.
 */
-export const getNote = async (noteId: number, userId: number) => {
+export const getUserNoteById = async (userId: number, noteId: number) => {
     const notes = await db
         .select()
         .from(tables.notes)
-        .where(eq(tables.notes.id, noteId))
-        .limit(1);
+        .where(eq(tables.notes.id, noteId));
     const note = notes[0];
     if (note && note.userId !== userId && !note.isShared) {
         throw new ForbiddenError();
@@ -52,8 +56,11 @@ Gets a note.
 If user is not the owner and the note is not shared throws a forbidden error.
 If note does not exist throws a not found error.
 */
-export const getNoteOrThrow = async (noteId: number, userId: number) => {
-    const note = await getNote(noteId, userId);
+export const getUserNoteByIdOrThrow = async (
+    userId: number,
+    noteId: number
+) => {
+    const note = await getUserNoteById(userId, noteId);
     if (!note) {
         throw new NotFoundError('Note not found');
     }
@@ -64,9 +71,9 @@ export const getNoteOrThrow = async (noteId: number, userId: number) => {
 Gets the highest current position for user's notes in a session.
 If no notes are found returns 0.
 */
-export const getMaxNotePosition = async (
-    sessionId: number,
-    userId: number
+export const getUserSessionNoteMaxPosition = async (
+    userId: number,
+    sessionId: number
 ): Promise<number> => {
     const note = await db
         .select()
@@ -85,20 +92,20 @@ export const getMaxNotePosition = async (
 /**
 Gets the next position for a note to be created.
 */
-export const getNextNotePosition = async (
-    sessionId: number,
-    userId: number
+export const getUserSessionNoteNextPosition = async (
+    userId: number,
+    sessionId: number
 ): Promise<number> => {
-    const maxPosition = await getMaxNotePosition(sessionId, userId);
+    const maxPosition = await getUserSessionNoteMaxPosition(userId, sessionId);
     return maxPosition + 1;
 };
 
 /**
 Switches the positions of two notes.
 */
-export const switchNotePositions = async (
-    sessionId: number,
+export const switchUserSessionNotesPositions = async (
     userId: number,
+    sessionId: number,
     position1: number,
     position2: number
 ) =>
@@ -110,3 +117,54 @@ export const switchNotePositions = async (
         where session_id = ${sessionId}
         and user_id = ${userId}
         and position in (${position1}, ${position2});`);
+
+/**
+Creates a note.
+*/
+export const createNote = async (data: NoteInsert) => {
+    const createdNotes = await db.insert(tables.notes).values(data).returning();
+    const createdNote = createdNotes[0];
+    if (!createdNote) {
+        throw new InternError('Could not retreive inserted note');
+    }
+    return createdNote;
+};
+
+/**
+Updates a note with the given ID.
+*/
+export const updateNoteById = async (noteId: number, data: NoteUpdate) => {
+    const updatedNotes = await db
+        .update(tables.notes)
+        .set(data)
+        .where(eq(tables.notes.id, noteId))
+        .returning();
+    const updatedNote = updatedNotes[0];
+    if (!updatedNote) {
+        throw new InternError('Could not retreive updated note');
+    }
+    return updatedNote;
+};
+
+/**
+Deletes a note with the given ID.
+*/
+export const deleteNoteById = async (noteId: number) =>
+    db.delete(tables.notes).where(eq(tables.notes.id, noteId));
+
+/**
+Reorders note position for a given user and session.
+*/
+export const reorderUserSessionNotes = async (
+    userId: number,
+    sessionId: number
+) =>
+    db.execute(sql`with ordered_notes as (
+        select id, row_number() over (order by position) as new_position
+        from notes
+        where session_id = ${sessionId} and user_id = ${userId}
+    )
+    update notes
+    set position = ordered_notes.new_position
+    from ordered_notes
+    where notes.id = ordered_notes.id;`);

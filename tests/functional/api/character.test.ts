@@ -1,4 +1,3 @@
-import { eq, and } from 'drizzle-orm';
 import path from 'path';
 import {
     describe,
@@ -9,9 +8,9 @@ import {
     afterEach
 } from 'vitest';
 
+import { getUserCharacters } from '../../../src/services/queries/character.js';
 import { assertCharacter } from '../helpers/assert.helper.js';
 import { mockEnvVar } from '../../../src/services/env.js';
-import { db, tables } from '../../../src/services/db.js';
 import { api } from '../helpers/api.helper.js';
 import {
     charactersData,
@@ -33,16 +32,7 @@ const findCharacter = (userId: number, gameId?: string) => {
 };
 
 const findCharacterFromDb = async (userId: number, gameId?: string) => {
-    const characters = await db
-        .select()
-        .from(tables.characters)
-        .where(
-            and(
-                eq(tables.characters.userId, userId),
-                gameId ? eq(tables.characters.gameId, gameId) : undefined
-            )
-        )
-        .limit(1);
+    const characters = await getUserCharacters(userId, gameId);
     if (characters[0]) {
         return characters[0];
     }

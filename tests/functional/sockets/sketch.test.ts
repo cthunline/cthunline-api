@@ -1,8 +1,8 @@
 import { describe, expect, test, beforeAll, beforeEach, vi } from 'vitest';
 
 import { type SketchBody } from '../../../src/controllers/schemas/definitions.js';
+import { getSessionByIdOrThrow } from '../../../src/services/queries/session.js';
 import { sessionsData, resetData, resetCache } from '../helpers/data.helper.js';
-import { getSessionOrThrow } from '../../../src/controllers/helpers/session.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
 import {
     assertUser,
@@ -109,7 +109,7 @@ describe('[Sockets] Sketch', () => {
         ]);
         await vi.waitFor(
             async () => {
-                const updatedSession = await getSessionOrThrow(session.id);
+                const updatedSession = await getSessionByIdOrThrow(session.id);
                 assertSketchData(
                     updatedSession.sketch as SketchBody,
                     anotherSketch
@@ -187,7 +187,7 @@ describe('[Sockets] Sketch', () => {
         ]);
         await vi.waitFor(
             async () => {
-                const updatedSession = await getSessionOrThrow(session.id);
+                const updatedSession = await getSessionByIdOrThrow(session.id);
                 assertSketchData(
                     updatedSession.sketch as SketchBody,
                     expectedSketchData

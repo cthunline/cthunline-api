@@ -1,12 +1,10 @@
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
+import { getCharacterCacheKey } from '../controllers/helpers/character.js';
+import { getCharacterByIdOrThrow } from '../services/queries/character.js';
 import { ForbiddenError } from '../services/errors.js';
 import { type Character } from '../drizzle/schema.js';
 import { cache } from '../services/cache.js';
 import { meta } from './helper.js';
-import {
-    getCharacterByIdOrThrow,
-    getCharacterCacheKey
-} from '../controllers/helpers/character.js';
 
 export const characterHandler = (
     io: SocketIoServer,

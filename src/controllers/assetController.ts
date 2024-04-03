@@ -1,15 +1,13 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { type File as FormidableFile } from 'formidable';
-import { and, eq, getTableColumns, inArray } from 'drizzle-orm';
 import path from 'path';
 import fs from 'fs';
 
-import { InternError, ValidationError } from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
+import { ValidationError } from '../services/errors.js';
 import { type TypedFile } from '../types/asset.js';
 import { type QueryParam } from '../types/api.js';
 import { parseParamId } from '../services/api.js';
-import { db, tables } from '../services/db.js';
 import { log } from '../services/log.js';
 import {
     createDirectorySchema,
@@ -25,11 +23,23 @@ import {
     assetTempDir,
     controlUserDir,
     getFormidableOptions,
-    getUserAssetOrThrow,
-    getUserDirectories,
-    getChildrenDirectories,
-    getUserDirectoryOrThrow
+    getChildrenDirectories
 } from './helpers/asset.js';
+import {
+    createAssets,
+    deleteAssetById,
+    deleteAssetsByIds,
+    getUserAssetByIdOrThrow,
+    getUserAssets,
+    getUserDirectoriesAssets
+} from '../services/queries/asset.js';
+import {
+    createDirectory,
+    deleteDirectoryById,
+    getUserDirectories,
+    getUserDirectoryByIdOrThrow,
+    updateDirectoryById
+} from '../services/queries/directory.js';
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {
@@ -59,23 +69,8 @@ export const assetController = async (app: FastifyInstance) => {
             }>,
             rep: FastifyReply
         ) => {
-            const { type } = query;
-            const assets = await db
-                .select({
-                    ...getTableColumns(tables.assets),
-                    directory: getTableColumns(tables.directories)
-                })
-                .from(tables.assets)
-                .where(
-                    and(
-                        eq(tables.assets.userId, user.id),
-                        type ? eq(tables.assets.type, String(type)) : undefined
-                    )
-                )
-                .leftJoin(
-                    tables.directories,
-                    eq(tables.assets.directoryId, tables.directories.id)
-                );
+            const assetType = query.type ? String(query.type) : undefined;
+            const assets = await getUserAssets(user.id, assetType);
             rep.send({ assets });
         }
     });
@@ -110,7 +105,7 @@ export const assetController = async (app: FastifyInstance) => {
                 ? Number(body.directoryId)
                 : null;
             if (directoryId !== null) {
-                await getUserDirectoryOrThrow(directoryId, user.id);
+                await getUserDirectoryByIdOrThrow(user.id, directoryId);
             }
             // get files data
             const assetFiles: FormidableFile[] = [];
@@ -136,27 +131,24 @@ export const assetController = async (app: FastifyInstance) => {
                 )
             );
             // save assets in database
-            const assets = await db
-                .insert(tables.assets)
-                .values(
-                    typedAssetFiles.map(
-                        ({ originalFilename, newFilename, type }) => {
-                            const name = originalFilename ?? newFilename;
-                            const assetPath = path.join(
-                                user.id.toString(),
-                                newFilename
-                            );
-                            return {
-                                userId: user.id,
-                                directoryId,
-                                type,
-                                name,
-                                path: assetPath
-                            };
-                        }
-                    )
+            const assets = await createAssets(
+                typedAssetFiles.map(
+                    ({ originalFilename, newFilename, type }) => {
+                        const name = originalFilename ?? newFilename;
+                        const assetPath = path.join(
+                            user.id.toString(),
+                            newFilename
+                        );
+                        return {
+                            userId: user.id,
+                            directoryId,
+                            type,
+                            name,
+                            path: assetPath
+                        };
+                    }
                 )
-                .returning();
+            );
             //
             rep.send({ assets });
         }
@@ -178,7 +170,7 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const assetId = parseParamId(params, 'assetId');
-            const asset = await getUserAssetOrThrow(assetId, user.id);
+            const asset = await getUserAssetByIdOrThrow(user.id, assetId);
             rep.send(asset);
         }
     });
@@ -199,12 +191,12 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const assetId = parseParamId(params, 'assetId');
-            const { path: assetPath } = await getUserAssetOrThrow(
-                assetId,
-                user.id
+            const { path: assetPath } = await getUserAssetByIdOrThrow(
+                user.id,
+                assetId
             );
             await Promise.all([
-                db.delete(tables.assets).where(eq(tables.assets.id, assetId)),
+                deleteAssetById(assetId),
                 fs.promises.rm(path.join(assetDir, assetPath))
             ]);
             rep.send({});
@@ -247,19 +239,12 @@ export const assetController = async (app: FastifyInstance) => {
         ) => {
             const { parentId } = body;
             if (parentId) {
-                await getUserDirectoryOrThrow(parentId, user.id);
+                await getUserDirectoryByIdOrThrow(user.id, parentId);
             }
-            const createdDirectories = await db
-                .insert(tables.directories)
-                .values({
-                    ...body,
-                    userId: user.id
-                })
-                .returning();
-            const directory = createdDirectories[0];
-            if (!directory) {
-                throw new InternError('Could not retreive inserted directory');
-            }
+            const directory = await createDirectory({
+                ...body,
+                userId: user.id
+            });
             rep.send(directory);
         }
     });
@@ -281,9 +266,9 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const directoryId = parseParamId(params, 'directoryId');
-            const directory = await getUserDirectoryOrThrow(
-                directoryId,
-                user.id
+            const directory = await getUserDirectoryByIdOrThrow(
+                user.id,
+                directoryId
             );
             rep.send(directory);
         }
@@ -308,16 +293,8 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const directoryId = parseParamId(params, 'directoryId');
-            await getUserDirectoryOrThrow(directoryId, user.id);
-            const updatedDirectories = await db
-                .update(tables.directories)
-                .set(body)
-                .where(eq(tables.directories.id, directoryId))
-                .returning();
-            const directory = updatedDirectories[0];
-            if (!directory) {
-                throw new InternError('Could not retreive updated directory');
-            }
+            await getUserDirectoryByIdOrThrow(user.id, directoryId);
+            const directory = await updateDirectoryById(directoryId, body);
             rep.send(directory);
         }
     });
@@ -338,7 +315,7 @@ export const assetController = async (app: FastifyInstance) => {
             rep: FastifyReply
         ) => {
             const directoryId = parseParamId(params, 'directoryId');
-            await getUserDirectoryOrThrow(directoryId, user.id);
+            await getUserDirectoryByIdOrThrow(user.id, directoryId);
             // get all directories of the user
             const directories = await getUserDirectories(user.id);
             // get all children directories
@@ -352,27 +329,14 @@ export const assetController = async (app: FastifyInstance) => {
             const assetDirectoryIds = [directoryId, ...childrenDirectoryIds];
             if (assetDirectoryIds.length) {
                 // get assets within all children directories
-                const assets = await db
-                    .select()
-                    .from(tables.assets)
-                    .where(
-                        and(
-                            eq(tables.assets.userId, user.id),
-                            inArray(
-                                tables.assets.directoryId,
-                                assetDirectoryIds
-                            )
-                        )
-                    );
+                const assets = await getUserDirectoriesAssets(
+                    user.id,
+                    assetDirectoryIds
+                );
                 if (assets.length) {
                     // delete all children assets
                     await Promise.all([
-                        db.delete(tables.assets).where(
-                            inArray(
-                                tables.assets.id,
-                                assets.map(({ id }) => id)
-                            )
-                        ),
+                        deleteAssetsByIds(assets.map(({ id }) => id)),
                         ...assets.map(({ path: assetPath }) =>
                             fs.promises.rm(path.join(assetDir, assetPath))
                         )
@@ -380,9 +344,7 @@ export const assetController = async (app: FastifyInstance) => {
                 }
             }
             // delete directory (children directories will cascade-deleted)
-            await db
-                .delete(tables.directories)
-                .where(eq(tables.directories.id, directoryId));
+            await deleteDirectoryById(directoryId);
             rep.send({});
         }
     });

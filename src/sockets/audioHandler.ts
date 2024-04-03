@@ -1,7 +1,7 @@
 import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
 import { ForbiddenError, ValidationError } from '../services/errors.js';
 import { playAudioSchema, PlayAudioBody } from './schemas/audio.js';
-import { getAssetOrThrow } from '../controllers/helpers/asset.js';
+import { getAssetByIdOrThrow } from '../services/queries/asset.js';
 import { validateSchema } from '../services/typebox.js';
 import { meta } from './helper.js';
 
@@ -15,7 +15,7 @@ export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 throw new ForbiddenError();
             }
             const { assetId, time } = request;
-            const asset = await getAssetOrThrow(Number(assetId));
+            const asset = await getAssetByIdOrThrow(Number(assetId));
             if (asset.type !== 'audio') {
                 throw new ValidationError('Asset type is not audio');
             }
