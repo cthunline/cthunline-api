@@ -1,5 +1,5 @@
-import { FastifyInstance } from 'fastify';
-import { Socket } from 'socket.io';
+import { type FastifyInstance } from 'fastify';
+import { type Socket } from 'socket.io';
 
 import { type SocketIoSocket } from '../types/socket.js';
 import { characterHandler } from './characterHandler.js';

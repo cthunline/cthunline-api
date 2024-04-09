@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { FastifyRequest } from 'fastify';
+import { type FastifyRequest } from 'fastify';
 
 import { type SafeUser, type User } from '../../src/drizzle/schema.js';
 import { expectAsync } from '../functional/helpers/assert.helper.js';

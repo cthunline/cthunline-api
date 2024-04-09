@@ -1,7 +1,7 @@
 import {
-    FastifyInstance,
-    InjectOptions,
-    LightMyRequestResponse
+    type FastifyInstance,
+    type InjectOptions,
+    type LightMyRequestResponse
 } from 'fastify';
 
 export interface AgentResponse extends LightMyRequestResponse {

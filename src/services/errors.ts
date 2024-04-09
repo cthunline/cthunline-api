@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { type FastifyReply, type FastifyRequest } from 'fastify';
 
 import {
     type FastifySchemaValidationError,
@@ -8,7 +8,7 @@ import {
 
 import { log } from './log.js';
 
-import { ErrorJsonResponse } from '../types/errors.js';
+import { type ErrorJsonResponse } from '../types/errors.js';
 
 /**
 Custom error class with additional http status and data

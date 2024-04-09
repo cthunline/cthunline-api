@@ -1,4 +1,8 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyRequest,
+    type FastifyReply
+} from 'fastify';
 
 import { getSessionByIdOrThrow } from '../services/queries/session.js';
 import { ConflictError, InternError } from '../services/errors.js';

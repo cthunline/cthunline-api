@@ -1,4 +1,8 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyRequest,
+    type FastifyReply
+} from 'fastify';
 
 import { defaultSketchData } from './helpers/sketch.js';
 import { ValidationError } from '../services/errors.js';

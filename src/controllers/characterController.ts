@@ -1,9 +1,13 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyRequest,
+    type FastifyReply
+} from 'fastify';
 import { type Character as CharacterData } from '@cthunline/games';
 import path from 'path';
 import fs from 'fs';
 
-import { games, GameId, isValidGameId } from '../services/games.js';
+import { games, type GameId, isValidGameId } from '../services/games.js';
 import { getUserByIdOrThrow } from '../services/queries/user.js';
 import { assetDir, controlFile } from './helpers/asset.js';
 import { validateSchema } from '../services/typebox.js';
@@ -25,9 +29,9 @@ import {
 } from './helpers/character.js';
 import {
     createCharacterSchema,
-    CreateCharacterBody,
+    type CreateCharacterBody,
     updateCharacterSchema,
-    UpdateCharacterBody,
+    type UpdateCharacterBody,
     uploadPortraitSchema
 } from './schemas/character.js';
 import {

@@ -1,4 +1,8 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyReply,
+    type FastifyRequest
+} from 'fastify';
 
 import { registerUserSchema, type RegisterUserBody } from './schemas/user.js';
 import { controlUniqueEmail, defaultUserData } from './helpers/user.js';

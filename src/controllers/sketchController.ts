@@ -1,4 +1,8 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyRequest,
+    type FastifyReply
+} from 'fastify';
 
 import { parseParamId } from '../services/api.js';
 import { controlSelf } from './helpers/auth.js';

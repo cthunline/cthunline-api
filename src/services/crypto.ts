@@ -2,8 +2,8 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
-import { AppErrorConstructor, AuthenticationError } from './errors.js';
-import { SafeUser } from '../drizzle/schema.js';
+import { type AppErrorConstructor, AuthenticationError } from './errors.js';
+import { type SafeUser } from '../drizzle/schema.js';
 import { getEnv } from './env.js';
 
 /**

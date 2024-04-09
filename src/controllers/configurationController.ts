@@ -1,4 +1,8 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyRequest,
+    type FastifyReply
+} from 'fastify';
 
 import { getEnv } from '../services/env.js';
 

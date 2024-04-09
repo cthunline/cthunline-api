@@ -1,5 +1,5 @@
-import { CookieSerializeOptions } from '@fastify/cookie';
-import { FastifyRequest } from 'fastify';
+import { type CookieSerializeOptions } from '@fastify/cookie';
+import { type FastifyRequest } from 'fastify';
 import dayjs from 'dayjs';
 
 import { AuthenticationError, ForbiddenError } from '../../services/errors.js';

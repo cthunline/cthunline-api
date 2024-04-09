@@ -13,9 +13,9 @@ import {
 } from '../services/errors.js';
 import {
     sketchSchema,
-    SketchBody,
+    type SketchBody,
     tokenSchema,
-    TokenBody
+    type TokenBody
 } from '../controllers/schemas/definitions.js';
 
 const sketchSaveTimerMs = getEnv('CACHE_SKETCH_SAVE_MS') ?? 1000;

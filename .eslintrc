@@ -16,13 +16,11 @@
         "prettier"
     ],
     "rules": {
-        "@typescript-eslint/lines-between-class-members": [
-            "error",
-            "always",
-            {
-                "exceptAfterSingleLine": true
-            }
-        ],
+        "@typescript-eslint/consistent-type-imports": ["error", {
+            "prefer": "type-imports",
+            "fixStyle": "inline-type-imports"
+        }],
+        "@typescript-eslint/lines-between-class-members": "off",
         "import/extensions": ["error", "ignorePackages"],
         "import/no-commonjs": "error",
         "import/no-extraneous-dependencies": [

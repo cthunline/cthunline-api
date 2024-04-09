@@ -1,10 +1,14 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyReply,
+    type FastifyRequest
+} from 'fastify';
 
 import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
 import { getUnsafeUserByEmail } from '../services/queries/user.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
 import { AuthenticationError } from '../services/errors.js';
-import { loginSchema, LoginBody } from './schemas/auth.js';
+import { loginSchema, type LoginBody } from './schemas/auth.js';
 import { cache } from '../services/cache.js';
 import { getEnv } from '../services/env.js';
 import {

@@ -1,4 +1,8 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyRequest,
+    type FastifyReply
+} from 'fastify';
 import { type File as FormidableFile } from 'formidable';
 import path from 'path';
 import fs from 'fs';
@@ -11,11 +15,11 @@ import { parseParamId } from '../services/api.js';
 import { log } from '../services/log.js';
 import {
     createDirectorySchema,
-    CreateDirectoryBody,
+    type CreateDirectoryBody,
     updateDirectorySchema,
-    UpdateDirectoryBody,
+    type UpdateDirectoryBody,
     uploadAssetsSchema,
-    UploadAssetsBody
+    type UploadAssetsBody
 } from './schemas/asset.js';
 import {
     controlFile,

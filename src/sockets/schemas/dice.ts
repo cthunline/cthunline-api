@@ -1,4 +1,4 @@
-import { Static, Type } from '@sinclair/typebox';
+import { type Static, Type } from '@sinclair/typebox';
 
 export const requestDiceSchema = Type.Partial(
     Type.Object({

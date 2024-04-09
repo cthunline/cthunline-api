@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from 'fastify';
+import { type FastifyInstance, type FastifyRequest } from 'fastify';
 import FastifyStatic from '@fastify/static';
 import path from 'path';
 

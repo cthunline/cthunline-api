@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 
-import { AppErrorConstructor } from '../../../src/services/errors.js';
+import { type AppErrorConstructor } from '../../../src/services/errors.js';
 import { locales } from '../../../src/services/locale.js';
 
 export const expectAsync = async (

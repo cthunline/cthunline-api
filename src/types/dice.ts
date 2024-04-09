@@ -1,4 +1,4 @@
-import { RequestDiceBody } from '../sockets/schemas/dice.js';
+import { type RequestDiceBody } from '../sockets/schemas/dice.js';
 
 import { type SafeUser } from '../drizzle/schema.js';
 

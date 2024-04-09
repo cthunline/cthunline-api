@@ -1,5 +1,5 @@
 import { fastifyCookie } from '@fastify/cookie';
-import { OutgoingHttpHeaders } from 'http';
+import { type OutgoingHttpHeaders } from 'http';
 import { expect, beforeAll, afterAll } from 'vitest';
 import FormData from 'form-data';
 import path from 'path';

@@ -1,9 +1,13 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import {
+    type FastifyInstance,
+    type FastifyRequest,
+    type FastifyReply
+} from 'fastify';
 
 import { verifyPassword, hashPassword } from '../services/crypto.js';
 import { ValidationError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
-import { QueryParam } from '../types/api.js';
+import { type QueryParam } from '../types/api.js';
 import { cache } from '../services/cache.js';
 import {
     createUser,
@@ -16,7 +20,7 @@ import {
     controlSelf,
     controlAdmin,
     controlAdminMiddleware,
-    CacheJwtData,
+    type CacheJwtData,
     getJwtCacheKey
 } from './helpers/auth.js';
 import {

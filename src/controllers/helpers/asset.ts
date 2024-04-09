@@ -6,8 +6,8 @@ import {
 } from 'formidable';
 
 import { InternError, ValidationError } from '../../services/errors.js';
-import { mimeTypes, FileType, MimeType } from '../../types/asset.js';
-import { Directory } from '../../drizzle/schema.js';
+import { mimeTypes, type FileType, type MimeType } from '../../types/asset.js';
+import { type Directory } from '../../drizzle/schema.js';
 import { getEnv } from '../../services/env.js';
 
 // controls form's file mimetype extension, and size

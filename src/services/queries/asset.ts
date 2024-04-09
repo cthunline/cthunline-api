@@ -1,7 +1,7 @@
 import { eq, and, getTableColumns, inArray } from 'drizzle-orm';
 
 import { ForbiddenError, NotFoundError } from '../../services/errors.js';
-import { AssetInsert } from '../../drizzle/schema.js';
+import { type AssetInsert } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
 
 /**
