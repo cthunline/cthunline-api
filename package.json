@@ -19,7 +19,7 @@
         "@fastify/helmet": "^11.1.1",
         "@fastify/rate-limit": "^9.1.0",
         "@fastify/static": "^7.0.3",
-        "@pitininja/envious": "^1.0.6",
+        "@pitininja/envious": "^2.0.0",
         "@sinclair/typebox": "^0.32.20",
         "ajv-formats": "^3.0.1",
         "bcrypt": "^5.1.1",
@@ -46,7 +46,7 @@
         "@types/bcrypt": "^5.0.2",
         "@types/deep-equal-in-any-order": "^1.0.3",
         "@types/jsonwebtoken": "^9.0.6",
-        "@types/node": "^20.12.6",
+        "@types/node": "^20.12.7",
         "@types/pg": "^8.11.5",
         "@types/qs": "^6.9.14",
         "@types/type-detect": "^4.0.3",
@@ -70,7 +70,7 @@
         "prettier": "^3.2.5",
         "socket.io-client": "^4.7.5",
         "type-detect": "^4.0.8",
-        "typescript": "^5.4.4",
+        "typescript": "^5.4.5",
         "vitest": "^1.4.0"
     }
 }
