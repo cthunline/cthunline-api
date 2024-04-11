@@ -153,6 +153,12 @@ export const deleteNoteById = async (noteId: number) =>
     db.delete(tables.notes).where(eq(tables.notes.id, noteId));
 
 /**
+Deletes all notes related to a session.
+*/
+export const deleteSessionNotes = async (sessionId: number) =>
+    db.delete(tables.notes).where(eq(tables.notes.sessionId, sessionId));
+
+/**
 Reorders note position for a given user and session.
 */
 export const reorderUserSessionNotes = async (

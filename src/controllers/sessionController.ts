@@ -4,6 +4,7 @@ import {
     type FastifyReply
 } from 'fastify';
 
+import { deleteSessionNotes } from '../services/queries/note.js';
 import { defaultSketchData } from './helpers/sketch.js';
 import { ValidationError } from '../services/errors.js';
 import { isValidGameId } from '../services/games.js';
@@ -132,6 +133,7 @@ export const sessionController = async (app: FastifyInstance) => {
             const sessionId = parseParamId(params, 'sessionId');
             const session = await getSessionByIdOrThrow(sessionId);
             controlSelf(session.masterId, user);
+            await deleteSessionNotes(sessionId);
             await deleteSessionById(sessionId);
             rep.send({});
         }
