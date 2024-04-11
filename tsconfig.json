@@ -6,9 +6,9 @@
     "compilerOptions": {
         "target": "ESNext",
         "outDir": "./build",
-        "resolveJsonModule": true,
+        "module": "ESNext",
         "moduleResolution": "Node",
-        "module": "ESNext"
+        "resolveJsonModule": true
     },
     "include": ["src", "tests", "./vitest.config.ts"],
     "exclude": ["node_modules", "build"]

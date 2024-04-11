@@ -11,10 +11,10 @@ import FastifyQs from 'fastify-qs';
 import { errorHandler, schemaErrorFormatter } from './services/errors.js';
 import { mainController } from './controllers/index.js';
 import { initDb, migrateDb } from './services/db.js';
+import { migrateData } from './migrations/index.js';
 import { socketRouter } from './sockets/index.js';
 import { getEnv } from './services/env.js';
 import { log } from './services/log.js';
-import { migrateData } from './migrations/index.js';
 
 export const app = Fastify({
     trustProxy: getEnv('REVERSE_PROXY'),
