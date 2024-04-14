@@ -42,6 +42,27 @@ describe('[Sockets] Sketch', () => {
                     images: []
                 },
                 {
+                    dislayed: true,
+                    paths: ['invalidValue'],
+                    images: []
+                },
+                {
+                    dislayed: true,
+                    paths: [{}],
+                    images: []
+                },
+                {
+                    dislayed: true,
+                    paths: [
+                        {
+                            d: '',
+                            colorfill: '',
+                            invalidProperty: 'invalidValue'
+                        }
+                    ],
+                    images: []
+                },
+                {
                     dislayed: false,
                     paths: [],
                     images: 'invalidValue'

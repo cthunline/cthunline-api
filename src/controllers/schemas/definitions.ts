@@ -1,5 +1,17 @@
 import { type Static, Type } from '@sinclair/typebox';
 
+export const drawingPathSchema = Type.Object(
+    {
+        d: Type.String({ minLength: 1 }),
+        color: Type.String({ minLength: 1 })
+    },
+    {
+        additionalProperties: false
+    }
+);
+
+export type DrawingPathBody = Static<typeof drawingPathSchema>;
+
 export const imageSchema = Type.Object(
     {
         id: Type.String({ minLength: 1 }),
@@ -57,7 +69,7 @@ export type TokenBody = Static<typeof tokenSchema>;
 export const sketchSchema = Type.Object(
     {
         displayed: Type.Boolean(),
-        paths: Type.Array(Type.String({ minLength: 1 })),
+        paths: Type.Array(drawingPathSchema),
         images: Type.Array(imageSchema),
         // tokens: Type.Optional(Type.Array(tokenSchema)),
         tokens: Type.Array(tokenSchema)

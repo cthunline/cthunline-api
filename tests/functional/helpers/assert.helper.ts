@@ -114,6 +114,14 @@ export const assertGame = (
     }
 };
 
+export const assertSketchDrawingPath = (data: Record<string, any>) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('d');
+    expect(data.d).to.be.a('string');
+    expect(data).to.have.property('color');
+    expect(data.color).to.be.a('string');
+};
+
 export const assertSketchImage = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('url');
@@ -158,7 +166,7 @@ export const assertSketchData = (
     expect(data.displayed).to.be.a('boolean');
     expect(data).to.have.property('paths');
     data.paths.forEach((path: any) => {
-        expect(path).to.be.a('string');
+        assertSketchDrawingPath(path);
     });
     expect(data.paths).to.be.an('array');
     expect(data).to.have.property('images');
