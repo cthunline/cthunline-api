@@ -31,7 +31,7 @@ export const socketRouter = (app: FastifyInstance) => {
     io.on('connection', async (socket: SocketIoSocket) => {
         disconnectCopycats(io, socket);
         const { user, sessionId, isMaster } = socket.data;
-        const users = await getSessionUsers(io);
+        const users = await getSessionUsers(io, sessionId);
         io.sockets.to(String(sessionId)).emit(
             'join',
             meta({
@@ -41,7 +41,7 @@ export const socketRouter = (app: FastifyInstance) => {
             })
         );
         socket.on('disconnect', async () => {
-            const sessionUsers = await getSessionUsers(io);
+            const sessionUsers = await getSessionUsers(io, sessionId);
             socket.to(String(sessionId)).emit(
                 'leave',
                 meta({

@@ -161,9 +161,10 @@ export const disconnectCopycats = async (
 };
 
 export const getSessionUsers = async (
-    io: SocketIoServer
+    io: SocketIoServer,
+    sessionId: number
 ): Promise<SocketSessionUser[]> => {
-    const allSockets = await io.fetchSockets();
+    const allSockets = await io.in(String(sessionId)).fetchSockets();
     return allSockets.map((socket) => {
         if (socket.data.isMaster) {
             return {
