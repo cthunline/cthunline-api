@@ -187,10 +187,10 @@ describe('[API] Notes', () => {
         });
     });
 
-    describe('POST /notes/:id', () => {
+    describe('PATCH /notes/:id', () => {
         test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
-                method: 'POST',
+                method: 'PATCH',
                 route: '/notes/:id',
                 body: {
                     text: 'Test'
@@ -201,7 +201,7 @@ describe('[API] Notes', () => {
             for (const noteId of [sharedNote.id, unsharedNote.id]) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/notes/${noteId}`,
                         body: {
                             title: 'Test'
@@ -240,7 +240,7 @@ describe('[API] Notes', () => {
             for (const body of invalidData) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/notes/${note.id}`,
                         body
                     },

@@ -110,10 +110,10 @@ describe('[API] Sketchs', () => {
         });
     });
 
-    describe('POST /sketchs/:id', () => {
+    describe('PATCH /sketchs/:id', () => {
         test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
-                method: 'POST',
+                method: 'PATCH',
                 route: '/sketchs/:id',
                 body: {
                     name: 'test'
@@ -124,7 +124,7 @@ describe('[API] Sketchs', () => {
             const anotherUserSketch = getAnotherUserSketch(api.userId);
             await api.testError(
                 {
-                    method: 'POST',
+                    method: 'PATCH',
                     route: `/sketchs/${anotherUserSketch.id}`,
                     body: { name: 'test' }
                 },
@@ -154,7 +154,7 @@ describe('[API] Sketchs', () => {
             for (const body of invalidData) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/sketchs/${sketch.id}`,
                         body
                     },

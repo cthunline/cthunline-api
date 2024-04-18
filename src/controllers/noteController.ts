@@ -122,7 +122,7 @@ export const noteController = async (app: FastifyInstance) => {
 
     // updates a note
     app.route({
-        method: 'POST',
+        method: 'PATCH',
         url: '/notes/:noteId',
         schema: { body: updateNoteSchema },
         handler: async (

@@ -119,7 +119,7 @@ export const characterController = async (app: FastifyInstance) => {
 
     // edit a character
     app.route({
-        method: 'POST',
+        method: 'PATCH',
         url: '/characters/:characterId',
         schema: { body: updateCharacterSchema },
         handler: async (

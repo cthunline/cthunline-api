@@ -279,7 +279,7 @@ export const api = {
     async testEdit(options: EditOptions): Promise<void> {
         const { route, data, assert, expected } = options;
         const editResponse = await api.request({
-            method: 'POST',
+            method: 'PATCH',
             route,
             body: data
         });

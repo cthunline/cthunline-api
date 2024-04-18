@@ -91,7 +91,7 @@ export const sessionController = async (app: FastifyInstance) => {
 
     // edit a session
     app.route({
-        method: 'POST',
+        method: 'PATCH',
         url: '/sessions/:sessionId',
         schema: { body: updateSessionSchema },
         handler: async (

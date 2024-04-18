@@ -108,7 +108,7 @@ export const userController = async (app: FastifyInstance) => {
 
     // edit user
     app.route({
-        method: 'POST',
+        method: 'PATCH',
         url: '/users/:userId',
         schema: { body: updateUserSchema },
         handler: async (

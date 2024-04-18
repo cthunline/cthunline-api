@@ -32,7 +32,7 @@ export const sketchController = async (app: FastifyInstance) => {
         }
     });
 
-    // save a sketch for current user
+    // create a sketch for current user
     app.route({
         method: 'POST',
         url: '/sketchs',
@@ -54,9 +54,9 @@ export const sketchController = async (app: FastifyInstance) => {
         }
     });
 
-    // save a sketch for current user
+    // edit a sketch for current user
     app.route({
-        method: 'POST',
+        method: 'PATCH',
         url: '/sketchs/:sketchId',
         schema: { body: updateSketchSchema },
         handler: async (

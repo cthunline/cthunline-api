@@ -363,7 +363,7 @@ describe('[API] Assets', () => {
         });
     });
 
-    describe('POST /directories/:id', () => {
+    describe('PATCH /directories/:id', () => {
         test('Should throw a validation error', async () => {
             const invalidData = [
                 {
@@ -382,7 +382,7 @@ describe('[API] Assets', () => {
             for (const body of invalidData) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/directories/${userDirectories[0].id}`,
                         body
                     },
@@ -393,7 +393,7 @@ describe('[API] Assets', () => {
         test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
-                    method: 'POST',
+                    method: 'PATCH',
                     route: `/directories/${forbiddenDirectory?.id}`,
                     body: {
                         name: 'Test'

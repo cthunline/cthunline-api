@@ -185,10 +185,10 @@ describe('[API] Characters', () => {
         });
     });
 
-    describe('POST /characters/:id', () => {
+    describe('PATCH /characters/:id', () => {
         test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
-                method: 'POST',
+                method: 'PATCH',
                 route: '/characters/:id',
                 body: {
                     name: 'Test'
@@ -254,7 +254,7 @@ describe('[API] Characters', () => {
             for (const body of invalidData) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/characters/${id}`,
                         body
                     },
@@ -265,7 +265,7 @@ describe('[API] Characters', () => {
         test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
-                    method: 'POST',
+                    method: 'PATCH',
                     route: `/characters/${charactersData[1].id}`,
                     body: {
                         name: 'Test'

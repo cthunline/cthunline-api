@@ -280,7 +280,7 @@ export const assetController = async (app: FastifyInstance) => {
 
     // update a directory belonging to the authenticated user
     app.route({
-        method: 'POST',
+        method: 'PATCH',
         url: '/directories/:directoryId',
         schema: { body: updateDirectorySchema },
         handler: async (

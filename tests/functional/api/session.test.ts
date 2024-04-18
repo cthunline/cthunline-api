@@ -101,10 +101,10 @@ describe('[API] Sessions', () => {
         });
     });
 
-    describe('POST /sessions/:id', () => {
+    describe('PATCH /sessions/:id', () => {
         test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
-                method: 'POST',
+                method: 'PATCH',
                 route: '/sessions/:id',
                 body: {
                     name: 'Test'
@@ -138,7 +138,7 @@ describe('[API] Sessions', () => {
             for (const body of invalidData) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/sessions/${id}`,
                         body
                     },
@@ -149,7 +149,7 @@ describe('[API] Sessions', () => {
         test('Should throw a forbidden error', async () => {
             await api.testError(
                 {
-                    method: 'POST',
+                    method: 'PATCH',
                     route: `/sessions/${sessionsData[1].id}`,
                     body: {
                         name: 'Test11'

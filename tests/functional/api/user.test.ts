@@ -179,10 +179,10 @@ describe('[API] Users', () => {
         });
     });
 
-    describe('POST /users/:id', () => {
+    describe('PATCH /users/:id', () => {
         test('Should throw error because of invalid ID', async () => {
             await api.testInvalidIdError({
-                method: 'POST',
+                method: 'PATCH',
                 route: '/users/:id',
                 body: {
                     name: 'Test'
@@ -220,7 +220,7 @@ describe('[API] Users', () => {
             for (const body of invalidData) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/users/${api.userId}`,
                         body
                     },
@@ -259,7 +259,7 @@ describe('[API] Users', () => {
             for (const body of bodies) {
                 await api.testError(
                     {
-                        method: 'POST',
+                        method: 'PATCH',
                         route: `/users/${id}`,
                         body
                     },
@@ -268,7 +268,7 @@ describe('[API] Users', () => {
             }
             await api.testError(
                 {
-                    method: 'POST',
+                    method: 'PATCH',
                     route: `/users/${usersData[0].id}`,
                     body: {
                         name: 'Test1'
