@@ -25,7 +25,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 weaponSkill: {
                     initial: 23,
                     advances: 0,
-                    current: 23
+                    current: 23,
+                    careerLevel: 1
                 },
                 ballisticSkill: {
                     initial: 39,
@@ -40,12 +41,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 toughness: {
                     initial: 27,
                     advances: 5,
-                    current: 32
+                    current: 32,
+                    careerLevel: 1
                 },
                 initiative: {
                     initial: 38,
                     advances: 5,
-                    current: 43
+                    current: 43,
+                    careerLevel: 1
                 },
                 agility: {
                     initial: 39,
@@ -55,12 +58,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 dexterity: {
                     initial: 46,
                     advances: 0,
-                    current: 46
+                    current: 46,
+                    careerLevel: 3
                 },
                 intelligence: {
                     initial: 26,
                     advances: 0,
-                    current: 26
+                    current: 26,
+                    careerLevel: 2
                 },
                 willpower: {
                     initial: 43,
@@ -70,7 +75,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 fellowship: {
                     initial: 45,
                     advances: 5,
-                    current: 50
+                    current: 50,
+                    careerLevel: 4
                 }
             },
             fate: {
@@ -111,7 +117,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 charm: {
                     characteristicName: 'fellowship',
                     advances: 0,
-                    skill: 50
+                    skill: 50,
+                    careerLevel: 1
                 },
                 charmAnimal: {
                     characteristicName: 'willpower',
@@ -121,7 +128,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 climb: {
                     characteristicName: 'strength',
                     advances: 15,
-                    skill: 35
+                    skill: 35,
+                    careerLevel: 1
                 },
                 cool: {
                     characteristicName: 'willpower',
@@ -136,7 +144,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 dodge: {
                     characteristicName: 'agility',
                     advances: 10,
-                    skill: 54
+                    skill: 54,
+                    careerLevel: 1
                 },
                 drive: {
                     characteristicName: 'agility',
@@ -151,12 +160,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 entertain: {
                     characteristicName: 'fellowship',
                     advances: 0,
-                    skill: 50
+                    skill: 50,
+                    careerLevel: 2
                 },
                 gamble: {
                     characteristicName: 'intelligence',
                     advances: 0,
-                    skill: 26
+                    skill: 26,
+                    careerLevel: 1
                 },
                 gossip: {
                     characteristicName: 'fellowship',
@@ -181,12 +192,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 leadership: {
                     characteristicName: 'fellowship',
                     advances: 0,
-                    skill: 50
+                    skill: 50,
+                    careerLevel: 2
                 },
                 meleeBasic: {
                     characteristicName: 'weaponSkill',
                     advances: 0,
-                    skill: 23
+                    skill: 23,
+                    careerLevel: 2
                 },
                 melee: {
                     characteristicName: 'weaponSkill',
@@ -206,7 +219,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 perception: {
                     characteristicName: 'initiative',
                     advances: 10,
-                    skill: 53
+                    skill: 53,
+                    careerLevel: 3
                 },
                 ride: {
                     characteristicName: 'agility',
@@ -229,13 +243,15 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                     name: 'Entertain (comedy)',
                     characteristicName: 'fellowship',
                     advances: 10,
-                    skill: 60
+                    skill: 60,
+                    careerLevel: 4
                 },
                 {
                     name: 'Pick lock',
                     characteristicName: 'dexterity',
                     advances: 5,
-                    skill: 51
+                    skill: 51,
+                    careerLevel: 4
                 },
                 {
                     name: 'Sleight of hand',
@@ -415,7 +431,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 weaponSkill: {
                     initial: 32,
                     advances: 10,
-                    current: 42
+                    current: 42,
+                    careerLevel: 1
                 },
                 ballisticSkill: {
                     initial: 24,
@@ -425,7 +442,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 strength: {
                     initial: 25,
                     advances: 0,
-                    current: 25
+                    current: 25,
+                    careerLevel: 4
                 },
                 toughness: {
                     initial: 28,
@@ -435,12 +453,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 initiative: {
                     initial: 32,
                     advances: 0,
-                    current: 32
+                    current: 32,
+                    careerLevel: 3
                 },
                 agility: {
                     initial: 31,
                     advances: 0,
-                    current: 31
+                    current: 31,
+                    careerLevel: 2
                 },
                 dexterity: {
                     initial: 27,
@@ -450,12 +470,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 intelligence: {
                     initial: 40,
                     advances: 8,
-                    current: 48
+                    current: 48,
+                    careerLevel: 1
                 },
                 willpower: {
                     initial: 33,
                     advances: 10,
-                    current: 43
+                    current: 43,
+                    careerLevel: 1
                 },
                 fellowship: {
                     initial: 23,
@@ -486,12 +508,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 art: {
                     characteristicName: 'dexterity',
                     advances: 0,
-                    skill: 27
+                    skill: 27,
+                    careerLevel: 3
                 },
                 athletics: {
                     characteristicName: 'agility',
                     advances: 0,
-                    skill: 31
+                    skill: 31,
+                    careerLevel: 4
                 },
                 bribery: {
                     characteristicName: 'fellowship',
@@ -506,7 +530,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 charmAnimal: {
                     characteristicName: 'willpower',
                     advances: 0,
-                    skill: 43
+                    skill: 43,
+                    careerLevel: 1
                 },
                 climb: {
                     characteristicName: 'strength',
@@ -531,7 +556,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 drive: {
                     characteristicName: 'agility',
                     advances: 0,
-                    skill: 31
+                    skill: 31,
+                    careerLevel: 1
                 },
                 endurance: {
                     characteristicName: 'toughness',
@@ -551,7 +577,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 gossip: {
                     characteristicName: 'fellowship',
                     advances: 0,
-                    skill: 23
+                    skill: 23,
+                    careerLevel: 1
                 },
                 haggle: {
                     characteristicName: 'fellowship',
@@ -571,12 +598,14 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                 leadership: {
                     characteristicName: 'fellowship',
                     advances: 0,
-                    skill: 23
+                    skill: 23,
+                    careerLevel: 2
                 },
                 meleeBasic: {
                     characteristicName: 'weaponSkill',
                     advances: 5,
-                    skill: 47
+                    skill: 47,
+                    careerLevel: 2
                 },
                 melee: {
                     characteristicName: 'weaponSkill',
@@ -619,7 +648,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                     name: 'Channelling (Shyish)',
                     characteristicName: 'willpower',
                     advances: 10,
-                    skill: 53
+                    skill: 53,
+                    careerLevel: 4
                 },
                 {
                     name: 'Lore (Reikland)',
@@ -631,7 +661,8 @@ export const warhammerFantasyCharacters: CharacterInsert[] = [
                     name: 'Heal',
                     characteristicName: 'intelligence',
                     advances: 1,
-                    skill: 49
+                    skill: 49,
+                    careerLevel: 3
                 }
             ],
             talents: [
