@@ -81,13 +81,15 @@ steps:
   image: alpine/git
   commands:
   - git clone https://github.com/cthunline/cthunline-docker.git .
+  # build docker image tag from backend & frontend repos tags
+  - apk add --no-cache coreutils
+  - API_TAG=$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' --tags https://github.com/cthunline/cthunline-api.git '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3 | cut --delimiter='v' --fields=2)
+  - WEB_TAG=$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' --tags https://github.com/cthunline/cthunline-web.git '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3 | cut --delimiter='v' --fields=2)
+  - echo "latest,$API_TAG-$WEB_TAG" > .tags
 - name: docker  
   image: plugins/docker
   settings:
     repo: cthunline/cthunline
-    tags:
-    - ${DRONE_TAG}
-    - latest
     username:
       from_secret: docker_user
     password:
