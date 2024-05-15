@@ -6,6 +6,7 @@ import { characterHandler } from './characterHandler.js';
 import { sketchHandler } from './sketchHandler.js';
 import { audioHandler } from './audioHandler.js';
 import { diceHandler } from './diceHandler.js';
+import { noteHandler } from './noteHandler.js';
 import { meta } from './helper.js';
 import {
     connectionMiddleware,
@@ -55,5 +56,6 @@ export const socketRouter = (app: FastifyInstance) => {
         characterHandler(io, socket);
         audioHandler(io, socket);
         sketchHandler(io, socket);
+        noteHandler(io, socket);
     });
 };

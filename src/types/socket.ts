@@ -1,5 +1,6 @@
 import { type Server, type Socket } from 'socket.io';
 
+import { type NoteSocketUpdateBody } from '../sockets/schemas/note.js';
 import { type RequestDiceBody } from '../sockets/schemas/dice.js';
 import { type PlayAudioBody } from '../sockets/schemas/audio.js';
 import { type SocketMeta } from '../sockets/helper.js';
@@ -12,7 +13,8 @@ import {
     type Character,
     type Session,
     type Asset,
-    type SafeUser
+    type SafeUser,
+    type Note
 } from '../drizzle/schema.js';
 
 export interface ListenEvents {
@@ -23,6 +25,7 @@ export interface ListenEvents {
     audioPlay: (data: PlayAudioBody) => void;
     audioStop: () => void;
     characterUpdate: () => void;
+    noteUpdate: (note: NoteSocketUpdateBody) => void;
 }
 
 export interface EmitEvents {
@@ -34,6 +37,7 @@ export interface EmitEvents {
     audioPlay: (data: SocketAudioPlayData) => void;
     audioStop: (data: SocketBaseData) => void;
     characterUpdate: (data: SocketCharacterUpdateData) => void;
+    noteUpdate: (note: SocketNoteUpdateData) => void;
 }
 
 export interface ServerSideEvents {
@@ -114,5 +118,11 @@ export type SocketAudioPlayData = SocketMeta<
 export type SocketCharacterUpdateData = SocketMeta<
     SocketBaseData & {
         character: Character;
+    }
+>;
+
+export type SocketNoteUpdateData = SocketMeta<
+    SocketBaseData & {
+        note: Note;
     }
 >;

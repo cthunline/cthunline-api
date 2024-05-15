@@ -12,6 +12,7 @@ import { api } from './api.helper.js';
 interface SetupSessionReturn {
     sockets: Socket[];
     session: Omit<Session, 'createdAt' | 'updatedAt'>;
+    emails: string[];
 }
 
 interface SocketsHelper {
@@ -178,7 +179,8 @@ export const socketHelper: SocketsHelper = {
         );
         return {
             sockets,
-            session
+            session,
+            emails: [masterEmail, player1Email, player2Email]
         };
     },
 
@@ -189,9 +191,15 @@ export const socketHelper: SocketsHelper = {
         expectedStatus,
         isMaster = false
     }: TestErrorData) => {
-        const invalidData = Array.isArray(data) ? data : [data];
+        const socket = await socketHelper.connectRole(isMaster);
+        let invalidData = data;
+        if (typeof data === 'function') {
+            invalidData = data(api.userId);
+        }
+        if (!Array.isArray(invalidData)) {
+            invalidData = [invalidData];
+        }
         for (const emitData of invalidData) {
-            const socket = await socketHelper.connectRole(isMaster);
             await new Promise<void>((resolve, reject) => {
                 socket.on(onEvent, () => {
                     socket.disconnect();
@@ -204,12 +212,12 @@ export const socketHelper: SocketsHelper = {
                 socket.on('error', (errorData: any) => {
                     assertSocketMeta(errorData);
                     expect(errorData.status).to.equal(expectedStatus);
-                    socket.disconnect();
                     resolve();
                 });
                 socket.emit(emitEvent, emitData);
             });
         }
+        socket.disconnect();
     }
 };
 

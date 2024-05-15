@@ -18,11 +18,13 @@ export const characterHandler = (
                 throw new ForbiddenError();
             }
             const { user, isMaster, sessionId, characterId } = socket.data;
-            const cachedCharacter = await cache.getJson<Character>(
-                getCharacterCacheKey(characterId)
-            );
+            const cacheKey = getCharacterCacheKey(characterId);
+            const cachedCharacter = await cache.getJson<Character>(cacheKey);
             const character =
                 cachedCharacter ?? (await getCharacterByIdOrThrow(characterId));
+            if (!cachedCharacter) {
+                await cache.setJson<Character>(cacheKey, character);
+            }
             socket.data.character = character;
             const sessionSockets = await io
                 .in(String(sessionId))
