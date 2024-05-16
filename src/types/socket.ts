@@ -25,7 +25,8 @@ export interface ListenEvents {
     audioPlay: (data: PlayAudioBody) => void;
     audioStop: () => void;
     characterUpdate: () => void;
-    noteUpdate: (note: NoteSocketUpdateBody) => void;
+    noteUpdate: (data: NoteSocketUpdateBody) => void;
+    noteDelete: (data: NoteSocketUpdateBody) => void;
 }
 
 export interface EmitEvents {
@@ -37,7 +38,8 @@ export interface EmitEvents {
     audioPlay: (data: SocketAudioPlayData) => void;
     audioStop: (data: SocketBaseData) => void;
     characterUpdate: (data: SocketCharacterUpdateData) => void;
-    noteUpdate: (note: SocketNoteUpdateData) => void;
+    noteUpdate: (data: SocketNoteUpdateData) => void;
+    noteDelete: (data: SocketNoteDeleteData) => void;
 }
 
 export interface ServerSideEvents {
@@ -124,5 +126,11 @@ export type SocketCharacterUpdateData = SocketMeta<
 export type SocketNoteUpdateData = SocketMeta<
     SocketBaseData & {
         note: Note;
+    }
+>;
+
+export type SocketNoteDeleteData = SocketMeta<
+    SocketBaseData & {
+        noteId: number;
     }
 >;

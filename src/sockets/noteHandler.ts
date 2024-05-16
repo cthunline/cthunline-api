@@ -12,6 +12,7 @@ import {
 import { ForbiddenError } from '../services/errors.js';
 
 export const noteHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
+    // notify users when a shared note is updated
     socket.on('noteUpdate', async (body: NoteSocketUpdateBody) => {
         try {
             validateSchema(noteSocketUpdateSchema, body);
@@ -38,6 +39,24 @@ export const noteHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                     user,
                     isMaster,
                     note
+                })
+            );
+        } catch (err) {
+            socket.emit('error', meta(err));
+        }
+    });
+    // notify users when a shared note is deleted / unshared
+    socket.on('noteDelete', async (body: NoteSocketUpdateBody) => {
+        try {
+            validateSchema(noteSocketUpdateSchema, body);
+            const { sessionId, user, isMaster } = socket.data;
+            const { noteId } = body;
+            socket.to(String(sessionId)).emit(
+                'noteDelete',
+                meta({
+                    user,
+                    isMaster,
+                    noteId
                 })
             );
         } catch (err) {

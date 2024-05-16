@@ -2,7 +2,9 @@ import { type Options as FormidableOptions } from 'formidable';
 import path from 'path';
 import fs from 'fs';
 
+import { type Character } from '../../drizzle/schema.js';
 import { assetTempDir, getAssetDir } from './asset.js';
+import { cache } from '../../services/cache.js';
 import { getEnv } from '../../services/env.js';
 
 /**
@@ -31,4 +33,23 @@ export const controlPortraitDir = async (): Promise<string> => {
         await fs.promises.mkdir(dir);
     }
     return dir;
+};
+
+/**
+Updates character in cache if exists.
+*/
+export const updateCachedCharacterIfExists = async (character: Character) => {
+    const cacheKey = getCharacterCacheKey(character.id);
+    const cachedCharacter = await cache.getJson<Character>(cacheKey);
+    if (cachedCharacter) {
+        await cache.setJson<Character>(cacheKey, character);
+    }
+};
+
+/**
+Deletes character in cache.
+*/
+export const deleteCachedCharacter = async (characterId: number) => {
+    const cacheKey = getCharacterCacheKey(characterId);
+    await cache.del(cacheKey);
 };

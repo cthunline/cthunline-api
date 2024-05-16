@@ -149,7 +149,7 @@ describe('[API] Notes', () => {
                     isShared: false,
                     position: expectedPosition
                 },
-                assert: assertNote
+                assert: (dt, ex) => assertNote(dt, ex, true)
             });
         });
     });
@@ -175,14 +175,14 @@ describe('[API] Notes', () => {
             await api.testGetOne({
                 route: '/notes/:id',
                 data: notes[0],
-                assert: assertNote
+                assert: (dt, ex) => assertNote(dt, ex, true)
             });
         });
         test('Should get a shared note', async () => {
             await api.testGetOne({
                 route: '/notes/:id',
                 data: sharedNote,
-                assert: assertNote
+                assert: (dt, ex) => assertNote(dt, ex, true)
             });
         });
     });
@@ -282,8 +282,8 @@ describe('[API] Notes', () => {
                 await api.testEdit({
                     route: `/notes/${note.id}`,
                     data,
-                    assert: assertNote,
-                    expected
+                    expected,
+                    assert: (dt, ex) => assertNote(dt, ex, true)
                 });
             }
         });
@@ -411,14 +411,14 @@ describe('[API] Notes', () => {
                 expect(moveUpResponse).toHaveStatus(200);
                 expect(moveUpResponse.body).to.be.an('object');
                 const { user, ...expected } = expectedNotes[0];
-                assertNote(moveUpResponse.body, expected);
+                assertNote(moveUpResponse.body, expected, true);
                 for (const expectedNote of expectedNotes) {
                     const { user: noteUser, ...rest } = expectedNote;
                     const { body } = await api.request({
                         method: 'GET',
                         route: `/notes/${expectedNote.id}`
                     });
-                    assertNote(body, rest);
+                    assertNote(body, rest, true);
                 }
             }
         });

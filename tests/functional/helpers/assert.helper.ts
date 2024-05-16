@@ -240,12 +240,14 @@ export const assertNote = (
     expect(data.userId).to.be.a('number');
     if (shouldContainUser !== null && shouldContainUser) {
         expect(data).to.have.property('user');
-        assertUser(data.user);
+        assertUser(data.user, expected?.user);
     } else if (shouldContainUser !== null && !shouldContainUser) {
         expect(data).to.not.have.property('user');
     }
     if (expected) {
-        compareDataWithExpected(data, expected);
+        const { user: dtUsr, ...compareData } = data;
+        const { user: exUsr, ...compareExpected } = expected;
+        compareDataWithExpected(compareData, compareExpected);
     }
 };
 

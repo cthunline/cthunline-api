@@ -6,6 +6,7 @@ import {
 
 import { getSessionByIdOrThrow } from '../services/queries/session.js';
 import { ConflictError, InternError } from '../services/errors.js';
+import { deleteCachedNote, updateCachedNoteIfExists } from './helpers/note.js';
 import { parseParamId } from '../services/api.js';
 import { type Note } from '../drizzle/schema.js';
 import { controlSelf } from './helpers/auth.js';
@@ -142,6 +143,7 @@ export const noteController = async (app: FastifyInstance) => {
             const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
             const updatedNote = await updateNoteById(noteId, body);
+            await updateCachedNoteIfExists(updatedNote);
             rep.send(updatedNote);
         }
     });
@@ -197,6 +199,7 @@ export const noteController = async (app: FastifyInstance) => {
                 positionToSwitch
             );
             const updatedNote = await getUserNoteByIdOrThrow(user.id, noteId);
+            await updateCachedNoteIfExists(updatedNote);
             rep.send(updatedNote);
         }
     });
@@ -221,6 +224,7 @@ export const noteController = async (app: FastifyInstance) => {
             const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
             await deleteNoteById(noteId);
+            await deleteCachedNote(noteId);
             // re-order note positions
             await reorderUserSessionNotes(user.id, note.sessionId);
             //

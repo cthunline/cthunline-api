@@ -1,13 +1,14 @@
 import { getTableColumns, and, eq, ne, or, asc, desc, sql } from 'drizzle-orm';
 
+import { type NoteUpdate, type NoteInsert } from '../../drizzle/schema.js';
+import { type DbTransaction } from '../../types/db.js';
+import { db, tables } from '../../services/db.js';
+import { safeUserSelect } from './user.js';
 import {
     ForbiddenError,
     InternError,
     NotFoundError
 } from '../../services/errors.js';
-import { type NoteUpdate, type NoteInsert } from '../../drizzle/schema.js';
-import { db, tables } from '../../services/db.js';
-import { safeUserSelect } from './user.js';
 
 /**
 Gets notes of a user for a session ordered by position.
@@ -41,8 +42,12 @@ If user is not the owner and the note is not shared throws a forbidden error.
 */
 export const getUserNoteById = async (userId: number, noteId: number) => {
     const notes = await db
-        .select()
+        .select({
+            ...getTableColumns(tables.notes),
+            user: safeUserSelect
+        })
         .from(tables.notes)
+        .innerJoin(tables.users, eq(tables.users.id, tables.notes.userId))
         .where(eq(tables.notes.id, noteId));
     const note = notes[0];
     if (note && note.userId !== userId && !note.isShared) {
@@ -119,10 +124,26 @@ export const switchUserSessionNotesPositions = async (
         and position in (${position1}, ${position2});`);
 
 /**
+Gets a note by its id including its user data using a transaction context.
+*/
+const getTransactionNoteById = (tx: DbTransaction, noteId: number) =>
+    tx
+        .select({
+            ...getTableColumns(tables.notes),
+            user: safeUserSelect
+        })
+        .from(tables.notes)
+        .where(eq(tables.notes.id, noteId))
+        .innerJoin(tables.users, eq(tables.users.id, tables.notes.userId));
+
+/**
 Creates a note.
 */
 export const createNote = async (data: NoteInsert) => {
-    const createdNotes = await db.insert(tables.notes).values(data).returning();
+    const createdNotes = await db.transaction(async (tx) => {
+        const [nt] = await tx.insert(tables.notes).values(data).returning();
+        return nt ? getTransactionNoteById(tx, nt.id) : [];
+    });
     const createdNote = createdNotes[0];
     if (!createdNote) {
         throw new InternError('Could not retreive inserted note');
@@ -134,11 +155,14 @@ export const createNote = async (data: NoteInsert) => {
 Updates a note with the given ID.
 */
 export const updateNoteById = async (noteId: number, data: NoteUpdate) => {
-    const updatedNotes = await db
-        .update(tables.notes)
-        .set(data)
-        .where(eq(tables.notes.id, noteId))
-        .returning();
+    const updatedNotes = await db.transaction(async (tx) => {
+        const [nt] = await tx
+            .update(tables.notes)
+            .set(data)
+            .where(eq(tables.notes.id, noteId))
+            .returning();
+        return nt ? getTransactionNoteById(tx, nt.id) : [];
+    });
     const updatedNote = updatedNotes[0];
     if (!updatedNote) {
         throw new InternError('Could not retreive updated note');
