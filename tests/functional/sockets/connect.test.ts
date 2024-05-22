@@ -1,6 +1,7 @@
 import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
 import { type Socket } from 'socket.io-client';
 
+import { findCharacter, getAnotherUser } from '../api/character.test.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
 import { api } from '../helpers/api.helper.js';
 import {
@@ -108,11 +109,13 @@ describe('[Sockets] Connection', () => {
 
     test('Should fail to connect socket because of forbidden characterId', async () => {
         const { jwt } = await api.login();
+        const anotherUser = getAnotherUser(api.userId);
+        const anotherUserCharacter = findCharacter(anotherUser.id);
         await socketHelper.failConnect({
             jwt,
             query: {
                 sessionId: sessionsData[1].id,
-                characterId: charactersData[1].id
+                characterId: anotherUserCharacter.id
             },
             status: 403
         });
@@ -120,10 +123,11 @@ describe('[Sockets] Connection', () => {
 
     test('Should connect to socket', async () => {
         const { jwt } = await api.login();
+        const userCharacter = findCharacter(api.userId);
         await socketHelper.connect({
             jwt,
             sessionId: sessionsData[1].id,
-            characterId: charactersData[0].id
+            characterId: userCharacter.id
         });
         const masterUser = usersData.find(
             ({ id }) => id === sessionsData[1].masterId
@@ -141,10 +145,11 @@ describe('[Sockets] Connection', () => {
 
     test('Should disconnect copycat socket on connection', async () => {
         const { jwt } = await api.login();
+        const userCharacter = findCharacter(api.userId);
         const copycatSocket = await socketHelper.connect({
             jwt,
             sessionId: sessionsData[1].id,
-            characterId: charactersData[0].id
+            characterId: userCharacter.id
         });
         await Promise.all([
             new Promise<void>((resolve, reject) => {
@@ -159,7 +164,7 @@ describe('[Sockets] Connection', () => {
             socketHelper.connect({
                 jwt,
                 sessionId: sessionsData[2].id,
-                characterId: charactersData[0].id
+                characterId: userCharacter.id
             })
         ]);
     });

@@ -20,10 +20,9 @@ import {
     resetCache
 } from '../helpers/data.helper.js';
 
-const findCharacter = (userId: number, gameId?: string) => {
+export const findCharacter = (userId: number, gameId?: string) => {
     const character = charactersData.find(
-        (char) =>
-            char.userId === api.userId && (!gameId || char.gameId === gameId)
+        (char) => char.userId === userId && (!gameId || char.gameId === gameId)
     );
     if (character) {
         return character as any;
@@ -39,7 +38,10 @@ const findCharacterFromDb = async (userId: number, gameId?: string) => {
     throw new Error(`Could not find character for user ${userId}`);
 };
 
-const getAnotherUser = (selfUserId: number, mustBeEnabled: boolean = true) => {
+export const getAnotherUser = (
+    selfUserId: number,
+    mustBeEnabled: boolean = true
+) => {
     const user = usersData.find(
         ({ id, isEnabled }) =>
             (!mustBeEnabled || isEnabled) && id !== selfUserId
@@ -148,6 +150,7 @@ describe('[API] Characters', () => {
         });
         test('Should create a character', async () => {
             const gameIds = [
+                'apocalypseWorld',
                 'callOfCthulhu',
                 'starWarsD6',
                 'dnd5',
@@ -263,10 +266,12 @@ describe('[API] Characters', () => {
             }
         });
         test('Should throw a forbidden error', async () => {
+            const anotherUser = getAnotherUser(api.userId);
+            const anotherUserCharacter = findCharacter(anotherUser.id);
             await api.testError(
                 {
                     method: 'PATCH',
-                    route: `/characters/${charactersData[1].id}`,
+                    route: `/characters/${anotherUserCharacter.id}`,
                     body: {
                         name: 'Test'
                     }
@@ -319,10 +324,12 @@ describe('[API] Characters', () => {
             });
         });
         test('Should throw a forbidden error', async () => {
+            const anotherUser = getAnotherUser(api.userId);
+            const anotherUserCharacter = findCharacter(anotherUser.id);
             await api.testError(
                 {
                     method: 'DELETE',
-                    route: `/characters/${charactersData[1].id}`
+                    route: `/characters/${anotherUserCharacter.id}`
                 },
                 403
             );
@@ -381,12 +388,14 @@ describe('[API] Characters', () => {
             }
         });
         test('Should throw a forbidden error', async () => {
+            const anotherUser = getAnotherUser(api.userId);
+            const anotherUserCharacter = findCharacter(anotherUser.id);
             const name = 'asset.png';
             const buffer = await getAssetBuffer(name);
             await api.testError(
                 {
                     method: 'POST',
-                    route: `/characters/${charactersData[1].id}/portrait`,
+                    route: `/characters/${anotherUserCharacter.id}/portrait`,
                     files: [
                         {
                             field: 'portrait',
@@ -504,10 +513,12 @@ describe('[API] Characters', () => {
             });
         });
         test('Should throw a forbidden error', async () => {
+            const anotherUser = getAnotherUser(api.userId);
+            const anotherUserCharacter = findCharacter(anotherUser.id);
             await api.testError(
                 {
                     method: 'DELETE',
-                    route: `/characters/${charactersData[1].id}/portrait`
+                    route: `/characters/${anotherUserCharacter.id}/portrait`
                 },
                 403
             );

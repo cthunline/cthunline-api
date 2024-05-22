@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 import { warhammerFantasyCharacters } from '../data/characters/warhammerFantasyCharacters.data.js';
+import { apocalypseWorldCharacters } from '../data/characters/apocalypseWorldCharacters.data.js';
 import { seventhSeaCharacters } from '../data/characters/seventhSeaCharacters.data.js';
 import { swd6Characters } from '../data/characters/swd6Characters.data.js';
 import { dnd5Characters } from '../data/characters/dnd5Characters.data.js';
@@ -25,6 +26,7 @@ export const notesData = notes;
 export const assetsData = assets;
 export const directoriesData = directories;
 export const charactersData = [
+    ...apocalypseWorldCharacters,
     ...cocCharacters,
     ...swd6Characters,
     ...dnd5Characters,
