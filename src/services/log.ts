@@ -4,6 +4,8 @@ import fs from 'fs';
 
 import { getEnv } from './env.js';
 
+const level = getEnv('LOG_LEVEL');
+
 const printf = (i: winston.Logform.TransformableInfo) =>
     `${i.timestamp} [${i.level}] ${i.message}`;
 
@@ -16,7 +18,7 @@ Default log transport in console.
 */
 const transports: winston.transport[] = [
     new winston.transports.Console({
-        level: 'info',
+        level,
         handleExceptions: false,
         format: format.combine(
             format.colorize(),
@@ -48,7 +50,7 @@ if (logDir && !fileTransportError) {
     // log transport in file
     transports.push(
         new winston.transports.File({
-            level: 'info',
+            level,
             filename: path.join(logDir, 'cthunline.log'),
             handleExceptions: false,
             maxsize: 5242880,
@@ -66,8 +68,7 @@ Logging instance to use in code.
 */
 export const log = winston.createLogger({
     transports,
-    exitOnError: false,
-    silent: !getEnv('LOG_ENABLED')
+    exitOnError: false
 });
 
 if (fileTransportError) {

@@ -17,7 +17,11 @@ export const envSchema = Type.Object({
     CRYPTO_SECRET: Type.String({ minLength: 32, maxLength: 32 }),
     COOKIE_SECRET: Type.String({ minLength: 32, maxLength: 32 }),
     COOKIE_SECURE: Type.Boolean(),
-    LOG_ENABLED: Type.Boolean(),
+    LOG_LEVEL: Type.Union([
+        Type.Literal('info'),
+        Type.Literal('warning'),
+        Type.Literal('error')
+    ]),
     LOG_DIR: Type.Optional(Type.String({ minLength: 1 })),
     REVERSE_PROXY: Type.Boolean(),
     RL_WINDOW_DURATION: Type.Integer({ minimum: 1 }),
