@@ -3,7 +3,8 @@ import { type Static, Type } from '@sinclair/typebox';
 export const drawingPathSchema = Type.Object(
     {
         d: Type.String({ minLength: 1 }),
-        color: Type.String({ minLength: 1 })
+        color: Type.String({ minLength: 1 }),
+        width: Type.Integer({ minimum: 1 })
     },
     {
         additionalProperties: false

@@ -18,7 +18,8 @@ const migrateSketchData = (
             atLeastOneChange = true;
             paths.push({
                 d: oldPath,
-                color: 'white'
+                color: 'white',
+                width: 4
             });
         } else {
             paths.push(oldPath);
