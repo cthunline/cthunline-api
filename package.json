@@ -14,7 +14,7 @@
         "drizzle:generate": "npx drizzle-kit generate:pg --config=src/drizzle/config.ts"
     },
     "dependencies": {
-        "@cthunline/games": "^3.2.19",
+        "@cthunline/games": "^3.2.20",
         "@fastify/cookie": "^9.3.1",
         "@fastify/helmet": "^11.1.1",
         "@fastify/rate-limit": "^9.1.0",
