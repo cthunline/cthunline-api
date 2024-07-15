@@ -7,9 +7,12 @@ export default defineConfig({
         setupFiles: ['tests/setup.ts'],
         reporters: ['default'],
         maxConcurrency: 1,
+        sequence: {
+            hooks: 'list'
+        },
         poolOptions: {
-            threads: {
-                singleThread: true
+            forks: {
+                singleFork: true
             }
         },
         coverage: {
