@@ -1,34 +1,30 @@
-import { type ExtendedError } from 'socket.io/dist/namespace';
+import type { ExtendedError } from 'socket.io/dist/namespace';
 
-import { getCharacterCacheKey } from '../controllers/helpers/character.js';
-import { type SketchBody } from '../controllers/schemas/definitions.js';
-import { getSessionByIdOrThrow } from '../services/queries/session.js';
-import { getSketchCacheKey } from '../controllers/helpers/sketch.js';
-import { getCharacterById } from '../services/queries/character.js';
-import { decrypt, verifyJwt } from '../services/crypto.js';
-import { cache } from '../services/cache.js';
-import { getEnv } from '../services/env.js';
 import {
     type CacheJwtData,
     getJwtCacheKey
 } from '../controllers/helpers/auth.js';
+import { getCharacterCacheKey } from '../controllers/helpers/character.js';
+import { getSketchCacheKey } from '../controllers/helpers/sketch.js';
+import type { SketchBody } from '../controllers/schemas/definitions.js';
+import type { Character, SafeUser, Session } from '../drizzle/schema.js';
+import { cache } from '../services/cache.js';
+import { decrypt, verifyJwt } from '../services/crypto.js';
+import { getEnv } from '../services/env.js';
 import {
-    type Character,
-    type Session,
-    type SafeUser
-} from '../drizzle/schema.js';
-import {
-    type SocketIoServer,
-    type SocketSessionUser,
-    type SocketIoSocket
-} from '../types/socket.js';
-import {
-    CustomError,
     AuthenticationError,
+    CustomError,
+    ForbiddenError,
     NotFoundError,
-    ValidationError,
-    ForbiddenError
+    ValidationError
 } from '../services/errors.js';
+import { getCharacterById } from '../services/queries/character.js';
+import { getSessionByIdOrThrow } from '../services/queries/session.js';
+import type {
+    SocketIoServer,
+    SocketIoSocket,
+    SocketSessionUser
+} from '../types/socket.js';
 
 // verify auth token
 const verifySocketJwt = async (socket: SocketIoSocket): Promise<SafeUser> => {
@@ -130,10 +126,17 @@ export const connectionMiddleware = async (
         socket.join(session.id.toString());
         //
         next();
-    } catch (err: any) {
+    } catch (err: unknown) {
         // due to socket.io middleware error handling
         // we have to pass all error info in the data property
-        const { message, status, data } = err;
+        const { message, status, data } =
+            err instanceof CustomError
+                ? err
+                : {
+                      message: 'Intern error',
+                      status: 500,
+                      data: undefined
+                  };
         const connectionError = new CustomError(message, status, {
             message,
             status,
@@ -155,9 +158,9 @@ export const disconnectCopycats = async (
         (otherSocket) =>
             otherSocket.id !== socketId && otherSocket.data.user.id === userId
     );
-    copycatSockets.forEach((copycatSocket) => {
+    for (const copycatSocket of copycatSockets) {
         copycatSocket.disconnect();
-    });
+    }
 };
 
 export const getSessionUsers = async (

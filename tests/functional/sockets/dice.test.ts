@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
 import { assertSocketMeta, assertUser } from '../helpers/assert.helper.js';
 import { resetCache, resetData } from '../helpers/data.helper.js';

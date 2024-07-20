@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, beforeAll } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
 import { api, httpMethods } from '../helpers/api.helper.js';
 import { assertError } from '../helpers/assert.helper.js';

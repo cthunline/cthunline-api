@@ -1,14 +1,14 @@
-import path from 'path';
-import fs from 'fs';
-import {
-    type File as FormidableFile,
-    type Options as FormidableOptions
+import fs from 'node:fs';
+import path from 'node:path';
+import type {
+    File as FormidableFile,
+    Options as FormidableOptions
 } from 'formidable';
 
-import { InternError, ValidationError } from '../../services/errors.js';
-import { mimeTypes, type FileType, type MimeType } from '../../types/asset.js';
-import { type Directory } from '../../drizzle/schema.js';
+import type { Directory } from '../../drizzle/schema.js';
 import { getEnv } from '../../services/env.js';
+import { InternError, ValidationError } from '../../services/errors.js';
+import { type FileType, type MimeType, mimeTypes } from '../../types/asset.js';
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
@@ -93,7 +93,7 @@ export const getChildrenDirectories = (
     directories: Directory[]
 ): Directory[] => {
     const childrenDirs: Directory[] = [];
-    directories.forEach((directory) => {
+    for (const directory of directories) {
         if (directory.parentId === directoryId) {
             childrenDirs.push(
                 ...[
@@ -102,6 +102,6 @@ export const getChildrenDirectories = (
                 ]
             );
         }
-    });
+    }
     return childrenDirs;
 };

@@ -1,13 +1,13 @@
-import { type CookieSerializeOptions } from '@fastify/cookie';
-import { type FastifyRequest } from 'fastify';
+import type { CookieSerializeOptions } from '@fastify/cookie';
 import dayjs from 'dayjs';
+import type { FastifyRequest } from 'fastify';
 
-import { AuthenticationError, ForbiddenError } from '../../services/errors.js';
-import { decrypt, verifyJwt } from '../../services/crypto.js';
-import { type SafeUser } from '../../drizzle/schema.js';
+import type { SafeUser } from '../../drizzle/schema.js';
 import { parseParamId } from '../../services/api.js';
 import { cache } from '../../services/cache.js';
+import { decrypt, verifyJwt } from '../../services/crypto.js';
 import { getEnv } from '../../services/env.js';
+import { AuthenticationError, ForbiddenError } from '../../services/errors.js';
 
 /**
 Returns options object for cookies.

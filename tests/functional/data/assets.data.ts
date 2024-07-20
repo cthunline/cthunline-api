@@ -1,4 +1,4 @@
-import { type AssetInsert } from '../../../src/drizzle/schema.js';
+import type { AssetInsert } from '../../../src/drizzle/schema.js';
 
 export const assets: (AssetInsert & { id: number })[] = [
     {

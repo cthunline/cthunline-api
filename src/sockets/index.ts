@@ -1,29 +1,30 @@
-import { type FastifyInstance } from 'fastify';
-import { type Socket } from 'socket.io';
+import type { FastifyInstance } from 'fastify';
+import type { Socket } from 'socket.io';
+import type { ExtendedError } from 'socket.io/dist/namespace';
 
-import { type SocketIoSocket } from '../types/socket.js';
-import { characterHandler } from './characterHandler.js';
-import { sketchHandler } from './sketchHandler.js';
+import type { SocketIoSocket } from '../types/socket.js';
 import { audioHandler } from './audioHandler.js';
-import { diceHandler } from './diceHandler.js';
-import { noteHandler } from './noteHandler.js';
-import { meta } from './helper.js';
+import { characterHandler } from './characterHandler.js';
 import {
     connectionMiddleware,
     disconnectCopycats,
     getSessionUsers
 } from './connectionHandler.js';
+import { diceHandler } from './diceHandler.js';
+import { meta } from './helper.js';
+import { noteHandler } from './noteHandler.js';
+import { sketchHandler } from './sketchHandler.js';
 
 export const socketRouter = (app: FastifyInstance) => {
     const { io } = app;
-    io.use((socket: Socket, next: Function) => {
+    io.use((socket: Socket, next: (err?: ExtendedError) => void) => {
         if (socket.request.headers.cookie) {
             const cookies = app.parseCookie(socket.request.headers.cookie);
-            Object.keys(cookies).forEach((key) => {
+            for (const key of Object.keys(cookies)) {
                 cookies[key] =
                     app.unsignCookie(cookies[key].replace(/^s:/, '')).value ??
                     cookies[key];
-            });
+            }
             socket.data.cookies = cookies;
         }
         next();

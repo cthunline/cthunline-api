@@ -1,4 +1,4 @@
-import { type File as FormidableFile } from 'formidable';
+import type { File as FormidableFile } from 'formidable';
 
 // allowed mime types with their intern type and allowed extensions
 export const mimeTypes = {

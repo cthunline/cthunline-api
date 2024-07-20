@@ -1,14 +1,14 @@
+import type { OutgoingHttpHeaders } from 'node:http';
+import path from 'node:path';
 import { fastifyCookie } from '@fastify/cookie';
-import { type OutgoingHttpHeaders } from 'http';
-import { expect, beforeAll, afterAll } from 'vitest';
 import FormData from 'form-data';
-import path from 'path';
+import { afterAll, beforeAll, expect } from 'vitest';
 
-import { getEnv } from '../../../src/services/env.js';
 import { app, initApp } from '../../../src/app.js';
+import { getEnv } from '../../../src/services/env.js';
 
-import { assertError, assertUser } from './assert.helper.js';
 import { Agent } from './agent.helper.js';
+import { assertError, assertUser } from './assert.helper.js';
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -117,16 +117,16 @@ export const api = {
         if (!body && (fields || files)) {
             formData = new FormData();
             if (fields) {
-                Object.entries(fields).forEach(([key, value]) => {
+                for (const [key, value] of Object.entries(fields)) {
                     formData?.append(key, value);
-                });
+                }
             }
             if (files) {
-                files.forEach(({ field, buffer, name }) => {
+                for (const { field, buffer, name } of files) {
                     formData?.append(field, buffer, {
                         filename: name
                     });
-                });
+                }
             }
             headers = formData.getHeaders();
         }
@@ -145,7 +145,7 @@ export const api = {
 
     async login(
         credentials?: CredentialOptions,
-        expectSuccess: boolean = true
+        expectSuccess = true
     ): Promise<any> {
         const response = await api.request({
             method: 'POST',
@@ -177,7 +177,7 @@ export const api = {
         return null;
     },
 
-    async logout(expectSuccess: boolean = true): Promise<void> {
+    async logout(expectSuccess = true): Promise<void> {
         const response = await api.request({
             method: 'DELETE',
             route: '/auth'
@@ -195,7 +195,7 @@ export const api = {
         }
     },
 
-    async checkAuth(expectSuccess: boolean = true): Promise<void> {
+    async checkAuth(expectSuccess = true): Promise<void> {
         const response = await api.request({
             method: 'GET',
             route: '/auth'
@@ -235,9 +235,9 @@ export const api = {
         const { body } = response;
         expect(body[listKey]).to.be.an('array');
         expect(body[listKey]).to.have.lengthOf(data.length);
-        body[listKey].forEach((item: Record<string, any>) => {
+        for (const item of body[listKey]) {
             assert(item, dataById[item.id]);
-        });
+        }
     },
 
     async testGetOne(options: GetOneOptions): Promise<void> {
@@ -349,10 +349,7 @@ export const api = {
         }
     },
 
-    async testStaticFile(
-        route: string,
-        expectSuccess: boolean = true
-    ): Promise<void> {
+    async testStaticFile(route: string, expectSuccess = true): Promise<void> {
         const response = await api.request({
             apiPrefix: false,
             method: 'GET',

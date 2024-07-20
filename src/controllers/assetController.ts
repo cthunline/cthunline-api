@@ -1,34 +1,11 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
-import { type File as FormidableFile } from 'formidable';
-import path from 'path';
-import fs from 'fs';
+import fs from 'node:fs';
+import path from 'node:path';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { File as FormidableFile } from 'formidable';
 
-import { validateSchema } from '../services/typebox.js';
-import { ValidationError } from '../services/errors.js';
-import { type TypedFile } from '../types/asset.js';
-import { type QueryParam } from '../types/api.js';
 import { parseParamId } from '../services/api.js';
+import { ValidationError } from '../services/errors.js';
 import { log } from '../services/log.js';
-import {
-    createDirectorySchema,
-    type CreateDirectoryBody,
-    updateDirectorySchema,
-    type UpdateDirectoryBody,
-    uploadAssetsSchema,
-    type UploadAssetsBody
-} from './schemas/asset.js';
-import {
-    controlFile,
-    assetDir,
-    assetTempDir,
-    controlUserDir,
-    getFormidableOptions,
-    getChildrenDirectories
-} from './helpers/asset.js';
 import {
     createAssets,
     deleteAssetById,
@@ -44,6 +21,25 @@ import {
     getUserDirectoryByIdOrThrow,
     updateDirectoryById
 } from '../services/queries/directory.js';
+import { validateSchema } from '../services/typebox.js';
+import type { QueryParam } from '../types/api.js';
+import type { TypedFile } from '../types/asset.js';
+import {
+    assetDir,
+    assetTempDir,
+    controlFile,
+    controlUserDir,
+    getChildrenDirectories,
+    getFormidableOptions
+} from './helpers/asset.js';
+import {
+    type CreateDirectoryBody,
+    type UpdateDirectoryBody,
+    type UploadAssetsBody,
+    createDirectorySchema,
+    updateDirectorySchema,
+    uploadAssetsSchema
+} from './schemas/asset.js';
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {

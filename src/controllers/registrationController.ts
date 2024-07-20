@@ -1,21 +1,17 @@
-import {
-    type FastifyInstance,
-    type FastifyReply,
-    type FastifyRequest
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { registerUserSchema, type RegisterUserBody } from './schemas/user.js';
-import { controlUniqueEmail, defaultUserData } from './helpers/user.js';
-import { createInvitation } from '../services/queries/invitation.js';
-import { registerRateLimiter } from '../services/rateLimiter.js';
-import { createUser } from '../services/queries/user.js';
-import { ForbiddenError } from '../services/errors.js';
 import { hashPassword } from '../services/crypto.js';
 import { getEnv } from '../services/env.js';
+import { ForbiddenError } from '../services/errors.js';
+import { createInvitation } from '../services/queries/invitation.js';
+import { createUser } from '../services/queries/user.js';
+import { registerRateLimiter } from '../services/rateLimiter.js';
 import {
     controlInvitationCode,
     generateInvitationCode
 } from './helpers/registration.js';
+import { controlUniqueEmail, defaultUserData } from './helpers/user.js';
+import { type RegisterUserBody, registerUserSchema } from './schemas/user.js';
 
 export const registrationController = async (app: FastifyInstance) => {
     await app.register(async (routeApp: FastifyInstance) => {
@@ -61,7 +57,7 @@ export const registrationController = async (app: FastifyInstance) => {
         method: 'POST',
         url: '/invitation',
         handler: async (
-            req: FastifyRequest<{
+            _req: FastifyRequest<{
                 Body: RegisterUserBody;
             }>,
             rep: FastifyReply

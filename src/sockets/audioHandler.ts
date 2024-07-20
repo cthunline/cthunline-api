@@ -1,9 +1,9 @@
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
 import { ForbiddenError, ValidationError } from '../services/errors.js';
-import { playAudioSchema, type PlayAudioBody } from './schemas/audio.js';
 import { getAssetByIdOrThrow } from '../services/queries/asset.js';
 import { validateSchema } from '../services/typebox.js';
+import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
 import { meta } from './helper.js';
+import { type PlayAudioBody, playAudioSchema } from './schemas/audio.js';
 
 export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // notify session players that game master started playing audio asset

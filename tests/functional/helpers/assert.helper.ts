@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 
-import { type AppErrorConstructor } from '../../../src/services/errors.js';
+import type { AppErrorConstructor } from '../../../src/services/errors.js';
 import { locales } from '../../../src/services/locale.js';
 
 export const expectAsync = async (
@@ -24,10 +24,10 @@ export const compareDataWithExpected = (
     data: Record<string, any>,
     expected: Record<string, any>
 ) => {
-    Object.keys(expected).forEach((key) => {
+    for (const key of Object.keys(expected)) {
         expect(data).to.have.property(key);
         expect(data[key]).to.equal(expected[key]);
-    });
+    }
 };
 
 export const assertUser = (
@@ -165,20 +165,20 @@ export const assertSketchData = (
     expect(data).to.have.property('displayed');
     expect(data.displayed).to.be.a('boolean');
     expect(data).to.have.property('paths');
-    data.paths.forEach((path: any) => {
+    for (const path of data.paths) {
         assertSketchDrawingPath(path);
-    });
+    }
     expect(data.paths).to.be.an('array');
     expect(data).to.have.property('images');
     expect(data.images).to.be.an('array');
-    data.images.forEach((image: any) => {
+    for (const image of data.images) {
         assertSketchImage(image);
-    });
+    }
     expect(data).to.have.property('tokens');
     expect(data.tokens).to.be.an('array');
-    data.tokens.forEach((token: any) => {
+    for (const token of data.tokens) {
         assertSketchToken(token);
-    });
+    }
     if (expected) {
         expect(data).toEqual(expected);
     }
@@ -196,12 +196,12 @@ export const assertSketch = (
     expect(data).to.have.property('data');
     expect(data.data).to.be.an('object');
     if (expected) {
-        Object.keys(expected).forEach((key) => {
+        for (const key of Object.keys(expected)) {
             if (key !== 'data') {
                 expect(data).to.have.property(key);
                 expect(data[key]).to.equal(expected[key]);
             }
-        });
+        }
     }
     assertSketchData(data.data, expected?.data);
 };
@@ -271,14 +271,14 @@ export const assertCharacter = (
         expect(data.portrait).toBeNull();
     }
     if (expected) {
-        Object.keys(expected).forEach((key) => {
+        for (const key of Object.keys(expected)) {
             if (key === 'data') {
                 expect(data[key]).toEqual(expected[key]);
             } else {
                 expect(data).to.have.property(key);
                 expect(data[key]).to.equal(expected[key]);
             }
-        });
+        }
     }
 };
 

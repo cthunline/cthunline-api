@@ -1,25 +1,25 @@
-import { describe, test, expect } from 'vitest';
-import { type FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
+import { describe, expect, test } from 'vitest';
 
-import { type SafeUser, type User } from '../../src/drizzle/schema.js';
-import { expectAsync } from '../functional/helpers/assert.helper.js';
-import { users } from '../functional/data/users.data.js';
+import {
+    controlAdmin,
+    controlAdminMiddleware,
+    controlSelf,
+    controlSelfMiddleware
+} from '../../src/controllers/helpers/auth.js';
+import type { SafeUser, User } from '../../src/drizzle/schema.js';
+import {
+    generateJwt,
+    hashPassword,
+    verifyJwt,
+    verifyPassword
+} from '../../src/services/crypto.js';
 import {
     AuthenticationError,
     ForbiddenError
 } from '../../src/services/errors.js';
-import {
-    hashPassword,
-    verifyPassword,
-    generateJwt,
-    verifyJwt
-} from '../../src/services/crypto.js';
-import {
-    controlSelf,
-    controlAdmin,
-    controlSelfMiddleware,
-    controlAdminMiddleware
-} from '../../src/controllers/helpers/auth.js';
+import { users } from '../functional/data/users.data.js';
+import { expectAsync } from '../functional/helpers/assert.helper.js';
 
 describe('[Unit] Auth', () => {
     describe('hashPassword + verifyPassword', () => {

@@ -1,7 +1,7 @@
-import {
-    type FastifyInstance,
-    type InjectOptions,
-    type LightMyRequestResponse
+import type {
+    FastifyInstance,
+    InjectOptions,
+    LightMyRequestResponse
 } from 'fastify';
 
 export interface AgentResponse extends LightMyRequestResponse {
@@ -29,9 +29,9 @@ export class Agent {
             ...options,
             cookies: this.cookies
         });
-        response.cookies.forEach(({ name, value }) => {
+        for (const { name, value } of response.cookies) {
             this.cookies[name] = value;
-        });
+        }
         if (parseJson) {
             return {
                 ...response,

@@ -1,9 +1,9 @@
-import { describe, test, beforeAll, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, test } from 'vitest';
 
-import { resetCache, resetData } from '../helpers/data.helper.js';
 import { gamesData } from '../../../src/services/games.js';
-import { assertGame } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
+import { assertGame } from '../helpers/assert.helper.js';
+import { resetCache, resetData } from '../helpers/data.helper.js';
 
 const games = Object.values(gamesData);
 

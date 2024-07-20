@@ -1,14 +1,14 @@
-import { getTableColumns, and, eq, ne, or, asc, desc, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, getTableColumns, ne, or, sql } from 'drizzle-orm';
 
-import { type NoteUpdate, type NoteInsert } from '../../drizzle/schema.js';
-import { type DbTransaction } from '../../types/db.js';
+import type { NoteInsert, NoteUpdate } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
-import { safeUserSelect } from './user.js';
 import {
     ForbiddenError,
     InternError,
     NotFoundError
 } from '../../services/errors.js';
+import type { DbTransaction } from '../../types/db.js';
+import { safeUserSelect } from './user.js';
 
 /**
 Gets notes of a user for a session ordered by position.

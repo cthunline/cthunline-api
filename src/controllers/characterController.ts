@@ -1,38 +1,15 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
-import { type Character as CharacterData } from '@cthunline/games';
-import path from 'path';
-import fs from 'fs';
+import fs from 'node:fs';
+import path from 'node:path';
+import type { Character as CharacterData } from '@cthunline/games';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { games, type GameId, isValidGameId } from '../services/games.js';
-import { getUserByIdOrThrow } from '../services/queries/user.js';
-import { assetDir, controlFile } from './helpers/asset.js';
-import { validateSchema } from '../services/typebox.js';
-import { type QueryParam } from '../types/api.js';
 import { parseParamId } from '../services/api.js';
-import { controlSelf } from './helpers/auth.js';
 import {
     ConflictError,
     InternError,
     ValidationError
 } from '../services/errors.js';
-import {
-    getFormidablePortraitOptions,
-    controlPortraitDir,
-    portraitDirName,
-    updateCachedCharacterIfExists,
-    deleteCachedCharacter
-} from './helpers/character.js';
-import {
-    createCharacterSchema,
-    type CreateCharacterBody,
-    updateCharacterSchema,
-    type UpdateCharacterBody,
-    uploadPortraitSchema
-} from './schemas/character.js';
+import { type GameId, games, isValidGameId } from '../services/games.js';
 import {
     createCharacter,
     deleteCharacterById,
@@ -40,6 +17,25 @@ import {
     getCharacters,
     updateCharacterById
 } from '../services/queries/character.js';
+import { getUserByIdOrThrow } from '../services/queries/user.js';
+import { validateSchema } from '../services/typebox.js';
+import type { QueryParam } from '../types/api.js';
+import { assetDir, controlFile } from './helpers/asset.js';
+import { controlSelf } from './helpers/auth.js';
+import {
+    controlPortraitDir,
+    deleteCachedCharacter,
+    getFormidablePortraitOptions,
+    portraitDirName,
+    updateCachedCharacterIfExists
+} from './helpers/character.js';
+import {
+    type CreateCharacterBody,
+    type UpdateCharacterBody,
+    createCharacterSchema,
+    updateCharacterSchema,
+    uploadPortraitSchema
+} from './schemas/character.js';
 
 export const characterController = async (app: FastifyInstance) => {
     // get all characters

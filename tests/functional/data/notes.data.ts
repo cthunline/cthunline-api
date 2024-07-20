@@ -1,4 +1,4 @@
-import { type NoteInsert } from '../../../src/drizzle/schema.js';
+import type { NoteInsert } from '../../../src/drizzle/schema.js';
 
 export const notes: (NoteInsert & { id: number })[] = [
     {

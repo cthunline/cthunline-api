@@ -1,20 +1,20 @@
 import 'dotenv/config';
 
-import Fastify from 'fastify';
-import FastifyFormidable from 'fastify-formidable';
-import FastifySocketIo from 'fastify-socket.io';
 import FastifyCookie from '@fastify/cookie';
 import FastifyHelmet from '@fastify/helmet';
 import ajvFormats from 'ajv-formats';
+import Fastify from 'fastify';
+import FastifyFormidable from 'fastify-formidable';
 import FastifyQs from 'fastify-qs';
+import FastifySocketIo from 'fastify-socket.io';
 
-import { errorHandler, schemaErrorFormatter } from './services/errors.js';
 import { mainController } from './controllers/index.js';
-import { initDb, migrateDb } from './services/db.js';
 import { migrateData } from './migrations/index.js';
-import { socketRouter } from './sockets/index.js';
+import { initDb, migrateDb } from './services/db.js';
 import { getEnv } from './services/env.js';
+import { errorHandler, schemaErrorFormatter } from './services/errors.js';
 import { log } from './services/log.js';
+import { socketRouter } from './sockets/index.js';
 
 export const app = Fastify({
     trustProxy: getEnv('REVERSE_PROXY'),
@@ -65,8 +65,8 @@ export const initApp = async () => {
         socketRouter(app);
         // emit ready event
         app.ready();
-    } catch (err: any) {
+    } catch (err: unknown) {
         log.error('Error while starting app');
-        log.error(err.stack);
+        log.error(err instanceof Error ? err.stack : err);
     }
 };

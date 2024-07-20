@@ -1,21 +1,17 @@
-import {
-    type FastifyInstance,
-    type FastifyReply,
-    type FastifyRequest
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { verifyPassword, generateJwt, encrypt } from '../services/crypto.js';
+import { cache } from '../services/cache.js';
+import { encrypt, generateJwt, verifyPassword } from '../services/crypto.js';
+import { getEnv } from '../services/env.js';
+import { AuthenticationError } from '../services/errors.js';
 import { getUnsafeUserByEmail } from '../services/queries/user.js';
 import { registerRateLimiter } from '../services/rateLimiter.js';
-import { AuthenticationError } from '../services/errors.js';
-import { loginSchema, type LoginBody } from './schemas/auth.js';
-import { cache } from '../services/cache.js';
-import { getEnv } from '../services/env.js';
 import {
     type CacheJwtData,
-    getJwtCacheKey,
-    getCookieOptions
+    getCookieOptions,
+    getJwtCacheKey
 } from './helpers/auth.js';
+import { type LoginBody, loginSchema } from './schemas/auth.js';
 
 export const authController = async (app: FastifyInstance) => {
     // check authentication validity

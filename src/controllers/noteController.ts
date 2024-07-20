@@ -1,21 +1,8 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { getSessionByIdOrThrow } from '../services/queries/session.js';
-import { ConflictError, InternError } from '../services/errors.js';
-import { deleteCachedNote, updateCachedNoteIfExists } from './helpers/note.js';
+import type { Note } from '../drizzle/schema.js';
 import { parseParamId } from '../services/api.js';
-import { type Note } from '../drizzle/schema.js';
-import { controlSelf } from './helpers/auth.js';
-import {
-    createNoteSchema,
-    type CreateNoteBody,
-    updateNoteSchema,
-    type UpdateNoteBody
-} from './schemas/note.js';
+import { ConflictError, InternError } from '../services/errors.js';
 import {
     createNote,
     deleteNoteById,
@@ -27,6 +14,15 @@ import {
     switchUserSessionNotesPositions,
     updateNoteById
 } from '../services/queries/note.js';
+import { getSessionByIdOrThrow } from '../services/queries/session.js';
+import { controlSelf } from './helpers/auth.js';
+import { deleteCachedNote, updateCachedNoteIfExists } from './helpers/note.js';
+import {
+    type CreateNoteBody,
+    type UpdateNoteBody,
+    createNoteSchema,
+    updateNoteSchema
+} from './schemas/note.js';
 
 export const noteController = async (app: FastifyInstance) => {
     // get current user's notes in a session
@@ -50,13 +46,13 @@ export const noteController = async (app: FastifyInstance) => {
             const notes = await getUserSessionNotes(user.id, sessionId);
             const userNotes: Note[] = [];
             const sharedNotes: Note[] = [];
-            notes.forEach((note) => {
+            for (const note of notes) {
                 if (note.userId === user.id) {
                     userNotes.push(note);
                 } else {
                     sharedNotes.push(note);
                 }
-            });
+            }
             rep.send({
                 notes: userNotes,
                 sharedNotes

@@ -1,12 +1,12 @@
-import mockDate from 'mockdate';
 import dayjs from 'dayjs';
-import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
+import mockDate from 'mockdate';
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
 import { mockEnvVar } from '../../../src/services/env.js';
 
+import { api } from '../helpers/api.helper.js';
 import { assertUser } from '../helpers/assert.helper.js';
 import { resetCache, resetData } from '../helpers/data.helper.js';
-import { api } from '../helpers/api.helper.js';
 
 const registerUser = async (data: any) => {
     const { invitationCode, ...expected } = data;

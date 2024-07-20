@@ -1,6 +1,6 @@
+import dayjs from 'dayjs';
 import detectType from 'type-detect';
 import { expect } from 'vitest';
-import dayjs from 'dayjs';
 
 expect.extend({
     toBeDateString(received) {

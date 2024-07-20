@@ -1,12 +1,12 @@
-import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
-import { assetsData, resetData, resetCache } from '../helpers/data.helper.js';
-import { socketHelper } from '../helpers/sockets.helper.js';
 import {
-    assertUser,
     assertAsset,
-    assertSocketMeta
+    assertSocketMeta,
+    assertUser
 } from '../helpers/assert.helper.js';
+import { assetsData, resetCache, resetData } from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 
 const audioAsset = assetsData.find(({ type }) => type === 'audio');
 

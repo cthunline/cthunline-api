@@ -1,17 +1,6 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { parseParamId } from '../services/api.js';
-import { controlSelf } from './helpers/auth.js';
-import {
-    createSketchSchema,
-    type CreateSketchBody,
-    updateSketchSchema,
-    type UpdateSketchBody
-} from './schemas/sketch.js';
 import {
     createSketch,
     deleteSketchById,
@@ -19,6 +8,13 @@ import {
     getUserSketchs,
     updateSketchById
 } from '../services/queries/sketch.js';
+import { controlSelf } from './helpers/auth.js';
+import {
+    type CreateSketchBody,
+    type UpdateSketchBody,
+    createSketchSchema,
+    updateSketchSchema
+} from './schemas/sketch.js';
 
 export const sketchController = async (app: FastifyInstance) => {
     // get all sketchs belonging to current user

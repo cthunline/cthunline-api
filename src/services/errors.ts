@@ -1,14 +1,12 @@
 /* eslint-disable max-classes-per-file */
-import { type FastifyReply, type FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
-import {
-    type FastifySchemaValidationError,
-    type SchemaErrorFormatter
+import type {
+    FastifySchemaValidationError,
+    SchemaErrorFormatter
 } from 'fastify/types/schema.js';
 
 import { log } from './log.js';
-
-import { type ErrorJsonResponse } from '../types/errors.js';
 
 /**
 Custom error class with additional http status and data
@@ -16,8 +14,8 @@ unless realy necessary do not throw error using this class.
 */
 export class CustomError extends Error {
     status: number;
-    data: any;
-    constructor(message: string, status: number, data?: any) {
+    data: unknown;
+    constructor(message: string, status: number, data?: unknown) {
         super(message);
         this.status = status;
         if (data) {
@@ -52,32 +50,32 @@ export type AppErrorConstructor =
 Specific custom error classes that should be used to throw errors.
 */
 export class InternError extends CustomError {
-    constructor(message: string = 'Intern error', data?: any) {
+    constructor(message = 'Intern error', data?: unknown) {
         super(message, 500, data);
     }
 }
 export class NotFoundError extends CustomError {
-    constructor(message: string = 'Not found', data?: any) {
+    constructor(message = 'Not found', data?: unknown) {
         super(message, 404, data);
     }
 }
 export class ValidationError extends CustomError {
-    constructor(message: string = 'Invalid data', data?: any) {
+    constructor(message = 'Invalid data', data?: unknown) {
         super(message, 400, data);
     }
 }
 export class AuthenticationError extends CustomError {
-    constructor(message: string = 'Authentication failed', data?: any) {
+    constructor(message = 'Authentication failed', data?: unknown) {
         super(message, 401, data);
     }
 }
 export class ForbiddenError extends CustomError {
-    constructor(message: string = 'Not allowed', data?: any) {
+    constructor(message = 'Not allowed', data?: unknown) {
         super(message, 403, data);
     }
 }
 export class ConflictError extends CustomError {
-    constructor(message: string = 'Conflict error', data?: any) {
+    constructor(message = 'Conflict error', data?: unknown) {
         super(message, 409, data);
     }
 }
@@ -88,6 +86,11 @@ Fastify schema error formatter
 export const schemaErrorFormatter: SchemaErrorFormatter = (
     errors: FastifySchemaValidationError[]
 ) => new ValidationError('Invalid data', errors);
+
+interface ErrorJsonResponse {
+    error: string;
+    data?: unknown;
+}
 
 /**
 Fastify error middleware

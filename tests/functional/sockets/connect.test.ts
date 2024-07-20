@@ -1,21 +1,21 @@
-import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
-import { type Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
-import { findCharacter, getAnotherUser } from '../api/character.test.js';
-import { socketHelper } from '../helpers/sockets.helper.js';
 import { api } from '../helpers/api.helper.js';
 import {
-    sessionsData,
-    charactersData,
-    usersData,
-    resetData,
-    resetCache
-} from '../helpers/data.helper.js';
-import {
-    assertUser,
     assertCharacter,
-    assertSocketMeta
+    assertSocketMeta,
+    assertUser
 } from '../helpers/assert.helper.js';
+import { findCharacter, getAnotherUser } from '../helpers/character.helper.js';
+import {
+    charactersData,
+    resetCache,
+    resetData,
+    sessionsData,
+    usersData
+} from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 
 describe('[Sockets] Connection', () => {
     beforeAll(async () => {
@@ -192,7 +192,7 @@ describe('[Sockets] Connection', () => {
             assertUser(user);
             expect(isMaster).to.equal(expectedIsMaster);
             expect(users).have.lengthOf(expectedUsersLength);
-            users.forEach((sessionUser: Record<string, any>) => {
+            for (const sessionUser of users) {
                 const isSessionUserMaster =
                     sessionUser.id === masterAuthUser.id;
                 assertUser(sessionUser);
@@ -202,7 +202,7 @@ describe('[Sockets] Connection', () => {
                     assertCharacter(sessionUser.character);
                 }
                 expect(sessionUser.isMaster).to.be.equal(isSessionUserMaster);
-            });
+            }
         };
         const removeListeners = (socket: Socket) => {
             socket.off('join');

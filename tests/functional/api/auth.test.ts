@@ -1,7 +1,7 @@
-import { describe, test, beforeAll, beforeEach } from 'vitest';
+import { beforeAll, beforeEach, describe, test } from 'vitest';
 
-import { usersData, resetData, resetCache } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
+import { resetCache, resetData, usersData } from '../helpers/data.helper.js';
 
 describe('[API] Authentication', () => {
     beforeAll(async () => {

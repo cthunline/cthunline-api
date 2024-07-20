@@ -1,15 +1,15 @@
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
-import { getUserNoteByIdOrThrow } from '../services/queries/note.js';
 import { getNoteCacheKey } from '../controllers/helpers/note.js';
-import { validateSchema } from '../services/typebox.js';
-import { type Note } from '../drizzle/schema.js';
+import type { Note } from '../drizzle/schema.js';
 import { cache } from '../services/cache.js';
+import { ForbiddenError } from '../services/errors.js';
+import { getUserNoteByIdOrThrow } from '../services/queries/note.js';
+import { validateSchema } from '../services/typebox.js';
+import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
 import { meta } from './helper.js';
 import {
     type NoteSocketUpdateBody,
     noteSocketUpdateSchema
 } from './schemas/note.js';
-import { ForbiddenError } from '../services/errors.js';
 
 export const noteHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     // notify users when a shared note is updated

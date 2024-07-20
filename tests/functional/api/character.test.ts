@@ -1,34 +1,24 @@
-import path from 'path';
+import path from 'node:path';
 import {
-    describe,
-    expect,
-    test,
+    afterEach,
     beforeAll,
     beforeEach,
-    afterEach
+    describe,
+    expect,
+    test
 } from 'vitest';
 
-import { getUserCharacters } from '../../../src/services/queries/character.js';
-import { assertCharacter } from '../helpers/assert.helper.js';
 import { mockEnvVar } from '../../../src/services/env.js';
+import { getUserCharacters } from '../../../src/services/queries/character.js';
 import { api } from '../helpers/api.helper.js';
+import { assertCharacter } from '../helpers/assert.helper.js';
+import { findCharacter, getAnotherUser } from '../helpers/character.helper.js';
 import {
     charactersData,
-    usersData,
-    resetData,
     getAssetBuffer,
-    resetCache
+    resetCache,
+    resetData
 } from '../helpers/data.helper.js';
-
-export const findCharacter = (userId: number, gameId?: string) => {
-    const character = charactersData.find(
-        (char) => char.userId === userId && (!gameId || char.gameId === gameId)
-    );
-    if (character) {
-        return character as any;
-    }
-    throw new Error(`Could not find character for user ${userId}`);
-};
 
 const findCharacterFromDb = async (userId: number, gameId?: string) => {
     const characters = await getUserCharacters(userId, gameId);
@@ -36,20 +26,6 @@ const findCharacterFromDb = async (userId: number, gameId?: string) => {
         return characters[0];
     }
     throw new Error(`Could not find character for user ${userId}`);
-};
-
-export const getAnotherUser = (
-    selfUserId: number,
-    mustBeEnabled: boolean = true
-) => {
-    const user = usersData.find(
-        ({ id, isEnabled }) =>
-            (!mustBeEnabled || isEnabled) && id !== selfUserId
-    );
-    if (user) {
-        return user;
-    }
-    throw new Error('Could not find another user to run test');
 };
 
 describe('[API] Characters', () => {
@@ -642,11 +618,11 @@ describe('[API] Characters', () => {
             expect(charsResponse.body).to.have.property('characters');
             expect(charsResponse.body.characters).to.be.an('array');
             let containsChar = false;
-            charsResponse.body.characters.forEach(({ id }: any) => {
+            for (const { id } of charsResponse.body.characters) {
                 if (id === characterId) {
                     containsChar = true;
                 }
-            });
+            }
             expect(containsChar).toEqual(false);
         });
     });

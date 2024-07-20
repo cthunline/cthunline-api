@@ -1,17 +1,17 @@
-import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
-import { socketHelper } from '../helpers/sockets.helper.js';
 import {
-    assertUser,
+    assertNote,
     assertSocketMeta,
-    assertNote
+    assertUser
 } from '../helpers/assert.helper.js';
 import {
-    resetData,
-    resetCache,
     notesData,
+    resetCache,
+    resetData,
     usersData
 } from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 
 const getUserByEmail = (email: string) => {
     const user = usersData.find(({ email: userEmail }) => userEmail === email);

@@ -1,16 +1,16 @@
-import { randomInt } from 'crypto';
+import { randomInt } from 'node:crypto';
 
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
-import { requestDiceSchema, type RequestDiceBody } from './schemas/dice.js';
-import { type DiceType, type SocketDiceResult } from '../types/dice.js';
-import { validateSchema } from '../services/typebox.js';
+import type { SafeUser } from '../drizzle/schema.js';
 import { ForbiddenError } from '../services/errors.js';
-import { type SafeUser } from '../drizzle/schema.js';
 import { sum } from '../services/tools.js';
+import { validateSchema } from '../services/typebox.js';
+import type { DiceType, SocketDiceResult } from '../types/dice.js';
+import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
 import { meta } from './helper.js';
+import { type RequestDiceBody, requestDiceSchema } from './schemas/dice.js';
 
 const getDiceMax = (diceType: DiceType): number =>
-    parseInt(diceType.replace('D', ''));
+    Number.parseInt(diceType.replace('D', ''));
 
 const rollDice = (diceType: DiceType): number =>
     randomInt(getDiceMax(diceType)) + 1;
@@ -19,7 +19,7 @@ const getDiceResult = (
     user: SafeUser,
     isMaster: boolean,
     request: RequestDiceBody,
-    isPrivate: boolean = false
+    isPrivate = false
 ): SocketDiceResult => ({
     user,
     isMaster,

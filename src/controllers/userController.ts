@@ -1,14 +1,9 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { verifyPassword, hashPassword } from '../services/crypto.js';
-import { ValidationError } from '../services/errors.js';
 import { parseParamId } from '../services/api.js';
-import { type QueryParam } from '../types/api.js';
 import { cache } from '../services/cache.js';
+import { hashPassword, verifyPassword } from '../services/crypto.js';
+import { ValidationError } from '../services/errors.js';
 import {
     createUser,
     getUnsafeUserByIdOrThrow,
@@ -16,24 +11,25 @@ import {
     getUsers,
     updateUserById
 } from '../services/queries/user.js';
+import type { QueryParam } from '../types/api.js';
 import {
-    controlSelf,
+    type CacheJwtData,
     controlAdmin,
     controlAdminMiddleware,
-    type CacheJwtData,
+    controlSelf,
     getJwtCacheKey
 } from './helpers/auth.js';
 import {
     controlAdminFields,
-    controlUniqueEmail,
     controlLocale,
+    controlUniqueEmail,
     defaultUserData
 } from './helpers/user.js';
 import {
-    createUserSchema,
     type CreateUserBody,
-    updateUserSchema,
-    type UpdateUserBody
+    type UpdateUserBody,
+    createUserSchema,
+    updateUserSchema
 } from './schemas/user.js';
 
 export const userController = async (app: FastifyInstance) => {
@@ -127,7 +123,7 @@ export const userController = async (app: FastifyInstance) => {
             const userId = parseParamId(params, 'userId');
             try {
                 controlAdmin(reqUser);
-            } catch (err) {
+            } catch {
                 controlSelf(userId, reqUser);
                 controlAdminFields<UpdateUserBody>(body);
             }
@@ -135,20 +131,19 @@ export const userController = async (app: FastifyInstance) => {
             if (body.locale) {
                 controlLocale(body.locale);
             }
-            const data = { ...body };
+            const { oldPassword, ...data } = { ...body };
             if (body.password) {
-                if (!body.oldPassword) {
+                if (!oldPassword) {
                     throw new ValidationError('Missing old password');
                 }
                 const verified = await verifyPassword(
-                    body.oldPassword,
+                    oldPassword,
                     userData.password
                 );
                 if (!verified) {
                     throw new ValidationError('Old password is not valid');
                 }
                 data.password = await hashPassword(body.password);
-                delete data.oldPassword;
             }
             const updatedUser = await updateUserById(userData.id, data);
             if (updatedUser.id === reqUser.id) {

@@ -1,15 +1,15 @@
 import {
-    describe,
-    expect,
-    test,
+    afterEach,
     beforeAll,
     beforeEach,
-    afterEach
+    describe,
+    expect,
+    test
 } from 'vitest';
 
-import { assertSession, assertUser } from '../helpers/assert.helper.js';
-import { sessionsData, resetData, resetCache } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
+import { assertSession, assertUser } from '../helpers/assert.helper.js';
+import { resetCache, resetData, sessionsData } from '../helpers/data.helper.js';
 
 const { gameId } = sessionsData[0];
 

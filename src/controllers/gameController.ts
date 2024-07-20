@@ -1,18 +1,14 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { gamesData, isValidGameId } from '../services/games.js';
 import { NotFoundError } from '../services/errors.js';
+import { gamesData, isValidGameId } from '../services/games.js';
 
 export const gameController = async (app: FastifyInstance) => {
     // get all games
     app.route({
         method: 'GET',
         url: '/games',
-        handler: async (req: FastifyRequest, rep: FastifyReply) => {
+        handler: async (_req: FastifyRequest, rep: FastifyReply) => {
             const games = Object.values(gamesData);
             rep.send({ games });
         }

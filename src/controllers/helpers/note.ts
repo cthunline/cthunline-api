@@ -1,4 +1,4 @@
-import { type Note } from '../../drizzle/schema.js';
+import type { Note } from '../../drizzle/schema.js';
 import { cache } from '../../services/cache.js';
 
 /**

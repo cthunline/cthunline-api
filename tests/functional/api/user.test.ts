@@ -1,15 +1,15 @@
 import {
-    describe,
-    expect,
-    test,
+    afterEach,
     beforeAll,
     beforeEach,
-    afterEach
+    describe,
+    expect,
+    test
 } from 'vitest';
 
-import { usersData, resetData, resetCache } from '../helpers/data.helper.js';
-import { assertUser } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
+import { assertUser } from '../helpers/assert.helper.js';
+import { resetCache, resetData, usersData } from '../helpers/data.helper.js';
 
 describe('[API] Users', () => {
     beforeAll(async () => {

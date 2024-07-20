@@ -1,6 +1,6 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { sum, isInteger, isObject } from '../../src/services/tools.js';
+import { isInteger, isObject, sum } from '../../src/services/tools.js';
 
 describe('[Unit] Tools', () => {
     describe('sum', () => {
@@ -19,9 +19,9 @@ describe('[Unit] Tools', () => {
                     expected: 5
                 }
             ];
-            data.forEach(({ numbers, expected }) => {
+            for (const { numbers, expected } of data) {
                 expect(sum(numbers)).to.equal(expected);
-            });
+            }
         });
     });
 
@@ -39,9 +39,9 @@ describe('[Unit] Tools', () => {
                 { value: 7, expected: true },
                 { value: 123, expected: true }
             ];
-            data.forEach(({ value, expected }) => {
+            for (const { value, expected } of data) {
                 expect(isInteger(value)).to.equal(expected);
-            });
+            }
         });
     });
 
@@ -56,9 +56,9 @@ describe('[Unit] Tools', () => {
                 { value: {}, expected: true },
                 { value: { a: 1, b: 2 }, expected: true }
             ];
-            data.forEach(({ value, expected }) => {
+            for (const { value, expected } of data) {
                 expect(isObject(value)).to.equal(expected);
-            });
+            }
         });
     });
 });

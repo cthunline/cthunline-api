@@ -1,7 +1,7 @@
 import { Redis as IoRedis, type RedisOptions as IoRedisOptions } from 'ioredis';
 
-import { InternError } from './errors.js';
 import { getEnv } from './env.js';
+import { InternError } from './errors.js';
 
 interface CacheSetJsonOptions {
     /** Expiration time in seconds */
@@ -9,7 +9,7 @@ interface CacheSetJsonOptions {
 }
 
 class CacheClient extends IoRedis {
-    async getJson<T = any>(key: string): Promise<T | null> {
+    async getJson<T>(key: string): Promise<T | null> {
         try {
             const jsonString = await this.get(key);
             if (jsonString) {
@@ -21,7 +21,7 @@ class CacheClient extends IoRedis {
         }
     }
 
-    async setJson<T = any>(
+    async setJson<T>(
         key: string,
         data: T,
         options?: CacheSetJsonOptions

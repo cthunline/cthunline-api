@@ -1,11 +1,8 @@
 import { and, eq } from 'drizzle-orm';
 
-import {
-    type CharacterUpdate,
-    type CharacterInsert
-} from '../../drizzle/schema.js';
-import { InternError, NotFoundError } from '../../services/errors.js';
+import type { CharacterInsert, CharacterUpdate } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
+import { InternError, NotFoundError } from '../../services/errors.js';
 
 /**
 Gets characters. Can be filtered by user ID.

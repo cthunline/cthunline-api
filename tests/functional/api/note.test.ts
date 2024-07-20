@@ -1,19 +1,19 @@
 import {
-    describe,
-    expect,
-    test,
+    afterEach,
     beforeAll,
     beforeEach,
-    afterEach
+    describe,
+    expect,
+    test
 } from 'vitest';
 
-import { assertNote } from '../helpers/assert.helper.js';
 import { api } from '../helpers/api.helper.js';
+import { assertNote } from '../helpers/assert.helper.js';
 import {
-    sessionsData,
     notesData,
+    resetCache,
     resetData,
-    resetCache
+    sessionsData
 } from '../helpers/data.helper.js';
 
 const notesById: Record<number, Record<string, any>> = Object.fromEntries(
@@ -77,14 +77,14 @@ describe('[API] Notes', () => {
             expect(response.body).to.be.an('object');
             const { body } = response;
             expect(body).to.be.an('object');
-            ['notes', 'sharedNotes'].forEach((key: string) => {
+            for (const key of ['notes', 'sharedNotes']) {
                 expect(body).to.haveOwnProperty(key);
                 expect(body[key]).to.be.an('array');
                 expect(body[key]).to.have.lengthOf(expected[key].length);
-                body[key].forEach((note: Record<string, any>) => {
+                for (const note of body[key]) {
                     assertNote(note, notesById[note.id], true);
-                });
-            });
+                }
+            }
         });
     });
 
@@ -272,8 +272,7 @@ describe('[API] Notes', () => {
                     isShared: true
                 }
             ];
-            let expected = { ...note };
-            delete expected.updatedAt;
+            let { updatedAt = undefined, ...expected } = { ...note };
             for (const data of editData) {
                 expected = {
                     ...expected,
@@ -327,7 +326,7 @@ describe('[API] Notes', () => {
                 notes.map((note: any) => [note.position, note])
             );
             const maxPosition = Math.max(
-                ...Object.keys(notesByPosition).map((k) => parseInt(k))
+                ...Object.keys(notesByPosition).map((k) => Number.parseInt(k))
             );
             const lowestPositionNote = notesByPosition[1];
             const highestPositionNote = notesByPosition[maxPosition];
@@ -368,7 +367,7 @@ describe('[API] Notes', () => {
             for (const { action, position } of moveData) {
                 const { notes } = await getApiNotes(sessionsData[0].id);
                 const maxPosition = Math.max(
-                    ...notes.map(({ position: pos }) => parseInt(pos))
+                    ...notes.map(({ position: pos }) => Number.parseInt(pos))
                 );
                 const targetPosition =
                     position === 'last' ? maxPosition : Number(position);
@@ -451,9 +450,10 @@ describe('[API] Notes', () => {
             const { notes: updatedNotes } = await getApiNotes(
                 notes[0].sessionId
             );
-            updatedNotes.forEach(({ position }, index: number) => {
+            for (let index = 0; index < updatedNotes.length; index++) {
+                const { position } = updatedNotes[index];
                 expect(position).to.equal(index + 1);
-            });
+            }
         });
     });
 });

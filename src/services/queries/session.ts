@@ -1,11 +1,8 @@
 import { eq, getTableColumns } from 'drizzle-orm';
 
-import {
-    type SessionInsert,
-    type SessionUpdate
-} from '../../drizzle/schema.js';
-import { InternError, NotFoundError } from '../../services/errors.js';
+import type { SessionInsert, SessionUpdate } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
+import { InternError, NotFoundError } from '../../services/errors.js';
 import { safeUserSelect } from './user.js';
 
 /**

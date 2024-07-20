@@ -1,8 +1,4 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { getEnv } from '../services/env.js';
 
@@ -11,7 +7,7 @@ export const configurationController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/configuration',
-        handler: async (req: FastifyRequest, rep: FastifyReply) => {
+        handler: async (_req: FastifyRequest, rep: FastifyReply) => {
             rep.send({
                 registrationEnabled: getEnv('REGISTRATION_ENABLED'),
                 invitationEnabled: getEnv('INVITATION_ENABLED'),

@@ -1,21 +1,21 @@
-import { type Server, type Socket } from 'socket.io';
+import type { Server, Socket } from 'socket.io';
 
-import { type NoteSocketUpdateBody } from '../sockets/schemas/note.js';
-import { type RequestDiceBody } from '../sockets/schemas/dice.js';
-import { type PlayAudioBody } from '../sockets/schemas/audio.js';
-import { type SocketMeta } from '../sockets/helper.js';
-import { type SocketDiceResult } from './dice.js';
-import {
-    type TokenBody,
-    type SketchBody
+import type {
+    SketchBody,
+    TokenBody
 } from '../controllers/schemas/definitions.js';
-import {
-    type Character,
-    type Session,
-    type Asset,
-    type SafeUser,
-    type Note
+import type {
+    Asset,
+    Character,
+    Note,
+    SafeUser,
+    Session
 } from '../drizzle/schema.js';
+import type { SocketMeta } from '../sockets/helper.js';
+import type { PlayAudioBody } from '../sockets/schemas/audio.js';
+import type { RequestDiceBody } from '../sockets/schemas/dice.js';
+import type { NoteSocketUpdateBody } from '../sockets/schemas/note.js';
+import type { SocketDiceResult } from './dice.js';
 
 export interface ListenEvents {
     sketchUpdate: (data: SketchBody) => void;
@@ -42,9 +42,7 @@ export interface EmitEvents {
     noteDelete: (data: SocketNoteDeleteData) => void;
 }
 
-export interface ServerSideEvents {
-    //
-}
+export type ServerSideEvents = object;
 
 export type SocketData = {
     cookies: { [key: string]: string };

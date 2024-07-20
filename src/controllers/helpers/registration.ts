@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 
 import { ForbiddenError } from '../../services/errors.js';
-import { generateToken } from '../../services/tools.js';
 import {
     getInvitationByCode,
     updateInvitationByCode
 } from '../../services/queries/invitation.js';
+import { generateToken } from '../../services/tools.js';
 
 /**
 Checks that an invitation code is valid.

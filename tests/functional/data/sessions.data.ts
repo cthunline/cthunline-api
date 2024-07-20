@@ -1,4 +1,4 @@
-import { type SessionInsert } from '../../../src/drizzle/schema.js';
+import type { SessionInsert } from '../../../src/drizzle/schema.js';
 
 export const sessions: (SessionInsert & { id: number })[] = [
     {

@@ -1,12 +1,8 @@
 import { eq, getTableColumns } from 'drizzle-orm';
 
-import { InternError, NotFoundError } from '../../services/errors.js';
+import type { SafeUser, UserInsert, UserUpdate } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
-import {
-    type SafeUser,
-    type UserInsert,
-    type UserUpdate
-} from '../../drizzle/schema.js';
+import { InternError, NotFoundError } from '../../services/errors.js';
 
 const { password, ...safeUserColumns } = getTableColumns(tables.users);
 /**

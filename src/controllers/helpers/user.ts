@@ -1,11 +1,11 @@
-import { type SafeUser } from '../../drizzle/schema.js';
-import { locales } from '../../services/locale.js';
+import type { SafeUser } from '../../drizzle/schema.js';
 import { getEnv } from '../../services/env.js';
 import {
-    ForbiddenError,
     ConflictError,
+    ForbiddenError,
     ValidationError
 } from '../../services/errors.js';
+import { locales } from '../../services/locale.js';
 import { getUserByEmail } from '../../services/queries/user.js';
 
 /**
@@ -26,11 +26,11 @@ Throws forbidden error if any of the admin fields exists in the user edit body.
 */
 export const controlAdminFields = <T extends object>(body: T) => {
     const adminFields = ['isAdmin', 'isEnabled'];
-    adminFields.forEach((field) => {
+    for (const field of adminFields) {
         if (Object.hasOwn(body, field)) {
             throw new ForbiddenError();
         }
-    });
+    }
 };
 
 /**

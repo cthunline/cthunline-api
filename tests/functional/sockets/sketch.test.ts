@@ -1,14 +1,14 @@
-import { describe, expect, test, beforeAll, beforeEach, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { type SketchBody } from '../../../src/controllers/schemas/definitions.js';
+import type { SketchBody } from '../../../src/controllers/schemas/definitions.js';
 import { getSessionByIdOrThrow } from '../../../src/services/queries/session.js';
-import { sessionsData, resetData, resetCache } from '../helpers/data.helper.js';
-import { socketHelper } from '../helpers/sockets.helper.js';
 import {
-    assertUser,
     assertSketchData,
-    assertSocketMeta
+    assertSocketMeta,
+    assertUser
 } from '../helpers/assert.helper.js';
+import { resetCache, resetData, sessionsData } from '../helpers/data.helper.js';
+import { socketHelper } from '../helpers/sockets.helper.js';
 
 describe('[Sockets] Sketch', () => {
     beforeAll(async () => {

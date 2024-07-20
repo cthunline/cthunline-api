@@ -1,10 +1,10 @@
 import { describe, test } from 'vitest';
 
-import { resetCache, resetData } from '../helpers/data.helper.js';
-import { assertUser } from '../helpers/assert.helper.js';
-import { getEnv } from '../../../src/services/env.js';
 import { initDb } from '../../../src/services/db.js';
+import { getEnv } from '../../../src/services/env.js';
 import { api } from '../helpers/api.helper.js';
+import { assertUser } from '../helpers/assert.helper.js';
+import { resetCache, resetData } from '../helpers/data.helper.js';
 
 describe('[API] Initialization', () => {
     test('Should create a default user', async () => {

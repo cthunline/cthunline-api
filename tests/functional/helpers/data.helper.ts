@@ -1,22 +1,22 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { sql } from 'drizzle-orm';
-import path from 'path';
-import fs from 'fs';
 
-import { warhammerFantasyCharacters } from '../data/characters/warhammerFantasyCharacters.data.js';
+import { assetDir } from '../../../src/controllers/helpers/asset.js';
+import { cache } from '../../../src/services/cache.js';
+import { db, tables } from '../../../src/services/db.js';
+import { importMetaUrlDirname } from '../../../src/services/tools.js';
+import { assets } from '../data/assets.data.js';
 import { apocalypseWorldCharacters } from '../data/characters/apocalypseWorldCharacters.data.js';
+import { cocCharacters } from '../data/characters/cocCharacters.data.js';
+import { dnd5Characters } from '../data/characters/dnd5Characters.data.js';
 import { seventhSeaCharacters } from '../data/characters/seventhSeaCharacters.data.js';
 import { swd6Characters } from '../data/characters/swd6Characters.data.js';
-import { dnd5Characters } from '../data/characters/dnd5Characters.data.js';
-import { cocCharacters } from '../data/characters/cocCharacters.data.js';
-import { importMetaUrlDirname } from '../../../src/services/tools.js';
-import { assetDir } from '../../../src/controllers/helpers/asset.js';
+import { warhammerFantasyCharacters } from '../data/characters/warhammerFantasyCharacters.data.js';
 import { directories } from '../data/directories.data.js';
-import { db, tables } from '../../../src/services/db.js';
-import { cache } from '../../../src/services/cache.js';
+import { notes } from '../data/notes.data.js';
 import { sessions } from '../data/sessions.data.js';
 import { sketchs } from '../data/sketchs.data.js';
-import { assets } from '../data/assets.data.js';
-import { notes } from '../data/notes.data.js';
 import { users } from '../data/users.data.js';
 
 export const usersData = users;
@@ -129,7 +129,7 @@ export const insertAllData = async () => {
     await resetAutoIncrement();
 };
 
-export const resetData = async (insertData: boolean = true) => {
+export const resetData = async (insertData = true) => {
     await deleteAllData();
     if (insertData) {
         await insertAllData();

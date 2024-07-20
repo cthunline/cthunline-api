@@ -1,13 +1,13 @@
-import { io, type Socket } from 'socket.io-client';
 import { fastifyCookie } from '@fastify/cookie';
-import { expect, afterEach } from 'vitest';
+import { type Socket, io } from 'socket.io-client';
+import { afterEach, expect } from 'vitest';
 
-import { getMasterUserSessions } from '../../../src/services/queries/session.js';
-import { sessionsData, charactersData, usersData } from './data.helper.js';
-import { type Session } from '../../../src/drizzle/schema.js';
-import { assertSocketMeta } from './assert.helper.js';
+import type { Session } from '../../../src/drizzle/schema.js';
 import { getEnv } from '../../../src/services/env.js';
+import { getMasterUserSessions } from '../../../src/services/queries/session.js';
 import { api } from './api.helper.js';
+import { assertSocketMeta } from './assert.helper.js';
+import { charactersData, sessionsData, usersData } from './data.helper.js';
 
 interface SetupSessionReturn {
     sockets: Socket[];
@@ -222,7 +222,7 @@ export const socketHelper: SocketsHelper = {
 };
 
 afterEach(() => {
-    socketHelper.connectedSockets.forEach((socket) => {
+    for (const socket of socketHelper.connectedSockets) {
         socket.disconnect();
-    });
+    }
 });

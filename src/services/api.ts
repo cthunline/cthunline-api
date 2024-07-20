@@ -10,7 +10,7 @@ export const parseParamId = (
     idFieldName: string
 ) => {
     if (params[idFieldName] && isInteger(params[idFieldName])) {
-        return parseInt(params[idFieldName]);
+        return Number.parseInt(params[idFieldName]);
     }
     throw new ValidationError(`Parameter ${idFieldName} is not a valid ID`);
 };

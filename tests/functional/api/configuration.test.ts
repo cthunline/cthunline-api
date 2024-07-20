@@ -1,9 +1,9 @@
-import { describe, expect, test, beforeAll, beforeEach } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
-import { compareDataWithExpected } from '../helpers/assert.helper.js';
 import { mockEnvVar } from '../../../src/services/env.js';
-import { resetCache, resetData } from '../helpers/data.helper.js';
 import { api } from '../helpers/api.helper.js';
+import { compareDataWithExpected } from '../helpers/assert.helper.js';
+import { resetCache, resetData } from '../helpers/data.helper.js';
 
 const getConfiguration = async (expected: any) => {
     const response = await api.request({

@@ -1,4 +1,4 @@
-import { type CharacterInsert } from '../../../../src/drizzle/schema.js';
+import type { CharacterInsert } from '../../../../src/drizzle/schema.js';
 
 export const swd6Characters: CharacterInsert[] = [
     {

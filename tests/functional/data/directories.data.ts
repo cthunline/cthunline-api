@@ -1,4 +1,4 @@
-import { type DirectoryInsert } from '../../../src/drizzle/schema.js';
+import type { DirectoryInsert } from '../../../src/drizzle/schema.js';
 
 export const directories: (DirectoryInsert & { id: number })[] = [
     {

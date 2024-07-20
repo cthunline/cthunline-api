@@ -1,13 +1,13 @@
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import path from 'node:path';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import path from 'path';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import pg from 'pg';
 
-import { importMetaUrlDirname } from './tools.js';
 import * as schema from '../drizzle/schema.js';
 import { hashPassword } from './crypto.js';
 import { getEnv } from './env.js';
 import { log } from './log.js';
+import { importMetaUrlDirname } from './tools.js';
 
 const dirname = importMetaUrlDirname(import.meta.url);
 

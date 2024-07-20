@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 
-import {
-    type InvitationInsert,
-    type InvitationUpdate
+import type {
+    InvitationInsert,
+    InvitationUpdate
 } from '../../drizzle/schema.js';
 import { db, tables } from '../db.js';
 import { InternError } from '../errors.js';

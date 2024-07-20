@@ -1,4 +1,4 @@
-import { type Sketch } from '../schemas/definitions.js';
+import type { Sketch } from '../schemas/definitions.js';
 
 /**
 Builds the cache key for play sketch

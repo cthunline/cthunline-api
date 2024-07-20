@@ -1,9 +1,9 @@
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
 import { getCharacterCacheKey } from '../controllers/helpers/character.js';
-import { getCharacterByIdOrThrow } from '../services/queries/character.js';
-import { ForbiddenError } from '../services/errors.js';
-import { type Character } from '../drizzle/schema.js';
+import type { Character } from '../drizzle/schema.js';
 import { cache } from '../services/cache.js';
+import { ForbiddenError } from '../services/errors.js';
+import { getCharacterByIdOrThrow } from '../services/queries/character.js';
+import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
 import { meta } from './helper.js';
 
 export const characterHandler = (

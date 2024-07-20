@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 
-import { type Sketch as SketchData } from '../controllers/schemas/definitions.js';
+import type { Sketch as SketchData } from '../controllers/schemas/definitions.js';
 import { db, tables } from '../services/db.js';
 import { log } from '../services/log.js';
 
@@ -13,7 +13,7 @@ const migrateSketchData = (
 ): SketchData | null => {
     let atLeastOneChange = false;
     const paths: SketchData['paths'] = [];
-    oldSketch.paths.forEach((oldPath) => {
+    for (const oldPath of oldSketch.paths) {
         if (typeof oldPath === 'string') {
             atLeastOneChange = true;
             paths.push({
@@ -24,7 +24,7 @@ const migrateSketchData = (
         } else {
             paths.push(oldPath);
         }
-    });
+    }
     if (!atLeastOneChange) {
         return null;
     }
@@ -37,7 +37,7 @@ const migrateSketchData = (
 const migrateSessionSketchs = async () => {
     const sessions = await db.select().from(tables.sessions);
     const updateData: { id: number; sketch: SketchData }[] = [];
-    sessions.forEach(({ id, sketch }) => {
+    for (const { id, sketch } of sessions) {
         const oldSketch = { ...sketch } as SketchDataToBeMigrated;
         const newSketch = migrateSketchData(oldSketch);
         if (newSketch) {
@@ -46,7 +46,7 @@ const migrateSessionSketchs = async () => {
                 sketch: newSketch
             });
         }
-    });
+    }
     if (updateData.length) {
         await db.transaction(async (tx) => {
             for (const { id, sketch } of updateData) {
@@ -66,7 +66,7 @@ const migrateSessionSketchs = async () => {
 const migrateUserSavedSketchs = async () => {
     const sketchs = await db.select().from(tables.sketchs);
     const updateData: { id: number; data: SketchData }[] = [];
-    sketchs.forEach(({ id, data }) => {
+    for (const { id, data } of sketchs) {
         const oldData = { ...data } as SketchDataToBeMigrated;
         const newData = migrateSketchData(oldData);
         if (newData) {
@@ -75,7 +75,7 @@ const migrateUserSavedSketchs = async () => {
                 data: newData
             });
         }
-    });
+    }
     if (updateData.length) {
         await db.transaction(async (tx) => {
             for (const { id, data } of updateData) {

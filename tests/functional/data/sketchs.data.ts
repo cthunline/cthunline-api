@@ -1,4 +1,4 @@
-import { type SketchInsert } from '../../../src/drizzle/schema.js';
+import type { SketchInsert } from '../../../src/drizzle/schema.js';
 
 export const sketchs: (SketchInsert & { id: number })[] = [
     {

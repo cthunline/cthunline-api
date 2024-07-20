@@ -1,22 +1,22 @@
-import { type SocketIoServer, type SocketIoSocket } from '../types/socket.js';
 import { getSketchCacheKey } from '../controllers/helpers/sketch.js';
-import { updateSessionById } from '../services/queries/session.js';
-import { validateSchema } from '../services/typebox.js';
-import { resetTimeout } from '../services/tools.js';
+import {
+    type SketchBody,
+    type TokenBody,
+    sketchSchema,
+    tokenSchema
+} from '../controllers/schemas/definitions.js';
 import { cache } from '../services/cache.js';
 import { getEnv } from '../services/env.js';
-import { meta } from './helper.js';
 import {
     ForbiddenError,
     InternError,
     NotFoundError
 } from '../services/errors.js';
-import {
-    sketchSchema,
-    type SketchBody,
-    tokenSchema,
-    type TokenBody
-} from '../controllers/schemas/definitions.js';
+import { updateSessionById } from '../services/queries/session.js';
+import { resetTimeout } from '../services/tools.js';
+import { validateSchema } from '../services/typebox.js';
+import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
+import { meta } from './helper.js';
 
 const sketchSaveTimerMs = getEnv('CACHE_SKETCH_SAVE_MS') ?? 1000;
 

@@ -1,12 +1,12 @@
 import { eq } from 'drizzle-orm';
 
-import { type SketchUpdate, type SketchInsert } from '../../drizzle/schema.js';
+import type { SketchInsert, SketchUpdate } from '../../drizzle/schema.js';
+import { db, tables } from '../../services/db.js';
 import {
     ForbiddenError,
     InternError,
     NotFoundError
 } from '../../services/errors.js';
-import { db, tables } from '../../services/db.js';
 
 /**
 Gets sketchs belonging to the given user.

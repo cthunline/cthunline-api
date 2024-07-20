@@ -1,18 +1,18 @@
-import { type Character as CharacterData } from '@cthunline/games';
+import type { Character as CharacterData } from '@cthunline/games';
 import {
-    text,
-    json,
-    serial,
-    integer,
-    pgTable,
-    varchar,
+    type AnyPgColumn,
     boolean,
+    integer,
+    json,
+    pgTable,
+    serial,
+    text,
     timestamp,
     uniqueIndex,
-    type AnyPgColumn
+    varchar
 } from 'drizzle-orm/pg-core';
 
-import { type Sketch as SketchData } from '../controllers/schemas/definitions.js';
+import type { Sketch as SketchData } from '../controllers/schemas/definitions.js';
 
 export const users = pgTable(
     'users',

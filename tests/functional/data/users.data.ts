@@ -1,4 +1,4 @@
-import { type UserInsert } from '../../../src/drizzle/schema.js';
+import type { UserInsert } from '../../../src/drizzle/schema.js';
 
 export const users: (UserInsert & { id: number })[] = [
     {

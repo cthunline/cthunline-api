@@ -1,6 +1,6 @@
+import path from 'node:path';
+import url from 'node:url';
 import { customAlphabet } from 'nanoid';
-import path from 'path';
-import url from 'url';
 
 /**
 Return sum of an array of numbers
@@ -18,7 +18,7 @@ export const isInteger = (value: string | number) => {
     if (Number.isNaN(value)) {
         return false;
     }
-    const parsedFloat = parseFloat(String(value));
+    const parsedFloat = Number.parseFloat(String(value));
     // we allow the bitwise or syntax here because it has better performance
     // eslint-disable-next-line no-bitwise
     return (parsedFloat | 0) === parsedFloat;
@@ -27,7 +27,7 @@ export const isInteger = (value: string | number) => {
 /**
 Check if a variale is a JS object
 */
-export const isObject = (val: any): val is object =>
+export const isObject = (val: unknown): val is object =>
     typeof val === 'object' && val !== null && !Array.isArray(val);
 
 const generateCode32 = customAlphabet('1234567890abcdef', 32);
@@ -60,7 +60,7 @@ already exists clear it and replace it.
 export const resetTimeout = (
     key: string,
     task: () => void | Promise<void>,
-    timerMs: number = 0
+    timerMs = 0
 ) => {
     const timeout = timeouts.get(key);
     if (timeout) {

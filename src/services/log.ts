@@ -1,6 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import winston, { format } from 'winston';
-import path from 'path';
-import fs from 'fs';
 
 import { getEnv } from './env.js';
 
@@ -39,7 +39,7 @@ if (!logDir) {
     try {
         fs.accessSync(logDir, fs.constants.F_OK);
         fs.accessSync(logDir, fs.constants.W_OK);
-    } catch (err) {
+    } catch {
         fileTransportError = `log directory ${getEnv(
             'LOG_DIR'
         )} does not exist or is not writable`;

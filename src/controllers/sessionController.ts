@@ -1,21 +1,9 @@
-import {
-    type FastifyInstance,
-    type FastifyRequest,
-    type FastifyReply
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { deleteSessionNotes } from '../services/queries/note.js';
-import { defaultSketchData } from './helpers/sketch.js';
+import { parseParamId } from '../services/api.js';
 import { ValidationError } from '../services/errors.js';
 import { isValidGameId } from '../services/games.js';
-import { parseParamId } from '../services/api.js';
-import { controlSelf } from './helpers/auth.js';
-import {
-    createSessionSchema,
-    type CreateSessionBody,
-    updateSessionSchema,
-    type UpdateSessionBody
-} from './schemas/session.js';
+import { deleteSessionNotes } from '../services/queries/note.js';
 import {
     createSession,
     deleteSessionById,
@@ -23,6 +11,14 @@ import {
     getSessions,
     updateSessionById
 } from '../services/queries/session.js';
+import { controlSelf } from './helpers/auth.js';
+import { defaultSketchData } from './helpers/sketch.js';
+import {
+    type CreateSessionBody,
+    type UpdateSessionBody,
+    createSessionSchema,
+    updateSessionSchema
+} from './schemas/session.js';
 
 export const sessionController = async (app: FastifyInstance) => {
     // get all sessions
@@ -30,7 +26,7 @@ export const sessionController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/sessions',
         handler: async (
-            req: FastifyRequest<{
+            _req: FastifyRequest<{
                 Params: {
                     sessionId: string;
                 };

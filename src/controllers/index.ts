@@ -1,25 +1,25 @@
-import { type FastifyInstance, type FastifyRequest } from 'fastify';
+import path from 'node:path';
 import FastifyStatic from '@fastify/static';
-import path from 'path';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 
-import { configurationController } from './configurationController.js';
-import { registrationController } from './registrationController.js';
-import { characterController } from './characterController.js';
-import { sessionController } from './sessionController.js';
-import { sketchController } from './sketchController.js';
 import { assetController } from './assetController.js';
 import { authController } from './authController.js';
-import { userController } from './userController.js';
+import { characterController } from './characterController.js';
+import { configurationController } from './configurationController.js';
 import { gameController } from './gameController.js';
 import { noteController } from './noteController.js';
+import { registrationController } from './registrationController.js';
+import { sessionController } from './sessionController.js';
+import { sketchController } from './sketchController.js';
+import { userController } from './userController.js';
 
-import { authMiddleware } from './helpers/auth.js';
 import { assetDir } from './helpers/asset.js';
+import { authMiddleware } from './helpers/auth.js';
 
-import { importMetaUrlDirname } from '../services/tools.js';
-import { NotFoundError } from '../services/errors.js';
 import { getEnv } from '../services/env.js';
+import { NotFoundError } from '../services/errors.js';
 import { log } from '../services/log.js';
+import { importMetaUrlDirname } from '../services/tools.js';
 
 const dirname = importMetaUrlDirname(import.meta.url);
 
@@ -90,7 +90,8 @@ export const mainController = async (app: FastifyInstance) => {
         if (url?.startsWith('/api')) {
             // not found api routes
             throw new NotFoundError('API route does not exist');
-        } else if (isProd) {
+        }
+        if (isProd) {
             // serve web client build assets in production
             res.sendFile('index.html');
         } else {

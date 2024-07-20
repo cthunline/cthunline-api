@@ -1,15 +1,12 @@
 import { eq } from 'drizzle-orm';
 
+import type { DirectoryInsert, DirectoryUpdate } from '../../drizzle/schema.js';
+import { db, tables } from '../../services/db.js';
 import {
     ForbiddenError,
     InternError,
     NotFoundError
 } from '../../services/errors.js';
-import {
-    type DirectoryInsert,
-    type DirectoryUpdate
-} from '../../drizzle/schema.js';
-import { db, tables } from '../../services/db.js';
 
 /**
 Gets all directories belonging to a user.
