@@ -1,12 +1,12 @@
 {
     "name": "cthunline-api",
-    "version": "1.9.0",
+    "version": "1.9.1",
     "type": "module",
     "scripts": {
         "dev": "cross-env nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"tsx src/index.ts\"",
         "prod": "node index.js",
         "build": "tsc --build --clean tsconfig.build.json && tsc --project tsconfig.build.json",
-        "prepare": "husky",
+        "prepare": "[ -d '.husky' ] && husky || true",
         "drizzle:generate": "npx drizzle-kit generate:pg --config=src/drizzle/config.ts",
         "test": "dotenv -e .env.test -- vitest --run",
         "test:watch": "dotenv -e .env.test -- vitest --watch",
