@@ -10,8 +10,8 @@
         "drizzle:generate": "npx drizzle-kit generate:pg --config=src/drizzle/config.ts",
         "test": "dotenv -e .env.test -- vitest --run",
         "test:watch": "dotenv -e .env.test -- vitest --watch",
-        "lint": "npx @biomejs/biome check && npx tsc --noEmit",
-        "format": "npx @biomejs/biome check --write && npx tsc --noEmit"
+        "lint": "npx @biomejs/biome check --error-on-warnings && npx tsc --noEmit",
+        "format": "npx @biomejs/biome check --write --error-on-warnings && npx tsc --noEmit"
     },
     "dependencies": {
         "@cthunline/games": "^3.3.2",

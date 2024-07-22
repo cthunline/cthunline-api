@@ -21,6 +21,7 @@
                 "useImportType": "error"
             },
             "nursery": {
+                "noConsole": "error",
                 "useImportExtensions": "error"
             }
         }
