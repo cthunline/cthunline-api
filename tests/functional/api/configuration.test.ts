@@ -5,7 +5,7 @@ import { api } from '../helpers/api.helper.js';
 import { compareDataWithExpected } from '../helpers/assert.helper.js';
 import { resetCache, resetData } from '../helpers/data.helper.js';
 
-const getConfiguration = async (expected: any) => {
+const checkConfiguration = async (expected: any) => {
     const response = await api.request({
         method: 'GET',
         route: '/configuration'
@@ -31,11 +31,12 @@ describe('[API] Configuration', () => {
             for (const value of [true, false]) {
                 mockEnvVar('REGISTRATION_ENABLED', value);
                 mockEnvVar('INVITATION_ENABLED', value);
-                await getConfiguration({
+                await checkConfiguration({
                     registrationEnabled: value,
                     invitationEnabled: value,
                     defaultTheme: 'dark',
-                    defaultLocale: 'en'
+                    defaultLocale: 'en',
+                    apiVersion: process.env.npm_package_version
                 });
             }
         });

@@ -13,7 +13,8 @@ export const configurationController = async (app: FastifyInstance) => {
                 registrationEnabled: getEnv('REGISTRATION_ENABLED'),
                 invitationEnabled: getEnv('INVITATION_ENABLED'),
                 defaultTheme: getEnv('DEFAULT_THEME'),
-                defaultLocale: getEnv('DEFAULT_LOCALE')
+                defaultLocale: getEnv('DEFAULT_LOCALE'),
+                apiVersion: process.env.npm_package_version
             });
         }
     });
