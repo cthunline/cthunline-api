@@ -14,7 +14,7 @@
         "format": "npx @biomejs/biome check --write --error-on-warnings && npx tsc --noEmit"
     },
     "dependencies": {
-        "@cthunline/games": "^3.3.4",
+        "@cthunline/games": "^3.4.1",
         "@fastify/cookie": "^9.3.1",
         "@fastify/helmet": "^11.1.1",
         "@fastify/rate-limit": "^9.1.0",
@@ -61,7 +61,7 @@
         "nodemon": "^3.1.4",
         "socket.io-client": "^4.7.5",
         "type-detect": "^4.0.8",
-        "typescript": "^5.5.3",
+        "typescript": "^5.5.4",
         "vitest": "^2.0.4"
     }
 }
