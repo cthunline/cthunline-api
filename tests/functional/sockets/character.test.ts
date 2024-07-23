@@ -37,9 +37,7 @@ describe('[Sockets] Character', () => {
                     reject(err);
                 });
             }),
-            (async () => {
-                playerSocket.emit('characterUpdate');
-            })()
+            playerSocket.emit('characterUpdate')
         ]);
     });
 });

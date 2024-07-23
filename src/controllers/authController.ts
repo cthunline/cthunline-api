@@ -19,6 +19,7 @@ export const authController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/auth',
         handler: async (req: FastifyRequest, rep: FastifyReply) => {
+            // biome-ignore lint/suspicious/useAwait: fastify handler require async
             rep.send(req.user);
         }
     });

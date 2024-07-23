@@ -17,6 +17,8 @@ import {
 } from './schemas/sketch.js';
 
 export const sketchController = async (app: FastifyInstance) => {
+    // biome-ignore lint/suspicious/useAwait: fastify controllers require async
+
     // get all sketchs belonging to current user
     app.route({
         method: 'GET',

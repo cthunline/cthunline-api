@@ -25,6 +25,8 @@ import {
 } from './schemas/note.js';
 
 export const noteController = async (app: FastifyInstance) => {
+    // biome-ignore lint/suspicious/useAwait: fastify controllers require async
+
     // get current user's notes in a session
     // also returns shared notes in a separate list
     app.route({

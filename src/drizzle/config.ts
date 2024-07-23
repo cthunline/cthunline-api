@@ -2,7 +2,7 @@ import type { Config } from 'drizzle-kit';
 
 import 'dotenv/config';
 
-// eslint-disable-next-line import/no-default-export
+// biome-ignore lint/style/noDefaultExport: required by drizzle config
 export default {
     dialect: 'postgresql',
     schema: 'src/drizzle/schema.ts',

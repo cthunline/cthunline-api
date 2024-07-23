@@ -135,19 +135,19 @@ export const socketHelper: SocketsHelper = {
         const [masterEmail, player1Email, player2Email] = usersData.map(
             ({ email }) => email
         );
-        const masterJWTUser = await api.login({
+        const masterJwtUser = await api.login({
             email: masterEmail,
             password: 'test'
         });
-        const player1JWTUser = await api.login({
+        const player1jwtUser = await api.login({
             email: player1Email,
             password: 'test'
         });
-        const player2JWTUser = await api.login({
+        const player2jwtUser = await api.login({
             email: player2Email,
             password: 'test'
         });
-        const sessions = await getMasterUserSessions(masterJWTUser.id);
+        const sessions = await getMasterUserSessions(masterJwtUser.id);
         const session = sessions[0];
         if (!session) {
             throw new Error('Could not find session to setup');
@@ -155,25 +155,25 @@ export const socketHelper: SocketsHelper = {
         const sockets: Socket[] = [];
         sockets.push(
             await socketHelper.connect({
-                jwt: masterJWTUser.jwt,
+                jwt: masterJwtUser.jwt,
                 sessionId: session.id
             })
         );
         sockets.push(
             await socketHelper.connect({
-                jwt: player1JWTUser.jwt,
+                jwt: player1jwtUser.jwt,
                 sessionId: session.id,
                 characterId: charactersData.find(
-                    (character) => character.userId === player1JWTUser.id
+                    (character) => character.userId === player1jwtUser.id
                 )?.id
             })
         );
         sockets.push(
             await socketHelper.connect({
-                jwt: player2JWTUser.jwt,
+                jwt: player2jwtUser.jwt,
                 sessionId: session.id,
                 characterId: charactersData.find(
-                    (character) => character.userId === player2JWTUser.id
+                    (character) => character.userId === player2jwtUser.id
                 )?.id
             })
         );

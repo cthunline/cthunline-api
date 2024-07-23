@@ -39,7 +39,7 @@ const getDiceResult = (
 
 export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
     // dice roll request / result sent to every player in session
-    socket.on('diceRequest', async (request: RequestDiceBody) => {
+    socket.on('diceRequest', (request: RequestDiceBody) => {
         try {
             validateSchema(requestDiceSchema, request);
             const { user, isMaster, sessionId } = socket.data;
@@ -56,7 +56,7 @@ export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
 
     // private dice roll request for game master
     // result sent only to the user who requested it
-    socket.on('dicePrivateRequest', async (request: RequestDiceBody) => {
+    socket.on('dicePrivateRequest', (request: RequestDiceBody) => {
         try {
             validateSchema(requestDiceSchema, request);
             const { user, isMaster } = socket.data;

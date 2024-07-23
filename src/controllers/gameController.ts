@@ -9,6 +9,7 @@ export const gameController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/games',
         handler: async (_req: FastifyRequest, rep: FastifyReply) => {
+            // biome-ignore lint/suspicious/useAwait: fastify handler require async
             const games = Object.values(gamesData);
             rep.send({ games });
         }
@@ -28,6 +29,7 @@ export const gameController = async (app: FastifyInstance) => {
             }>,
             rep: FastifyReply
         ) => {
+            // biome-ignore lint/suspicious/useAwait: fastify handler require async
             const { gameId } = params;
             if (!isValidGameId(gameId)) {
                 throw new NotFoundError('Game not found');

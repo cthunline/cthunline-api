@@ -80,17 +80,15 @@ describe('[Sockets] Audio', () => {
                             });
                         })
                 ),
-                (async () => {
-                    masterSocket.emit(
-                        event,
-                        event === 'audioPlay'
-                            ? {
-                                  assetId: audioAsset?.id,
-                                  time: 1234
-                              }
-                            : undefined
-                    );
-                })()
+                masterSocket.emit(
+                    event,
+                    event === 'audioPlay'
+                        ? {
+                              assetId: audioAsset?.id,
+                              time: 1234
+                          }
+                        : undefined
+                )
             ]);
         }
     });

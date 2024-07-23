@@ -130,7 +130,7 @@ export const api = {
             }
             headers = formData.getHeaders();
         }
-        return (customAgent ?? this.agent).request({
+        return await (customAgent ?? this.agent).request({
             method,
             url: apiPrefix ? path.join(this.apiPrefix, route) : route,
             payload: body ?? formData ?? undefined,

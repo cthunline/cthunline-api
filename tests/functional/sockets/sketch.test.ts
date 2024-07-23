@@ -124,9 +124,7 @@ describe('[Sockets] Sketch', () => {
                         });
                     })
             ),
-            (async () => {
-                masterSocket.emit('sketchUpdate', anotherSketch);
-            })()
+            masterSocket.emit('sketchUpdate', anotherSketch)
         ]);
         await vi.waitFor(
             async () => {
@@ -202,9 +200,7 @@ describe('[Sockets] Sketch', () => {
                         });
                     })
             ),
-            (async () => {
-                player2Socket.emit('tokenUpdate', updatedTokenData);
-            })()
+            player2Socket.emit('tokenUpdate', updatedTokenData)
         ]);
         await vi.waitFor(
             async () => {

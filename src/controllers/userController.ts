@@ -33,6 +33,8 @@ import {
 } from './schemas/user.js';
 
 export const userController = async (app: FastifyInstance) => {
+    // biome-ignore lint/suspicious/useAwait: fastify controllers require async
+
     // get all users
     app.route({
         method: 'GET',

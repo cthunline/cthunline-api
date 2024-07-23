@@ -14,23 +14,32 @@
         "enabled": true,
         "rules": {
             "correctness": {
+                "noNewSymbol": "error",
                 "noUnusedImports": "error",
-                "noUnusedVariables": "error"
+                "noUnusedPrivateClassMembers": "error",
+                "noUnusedVariables": "error",
+                "useArrayLiterals": "error"
             },
             "style": {
+                "noDefaultExport": "error",
+                "noNegationElse": "error",
+                "useBlockStatements": "error",
+                "useCollapsedElseIf": "error",
                 "useImportType": "error"
             },
             "nursery": {
                 "noConsole": "error",
                 "useImportExtensions": "error"
+            },
+            "suspicious": {
+                "noEmptyBlockStatements": "error",
+                "useAwait": "error"
             }
         }
     },
     "javascript": {
         "formatter": {
-            "arrowParentheses": "always",
             "quoteStyle": "single",
-            "semicolons": "always",
             "trailingCommas": "none"
         }
     },

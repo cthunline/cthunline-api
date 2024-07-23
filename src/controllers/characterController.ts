@@ -38,6 +38,8 @@ import {
 } from './schemas/character.js';
 
 export const characterController = async (app: FastifyInstance) => {
+    // biome-ignore lint/suspicious/useAwait: fastify controllers require async
+
     // get all characters
     // can filter on a userId by providing a 'user' query parameter
     app.route({

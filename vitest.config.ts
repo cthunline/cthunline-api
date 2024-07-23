@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
-// eslint-disable-next-line import/no-default-export
+// biome-ignore lint/style/noDefaultExport: required by vite configuration
 export default defineConfig({
     test: {
         include: ['tests/**/*.test.ts'],

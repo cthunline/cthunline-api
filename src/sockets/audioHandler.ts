@@ -34,7 +34,7 @@ export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
     });
 
     // notify session players that game master stopped playing audio asset
-    socket.on('audioStop', async () => {
+    socket.on('audioStop', () => {
         try {
             const { user, sessionId, isMaster } = socket.data;
             if (!isMaster) {

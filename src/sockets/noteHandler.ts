@@ -46,7 +46,7 @@ export const noteHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
         }
     });
     // notify users when a shared note is deleted / unshared
-    socket.on('noteDelete', async (body: NoteSocketUpdateBody) => {
+    socket.on('noteDelete', (body: NoteSocketUpdateBody) => {
         try {
             validateSchema(noteSocketUpdateSchema, body);
             const { sessionId, user, isMaster } = socket.data;

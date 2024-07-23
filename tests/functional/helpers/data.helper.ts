@@ -94,7 +94,7 @@ export const deleteAssetFiles = async () => {
 
 export const getAssetBuffer = async (assetName: string) => {
     const localPath = path.join(dirname, '../data/assets', assetName);
-    return fs.promises.readFile(localPath);
+    return await fs.promises.readFile(localPath);
 };
 
 export const deleteAllData = async () => {

@@ -134,9 +134,7 @@ describe('[Sockets] Note', () => {
                             });
                         })
                 ),
-                (async () => {
-                    player1Socket.emit('noteUpdate', { noteId });
-                })()
+                player1Socket.emit('noteUpdate', { noteId })
             ]);
         });
     });
@@ -188,9 +186,7 @@ describe('[Sockets] Note', () => {
                             });
                         })
                 ),
-                (async () => {
-                    player1Socket.emit('noteDelete', { noteId });
-                })()
+                player1Socket.emit('noteDelete', { noteId })
             ]);
         });
     });

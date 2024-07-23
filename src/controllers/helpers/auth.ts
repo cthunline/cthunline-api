@@ -49,6 +49,7 @@ export const controlSelfMiddleware = async ({
 }: FastifyRequest<{
     Params: { userId: string };
 }>) => {
+    // biome-ignore lint/suspicious/useAwait: fastify middlewares require async
     const userId = parseParamId(params, 'userId');
     controlSelf(userId, user);
 };
@@ -66,6 +67,7 @@ export const controlAdmin = (user: SafeUser) => {
 Middleware checking that the currently authenticated user is an admin.
 */
 export const controlAdminMiddleware = async ({ user }: FastifyRequest) => {
+    // biome-ignore lint/suspicious/useAwait: fastify middlewares require async
     controlAdmin(user);
 };
 

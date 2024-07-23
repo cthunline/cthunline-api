@@ -115,9 +115,7 @@ describe('[Sockets] Dice', () => {
                         });
                     })
             ),
-            (async () => {
-                player1Socket.emit('diceRequest', diceRequest);
-            })()
+            player1Socket.emit('diceRequest', diceRequest)
         ]);
     });
 });

@@ -132,12 +132,12 @@ describe('[Sockets] Connection', () => {
         const masterUser = usersData.find(
             ({ id }) => id === sessionsData[1].masterId
         );
-        const { jwt: masterJWT } = await api.login({
+        const { jwt: masterJwt } = await api.login({
             email: masterUser?.email ?? '',
             password: 'test'
         });
         await socketHelper.connect({
-            jwt: masterJWT,
+            jwt: masterJwt,
             sessionId: sessionsData[1].id,
             isMaster: true
         });

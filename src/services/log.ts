@@ -33,9 +33,7 @@ Control log file directory exists and is writable
 */
 let fileTransportError = null;
 const logDir = getEnv('LOG_DIR');
-if (!logDir) {
-    fileTransportError = 'no log directory provided';
-} else {
+if (logDir) {
     try {
         fs.accessSync(logDir, fs.constants.F_OK);
         fs.accessSync(logDir, fs.constants.W_OK);
@@ -44,6 +42,8 @@ if (!logDir) {
             'LOG_DIR'
         )} does not exist or is not writable`;
     }
+} else {
+    fileTransportError = 'no log directory provided';
 }
 
 if (logDir && !fileTransportError) {

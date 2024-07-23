@@ -8,6 +8,7 @@ export const configurationController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/configuration',
         handler: async (_req: FastifyRequest, rep: FastifyReply) => {
+            // biome-ignore lint/suspicious/useAwait: fastify handler require async
             rep.send({
                 registrationEnabled: getEnv('REGISTRATION_ENABLED'),
                 invitationEnabled: getEnv('INVITATION_ENABLED'),

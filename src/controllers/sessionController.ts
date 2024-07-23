@@ -21,6 +21,8 @@ import {
 } from './schemas/session.js';
 
 export const sessionController = async (app: FastifyInstance) => {
+    // biome-ignore lint/suspicious/useAwait: fastify controllers require async
+
     // get all sessions
     app.route({
         method: 'GET',
