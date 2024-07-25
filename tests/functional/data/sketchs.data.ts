@@ -58,6 +58,26 @@ export const sketchs: (SketchInsert & { id: number })[] = [
                     height: 105.2647094726562
                 }
             ],
+            texts: [
+                {
+                    id: '07bd036821576231',
+                    index: 0,
+                    text: 'Text 0000',
+                    fontSize: 24,
+                    color: 'orange',
+                    x: 545.0642,
+                    y: 612.71594528031
+                },
+                {
+                    id: '08bd036821576231',
+                    index: 1,
+                    text: 'Text 0001',
+                    fontSize: 16,
+                    color: 'blue',
+                    x: 555.0642,
+                    y: 662.71594528031
+                }
+            ],
             tokens: [
                 {
                     id: 'c8ecbd692de4650c',
@@ -138,6 +158,35 @@ export const sketchs: (SketchInsert & { id: number })[] = [
                     height: 340.9968872070312
                 }
             ],
+            texts: [
+                {
+                    id: '09bd036821576231',
+                    index: 0,
+                    text: 'Text 12',
+                    fontSize: 12,
+                    color: 'red',
+                    x: 565.0642,
+                    y: 712.71594528031
+                },
+                {
+                    id: '0abd036821576231',
+                    index: 1,
+                    text: 'Text 13',
+                    fontSize: 12,
+                    color: 'blue',
+                    x: 575.0642,
+                    y: 762.71594528031
+                },
+                {
+                    id: '0bbd036821576231',
+                    index: 2,
+                    text: 'Text 14',
+                    fontSize: 8,
+                    color: 'green',
+                    x: 585.0642,
+                    y: 812.71594528031
+                }
+            ],
             tokens: [
                 {
                     id: '5c8ce6e320073a1e',
@@ -211,6 +260,17 @@ export const sketchs: (SketchInsert & { id: number })[] = [
                     x: 964.778198242187,
                     y: 627.834991455078,
                     height: 152.6674499511719
+                }
+            ],
+            texts: [
+                {
+                    id: '0cbd036821576231',
+                    index: 0,
+                    text: 'Some text',
+                    fontSize: 16,
+                    color: 'white',
+                    x: 595.0642,
+                    y: 862.71594528031
                 }
             ],
             tokens: [
@@ -307,6 +367,26 @@ export const sketchs: (SketchInsert & { id: number })[] = [
                     height: 340.9968872070312
                 }
             ],
+            texts: [
+                {
+                    id: '0dbd036821576231',
+                    index: 0,
+                    text: 'Text 111',
+                    fontSize: 20,
+                    color: 'orange',
+                    x: 605.0642,
+                    y: 912.71594528031
+                },
+                {
+                    id: '0ebd036821576231',
+                    index: 1,
+                    text: 'Text 222',
+                    fontSize: 20,
+                    color: 'black',
+                    x: 615.0642,
+                    y: 962.71594528031
+                }
+            ],
             tokens: [
                 {
                     id: '5c8ce6e320073a1e',
@@ -380,6 +460,17 @@ export const sketchs: (SketchInsert & { id: number })[] = [
                     x: 964.778198242187,
                     y: 627.834991455078,
                     height: 152.6674499511719
+                }
+            ],
+            texts: [
+                {
+                    id: '10bd036821576231',
+                    index: 0,
+                    text: 'Text test',
+                    fontSize: 24,
+                    color: 'blue',
+                    x: 635.0642,
+                    y: 1062.71594528031
                 }
             ],
             tokens: [

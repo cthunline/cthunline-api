@@ -124,6 +124,10 @@ export const assertSketchDrawingPath = (data: Record<string, any>) => {
 
 export const assertSketchImage = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('index');
+    expect(data.index).to.be.a('number');
     expect(data).to.have.property('url');
     expect(data.url).to.be.a('string');
     expect(data).to.have.property('width');
@@ -136,8 +140,30 @@ export const assertSketchImage = (data: Record<string, any>) => {
     expect(data.y).to.be.a('number');
 };
 
+export const assertSketchText = (data: Record<string, any>) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('index');
+    expect(data.index).to.be.a('number');
+    expect(data).to.have.property('text');
+    expect(data.text).to.be.a('string');
+    expect(data).to.have.property('fontSize');
+    expect(data.fontSize).to.be.a('number');
+    expect(data).to.have.property('color');
+    expect(data.color).to.be.a('string');
+    expect(data).to.have.property('x');
+    expect(data.x).to.be.a('number');
+    expect(data).to.have.property('y');
+    expect(data.y).to.be.a('number');
+};
+
 export const assertSketchToken = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
+    expect(data).to.have.property('index');
+    expect(data.index).to.be.a('number');
     expect(data).to.have.property('color');
     expect(data.color).to.be.a('string');
     expect(data).to.have.property('attachedData');
@@ -178,6 +204,11 @@ export const assertSketchData = (
     expect(data.tokens).to.be.an('array');
     for (const token of data.tokens) {
         assertSketchToken(token);
+    }
+    expect(data).to.have.property('texts');
+    expect(data.texts).to.be.an('array');
+    for (const text of data.texts) {
+        assertSketchText(text);
     }
     if (expected) {
         expect(data).toEqual(expected);

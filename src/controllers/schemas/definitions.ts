@@ -30,6 +30,21 @@ export const imageSchema = Type.Object(
 
 export type ImageBody = Static<typeof imageSchema>;
 
+export const textSchema = Type.Object(
+    {
+        id: Type.String({ minLength: 1 }),
+        index: Type.Integer({ minimum: 0 }),
+        text: Type.String({ minLength: 1 }),
+        fontSize: Type.Integer({ minimum: 1 }),
+        color: Type.String({ minLength: 1 }),
+        x: Type.Number(),
+        y: Type.Number()
+    },
+    {
+        additionalProperties: false
+    }
+);
+
 export const tokenSchema = Type.Object(
     {
         id: Type.String({ minLength: 1 }),
@@ -67,12 +82,14 @@ export const tokenSchema = Type.Object(
 
 export type TokenBody = Static<typeof tokenSchema>;
 
+export type TextBody = Static<typeof textSchema>;
+
 export const sketchSchema = Type.Object(
     {
         displayed: Type.Boolean(),
         paths: Type.Array(drawingPathSchema),
         images: Type.Array(imageSchema),
-        // tokens: Type.Optional(Type.Array(tokenSchema)),
+        texts: Type.Array(textSchema),
         tokens: Type.Array(tokenSchema)
     },
     {

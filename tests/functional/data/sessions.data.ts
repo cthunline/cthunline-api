@@ -59,6 +59,26 @@ export const sessions: (SessionInsert & { id: number })[] = [
                     height: 105.2647094726562
                 }
             ],
+            texts: [
+                {
+                    id: '993cde98ecbcd115',
+                    index: 0,
+                    text: 'Some text',
+                    fontSize: 10,
+                    color: 'red',
+                    x: 528.0642,
+                    y: 112.71594528031
+                },
+                {
+                    id: '8ecb11d191cde9c9',
+                    index: 1,
+                    text: 'Some other text',
+                    fontSize: 12,
+                    color: 'blue',
+                    x: 445.0642,
+                    y: 300.71594528031
+                }
+            ],
             tokens: [
                 {
                     id: 'c8ecbd692de4650c',
@@ -140,6 +160,35 @@ export const sessions: (SessionInsert & { id: number })[] = [
                     height: 340.9968872070312
                 }
             ],
+            texts: [
+                {
+                    id: '7acb10d091cde9a8',
+                    index: 0,
+                    text: 'Text 0',
+                    fontSize: 16,
+                    color: 'green',
+                    x: 445.0642,
+                    y: 112.71594528031
+                },
+                {
+                    id: '6bcd09c081bce897',
+                    index: 1,
+                    text: 'Text 1',
+                    fontSize: 12,
+                    color: 'orange',
+                    x: 455.0642,
+                    y: 162.71594528031
+                },
+                {
+                    id: '5ade08b071acb786',
+                    index: 2,
+                    text: 'Text 2',
+                    fontSize: 14,
+                    color: 'red',
+                    x: 465.0642,
+                    y: 212.71594528031
+                }
+            ],
             tokens: [
                 {
                     id: '5c8ce6e320073a1e',
@@ -214,6 +263,17 @@ export const sessions: (SessionInsert & { id: number })[] = [
                     x: 964.778198242187,
                     y: 627.834991455078,
                     height: 152.6674499511719
+                }
+            ],
+            texts: [
+                {
+                    id: '3ace0690518a9564',
+                    index: 0,
+                    text: 'Text 000',
+                    fontSize: 20,
+                    color: 'blue',
+                    x: 505.0642,
+                    y: 412.71594528031
                 }
             ],
             tokens: [

@@ -9,5 +9,6 @@ export const defaultSketchData: Sketch = {
     displayed: false,
     paths: [],
     images: [],
+    texts: [],
     tokens: []
 };
