@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import type {
@@ -119,5 +118,3 @@ export const errorHandler = (
         });
     }
 };
-
-/* eslint-enable max-classes-per-file */

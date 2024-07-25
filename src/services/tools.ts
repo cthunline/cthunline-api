@@ -20,7 +20,6 @@ export const isInteger = (value: string | number) => {
     }
     const parsedFloat = Number.parseFloat(String(value));
     // we allow the bitwise or syntax here because it has better performance
-    // eslint-disable-next-line no-bitwise
     return (parsedFloat | 0) === parsedFloat;
 };
 

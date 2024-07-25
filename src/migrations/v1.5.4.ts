@@ -24,7 +24,6 @@ export const v154 = async () => {
     if (updateData.length) {
         await db.transaction(async (tx) => {
             for (const { id, data } of updateData) {
-                // eslint-disable-next-line no-await-in-loop
                 await tx
                     .update(tables.characters)
                     .set({ data })

@@ -24,7 +24,6 @@ export const v180 = async () => {
     if (sessionUpdates.length) {
         await db.transaction(async (tx) => {
             for (const { id, sketch } of sessionUpdates) {
-                // eslint-disable-next-line no-await-in-loop
                 await tx
                     .update(tables.sessions)
                     .set({ sketch })
@@ -52,7 +51,6 @@ export const v180 = async () => {
     if (sketchUpdates.length) {
         await db.transaction(async (tx) => {
             for (const { id, data } of sketchUpdates) {
-                // eslint-disable-next-line no-await-in-loop
                 await tx
                     .update(tables.sketchs)
                     .set({ data })
