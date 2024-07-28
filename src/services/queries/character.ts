@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { type SQL, and, count, eq } from 'drizzle-orm';
 
 import type { CharacterInsert, CharacterUpdate } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
@@ -28,6 +28,26 @@ export const getUserCharacters = async (userId: number, gameId?: string) =>
                   )
                 : eq(tables.characters.userId, userId)
         );
+
+/**
+Gets the count of characters. Can be filtered by user ID and game ID.
+*/
+export const getCharacterCount = async (userId?: number, gameId?: string) => {
+    let where: SQL | undefined = undefined;
+    if (userId && gameId) {
+        where = and(
+            eq(tables.characters.userId, userId),
+            eq(tables.characters.gameId, gameId)
+        );
+    } else if (userId) {
+        where = eq(tables.characters.userId, userId);
+    }
+    const result = await db
+        .select({ count: count() })
+        .from(tables.characters)
+        .where(where);
+    return result[0]?.count ?? 0;
+};
 
 /**
 Gets a character with the given ID.

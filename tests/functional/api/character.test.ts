@@ -12,13 +12,14 @@ import { mockEnvVar } from '../../../src/services/env.js';
 import { getUserCharacters } from '../../../src/services/queries/character.js';
 import { api } from '../helpers/api.helper.js';
 import { assertCharacter } from '../helpers/assert.helper.js';
-import { findCharacter, getAnotherUser } from '../helpers/character.helper.js';
+import { findCharacter } from '../helpers/character.helper.js';
 import {
     charactersData,
     getAssetBuffer,
     resetCache,
     resetData
 } from '../helpers/data.helper.js';
+import { getAnotherUser } from '../helpers/user.helper.js';
 
 const findCharacterFromDb = async (userId: number, gameId?: string) => {
     const characters = await getUserCharacters(userId, gameId);

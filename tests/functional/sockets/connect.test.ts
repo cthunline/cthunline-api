@@ -7,7 +7,7 @@ import {
     assertSocketMeta,
     assertUser
 } from '../helpers/assert.helper.js';
-import { findCharacter, getAnotherUser } from '../helpers/character.helper.js';
+import { findCharacter } from '../helpers/character.helper.js';
 import {
     charactersData,
     resetCache,
@@ -16,6 +16,7 @@ import {
     usersData
 } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
+import { getAnotherUser } from '../helpers/user.helper.js';
 
 describe('[Sockets] Connection', () => {
     beforeAll(async () => {
