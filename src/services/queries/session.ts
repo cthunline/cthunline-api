@@ -1,4 +1,4 @@
-import { eq, getTableColumns } from 'drizzle-orm';
+import { count, eq, getTableColumns } from 'drizzle-orm';
 
 import type { SessionInsert, SessionUpdate } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
@@ -16,6 +16,14 @@ export const getSessions = async () =>
         })
         .from(tables.sessions)
         .innerJoin(tables.users, eq(tables.sessions.masterId, tables.users.id));
+
+/**
+Gets the count of sessions;
+*/
+export const getSessionCount = async () => {
+    const result = await db.select({ count: count() }).from(tables.sessions);
+    return result[0]?.count ?? 0;
+};
 
 /**
 Gets sessions belonging to a user (master).

@@ -1,3 +1,5 @@
+import type { FastifyInstance } from 'fastify';
+import type { Socket } from 'socket.io';
 import type { ExtendedError } from 'socket.io/dist/namespace';
 
 import {
@@ -20,11 +22,31 @@ import {
 } from '../services/errors.js';
 import { getCharacterById } from '../services/queries/character.js';
 import { getSessionByIdOrThrow } from '../services/queries/session.js';
-import type {
-    SocketIoServer,
-    SocketIoSocket,
-    SocketSessionUser
-} from '../types/socket.js';
+import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
+import { audioHandler } from './audioHandler.js';
+import { characterHandler } from './characterHandler.js';
+import { diceHandler } from './diceHandler.js';
+import { getSessionUsers, meta } from './helper.js';
+import { noteHandler } from './noteHandler.js';
+import { sketchHandler } from './sketchHandler.js';
+
+// cookie parsing middleware
+export const parseSocketCookies = (
+    app: FastifyInstance,
+    socket: Socket,
+    next: (err?: ExtendedError) => void
+) => {
+    if (socket.request.headers.cookie) {
+        const cookies = app.parseCookie(socket.request.headers.cookie);
+        for (const key of Object.keys(cookies)) {
+            cookies[key] =
+                app.unsignCookie(cookies[key].replace(/^s:/, '')).value ??
+                cookies[key];
+        }
+        socket.data.cookies = cookies;
+    }
+    next();
+};
 
 // verify auth token
 const verifySocketJwt = async (socket: SocketIoSocket): Promise<SafeUser> => {
@@ -163,25 +185,35 @@ export const disconnectCopycats = async (
     }
 };
 
-export const getSessionUsers = async (
+export const connectedHandler = async (
     io: SocketIoServer,
-    sessionId: number
-): Promise<SocketSessionUser[]> => {
-    const allSockets = await io.in(String(sessionId)).fetchSockets();
-    return allSockets.map((socket) => {
-        if (socket.data.isMaster) {
-            return {
-                ...socket.data.user,
-                socketId: socket.id,
-                character: null,
-                isMaster: true
-            };
-        }
-        return {
-            ...socket.data.user,
-            socketId: socket.id,
-            character: socket.data.character,
-            isMaster: false
-        };
+    socket: SocketIoSocket
+) => {
+    disconnectCopycats(io, socket);
+    const { user, sessionId, isMaster } = socket.data;
+    const sessionUsers = await getSessionUsers(io, sessionId);
+    io.sockets.to(String(sessionId)).emit(
+        'join',
+        meta({
+            user,
+            users: sessionUsers,
+            isMaster
+        })
+    );
+    socket.on('disconnect', async () => {
+        const sessionUsers = await getSessionUsers(io, sessionId);
+        socket.to(String(sessionId)).emit(
+            'leave',
+            meta({
+                user,
+                users: sessionUsers,
+                isMaster
+            })
+        );
     });
+    diceHandler(io, socket);
+    characterHandler(io, socket);
+    audioHandler(io, socket);
+    sketchHandler(io, socket);
+    noteHandler(io, socket);
 };

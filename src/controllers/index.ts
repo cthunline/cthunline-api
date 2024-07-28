@@ -11,6 +11,7 @@ import { noteController } from './noteController.js';
 import { registrationController } from './registrationController.js';
 import { sessionController } from './sessionController.js';
 import { sketchController } from './sketchController.js';
+import { statController } from './statController.js';
 import { userController } from './userController.js';
 
 import { assetDir } from './helpers/asset.js';
@@ -56,6 +57,7 @@ export const mainController = async (app: FastifyInstance) => {
             noteController,
             sessionController,
             sketchController,
+            statController,
             registrationController,
             userController
         ].map((controller) =>

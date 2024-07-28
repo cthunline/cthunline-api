@@ -3,60 +3,19 @@ import type { Socket } from 'socket.io';
 import type { ExtendedError } from 'socket.io/dist/namespace';
 
 import type { SocketIoSocket } from '../types/socket.js';
-import { audioHandler } from './audioHandler.js';
-import { characterHandler } from './characterHandler.js';
 import {
+    connectedHandler,
     connectionMiddleware,
-    disconnectCopycats,
-    getSessionUsers
+    parseSocketCookies
 } from './connectionHandler.js';
-import { diceHandler } from './diceHandler.js';
-import { meta } from './helper.js';
-import { noteHandler } from './noteHandler.js';
-import { sketchHandler } from './sketchHandler.js';
 
 export const socketRouter = (app: FastifyInstance) => {
     const { io } = app;
     io.use((socket: Socket, next: (err?: ExtendedError) => void) => {
-        if (socket.request.headers.cookie) {
-            const cookies = app.parseCookie(socket.request.headers.cookie);
-            for (const key of Object.keys(cookies)) {
-                cookies[key] =
-                    app.unsignCookie(cookies[key].replace(/^s:/, '')).value ??
-                    cookies[key];
-            }
-            socket.data.cookies = cookies;
-        }
-        next();
+        parseSocketCookies(app, socket, next);
     });
     io.use(connectionMiddleware);
-    io.on('connection', async (socket: SocketIoSocket) => {
-        disconnectCopycats(io, socket);
-        const { user, sessionId, isMaster } = socket.data;
-        const users = await getSessionUsers(io, sessionId);
-        io.sockets.to(String(sessionId)).emit(
-            'join',
-            meta({
-                user,
-                users,
-                isMaster
-            })
-        );
-        socket.on('disconnect', async () => {
-            const sessionUsers = await getSessionUsers(io, sessionId);
-            socket.to(String(sessionId)).emit(
-                'leave',
-                meta({
-                    user,
-                    users: sessionUsers,
-                    isMaster
-                })
-            );
-        });
-        diceHandler(io, socket);
-        characterHandler(io, socket);
-        audioHandler(io, socket);
-        sketchHandler(io, socket);
-        noteHandler(io, socket);
-    });
+    io.on('connection', (socket: SocketIoSocket) =>
+        connectedHandler(io, socket)
+    );
 };
