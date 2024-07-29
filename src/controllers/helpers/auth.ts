@@ -1,6 +1,7 @@
 import type { CookieSerializeOptions } from '@fastify/cookie';
 import dayjs from 'dayjs';
 import type { FastifyRequest } from 'fastify';
+import ms from 'ms';
 
 import type { SafeUser } from '../../drizzle/schema.js';
 import { parseParamId } from '../../services/api.js';
@@ -17,7 +18,9 @@ export const getCookieOptions = (): CookieSerializeOptions => ({
     signed: true,
     secure: getEnv('COOKIE_SECURE'),
     sameSite: true,
-    expires: dayjs().add(12, 'hours').toDate(),
+    expires: dayjs()
+        .add(ms(getEnv('COOKIE_DURATION')), 'ms')
+        .toDate(),
     path: '/'
 });
 

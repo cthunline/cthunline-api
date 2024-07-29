@@ -16,6 +16,7 @@ export const envSchema = Type.Object({
     JWT_SECRET: Type.String({ minLength: 32, maxLength: 32 }),
     CRYPTO_SECRET: Type.String({ minLength: 32, maxLength: 32 }),
     COOKIE_SECRET: Type.String({ minLength: 32, maxLength: 32 }),
+    COOKIE_DURATION: Type.TemplateLiteral('${number}${w|d|h|m|s|ms}'),
     COOKIE_SECURE: Type.Boolean(),
     LOG_LEVEL: Type.Union([
         Type.Literal('info'),
