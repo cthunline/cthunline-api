@@ -29,20 +29,20 @@ Check if a variale is a JS object
 export const isObject = (val: unknown): val is object =>
     typeof val === 'object' && val !== null && !Array.isArray(val);
 
-const generateCode32 = customAlphabet('1234567890abcdef', 32);
-const generateCode16 = customAlphabet('1234567890abcdef', 16);
-const generateCode8 = customAlphabet('1234567890abcdef', 8);
+const generateToken32 = customAlphabet('1234567890abcdef', 32);
+const generateToken16 = customAlphabet('1234567890abcdef', 16);
+const generateToken8 = customAlphabet('1234567890abcdef', 8);
 /**
 Generate a random token with length of 8, 16 or 32
 */
 export const generateToken = (size: 8 | 16 | 32 = 8) => {
     if (size === 32) {
-        return generateCode32();
+        return generateToken32();
     }
     if (size === 16) {
-        return generateCode16();
+        return generateToken16();
     }
-    return generateCode8();
+    return generateToken8();
 };
 
 /**

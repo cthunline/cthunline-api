@@ -116,6 +116,8 @@ export const assertGame = (
 
 export const assertSketchDrawingPath = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
+    expect(data).to.have.property('id');
+    expect(data.id).to.be.a('string');
     expect(data).to.have.property('d');
     expect(data.d).to.be.a('string');
     expect(data).to.have.property('color');

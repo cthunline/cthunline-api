@@ -3,17 +3,17 @@ import { eq } from 'drizzle-orm';
 import type { Sketch as SketchData } from '../controllers/schemas/definitions.js';
 import { db, tables } from '../services/db.js';
 import { log } from '../services/log.js';
+import { generateToken } from '../services/tools.js';
 
-// new width property in sketch drawing paths
-export const v180 = async () => {
-    const defaultWidth = 4;
+// added id in sketch drawing paths
+export const v1130 = async () => {
     const sessions = await db.select().from(tables.sessions);
     const sessionUpdates: { id: number; sketch: SketchData }[] = [];
     for (const { id, sketch } of sessions) {
         let updated = false;
         for (let i = 0; i < sketch.paths.length; i += 1) {
-            if (!sketch.paths[i].width) {
-                sketch.paths[i].width = defaultWidth;
+            if (!sketch.paths[i].id) {
+                sketch.paths[i].id = generateToken(16);
                 updated ||= true;
             }
         }
@@ -31,7 +31,7 @@ export const v180 = async () => {
             }
         });
         log.warn(
-            `Migrated ${sessionUpdates.length} sessions drawings to have default width`
+            `Migrated ${sessionUpdates.length} sessions drawings to have a random ID`
         );
     }
     const sketchs = await db.select().from(tables.sketchs);
@@ -39,8 +39,8 @@ export const v180 = async () => {
     for (const { id, data } of sketchs) {
         let updated = false;
         for (let i = 0; i < data.paths.length; i += 1) {
-            if (!data.paths[i].width) {
-                data.paths[i].width = defaultWidth;
+            if (!data.paths[i].id) {
+                data.paths[i].id = generateToken(16);
                 updated ||= true;
             }
         }
@@ -58,7 +58,7 @@ export const v180 = async () => {
             }
         });
         log.warn(
-            `Migrated ${sketchUpdates.length} sketchs drawings to have default width`
+            `Migrated ${sketchUpdates.length} sketchs drawings to have a random ID`
         );
     }
 };
