@@ -4,6 +4,7 @@ export const sketchs: (SketchInsert & { id: number })[] = [
     {
         id: 1,
         userId: 3,
+        sessionId: 1,
         name: 'Sketch 1',
         data: {
             displayed: true,
@@ -121,6 +122,7 @@ export const sketchs: (SketchInsert & { id: number })[] = [
     {
         id: 2,
         userId: 3,
+        sessionId: 1,
         name: 'Sketch 2',
         data: {
             displayed: true,
@@ -226,6 +228,7 @@ export const sketchs: (SketchInsert & { id: number })[] = [
     {
         id: 3,
         userId: 1,
+        sessionId: 2,
         name: 'Sketch 3',
         data: {
             displayed: true,
@@ -339,6 +342,7 @@ export const sketchs: (SketchInsert & { id: number })[] = [
     {
         id: 4,
         userId: 1,
+        sessionId: 2,
         name: 'Sketch 4',
         data: {
             displayed: true,
@@ -435,6 +439,7 @@ export const sketchs: (SketchInsert & { id: number })[] = [
     {
         id: 5,
         userId: 2,
+        sessionId: 3,
         name: 'Sketch 5',
         data: {
             displayed: true,

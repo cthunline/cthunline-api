@@ -1,10 +1,8 @@
 {
-    "id": "30b34ede-3d2d-490b-90e6-6ce0e798249b",
-    "prevId": "00000000-0000-0000-0000-000000000000",
-    "version": "5",
-    "dialect": "pg",
+    "version": "7",
+    "dialect": "postgresql",
     "tables": {
-        "assets": {
+        "public.assets": {
             "name": "assets",
             "schema": "",
             "columns": {
@@ -64,26 +62,26 @@
                 "assets_user_id_users_id_fk": {
                     "name": "assets_user_id_users_id_fk",
                     "tableFrom": "assets",
-                    "tableTo": "users",
                     "columnsFrom": ["user_id"],
+                    "tableTo": "users",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 },
                 "assets_directory_id_directories_id_fk": {
                     "name": "assets_directory_id_directories_id_fk",
                     "tableFrom": "assets",
-                    "tableTo": "directories",
                     "columnsFrom": ["directory_id"],
+                    "tableTo": "directories",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 }
             },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {}
         },
-        "characters": {
+        "public.characters": {
             "name": "characters",
             "schema": "",
             "columns": {
@@ -143,17 +141,17 @@
                 "characters_user_id_users_id_fk": {
                     "name": "characters_user_id_users_id_fk",
                     "tableFrom": "characters",
-                    "tableTo": "users",
                     "columnsFrom": ["user_id"],
+                    "tableTo": "users",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 }
             },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {}
         },
-        "directories": {
+        "public.directories": {
             "name": "directories",
             "schema": "",
             "columns": {
@@ -201,26 +199,26 @@
                 "directories_user_id_users_id_fk": {
                     "name": "directories_user_id_users_id_fk",
                     "tableFrom": "directories",
-                    "tableTo": "users",
                     "columnsFrom": ["user_id"],
+                    "tableTo": "users",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 },
                 "directories_parent_id_directories_id_fk": {
                     "name": "directories_parent_id_directories_id_fk",
                     "tableFrom": "directories",
-                    "tableTo": "directories",
                     "columnsFrom": ["parent_id"],
+                    "tableTo": "directories",
                     "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "cascade"
                 }
             },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {}
         },
-        "invitations": {
+        "public.invitations": {
             "name": "invitations",
             "schema": "",
             "columns": {
@@ -265,16 +263,26 @@
             },
             "indexes": {
                 "code_index": {
+                    "columns": [
+                        {
+                            "expression": "code",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "with": {},
                     "name": "code_index",
-                    "columns": ["code"],
-                    "isUnique": true
+                    "isUnique": true,
+                    "method": "btree",
+                    "concurrently": false
                 }
             },
             "foreignKeys": {},
             "compositePrimaryKeys": {},
             "uniqueConstraints": {}
         },
-        "notes": {
+        "public.notes": {
             "name": "notes",
             "schema": "",
             "columns": {
@@ -340,26 +348,26 @@
                 "notes_user_id_users_id_fk": {
                     "name": "notes_user_id_users_id_fk",
                     "tableFrom": "notes",
-                    "tableTo": "users",
                     "columnsFrom": ["user_id"],
+                    "tableTo": "users",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 },
                 "notes_session_id_sessions_id_fk": {
                     "name": "notes_session_id_sessions_id_fk",
                     "tableFrom": "notes",
-                    "tableTo": "sessions",
                     "columnsFrom": ["session_id"],
+                    "tableTo": "sessions",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 }
             },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {}
         },
-        "sessions": {
+        "public.sessions": {
             "name": "sessions",
             "schema": "",
             "columns": {
@@ -413,17 +421,17 @@
                 "sessions_master_id_users_id_fk": {
                     "name": "sessions_master_id_users_id_fk",
                     "tableFrom": "sessions",
-                    "tableTo": "users",
                     "columnsFrom": ["master_id"],
+                    "tableTo": "users",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 }
             },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {}
         },
-        "sketchs": {
+        "public.sketchs": {
             "name": "sketchs",
             "schema": "",
             "columns": {
@@ -471,17 +479,17 @@
                 "sketchs_user_id_users_id_fk": {
                     "name": "sketchs_user_id_users_id_fk",
                     "tableFrom": "sketchs",
-                    "tableTo": "users",
                     "columnsFrom": ["user_id"],
+                    "tableTo": "users",
                     "columnsTo": ["id"],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
+                    "onUpdate": "no action",
+                    "onDelete": "no action"
                 }
             },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {}
         },
-        "users": {
+        "public.users": {
             "name": "users",
             "schema": "",
             "columns": {
@@ -550,9 +558,19 @@
             },
             "indexes": {
                 "email_index": {
+                    "columns": [
+                        {
+                            "expression": "email",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "with": {},
                     "name": "email_index",
-                    "columns": ["email"],
-                    "isUnique": true
+                    "isUnique": true,
+                    "method": "btree",
+                    "concurrently": false
                 }
             },
             "foreignKeys": {},
@@ -563,8 +581,10 @@
     "enums": {},
     "schemas": {},
     "_meta": {
-        "columns": {},
         "schemas": {},
-        "tables": {}
-    }
+        "tables": {},
+        "columns": {}
+    },
+    "id": "30b34ede-3d2d-490b-90e6-6ce0e798249b",
+    "prevId": "00000000-0000-0000-0000-000000000000"
 }

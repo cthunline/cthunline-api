@@ -80,6 +80,9 @@ export const sketchs = pgTable('sketchs', {
     userId: integer('user_id')
         .references(() => users.id)
         .notNull(),
+    sessionId: integer('session_id')
+        .references(() => sessions.id)
+        .notNull(),
     name: varchar('name', { length: 256 }).notNull(),
     data: json('data').$type<SketchData>().notNull(),
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),

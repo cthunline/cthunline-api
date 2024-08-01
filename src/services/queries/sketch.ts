@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import type { SketchInsert, SketchUpdate } from '../../drizzle/schema.js';
 import { db, tables } from '../../services/db.js';
@@ -11,8 +11,19 @@ import {
 /**
 Gets sketchs belonging to the given user.
 */
-export const getUserSketchs = async (userId: number) =>
-    db.select().from(tables.sketchs).where(eq(tables.sketchs.userId, userId));
+export const getUserSessionSketchs = async (
+    userId: number,
+    sessionId: number
+) =>
+    db
+        .select()
+        .from(tables.sketchs)
+        .where(
+            and(
+                eq(tables.sketchs.userId, userId),
+                eq(tables.sketchs.sessionId, sessionId)
+            )
+        );
 
 /**
 Gets a sketch by ID.

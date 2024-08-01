@@ -4,11 +4,12 @@ import { parseParamId } from '../services/api.js';
 import {
     createSketch,
     deleteSketchById,
+    getUserSessionSketchs,
     getUserSketchByIdOrThrow,
-    getUserSketchs,
     updateSketchById
 } from '../services/queries/sketch.js';
 import { controlSelf } from './helpers/auth.js';
+import { controlSessionGameMaster } from './helpers/session.js';
 import {
     type CreateSketchBody,
     type UpdateSketchBody,
@@ -19,34 +20,52 @@ import {
 export const sketchController = async (app: FastifyInstance) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
 
-    // get all sketchs belonging to current user
+    // get all sketchs belonging to current user in the given session
     app.route({
         method: 'GET',
-        url: '/sketchs',
-        handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
-            const userId = user.id;
-            const sketchs = await getUserSketchs(userId);
+        url: '/sessions/:sessionId/sketchs',
+        handler: async (
+            {
+                user,
+                params
+            }: FastifyRequest<{
+                Params: {
+                    sessionId: string;
+                };
+            }>,
+            rep: FastifyReply
+        ) => {
+            const sessionId = parseParamId(params, 'sessionId');
+            const session = await controlSessionGameMaster(sessionId, user.id);
+            const sketchs = await getUserSessionSketchs(user.id, session.id);
             rep.send({ sketchs });
         }
     });
 
-    // create a sketch for current user
+    // create a sketch for current user and the given session
     app.route({
         method: 'POST',
-        url: '/sketchs',
+        url: '/sessions/:sessionId/sketchs',
         schema: { body: createSketchSchema },
         handler: async (
             {
+                params,
                 body,
                 user
             }: FastifyRequest<{
+                Params: {
+                    sessionId: string;
+                };
                 Body: CreateSketchBody;
             }>,
             rep: FastifyReply
         ) => {
+            const sessionId = parseParamId(params, 'sessionId');
+            const session = await controlSessionGameMaster(sessionId, user.id);
             const createdSketch = await createSketch({
                 ...body,
-                userId: user.id
+                userId: user.id,
+                sessionId: session.id
             });
             rep.send(createdSketch);
         }

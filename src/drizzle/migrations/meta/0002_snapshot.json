@@ -1,4 +1,6 @@
 {
+    "id": "b0621bf6-1d82-4ab2-b761-ac802e570a43",
+    "prevId": "bdf6afc1-da3e-4fea-a10d-e0fcb1394933",
     "version": "7",
     "dialect": "postgresql",
     "tables": {
@@ -62,20 +64,20 @@
                 "assets_user_id_users_id_fk": {
                     "name": "assets_user_id_users_id_fk",
                     "tableFrom": "assets",
-                    "columnsFrom": ["user_id"],
                     "tableTo": "users",
+                    "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 },
                 "assets_directory_id_directories_id_fk": {
                     "name": "assets_directory_id_directories_id_fk",
                     "tableFrom": "assets",
-                    "columnsFrom": ["directory_id"],
                     "tableTo": "directories",
+                    "columnsFrom": ["directory_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 }
             },
             "compositePrimaryKeys": {},
@@ -141,11 +143,11 @@
                 "characters_user_id_users_id_fk": {
                     "name": "characters_user_id_users_id_fk",
                     "tableFrom": "characters",
-                    "columnsFrom": ["user_id"],
                     "tableTo": "users",
+                    "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 }
             },
             "compositePrimaryKeys": {},
@@ -199,20 +201,20 @@
                 "directories_user_id_users_id_fk": {
                     "name": "directories_user_id_users_id_fk",
                     "tableFrom": "directories",
-                    "columnsFrom": ["user_id"],
                     "tableTo": "users",
+                    "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 },
                 "directories_parent_id_directories_id_fk": {
                     "name": "directories_parent_id_directories_id_fk",
                     "tableFrom": "directories",
-                    "columnsFrom": ["parent_id"],
                     "tableTo": "directories",
+                    "columnsFrom": ["parent_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "cascade"
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
                 }
             },
             "compositePrimaryKeys": {},
@@ -263,6 +265,7 @@
             },
             "indexes": {
                 "code_index": {
+                    "name": "code_index",
                     "columns": [
                         {
                             "expression": "code",
@@ -271,11 +274,10 @@
                             "nulls": "last"
                         }
                     ],
-                    "with": {},
-                    "name": "code_index",
                     "isUnique": true,
+                    "concurrently": false,
                     "method": "btree",
-                    "concurrently": false
+                    "with": {}
                 }
             },
             "foreignKeys": {},
@@ -348,20 +350,20 @@
                 "notes_user_id_users_id_fk": {
                     "name": "notes_user_id_users_id_fk",
                     "tableFrom": "notes",
-                    "columnsFrom": ["user_id"],
                     "tableTo": "users",
+                    "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 },
                 "notes_session_id_sessions_id_fk": {
                     "name": "notes_session_id_sessions_id_fk",
                     "tableFrom": "notes",
-                    "columnsFrom": ["session_id"],
                     "tableTo": "sessions",
+                    "columnsFrom": ["session_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 }
             },
             "compositePrimaryKeys": {},
@@ -421,11 +423,11 @@
                 "sessions_master_id_users_id_fk": {
                     "name": "sessions_master_id_users_id_fk",
                     "tableFrom": "sessions",
-                    "columnsFrom": ["master_id"],
                     "tableTo": "users",
+                    "columnsFrom": ["master_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 }
             },
             "compositePrimaryKeys": {},
@@ -443,6 +445,12 @@
                 },
                 "user_id": {
                     "name": "user_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "session_id": {
+                    "name": "session_id",
                     "type": "integer",
                     "primaryKey": false,
                     "notNull": true
@@ -479,11 +487,20 @@
                 "sketchs_user_id_users_id_fk": {
                     "name": "sketchs_user_id_users_id_fk",
                     "tableFrom": "sketchs",
-                    "columnsFrom": ["user_id"],
                     "tableTo": "users",
+                    "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
-                    "onUpdate": "no action",
-                    "onDelete": "no action"
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                },
+                "sketchs_session_id_sessions_id_fk": {
+                    "name": "sketchs_session_id_sessions_id_fk",
+                    "tableFrom": "sketchs",
+                    "tableTo": "sessions",
+                    "columnsFrom": ["session_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
                 }
             },
             "compositePrimaryKeys": {},
@@ -558,6 +575,7 @@
             },
             "indexes": {
                 "email_index": {
+                    "name": "email_index",
                     "columns": [
                         {
                             "expression": "email",
@@ -566,11 +584,10 @@
                             "nulls": "last"
                         }
                     ],
-                    "with": {},
-                    "name": "email_index",
                     "isUnique": true,
+                    "concurrently": false,
                     "method": "btree",
-                    "concurrently": false
+                    "with": {}
                 }
             },
             "foreignKeys": {},
@@ -580,11 +597,10 @@
     },
     "enums": {},
     "schemas": {},
+    "sequences": {},
     "_meta": {
+        "columns": {},
         "schemas": {},
-        "tables": {},
-        "columns": {}
-    },
-    "id": "bdf6afc1-da3e-4fea-a10d-e0fcb1394933",
-    "prevId": "30b34ede-3d2d-490b-90e6-6ce0e798249b"
+        "tables": {}
+    }
 }

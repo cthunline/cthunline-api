@@ -15,6 +15,13 @@
             "when": 1711574567625,
             "tag": "0001_thick_killraven",
             "breakpoints": true
+        },
+        {
+            "idx": 2,
+            "version": "7",
+            "when": 1722543243370,
+            "tag": "0002_cheerful_luke_cage",
+            "breakpoints": true
         }
     ]
 }

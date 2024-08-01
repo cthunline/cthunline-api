@@ -224,6 +224,10 @@ export const assertSketch = (
     expect(data).to.be.an('object');
     expect(data).to.have.property('id');
     expect(data.id).to.be.a('number');
+    expect(data).to.have.property('userId');
+    expect(data.userId).to.be.a('number');
+    expect(data).to.have.property('sessionId');
+    expect(data.sessionId).to.be.a('number');
     expect(data).to.have.property('name');
     expect(data.name).to.be.a('string');
     expect(data).to.have.property('data');
