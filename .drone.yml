@@ -46,7 +46,7 @@ steps:
   - install
 # sonarqube scan
 - name: sonarqube
-  image: plugins/sonarqube-scanner
+  image: plugins/sonarqube-scanner:latest
   failure: ignore
   settings:
     sonar_host:
