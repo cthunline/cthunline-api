@@ -1,1 +1,0 @@
-ALTER TABLE "sessions" RENAME COLUMN "gameId" TO "game_id";
