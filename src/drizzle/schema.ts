@@ -64,7 +64,7 @@ export const sessions = pgTable('sessions', {
     masterId: integer('master_id')
         .references(() => users.id)
         .notNull(),
-    gameId: varchar('gameId', { length: 32 }).notNull(),
+    gameId: varchar('game_id', { length: 32 }).notNull(),
     name: varchar('name', { length: 256 }).notNull(),
     sketch: json('data').$type<SketchData>().notNull(),
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
