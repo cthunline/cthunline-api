@@ -28,7 +28,7 @@ export const authController = async (app: FastifyInstance) => {
         // rate limiter
         await registerRateLimiter(routeApp);
         // login using an email, if the email is valid sends a magic link to the user by email
-        app.route({
+        routeApp.route({
             method: 'POST',
             url: '/auth',
             schema: { body: loginSchema },

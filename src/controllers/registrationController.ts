@@ -18,7 +18,7 @@ export const registrationController = async (app: FastifyInstance) => {
         // rate limiter
         await registerRateLimiter(routeApp);
         // register a new user
-        app.route({
+        routeApp.route({
             method: 'POST',
             url: '/register',
             schema: { body: registerUserSchema },
