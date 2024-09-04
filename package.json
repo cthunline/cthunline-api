@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.14.1",
+    "version": "1.14.2",
     "type": "module",
     "scripts": {
         "dev": "cross-env nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"tsx src/index.ts\"",
@@ -18,7 +18,7 @@
         "format": "npx @biomejs/biome check --write --error-on-warnings && npx tsc --noEmit"
     },
     "dependencies": {
-        "@cthunline/games": "^3.4.2",
+        "@cthunline/games": "^3.4.3",
         "@fastify/cookie": "^9.4.0",
         "@fastify/helmet": "^11.1.1",
         "@fastify/rate-limit": "^9.1.0",
