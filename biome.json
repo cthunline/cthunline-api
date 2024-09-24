@@ -1,5 +1,5 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+    "$schema": "https://biomejs.dev/schemas/1.9.2/schema.json",
     "files": {
         "ignore": [".husky/*", ".vscode/*", "coverage", "node_modules/*"]
     },
@@ -18,7 +18,8 @@
                 "noUnusedImports": "error",
                 "noUnusedPrivateClassMembers": "error",
                 "noUnusedVariables": "error",
-                "useArrayLiterals": "error"
+                "useArrayLiterals": "error",
+                "useImportExtensions": "error"
             },
             "style": {
                 "noDefaultExport": "error",
@@ -27,11 +28,8 @@
                 "useCollapsedElseIf": "error",
                 "useImportType": "error"
             },
-            "nursery": {
-                "noConsole": "error",
-                "useImportExtensions": "error"
-            },
             "suspicious": {
+                "noConsole": "error",
                 "noEmptyBlockStatements": "error",
                 "useAwait": "error"
             }

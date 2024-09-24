@@ -19,6 +19,7 @@ export const envSchema = Type.Object({
     COOKIE_DURATION: Type.TemplateLiteral('${number}${w|d|h|m|s|ms}'),
     COOKIE_SECURE: Type.Boolean(),
     LOG_LEVEL: Type.Union([
+        Type.Literal('debug'),
         Type.Literal('info'),
         Type.Literal('warning'),
         Type.Literal('error')

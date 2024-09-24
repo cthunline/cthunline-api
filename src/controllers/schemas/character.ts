@@ -1,5 +1,7 @@
 import { type Static, Type } from '@sinclair/typebox';
 
+import { multipartFileSchema } from '../../services/multipart.js';
+
 export const createCharacterSchema = Type.Object(
     {
         gameId: Type.String({ minLength: 1 }),
@@ -25,7 +27,7 @@ export type UpdateCharacterBody = Static<typeof updateCharacterSchema>;
 
 export const uploadPortraitSchema = Type.Object(
     {
-        portrait: Type.Any()
+        portrait: Type.Array(multipartFileSchema)
     },
     {
         additionalProperties: false

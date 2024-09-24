@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import type { FastifyBaseLogger } from 'fastify';
 import winston, { format } from 'winston';
 
 import { getEnv } from './env.js';
@@ -76,3 +77,38 @@ if (fileTransportError) {
         `Winston file transport could not be initialized (${fileTransportError})`
     );
 }
+
+/**
+Custom logger instance for fastify
+*/
+export const fastifyLogger: FastifyBaseLogger = {
+    level: getEnv('LOG_LEVEL'),
+    info: (msg: unknown) => {
+        log.info(msg);
+        return fastifyLogger;
+    },
+    error: (msg: unknown) => {
+        log.error(msg);
+        return fastifyLogger;
+    },
+    debug: (msg: unknown) => {
+        log.debug(msg);
+        return fastifyLogger;
+    },
+    fatal: (msg: unknown) => {
+        log.error(msg);
+        return fastifyLogger;
+    },
+    warn: (msg: unknown) => {
+        log.warn(msg);
+        return fastifyLogger;
+    },
+    trace: (msg: unknown) => {
+        log.debug(msg);
+        return fastifyLogger;
+    },
+    silent: () => {
+        /* deprecated */
+    },
+    child: () => fastifyLogger
+};

@@ -1,11 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import type { File as FormidableFile } from 'formidable';
 
 import { parseParamId } from '../services/api.js';
-import { ValidationError } from '../services/errors.js';
 import { log } from '../services/log.js';
+import {
+    cleanMultipartFiles,
+    parseMultipartBody
+} from '../services/multipart.js';
 import {
     createAssets,
     deleteAssetById,
@@ -21,7 +23,6 @@ import {
     getUserDirectoryByIdOrThrow,
     updateDirectoryById
 } from '../services/queries/directory.js';
-import { validateSchema } from '../services/typebox.js';
 import type { QueryParam } from '../types/api.js';
 import type { TypedFile } from '../types/asset.js';
 import {
@@ -29,8 +30,8 @@ import {
     assetTempDir,
     controlFile,
     controlUserDir,
-    getChildrenDirectories,
-    getFormidableOptions
+    getAssetMultipartOptions,
+    getChildrenDirectories
 } from './helpers/asset.js';
 import {
     type CreateDirectoryBody,
@@ -80,74 +81,54 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'POST',
         url: '/assets',
+        onResponse: async () => {
+            await cleanMultipartFiles();
+        },
         handler: async (
             req: FastifyRequest<{
-                Body: UploadAssetsBody;
+                Body: UploadAssetsBody | undefined;
             }>,
             rep: FastifyReply
         ) => {
-            // parse form data
-            try {
-                await req.parseMultipart(getFormidableOptions());
-            } catch {
-                throw new ValidationError('Error while parsing file');
-            }
-            const { body, files, user } = req;
+            const { user } = req;
+            const fileOptions = getAssetMultipartOptions();
+            const body = await parseMultipartBody({
+                app,
+                req,
+                schema: uploadAssetsSchema,
+                ...fileOptions
+            });
             // create user subdirectory if not exist
             const userDir = await controlUserDir(user.id);
-            // validate body
-            validateSchema(uploadAssetsSchema, {
-                ...body,
-                ...files
-            });
             // control directoryId
-            const directoryId = body.directoryId
+            const directoryId = body?.directoryId
                 ? Number(body.directoryId)
                 : null;
             if (directoryId !== null) {
                 await getUserDirectoryByIdOrThrow(user.id, directoryId);
             }
-            // get files data
-            const assetFiles: FormidableFile[] = [];
-            if (files?.assets) {
-                if (Array.isArray(files.assets)) {
-                    assetFiles.push(...files.assets);
-                } else {
-                    assetFiles.push(files.assets);
-                }
-            }
-            const typedAssetFiles: TypedFile[] = assetFiles.map((file) => ({
+            const typedAssetFiles: TypedFile[] = body.assets.map((file) => ({
                 ...file,
                 type: controlFile(file)
             }));
             // move temporary files to user's directory
             await Promise.all(
-                typedAssetFiles.map(
-                    ({ filepath: temporaryPath, newFilename }) =>
-                        fs.promises.rename(
-                            temporaryPath,
-                            path.join(userDir, newFilename)
-                        )
+                typedAssetFiles.map(({ filePath, fileName }) =>
+                    fs.promises.rename(filePath, path.join(userDir, fileName))
                 )
             );
             // save assets in database
             const assets = await createAssets(
-                typedAssetFiles.map(
-                    ({ originalFilename, newFilename, type }) => {
-                        const name = originalFilename ?? newFilename;
-                        const assetPath = path.join(
-                            user.id.toString(),
-                            newFilename
-                        );
-                        return {
-                            userId: user.id,
-                            directoryId,
-                            type,
-                            name,
-                            path: assetPath
-                        };
-                    }
-                )
+                typedAssetFiles.map(({ fileName, type }) => {
+                    const assetPath = path.join(user.id.toString(), fileName);
+                    return {
+                        userId: user.id,
+                        directoryId,
+                        type,
+                        name: fileName,
+                        path: assetPath
+                    };
+                })
             );
             //
             rep.send({ assets });

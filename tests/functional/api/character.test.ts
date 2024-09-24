@@ -500,7 +500,7 @@ describe('[API] Characters', () => {
                 403
             );
         });
-        test('Should delete an asset', async () => {
+        test('Should delete a portrait', async () => {
             const character = findCharacter(api.userId, 'callOfCthulhu');
             const { id: characterId } = character;
             const name = 'asset.png';

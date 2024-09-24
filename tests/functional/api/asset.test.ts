@@ -460,7 +460,12 @@ describe('[API] Assets', () => {
                     {
                         field: 'assets',
                         buffer: dirAssetBuffer,
-                        name: 'asset.png'
+                        name: 'asset1.png'
+                    },
+                    {
+                        field: 'assets',
+                        buffer: dirAssetBuffer,
+                        name: 'asset2.png'
                     }
                 ],
                 fields: {

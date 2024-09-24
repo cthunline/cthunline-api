@@ -1,4 +1,4 @@
-import type { File as FormidableFile } from 'formidable';
+import type { MultipartFileData } from '../services/multipart.js';
 
 // allowed mime types with their intern type and allowed extensions
 export const mimeTypes = {
@@ -25,6 +25,6 @@ export type MimeType = keyof typeof mimeTypes;
 // intern file type
 export type FileType = 'image' | 'audio';
 
-export interface TypedFile extends FormidableFile {
+export interface TypedFile extends MultipartFileData {
     type: FileType;
 }

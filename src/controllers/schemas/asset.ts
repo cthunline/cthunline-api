@@ -1,8 +1,10 @@
 import { type Static, Type } from '@sinclair/typebox';
 
+import { multipartFileSchema } from '../../services/multipart.js';
+
 export const uploadAssetsSchema = Type.Object(
     {
-        assets: Type.Any(),
+        assets: Type.Array(multipartFileSchema),
         directoryId: Type.Optional(Type.RegExp(/^\d+$/))
     },
     {

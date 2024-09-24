@@ -11,6 +11,10 @@ import {
 } from '../services/errors.js';
 import { type GameId, games, isValidGameId } from '../services/games.js';
 import {
+    cleanMultipartFiles,
+    parseMultipartBody
+} from '../services/multipart.js';
+import {
     createCharacter,
     deleteCharacterById,
     getCharacterByIdOrThrow,
@@ -25,7 +29,7 @@ import { controlSelf } from './helpers/auth.js';
 import {
     controlPortraitDir,
     deleteCachedCharacter,
-    getFormidablePortraitOptions,
+    getPortraitMultipartOptions,
     portraitDirName,
     updateCachedCharacterIfExists
 } from './helpers/character.js';
@@ -176,6 +180,9 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'POST',
         url: '/characters/:characterId/portrait',
+        onResponse: async () => {
+            await cleanMultipartFiles();
+        },
         handler: async (
             req: FastifyRequest<{
                 Params: {
@@ -184,24 +191,21 @@ export const characterController = async (app: FastifyInstance) => {
             }>,
             rep: FastifyReply
         ) => {
-            // parse form data
-            try {
-                await req.parseMultipart(getFormidablePortraitOptions());
-            } catch {
-                throw new ValidationError('Error while parsing file');
-            }
-            const { user, files } = req;
+            const { user } = req;
             const characterId = parseParamId(req.params, 'characterId');
             const character = await getCharacterByIdOrThrow(characterId);
+            const options = getPortraitMultipartOptions();
+            const body = await parseMultipartBody({
+                app,
+                req,
+                schema: uploadPortraitSchema,
+                ...options
+            });
             controlSelf(character.userId, user);
             // get portraits directory
             const portraitDirPath = await controlPortraitDir();
-            // validate body
-            validateSchema(uploadPortraitSchema, files);
             // get file data
-            const file = Array.isArray(files?.portrait)
-                ? files?.portrait?.shift()
-                : files?.portrait;
+            const file = body.portrait.shift();
             if (!file) {
                 throw new InternError('Could not get portrait file');
             }
@@ -210,10 +214,10 @@ export const characterController = async (app: FastifyInstance) => {
                 type: controlFile(file, 'image')
             };
             // move temporary file to character's directory
-            const { filepath: temporaryPath, newFilename } = typedFile;
-            const portraitFileName = `${characterId}-${newFilename}`;
+            const { filePath, fileName } = typedFile;
+            const portraitFileName = `${characterId}${path.extname(fileName)}`;
             await fs.promises.rename(
-                temporaryPath,
+                filePath,
                 path.join(portraitDirPath, portraitFileName)
             );
             // save portrait on character
@@ -222,8 +226,11 @@ export const characterController = async (app: FastifyInstance) => {
                 portrait
             });
             await updateCachedCharacterIfExists(updatedCharacter);
-            // if there was a portrait before then delete it
-            if (character.portrait) {
+            // if there was a portrait before that has a different name then delete it
+            if (
+                character.portrait &&
+                character.portrait !== updatedCharacter.portrait
+            ) {
                 await fs.promises.rm(path.join(assetDir, character.portrait));
             }
             //

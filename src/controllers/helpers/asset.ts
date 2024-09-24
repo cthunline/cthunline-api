@@ -1,52 +1,40 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type {
-    File as FormidableFile,
-    Options as FormidableOptions
-} from 'formidable';
 
 import type { Directory } from '../../drizzle/schema.js';
 import { getEnv } from '../../services/env.js';
 import { InternError, ValidationError } from '../../services/errors.js';
+import type {
+    MultipartFileData,
+    ParseMultipartBodyFileOptions
+} from '../../services/multipart.js';
 import { type FileType, type MimeType, mimeTypes } from '../../types/asset.js';
 
 // controls form's file mimetype extension, and size
 // returns file type (image or audio)
 export const controlFile = (
-    file: FormidableFile,
+    file: MultipartFileData,
     fileType?: FileType
 ): FileType => {
-    const { mimetype, originalFilename } = file;
-    const ext = originalFilename?.split('.').pop() ?? '';
-    // There's a bug in formidable@v2 where maxFileSize option is applied to
-    // all files and not each file so we have to control each file size ourself
-    const limitSize = getEnv('ASSET_MAX_SIZE_MB_PER_FILE') * 1024 * 1024;
-    if (file.size <= limitSize) {
-        if (mimetype) {
-            const mimeTypeData = mimeTypes[mimetype as MimeType];
-            // fileType
-            if (mimeTypeData && (!fileType || mimeTypeData.type === fileType)) {
-                const { extensions, type } = mimeTypes[mimetype as MimeType];
-                if (extensions.includes(ext)) {
-                    return type as FileType;
-                }
-                throw new ValidationError(
-                    `Extension of file ${originalFilename} ${ext} does not match mimetype ${mimetype}`
-                );
+    const { mimeType, fileName } = file;
+    const ext = fileName?.split('.').pop() ?? '';
+    if (mimeType) {
+        const mimeTypeData = mimeTypes[mimeType as MimeType];
+        // fileType
+        if (mimeTypeData && (!fileType || mimeTypeData.type === fileType)) {
+            const { extensions, type } = mimeTypes[mimeType as MimeType];
+            if (extensions.includes(ext)) {
+                return type as FileType;
             }
             throw new ValidationError(
-                `Mimetype of file ${originalFilename} ${mimetype} is not allowed`
+                `Extension of file ${fileName} ${ext} does not match mimetype ${mimeType}`
             );
         }
         throw new ValidationError(
-            `Could not get mimetype of file ${originalFilename}`
+            `Mimetype of file ${fileName} ${mimeType} is not allowed`
         );
     }
-    throw new ValidationError(
-        `Size of file ${originalFilename} is to big (max ${getEnv(
-            'ASSET_MAX_SIZE_MB_PER_FILE'
-        )}Mb)`
-    );
+    throw new ValidationError(`Could not get mimetype of file ${fileName}`);
 };
 
 // check asset directory exists and is writable
@@ -77,12 +65,11 @@ export const controlUserDir = async (userId: number): Promise<string> => {
     return userDir;
 };
 
-// formidable initialization options
-export const getFormidableOptions = (): FormidableOptions => ({
-    uploadDir: assetTempDir,
-    keepExtensions: false,
-    maxFileSize: getEnv('ASSET_MAX_SIZE_MB') * 1024 * 1024,
-    multiples: true
+// multipart parsing options
+export const getAssetMultipartOptions = (): ParseMultipartBodyFileOptions => ({
+    tmpDir: assetTempDir,
+    maxSizePerFile: getEnv('ASSET_MAX_SIZE_MB_PER_FILE') * 1024 * 1024,
+    maxSizeTotal: getEnv('ASSET_MAX_SIZE_MB') * 1024 * 1024
 });
 
 /**

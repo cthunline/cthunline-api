@@ -1,23 +1,25 @@
 import 'dotenv/config';
 
-import FastifyCookie from '@fastify/cookie';
-import FastifyHelmet from '@fastify/helmet';
+import fastifyCookie from '@fastify/cookie';
+import fastifyHelmet from '@fastify/helmet';
+import fastifyMultipart from '@fastify/multipart';
 import ajvFormats from 'ajv-formats';
-import Fastify from 'fastify';
-import FastifyFormidable from 'fastify-formidable';
-import FastifyQs from 'fastify-qs';
-import FastifySocketIo from 'fastify-socket.io';
+import fastify from 'fastify';
+import fastifySocketIo from 'fastify-socket.io';
+import qs from 'qs';
 
 import { mainController } from './controllers/index.js';
 import { migrateData } from './migrations/index.js';
 import { initDb, migrateDb } from './services/db.js';
 import { getEnv } from './services/env.js';
 import { errorHandler, schemaErrorFormatter } from './services/errors.js';
-import { log } from './services/log.js';
+import { fastifyLogger, log } from './services/log.js';
 import { socketRouter } from './sockets/index.js';
 
-export const app = Fastify({
+export const app = fastify({
+    loggerInstance: fastifyLogger,
     trustProxy: getEnv('REVERSE_PROXY'),
+    querystringParser: (str) => qs.parse(str),
     ajv: {
         plugins: [ajvFormats],
         customOptions: {
@@ -34,17 +36,15 @@ export const initApp = async () => {
         log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
         log.info('Registering middlewares');
         // cookie parser
-        await app.register(FastifyCookie, {
+        await app.register(fastifyCookie, {
             secret: getEnv('COOKIE_SECRET')
         });
-        // query params parser
-        await app.register(FastifyQs);
         // helmet middlewares (security)
-        await app.register(FastifyHelmet);
-        // formidable middleware (file upload)
-        await app.register(FastifyFormidable);
+        await app.register(fastifyHelmet);
+        // multipart middleware (file upload)
+        await app.register(fastifyMultipart);
         // socket.io middleware
-        await app.register(FastifySocketIo);
+        await app.register(fastifySocketIo);
         // custom error handler
         app.setErrorHandler(errorHandler);
         // custom schema error formatter
