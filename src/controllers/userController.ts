@@ -23,7 +23,7 @@ import {
     controlUniqueEmail,
     defaultUserData
 } from './helpers/user.js';
-import { type UserIdParams, userIdSchema } from './schemas/params.js';
+import { type UserIdParam, userIdParamSchema } from './schemas/params.js';
 import { type DisabledQuery, disabledQuerySchema } from './schemas/query.js';
 import {
     type CreateUserBody,
@@ -89,13 +89,13 @@ export const userController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/users/:userId',
         schema: {
-            params: userIdSchema
+            params: userIdParamSchema
         },
         handler: async (
             {
                 params: { userId }
             }: FastifyRequest<{
-                Params: UserIdParams;
+                Params: UserIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -109,7 +109,7 @@ export const userController = async (app: FastifyInstance) => {
         method: 'PATCH',
         url: '/users/:userId',
         schema: {
-            params: userIdSchema,
+            params: userIdParamSchema,
             body: updateUserSchema
         },
         handler: async (
@@ -118,7 +118,7 @@ export const userController = async (app: FastifyInstance) => {
                 body,
                 user: reqUser
             }: FastifyRequest<{
-                Params: UserIdParams;
+                Params: UserIdParam;
                 Body: UpdateUserBody;
             }>,
             rep: FastifyReply

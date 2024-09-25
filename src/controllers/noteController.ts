@@ -24,12 +24,12 @@ import {
     updateNoteSchema
 } from './schemas/note.js';
 import {
-    type NoteActionParams,
-    type NoteIdParams,
-    type SessionIdParams,
-    noteActionSchema,
-    noteIdSchema,
-    sessionIdSchema
+    type NoteActionParam,
+    type NoteIdParam,
+    type SessionIdParam,
+    noteActionParamSchema,
+    noteIdParamSchema,
+    sessionIdParamSchema
 } from './schemas/params.js';
 
 export const noteController = async (app: FastifyInstance) => {
@@ -41,14 +41,14 @@ export const noteController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/sessions/:sessionId/notes',
         schema: {
-            params: sessionIdSchema
+            params: sessionIdParamSchema
         },
         handler: async (
             {
                 params: { sessionId },
                 user
             }: FastifyRequest<{
-                Params: SessionIdParams;
+                Params: SessionIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -75,7 +75,7 @@ export const noteController = async (app: FastifyInstance) => {
         method: 'POST',
         url: '/sessions/:sessionId/notes',
         schema: {
-            params: sessionIdSchema,
+            params: sessionIdParamSchema,
             body: createNoteSchema
         },
         handler: async (
@@ -84,7 +84,7 @@ export const noteController = async (app: FastifyInstance) => {
                 body,
                 user
             }: FastifyRequest<{
-                Params: SessionIdParams;
+                Params: SessionIdParam;
                 Body: CreateNoteBody;
             }>,
             rep: FastifyReply
@@ -111,14 +111,14 @@ export const noteController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/notes/:noteId',
         schema: {
-            params: noteIdSchema
+            params: noteIdParamSchema
         },
         handler: async (
             {
                 params: { noteId },
                 user
             }: FastifyRequest<{
-                Params: NoteIdParams;
+                Params: NoteIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -132,7 +132,7 @@ export const noteController = async (app: FastifyInstance) => {
         method: 'PATCH',
         url: '/notes/:noteId',
         schema: {
-            params: noteIdSchema,
+            params: noteIdParamSchema,
             body: updateNoteSchema
         },
         handler: async (
@@ -141,7 +141,7 @@ export const noteController = async (app: FastifyInstance) => {
                 body,
                 user
             }: FastifyRequest<{
-                Params: NoteIdParams;
+                Params: NoteIdParam;
                 Body: UpdateNoteBody;
             }>,
             rep: FastifyReply
@@ -161,7 +161,7 @@ export const noteController = async (app: FastifyInstance) => {
         method: 'PUT',
         url: '/notes/:noteId/:action(up|down)',
         schema: {
-            params: Type.Composite([noteIdSchema, noteActionSchema], {
+            params: Type.Composite([noteIdParamSchema, noteActionParamSchema], {
                 additionalProperties: false
             })
         },
@@ -170,7 +170,7 @@ export const noteController = async (app: FastifyInstance) => {
                 params: { noteId, action },
                 user
             }: FastifyRequest<{
-                Params: NoteIdParams & NoteActionParams;
+                Params: NoteIdParam & NoteActionParam;
                 Body: UpdateNoteBody;
             }>,
             rep: FastifyReply
@@ -214,14 +214,14 @@ export const noteController = async (app: FastifyInstance) => {
         method: 'DELETE',
         url: '/notes/:noteId',
         schema: {
-            params: noteIdSchema
+            params: noteIdParamSchema
         },
         handler: async (
             {
                 params: { noteId },
                 user
             }: FastifyRequest<{
-                Params: NoteIdParams;
+                Params: NoteIdParam;
                 Body: UpdateNoteBody;
             }>,
             rep: FastifyReply

@@ -12,7 +12,7 @@ import {
 } from '../services/queries/session.js';
 import { controlSelf } from './helpers/auth.js';
 import { defaultSketchData } from './helpers/sketch.js';
-import { type SessionIdParams, sessionIdSchema } from './schemas/params.js';
+import { type SessionIdParam, sessionIdParamSchema } from './schemas/params.js';
 import {
     type CreateSessionBody,
     type UpdateSessionBody,
@@ -72,13 +72,13 @@ export const sessionController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/sessions/:sessionId',
         schema: {
-            params: sessionIdSchema
+            params: sessionIdParamSchema
         },
         handler: async (
             {
                 params: { sessionId }
             }: FastifyRequest<{
-                Params: SessionIdParams;
+                Params: SessionIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -92,7 +92,7 @@ export const sessionController = async (app: FastifyInstance) => {
         method: 'PATCH',
         url: '/sessions/:sessionId',
         schema: {
-            params: sessionIdSchema,
+            params: sessionIdParamSchema,
             body: updateSessionSchema
         },
         handler: async (
@@ -101,7 +101,7 @@ export const sessionController = async (app: FastifyInstance) => {
                 params: { sessionId },
                 user
             }: FastifyRequest<{
-                Params: SessionIdParams;
+                Params: SessionIdParam;
                 Body: UpdateSessionBody;
             }>,
             rep: FastifyReply
@@ -118,14 +118,14 @@ export const sessionController = async (app: FastifyInstance) => {
         method: 'DELETE',
         url: '/sessions/:sessionId',
         schema: {
-            params: sessionIdSchema
+            params: sessionIdParamSchema
         },
         handler: async (
             {
                 params: { sessionId },
                 user
             }: FastifyRequest<{
-                Params: SessionIdParams;
+                Params: SessionIdParam;
             }>,
             rep: FastifyReply
         ) => {

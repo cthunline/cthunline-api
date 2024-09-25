@@ -40,10 +40,10 @@ import {
     uploadPortraitSchema
 } from './schemas/character.js';
 import {
-    type CharacterIdParams,
-    type UserIdParams,
-    characterIdSchema,
-    userIdSchema
+    type CharacterIdParam,
+    type UserIdParam,
+    characterIdParamSchema,
+    userIdParamSchema
 } from './schemas/params.js';
 import { type UserQuery, userQuerySchema } from './schemas/query.js';
 
@@ -109,13 +109,13 @@ export const characterController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/characters/:characterId',
         schema: {
-            params: characterIdSchema
+            params: characterIdParamSchema
         },
         handler: async (
             {
                 params: { characterId }
             }: FastifyRequest<{
-                Params: CharacterIdParams;
+                Params: CharacterIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -129,7 +129,7 @@ export const characterController = async (app: FastifyInstance) => {
         method: 'PATCH',
         url: '/characters/:characterId',
         schema: {
-            params: characterIdSchema,
+            params: characterIdParamSchema,
             body: updateCharacterSchema
         },
         handler: async (
@@ -138,7 +138,7 @@ export const characterController = async (app: FastifyInstance) => {
                 params: { characterId },
                 user
             }: FastifyRequest<{
-                Params: CharacterIdParams;
+                Params: CharacterIdParam;
                 Body: UpdateCharacterBody;
             }>,
             rep: FastifyReply
@@ -163,14 +163,14 @@ export const characterController = async (app: FastifyInstance) => {
         method: 'DELETE',
         url: '/characters/:characterId',
         schema: {
-            params: characterIdSchema
+            params: characterIdParamSchema
         },
         handler: async (
             {
                 params: { characterId },
                 user
             }: FastifyRequest<{
-                Params: CharacterIdParams;
+                Params: CharacterIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -187,14 +187,14 @@ export const characterController = async (app: FastifyInstance) => {
         method: 'POST',
         url: '/characters/:characterId/portrait',
         schema: {
-            params: characterIdSchema
+            params: characterIdParamSchema
         },
         onResponse: async () => {
             await cleanMultipartFiles();
         },
         handler: async (
             req: FastifyRequest<{
-                Params: CharacterIdParams;
+                Params: CharacterIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -252,14 +252,14 @@ export const characterController = async (app: FastifyInstance) => {
         method: 'DELETE',
         url: '/characters/:characterId/portrait',
         schema: {
-            params: characterIdSchema
+            params: characterIdParamSchema
         },
         handler: async (
             {
                 params: { characterId },
                 user
             }: FastifyRequest<{
-                Params: CharacterIdParams;
+                Params: CharacterIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -283,16 +283,19 @@ export const characterController = async (app: FastifyInstance) => {
         method: 'PUT',
         url: '/characters/:characterId/transfer/:userId',
         schema: {
-            params: Type.Composite([characterIdSchema, userIdSchema], {
-                additionalProperties: false
-            })
+            params: Type.Composite(
+                [characterIdParamSchema, userIdParamSchema],
+                {
+                    additionalProperties: false
+                }
+            )
         },
         handler: async (
             {
                 params: { characterId, userId: targetUserId },
                 user
             }: FastifyRequest<{
-                Params: CharacterIdParams & UserIdParams;
+                Params: CharacterIdParam & UserIdParam;
             }>,
             rep: FastifyReply
         ) => {

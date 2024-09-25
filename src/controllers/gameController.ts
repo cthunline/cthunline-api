@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { NotFoundError } from '../services/errors.js';
 import { gamesData, isValidGameId } from '../services/games.js';
-import { type GameIdParams, gameIdSchema } from './schemas/params.js';
+import { type GameIdParam, gameIdParamSchema } from './schemas/params.js';
 
 export const gameController = async (app: FastifyInstance) => {
     // get all games
@@ -21,13 +21,13 @@ export const gameController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/games/:gameId',
         schema: {
-            params: gameIdSchema
+            params: gameIdParamSchema
         },
         handler: async (
             {
                 params: { gameId }
             }: FastifyRequest<{
-                Params: GameIdParams;
+                Params: GameIdParam;
             }>,
             rep: FastifyReply
         ) => {

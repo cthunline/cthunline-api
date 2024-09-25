@@ -40,10 +40,10 @@ import {
     uploadAssetsSchema
 } from './schemas/asset.js';
 import {
-    type AssetIdParams,
-    type DirectoryIdParams,
-    assetIdSchema,
-    directoryIdSchema
+    type AssetIdParam,
+    type DirectoryIdParam,
+    assetIdParamSchema,
+    directoryIdParamSchema
 } from './schemas/params.js';
 import { type AssetTypeQuery, assetTypeQuerySchema } from './schemas/query.js';
 
@@ -145,14 +145,14 @@ export const assetController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/assets/:assetId',
         schema: {
-            params: assetIdSchema
+            params: assetIdParamSchema
         },
         handler: async (
             {
                 params: { assetId },
                 user
             }: FastifyRequest<{
-                Params: AssetIdParams;
+                Params: AssetIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -166,14 +166,14 @@ export const assetController = async (app: FastifyInstance) => {
         method: 'DELETE',
         url: '/assets/:assetId',
         schema: {
-            params: assetIdSchema
+            params: assetIdParamSchema
         },
         handler: async (
             {
                 params: { assetId },
                 user
             }: FastifyRequest<{
-                Params: AssetIdParams;
+                Params: AssetIdParam;
             }>,
             rep: FastifyReply
         ) => {
@@ -230,14 +230,14 @@ export const assetController = async (app: FastifyInstance) => {
         method: 'GET',
         url: '/directories/:directoryId',
         schema: {
-            params: directoryIdSchema
+            params: directoryIdParamSchema
         },
         handler: async (
             {
                 user,
                 params: { directoryId }
             }: FastifyRequest<{
-                Params: DirectoryIdParams;
+                Params: DirectoryIdParam;
                 Body: CreateDirectoryBody;
             }>,
             rep: FastifyReply
@@ -255,7 +255,7 @@ export const assetController = async (app: FastifyInstance) => {
         method: 'PATCH',
         url: '/directories/:directoryId',
         schema: {
-            params: directoryIdSchema,
+            params: directoryIdParamSchema,
             body: updateDirectorySchema
         },
         handler: async (
@@ -264,7 +264,7 @@ export const assetController = async (app: FastifyInstance) => {
                 params: { directoryId },
                 user
             }: FastifyRequest<{
-                Params: DirectoryIdParams;
+                Params: DirectoryIdParam;
                 Body: UpdateDirectoryBody;
             }>,
             rep: FastifyReply
@@ -280,14 +280,14 @@ export const assetController = async (app: FastifyInstance) => {
         method: 'DELETE',
         url: '/directories/:directoryId',
         schema: {
-            params: directoryIdSchema
+            params: directoryIdParamSchema
         },
         handler: async (
             {
                 params: { directoryId },
                 user
             }: FastifyRequest<{
-                Params: DirectoryIdParams;
+                Params: DirectoryIdParam;
             }>,
             rep: FastifyReply
         ) => {

@@ -1,6 +1,6 @@
 import { type Static, Type } from '@sinclair/typebox';
 
-export const assetIdSchema = Type.Object(
+export const assetIdParamSchema = Type.Object(
     {
         assetId: Type.Number()
     },
@@ -9,9 +9,9 @@ export const assetIdSchema = Type.Object(
     }
 );
 
-export type AssetIdParams = Static<typeof assetIdSchema>;
+export type AssetIdParam = Static<typeof assetIdParamSchema>;
 
-export const characterIdSchema = Type.Object(
+export const characterIdParamSchema = Type.Object(
     {
         characterId: Type.Number()
     },
@@ -20,9 +20,9 @@ export const characterIdSchema = Type.Object(
     }
 );
 
-export type CharacterIdParams = Static<typeof characterIdSchema>;
+export type CharacterIdParam = Static<typeof characterIdParamSchema>;
 
-export const directoryIdSchema = Type.Object(
+export const directoryIdParamSchema = Type.Object(
     {
         directoryId: Type.Number()
     },
@@ -31,9 +31,9 @@ export const directoryIdSchema = Type.Object(
     }
 );
 
-export type DirectoryIdParams = Static<typeof directoryIdSchema>;
+export type DirectoryIdParam = Static<typeof directoryIdParamSchema>;
 
-export const gameIdSchema = Type.Object(
+export const gameIdParamSchema = Type.Object(
     {
         gameId: Type.String()
     },
@@ -42,9 +42,9 @@ export const gameIdSchema = Type.Object(
     }
 );
 
-export type GameIdParams = Static<typeof gameIdSchema>;
+export type GameIdParam = Static<typeof gameIdParamSchema>;
 
-export const noteIdSchema = Type.Object(
+export const noteIdParamSchema = Type.Object(
     {
         noteId: Type.Number()
     },
@@ -53,9 +53,9 @@ export const noteIdSchema = Type.Object(
     }
 );
 
-export type NoteIdParams = Static<typeof noteIdSchema>;
+export type NoteIdParam = Static<typeof noteIdParamSchema>;
 
-export const noteActionSchema = Type.Object(
+export const noteActionParamSchema = Type.Object(
     {
         action: Type.Union([Type.Literal('up'), Type.Literal('down')])
     },
@@ -64,9 +64,9 @@ export const noteActionSchema = Type.Object(
     }
 );
 
-export type NoteActionParams = Static<typeof noteActionSchema>;
+export type NoteActionParam = Static<typeof noteActionParamSchema>;
 
-export const sessionIdSchema = Type.Object(
+export const sessionIdParamSchema = Type.Object(
     {
         sessionId: Type.Number()
     },
@@ -75,9 +75,9 @@ export const sessionIdSchema = Type.Object(
     }
 );
 
-export type SessionIdParams = Static<typeof sessionIdSchema>;
+export type SessionIdParam = Static<typeof sessionIdParamSchema>;
 
-export const sketchIdSchema = Type.Object(
+export const sketchIdParamSchema = Type.Object(
     {
         sketchId: Type.Number()
     },
@@ -86,9 +86,9 @@ export const sketchIdSchema = Type.Object(
     }
 );
 
-export type SketchIdParams = Static<typeof sketchIdSchema>;
+export type SketchIdParam = Static<typeof sketchIdParamSchema>;
 
-export const userIdSchema = Type.Object(
+export const userIdParamSchema = Type.Object(
     {
         userId: Type.Number()
     },
@@ -97,4 +97,4 @@ export const userIdSchema = Type.Object(
     }
 );
 
-export type UserIdParams = Static<typeof userIdSchema>;
+export type UserIdParam = Static<typeof userIdParamSchema>;
