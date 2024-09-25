@@ -10,7 +10,6 @@ import {
     getUsers,
     updateUserById
 } from '../services/queries/user.js';
-import type { QueryParam } from '../types/api.js';
 import {
     type CacheJwtData,
     controlAdmin,
@@ -25,6 +24,7 @@ import {
     defaultUserData
 } from './helpers/user.js';
 import { type UserIdParams, userIdSchema } from './schemas/params.js';
+import { type DisabledQuery, disabledQuerySchema } from './schemas/query.js';
 import {
     type CreateUserBody,
     type UpdateUserBody,
@@ -39,18 +39,18 @@ export const userController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/users',
+        schema: {
+            querystring: disabledQuerySchema
+        },
         handler: async (
             {
-                query
+                query: { disabled }
             }: FastifyRequest<{
-                Querystring: {
-                    disabled?: QueryParam;
-                };
+                Querystring: DisabledQuery;
             }>,
             rep: FastifyReply
         ) => {
-            const getDisabled = query.disabled === 'true';
-            const users = await getUsers(getDisabled);
+            const users = await getUsers(disabled);
             rep.send({ users });
         }
     });

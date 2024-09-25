@@ -22,7 +22,6 @@ import {
     getUserDirectoryByIdOrThrow,
     updateDirectoryById
 } from '../services/queries/directory.js';
-import type { QueryParam } from '../types/api.js';
 import type { TypedFile } from '../types/asset.js';
 import {
     assetDir,
@@ -46,6 +45,7 @@ import {
     assetIdSchema,
     directoryIdSchema
 } from './schemas/params.js';
+import { type AssetTypeQuery, assetTypeQuerySchema } from './schemas/query.js';
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {
@@ -64,19 +64,19 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/assets',
+        schema: {
+            querystring: assetTypeQuerySchema
+        },
         handler: async (
             {
-                query,
+                query: { type },
                 user
             }: FastifyRequest<{
-                Querystring: {
-                    type?: QueryParam;
-                };
+                Querystring: AssetTypeQuery;
             }>,
             rep: FastifyReply
         ) => {
-            const assetType = query.type ? String(query.type) : undefined;
-            const assets = await getUserAssets(user.id, assetType);
+            const assets = await getUserAssets(user.id, type);
             rep.send({ assets });
         }
     });
@@ -193,17 +193,7 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/directories',
-        handler: async (
-            {
-                user
-            }: FastifyRequest<{
-                Querystring: {
-                    type?: QueryParam;
-                    include?: QueryParam;
-                };
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
             const directories = await getUserDirectories(user.id);
             rep.send({ directories });
         }

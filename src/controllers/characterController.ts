@@ -23,7 +23,6 @@ import {
 } from '../services/queries/character.js';
 import { getUserByIdOrThrow } from '../services/queries/user.js';
 import { validateSchema } from '../services/typebox.js';
-import type { QueryParam } from '../types/api.js';
 import { assetDir, controlFile } from './helpers/asset.js';
 import { controlSelf } from './helpers/auth.js';
 import {
@@ -46,6 +45,7 @@ import {
     characterIdSchema,
     userIdSchema
 } from './schemas/params.js';
+import { type UserQuery, userQuerySchema } from './schemas/query.js';
 
 export const characterController = async (app: FastifyInstance) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
@@ -55,17 +55,17 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/characters',
+        schema: {
+            querystring: userQuerySchema
+        },
         handler: async (
             {
-                query
+                query: { user: userId }
             }: FastifyRequest<{
-                Querystring: {
-                    user?: QueryParam;
-                };
+                Querystring: UserQuery;
             }>,
             rep: FastifyReply
         ) => {
-            const userId = query.user ? Number(query.user) : undefined;
             if (userId) {
                 await getUserByIdOrThrow(userId);
             }
