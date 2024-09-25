@@ -27,10 +27,10 @@ setValidatorCompilers(app);
 
 export const initApp = async () => {
     try {
-        log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-        log.info('~~~~~~~ Cthunline API Server ~~~~~~~');
-        log.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-        log.info('Registering middlewares');
+        log.always('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+        log.always('~~~~~~~ Cthunline API Server ~~~~~~~');
+        log.always('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+        log.always('Registering middlewares');
         // cookie parser
         await app.register(fastifyCookie, {
             secret: getEnv('COOKIE_SECRET')
@@ -46,18 +46,18 @@ export const initApp = async () => {
         // custom schema error formatter
         app.setSchemaErrorFormatter(schemaErrorFormatter);
         // database
-        log.info('Migrating database schema');
+        log.always('Migrating database schema');
         await migrateDb();
-        log.info('Initializing database');
+        log.always('Initializing database');
         await initDb();
         // data migrations
-        log.info('Migrating data');
+        log.always('Migrating data');
         await migrateData();
         // api routes
-        log.info('Registering routes');
+        log.always('Registering routes');
         await app.register(mainController);
         // web sockets
-        log.info('Initializing web sockets');
+        log.always('Initializing web sockets');
         socketRouter(app);
         // emit ready event
         app.ready();

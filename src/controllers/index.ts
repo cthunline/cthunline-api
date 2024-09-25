@@ -78,7 +78,7 @@ export const mainController = async (app: FastifyInstance) => {
 
     // serve web client build assets in production
     if (isProd) {
-        log.info('Serving production web client build');
+        log.always('Serving production web client build');
         await app.register(FastifyStatic, {
             root: path.join(dirname, '../web'),
             prefix: '/',

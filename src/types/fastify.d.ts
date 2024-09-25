@@ -10,4 +10,7 @@ declare module 'fastify' {
     interface FastifyRequest {
         user: SafeUser;
     }
+    interface FastifyBaseLogger {
+        always: pino.LogFn;
+    }
 }

@@ -46,7 +46,10 @@ Logger instance.
 */
 export const log: FastifyBaseLogger = pino(
     {
-        level
+        level,
+        customLevels: {
+            always: 999
+        }
     },
     pino.multistream(streams)
 );
