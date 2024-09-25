@@ -12,12 +12,12 @@ import { migrateData } from './migrations/index.js';
 import { initDb, migrateDb } from './services/db.js';
 import { getEnv } from './services/env.js';
 import { errorHandler, schemaErrorFormatter } from './services/errors.js';
-import { fastifyLogger, log } from './services/log.js';
+import { log } from './services/log.js';
 import { setValidatorCompilers } from './services/validator.js';
 import { socketRouter } from './sockets/index.js';
 
 export const app = fastify({
-    loggerInstance: fastifyLogger,
+    loggerInstance: log,
     trustProxy: getEnv('REVERSE_PROXY'),
     querystringParser: (str) => qs.parse(str)
 });
