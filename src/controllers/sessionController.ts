@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { parseParamId } from '../services/api.js';
 import { ValidationError } from '../services/errors.js';
 import { isValidGameId } from '../services/games.js';
 import { deleteSessionNotes } from '../services/queries/note.js';
@@ -13,6 +12,7 @@ import {
 } from '../services/queries/session.js';
 import { controlSelf } from './helpers/auth.js';
 import { defaultSketchData } from './helpers/sketch.js';
+import { type SessionIdParams, sessionIdSchema } from './schemas/params.js';
 import {
     type CreateSessionBody,
     type UpdateSessionBody,
@@ -71,17 +71,17 @@ export const sessionController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/sessions/:sessionId',
+        schema: {
+            params: sessionIdSchema
+        },
         handler: async (
             {
-                params
+                params: { sessionId }
             }: FastifyRequest<{
-                Params: {
-                    sessionId: string;
-                };
+                Params: SessionIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const sessionId = parseParamId(params, 'sessionId');
             const session = await getSessionByIdOrThrow(sessionId);
             rep.send(session);
         }
@@ -91,21 +91,21 @@ export const sessionController = async (app: FastifyInstance) => {
     app.route({
         method: 'PATCH',
         url: '/sessions/:sessionId',
-        schema: { body: updateSessionSchema },
+        schema: {
+            params: sessionIdSchema,
+            body: updateSessionSchema
+        },
         handler: async (
             {
                 body,
-                params,
+                params: { sessionId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    sessionId: string;
-                };
+                Params: SessionIdParams;
                 Body: UpdateSessionBody;
             }>,
             rep: FastifyReply
         ) => {
-            const sessionId = parseParamId(params, 'sessionId');
             const session = await getSessionByIdOrThrow(sessionId);
             controlSelf(session.masterId, user);
             const updatedSession = await updateSessionById(session.id, body);
@@ -117,18 +117,18 @@ export const sessionController = async (app: FastifyInstance) => {
     app.route({
         method: 'DELETE',
         url: '/sessions/:sessionId',
+        schema: {
+            params: sessionIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { sessionId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    sessionId: string;
-                };
+                Params: SessionIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const sessionId = parseParamId(params, 'sessionId');
             const session = await getSessionByIdOrThrow(sessionId);
             controlSelf(session.masterId, user);
             await deleteSessionNotes(sessionId);

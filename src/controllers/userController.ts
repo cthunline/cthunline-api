@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { parseParamId } from '../services/api.js';
 import { cache } from '../services/cache.js';
 import { hashPassword, verifyPassword } from '../services/crypto.js';
 import { ValidationError } from '../services/errors.js';
@@ -25,6 +24,7 @@ import {
     controlUniqueEmail,
     defaultUserData
 } from './helpers/user.js';
+import { type UserIdParams, userIdSchema } from './schemas/params.js';
 import {
     type CreateUserBody,
     type UpdateUserBody,
@@ -88,17 +88,17 @@ export const userController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/users/:userId',
+        schema: {
+            params: userIdSchema
+        },
         handler: async (
             {
-                params
+                params: { userId }
             }: FastifyRequest<{
-                Params: {
-                    userId: string;
-                };
+                Params: UserIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const userId = parseParamId(params, 'userId');
             const user = await getUserByIdOrThrow(userId);
             rep.send(user);
         }
@@ -108,21 +108,21 @@ export const userController = async (app: FastifyInstance) => {
     app.route({
         method: 'PATCH',
         url: '/users/:userId',
-        schema: { body: updateUserSchema },
+        schema: {
+            params: userIdSchema,
+            body: updateUserSchema
+        },
         handler: async (
             {
-                params,
+                params: { userId },
                 body,
                 user: reqUser
             }: FastifyRequest<{
-                Params: {
-                    userId: string;
-                };
+                Params: UserIdParams;
                 Body: UpdateUserBody;
             }>,
             rep: FastifyReply
         ) => {
-            const userId = parseParamId(params, 'userId');
             try {
                 controlAdmin(reqUser);
             } catch {

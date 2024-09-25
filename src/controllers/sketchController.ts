@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { parseParamId } from '../services/api.js';
 import {
     createSketch,
     deleteSketchById,
@@ -10,6 +9,12 @@ import {
 } from '../services/queries/sketch.js';
 import { controlSelf } from './helpers/auth.js';
 import { controlSessionGameMaster } from './helpers/session.js';
+import {
+    type SessionIdParams,
+    type SketchIdParams,
+    sessionIdSchema,
+    sketchIdSchema
+} from './schemas/params.js';
 import {
     type CreateSketchBody,
     type UpdateSketchBody,
@@ -24,18 +29,18 @@ export const sketchController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/sessions/:sessionId/sketchs',
+        schema: {
+            params: sessionIdSchema
+        },
         handler: async (
             {
                 user,
-                params
+                params: { sessionId }
             }: FastifyRequest<{
-                Params: {
-                    sessionId: string;
-                };
+                Params: SessionIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const sessionId = parseParamId(params, 'sessionId');
             const session = await controlSessionGameMaster(sessionId, user.id);
             const sketchs = await getUserSessionSketchs(user.id, session.id);
             rep.send({ sketchs });
@@ -46,21 +51,21 @@ export const sketchController = async (app: FastifyInstance) => {
     app.route({
         method: 'POST',
         url: '/sessions/:sessionId/sketchs',
-        schema: { body: createSketchSchema },
+        schema: {
+            params: sessionIdSchema,
+            body: createSketchSchema
+        },
         handler: async (
             {
-                params,
+                params: { sessionId },
                 body,
                 user
             }: FastifyRequest<{
-                Params: {
-                    sessionId: string;
-                };
+                Params: SessionIdParams;
                 Body: CreateSketchBody;
             }>,
             rep: FastifyReply
         ) => {
-            const sessionId = parseParamId(params, 'sessionId');
             const session = await controlSessionGameMaster(sessionId, user.id);
             const createdSketch = await createSketch({
                 ...body,
@@ -75,21 +80,21 @@ export const sketchController = async (app: FastifyInstance) => {
     app.route({
         method: 'PATCH',
         url: '/sketchs/:sketchId',
-        schema: { body: updateSketchSchema },
+        schema: {
+            params: sketchIdSchema,
+            body: updateSketchSchema
+        },
         handler: async (
             {
-                params,
+                params: { sketchId },
                 body,
                 user
             }: FastifyRequest<{
-                Params: {
-                    sketchId: string;
-                };
+                Params: SketchIdParams;
                 Body: UpdateSketchBody;
             }>,
             rep: FastifyReply
         ) => {
-            const sketchId = parseParamId(params, 'sketchId');
             await getUserSketchByIdOrThrow(user.id, sketchId);
             const updatedSketch = await updateSketchById(sketchId, body);
             rep.send(updatedSketch);
@@ -100,18 +105,18 @@ export const sketchController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/sketchs/:sketchId',
+        schema: {
+            params: sketchIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { sketchId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    sketchId: string;
-                };
+                Params: SketchIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const sketchId = parseParamId(params, 'sketchId');
             const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
             rep.send(sketch);
         }
@@ -121,18 +126,18 @@ export const sketchController = async (app: FastifyInstance) => {
     app.route({
         method: 'DELETE',
         url: '/sketchs/:sketchId',
+        schema: {
+            params: sketchIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { sketchId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    sketchId: string;
-                };
+                Params: SketchIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const sketchId = parseParamId(params, 'sketchId');
             const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
             controlSelf(sketch.userId, user);
             await deleteSketchById(sketchId);

@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { NotFoundError } from '../services/errors.js';
 import { gamesData, isValidGameId } from '../services/games.js';
+import { type GameIdParams, gameIdSchema } from './schemas/params.js';
 
 export const gameController = async (app: FastifyInstance) => {
     // get all games
@@ -19,18 +20,18 @@ export const gameController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/games/:gameId',
+        schema: {
+            params: gameIdSchema
+        },
         handler: async (
             {
-                params
+                params: { gameId }
             }: FastifyRequest<{
-                Params: {
-                    gameId: string;
-                };
+                Params: GameIdParams;
             }>,
             rep: FastifyReply
         ) => {
             // biome-ignore lint/suspicious/useAwait: fastify handler require async
-            const { gameId } = params;
             if (!isValidGameId(gameId)) {
                 throw new NotFoundError('Game not found');
             }

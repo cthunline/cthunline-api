@@ -4,8 +4,7 @@ import { describe, expect, test } from 'vitest';
 import {
     controlAdmin,
     controlAdminMiddleware,
-    controlSelf,
-    controlSelfMiddleware
+    controlSelf
 } from '../../src/controllers/helpers/auth.js';
 import type { SafeUser, User } from '../../src/drizzle/schema.js';
 import {
@@ -60,25 +59,6 @@ describe('[Unit] Auth', () => {
             const id = 123;
             expect(() => controlSelf(id, { id } as User)).to.not.throw();
             expect(() => controlSelf(999, { id } as User)).to.throw(
-                ForbiddenError
-            );
-        });
-    });
-
-    describe('controlSelfMiddleware', () => {
-        test('Should control request user match userId', async () => {
-            const id = 123;
-            await expectAsync(
-                controlSelfMiddleware({
-                    user: { id },
-                    params: { userId: id.toString() }
-                } as FastifyRequest<{ Params: { userId: string } }>)
-            );
-            await expectAsync(
-                controlSelfMiddleware({
-                    user: { id },
-                    params: { userId: '999' }
-                } as FastifyRequest<{ Params: { userId: string } }>),
                 ForbiddenError
             );
         });

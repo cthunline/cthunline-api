@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { parseParamId } from '../services/api.js';
 import { log } from '../services/log.js';
 import {
     cleanMultipartFiles,
@@ -41,6 +40,12 @@ import {
     updateDirectorySchema,
     uploadAssetsSchema
 } from './schemas/asset.js';
+import {
+    type AssetIdParams,
+    type DirectoryIdParams,
+    assetIdSchema,
+    directoryIdSchema
+} from './schemas/params.js';
 
 // create subdirectory for temporary uploads in asset dir if not exist and return its path
 (async () => {
@@ -139,18 +144,18 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/assets/:assetId',
+        schema: {
+            params: assetIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { assetId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    assetId: string;
-                };
+                Params: AssetIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const assetId = parseParamId(params, 'assetId');
             const asset = await getUserAssetByIdOrThrow(user.id, assetId);
             rep.send(asset);
         }
@@ -160,18 +165,18 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'DELETE',
         url: '/assets/:assetId',
+        schema: {
+            params: assetIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { assetId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    assetId: string;
-                };
+                Params: AssetIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const assetId = parseParamId(params, 'assetId');
             const { path: assetPath } = await getUserAssetByIdOrThrow(
                 user.id,
                 assetId
@@ -234,19 +239,19 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/directories/:directoryId',
+        schema: {
+            params: directoryIdSchema
+        },
         handler: async (
             {
                 user,
-                params
+                params: { directoryId }
             }: FastifyRequest<{
-                Params: {
-                    directoryId: string;
-                };
+                Params: DirectoryIdParams;
                 Body: CreateDirectoryBody;
             }>,
             rep: FastifyReply
         ) => {
-            const directoryId = parseParamId(params, 'directoryId');
             const directory = await getUserDirectoryByIdOrThrow(
                 user.id,
                 directoryId
@@ -259,21 +264,21 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'PATCH',
         url: '/directories/:directoryId',
-        schema: { body: updateDirectorySchema },
+        schema: {
+            params: directoryIdSchema,
+            body: updateDirectorySchema
+        },
         handler: async (
             {
                 body,
-                params,
+                params: { directoryId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    directoryId: string;
-                };
+                Params: DirectoryIdParams;
                 Body: UpdateDirectoryBody;
             }>,
             rep: FastifyReply
         ) => {
-            const directoryId = parseParamId(params, 'directoryId');
             await getUserDirectoryByIdOrThrow(user.id, directoryId);
             const directory = await updateDirectoryById(directoryId, body);
             rep.send(directory);
@@ -284,18 +289,18 @@ export const assetController = async (app: FastifyInstance) => {
     app.route({
         method: 'DELETE',
         url: '/directories/:directoryId',
+        schema: {
+            params: directoryIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { directoryId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    directoryId: string;
-                };
+                Params: DirectoryIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const directoryId = parseParamId(params, 'directoryId');
             await getUserDirectoryByIdOrThrow(user.id, directoryId);
             // get all directories of the user
             const directories = await getUserDirectories(user.id);

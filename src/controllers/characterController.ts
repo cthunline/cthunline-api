@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Character as CharacterData } from '@cthunline/games';
+import { Type } from '@sinclair/typebox';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { parseParamId } from '../services/api.js';
 import {
     ConflictError,
     InternError,
@@ -40,6 +40,12 @@ import {
     updateCharacterSchema,
     uploadPortraitSchema
 } from './schemas/character.js';
+import {
+    type CharacterIdParams,
+    type UserIdParams,
+    characterIdSchema,
+    userIdSchema
+} from './schemas/params.js';
 
 export const characterController = async (app: FastifyInstance) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
@@ -102,17 +108,17 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'GET',
         url: '/characters/:characterId',
+        schema: {
+            params: characterIdSchema
+        },
         handler: async (
             {
-                params
+                params: { characterId }
             }: FastifyRequest<{
-                Params: {
-                    characterId: string;
-                };
+                Params: CharacterIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const characterId = parseParamId(params, 'characterId');
             const character = await getCharacterByIdOrThrow(characterId);
             rep.send(character);
         }
@@ -122,21 +128,21 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'PATCH',
         url: '/characters/:characterId',
-        schema: { body: updateCharacterSchema },
+        schema: {
+            params: characterIdSchema,
+            body: updateCharacterSchema
+        },
         handler: async (
             {
                 body,
-                params,
+                params: { characterId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    characterId: string;
-                };
+                Params: CharacterIdParams;
                 Body: UpdateCharacterBody;
             }>,
             rep: FastifyReply
         ) => {
-            const characterId = parseParamId(params, 'characterId');
             const { gameId, userId } =
                 await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
@@ -156,18 +162,18 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'DELETE',
         url: '/characters/:characterId',
+        schema: {
+            params: characterIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { characterId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    characterId: string;
-                };
+                Params: CharacterIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const characterId = parseParamId(params, 'characterId');
             const { userId } = await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
             await deleteCharacterById(characterId);
@@ -180,19 +186,22 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'POST',
         url: '/characters/:characterId/portrait',
+        schema: {
+            params: characterIdSchema
+        },
         onResponse: async () => {
             await cleanMultipartFiles();
         },
         handler: async (
             req: FastifyRequest<{
-                Params: {
-                    characterId: string;
-                };
+                Params: CharacterIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const { user } = req;
-            const characterId = parseParamId(req.params, 'characterId');
+            const {
+                user,
+                params: { characterId }
+            } = req;
             const character = await getCharacterByIdOrThrow(characterId);
             const options = getPortraitMultipartOptions();
             const body = await parseMultipartBody({
@@ -242,18 +251,18 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'DELETE',
         url: '/characters/:characterId/portrait',
+        schema: {
+            params: characterIdSchema
+        },
         handler: async (
             {
-                params,
+                params: { characterId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    characterId: string;
-                };
+                Params: CharacterIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const characterId = parseParamId(params, 'characterId');
             const character = await getCharacterByIdOrThrow(characterId);
             controlSelf(character.userId, user);
             if (character.portrait) {
@@ -273,20 +282,20 @@ export const characterController = async (app: FastifyInstance) => {
     app.route({
         method: 'PUT',
         url: '/characters/:characterId/transfer/:userId',
+        schema: {
+            params: Type.Composite([characterIdSchema, userIdSchema], {
+                additionalProperties: false
+            })
+        },
         handler: async (
             {
-                params,
+                params: { characterId, userId: targetUserId },
                 user
             }: FastifyRequest<{
-                Params: {
-                    characterId: string;
-                    userId: string;
-                };
+                Params: CharacterIdParams & UserIdParams;
             }>,
             rep: FastifyReply
         ) => {
-            const characterId = parseParamId(params, 'characterId');
-            const targetUserId = parseParamId(params, 'userId');
             const [character, targetUser] = await Promise.all([
                 getCharacterByIdOrThrow(characterId),
                 getUserByIdOrThrow(targetUserId)

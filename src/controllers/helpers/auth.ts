@@ -4,7 +4,6 @@ import type { FastifyRequest } from 'fastify';
 import ms from 'ms';
 
 import type { SafeUser } from '../../drizzle/schema.js';
-import { parseParamId } from '../../services/api.js';
 import { cache } from '../../services/cache.js';
 import { decrypt, verifyJwt } from '../../services/crypto.js';
 import { getEnv } from '../../services/env.js';
@@ -41,20 +40,6 @@ export const controlSelf = (userId: number, currentUser: SafeUser) => {
     if (userId !== currentUser.id) {
         throw new ForbiddenError();
     }
-};
-
-/**
-Middleware controlling that the given userId is the same as the currently authenticated user's id.
-*/
-export const controlSelfMiddleware = async ({
-    params,
-    user
-}: FastifyRequest<{
-    Params: { userId: string };
-}>) => {
-    // biome-ignore lint/suspicious/useAwait: fastify middlewares require async
-    const userId = parseParamId(params, 'userId');
-    controlSelf(userId, user);
 };
 
 /**
