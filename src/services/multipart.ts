@@ -107,10 +107,36 @@ export const parseMultipartBody = async <
 export const cleanMultipartFiles = async () => {
     try {
         await Promise.all(
-            multipartFiles.map(({ filePath }) => fs.promises.unlink(filePath))
+            multipartFiles.map(({ filePath }) =>
+                (async () => {
+                    try {
+                        await fs.promises.unlink(filePath);
+                    } catch (err: unknown) {
+                        if (err instanceof Error) {
+                            const error: NodeJS.ErrnoException = err;
+                            /*
+                            if file is not there anymore / is missing
+                            (already deleted / renamed / moved)
+                            just skip and don't throw error
+                            */
+                            if (
+                                typeof error.errno === 'number' &&
+                                Math.abs(error.errno) ===
+                                    os.constants.errno.ENOENT
+                            ) {
+                                return;
+                            }
+                        }
+                        throw err;
+                    }
+                })()
+            )
         );
-    } catch {
-        throw new InternError('Error while cleaning multipart files');
+    } catch (err: unknown) {
+        const errorBaseMessage = 'Error while cleaning multipart files';
+        const errorAdditionalInfo =
+            err instanceof Error ? ` : ${err.message}` : '';
+        throw new InternError(`${errorBaseMessage}${errorAdditionalInfo}`);
     }
     multipartFiles = [];
 };
