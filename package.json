@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.16.2",
+    "version": "1.16.3",
     "type": "module",
     "scripts": {
         "dev": "cross-env nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"tsx src/index.ts\"",

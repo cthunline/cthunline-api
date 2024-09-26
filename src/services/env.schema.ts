@@ -21,7 +21,7 @@ export const envSchema = Type.Object({
     LOG_LEVEL: Type.Union([
         Type.Literal('debug'),
         Type.Literal('info'),
-        Type.Literal('warning'),
+        Type.Literal('warn'),
         Type.Literal('error')
     ]),
     LOG_DIR: Type.Optional(Type.String({ minLength: 1 })),
