@@ -1,22 +1,24 @@
 import { type Static, Type } from '@sinclair/typebox';
 
-import { multipartFileSchema } from '../../services/multipart.js';
+import { multipartFileSchema } from './definitions.js';
 
-export const uploadAssetsSchema = Type.Object(
+export const uploadAssetsFilesSchema = Type.Object(
     {
-        assets: Type.Array(multipartFileSchema),
-        directoryId: Type.Optional(Type.RegExp(/^\d+$/))
+        assets: Type.Array(multipartFileSchema)
     },
     {
         additionalProperties: false
     }
 );
 
-export type UploadAssetsBody = Static<typeof uploadAssetsSchema>;
-
-export const uploadAssetsFieldsSchema = Type.Omit(uploadAssetsSchema, [
-    'assets'
-]);
+export const uploadAssetsFieldsSchema = Type.Object(
+    {
+        directoryId: Type.Optional(Type.RegExp(/^\d+$/))
+    },
+    {
+        additionalProperties: false
+    }
+);
 
 export const createDirectorySchema = Type.Object(
     {

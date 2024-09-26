@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { Character } from '../../drizzle/schema.js';
 import { cache } from '../../services/cache.js';
 import { getEnv } from '../../services/env.js';
-import type { ParseMultipartBodyFileOptions } from '../../services/multipart.js';
+import type { ParseMultipartFileOptions } from '../../services/multipart.js';
 import { assetTempDir, getAssetDir } from './asset.js';
 
 /**
@@ -16,13 +16,12 @@ export const getCharacterCacheKey = (characterId: number) =>
 export const portraitDirName = 'portraits';
 
 // multipart parsing options
-export const getPortraitMultipartOptions =
-    (): ParseMultipartBodyFileOptions => ({
-        tmpDir: assetTempDir,
-        maxSizePerFile: getEnv('PORTRAIT_MAX_SIZE_MB') * 1024 * 1024,
-        maxSizeTotal: getEnv('PORTRAIT_MAX_SIZE_MB') * 1024 * 1024,
-        maxFiles: 1
-    });
+export const getPortraitMultipartOptions = (): ParseMultipartFileOptions => ({
+    tmpDir: assetTempDir,
+    maxSizePerFile: getEnv('PORTRAIT_MAX_SIZE_MB') * 1024 * 1024,
+    maxSizeTotal: getEnv('PORTRAIT_MAX_SIZE_MB') * 1024 * 1024,
+    maxFiles: 1
+});
 
 /**
 Creates user subdirectory in asset dir if not exist and return its path.

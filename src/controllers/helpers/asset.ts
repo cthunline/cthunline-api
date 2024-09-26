@@ -6,7 +6,7 @@ import { getEnv } from '../../services/env.js';
 import { InternError, ValidationError } from '../../services/errors.js';
 import type {
     MultipartFileData,
-    ParseMultipartBodyFileOptions
+    ParseMultipartFileOptions
 } from '../../services/multipart.js';
 import { type FileType, type MimeType, mimeTypes } from '../../types/asset.js';
 
@@ -66,7 +66,7 @@ export const controlUserDir = async (userId: number): Promise<string> => {
 };
 
 // multipart parsing options
-export const getAssetMultipartOptions = (): ParseMultipartBodyFileOptions => ({
+export const getAssetMultipartOptions = (): ParseMultipartFileOptions => ({
     tmpDir: assetTempDir,
     maxSizePerFile: getEnv('ASSET_MAX_SIZE_MB_PER_FILE') * 1024 * 1024,
     maxSizeTotal: getEnv('ASSET_MAX_SIZE_MB') * 1024 * 1024

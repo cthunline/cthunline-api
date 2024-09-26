@@ -10,10 +10,7 @@ import {
     ValidationError
 } from '../services/errors.js';
 import { type GameId, games, isValidGameId } from '../services/games.js';
-import {
-    cleanMultipartFiles,
-    parseMultipartBody
-} from '../services/multipart.js';
+import { cleanMultipartFiles, parseMultipart } from '../services/multipart.js';
 import {
     createCharacter,
     deleteCharacterById,
@@ -37,7 +34,7 @@ import {
     type UpdateCharacterBody,
     createCharacterSchema,
     updateCharacterSchema,
-    uploadPortraitSchema
+    uploadPortraitFilesSchema
 } from './schemas/character.js';
 import {
     type CharacterIdParam,
@@ -204,17 +201,20 @@ export const characterController = async (app: FastifyInstance) => {
             } = req;
             const character = await getCharacterByIdOrThrow(characterId);
             const options = getPortraitMultipartOptions();
-            const body = await parseMultipartBody({
+            const { files } = await parseMultipart({
                 app,
                 req,
-                schema: uploadPortraitSchema,
+                schema: {
+                    files: uploadPortraitFilesSchema,
+                    fields: false
+                },
                 ...options
             });
             controlSelf(character.userId, user);
             // get portraits directory
             const portraitDirPath = await controlPortraitDir();
             // get file data
-            const file = body.portrait.shift();
+            const file = files.portrait[0];
             if (!file) {
                 throw new InternError('Could not get portrait file');
             }

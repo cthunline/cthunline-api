@@ -3,10 +3,7 @@ import path from 'node:path';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { log } from '../services/log.js';
-import {
-    cleanMultipartFiles,
-    parseMultipartBody
-} from '../services/multipart.js';
+import { cleanMultipartFiles, parseMultipart } from '../services/multipart.js';
 import {
     createAssets,
     deleteAssetById,
@@ -34,10 +31,10 @@ import {
 import {
     type CreateDirectoryBody,
     type UpdateDirectoryBody,
-    type UploadAssetsBody,
     createDirectorySchema,
     updateDirectorySchema,
-    uploadAssetsSchema
+    uploadAssetsFieldsSchema,
+    uploadAssetsFilesSchema
 } from './schemas/asset.js';
 import {
     type AssetIdParam,
@@ -89,30 +86,28 @@ export const assetController = async (app: FastifyInstance) => {
         onResponse: async () => {
             await cleanMultipartFiles();
         },
-        handler: async (
-            req: FastifyRequest<{
-                Body: UploadAssetsBody | undefined;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async (req: FastifyRequest, rep: FastifyReply) => {
             const { user } = req;
             const fileOptions = getAssetMultipartOptions();
-            const body = await parseMultipartBody({
+            const { files, fields } = await parseMultipart({
                 app,
                 req,
-                schema: uploadAssetsSchema,
+                schema: {
+                    files: uploadAssetsFilesSchema,
+                    fields: uploadAssetsFieldsSchema
+                },
                 ...fileOptions
             });
             // create user subdirectory if not exist
             const userDir = await controlUserDir(user.id);
             // control directoryId
-            const directoryId = body?.directoryId
-                ? Number(body.directoryId)
+            const directoryId = fields?.directoryId
+                ? Number(fields.directoryId)
                 : null;
             if (directoryId !== null) {
                 await getUserDirectoryByIdOrThrow(user.id, directoryId);
             }
-            const typedAssetFiles: TypedFile[] = body.assets.map((file) => ({
+            const typedAssetFiles: TypedFile[] = files.assets.map((file) => ({
                 ...file,
                 type: controlFile(file)
             }));

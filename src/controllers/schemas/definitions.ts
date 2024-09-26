@@ -1,4 +1,6 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { type Static, type TSchema, Type } from '@sinclair/typebox';
+
+import type { MultipartFileData } from '../../services/multipart.js';
 
 export const drawingPathSchema = Type.Object(
     {
@@ -100,3 +102,21 @@ export const sketchSchema = Type.Object(
 
 export type SketchBody = Static<typeof sketchSchema>;
 export type Sketch = SketchBody;
+
+export const multipartFileSchema = Type.Object(
+    {
+        mimeType: Type.String(),
+        fileName: Type.String(),
+        filePath: Type.String()
+    } satisfies Record<keyof MultipartFileData, TSchema>,
+    {
+        additionalProperties: false
+    }
+);
+
+export const emptyObjectSchema = Type.Object(
+    {},
+    {
+        additionalProperties: false
+    }
+);

@@ -1,6 +1,6 @@
 import { type Static, Type } from '@sinclair/typebox';
 
-import { multipartFileSchema } from '../../services/multipart.js';
+import { multipartFileSchema } from './definitions.js';
 
 export const createCharacterSchema = Type.Object(
     {
@@ -25,7 +25,7 @@ export const updateCharacterSchema = Type.Partial(
 
 export type UpdateCharacterBody = Static<typeof updateCharacterSchema>;
 
-export const uploadPortraitSchema = Type.Object(
+export const uploadPortraitFilesSchema = Type.Object(
     {
         portrait: Type.Array(multipartFileSchema)
     },
