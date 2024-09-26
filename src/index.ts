@@ -4,6 +4,6 @@ import { getEnv } from './services/env.js';
 await initApp();
 
 await app.listen({
-    port: getEnv('PORT'),
-    host: '0.0.0.0'
+    host: getEnv('HOST') ?? '0.0.0.0',
+    port: getEnv('PORT') ?? 8080
 });
