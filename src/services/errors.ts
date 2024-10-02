@@ -109,6 +109,9 @@ export const errorHandler = (
         if (err.data) {
             response.data = err.data;
         }
+        if (err instanceof InternError) {
+            log.error(err.stack);
+        }
         rep.status(err.status).send(response);
     } else {
         // if error is not handled throw an intern error and logs stack
