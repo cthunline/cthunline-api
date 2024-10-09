@@ -1,0 +1,11 @@
+{
+    "env": {
+        "NODE_ENV": "development"
+    },
+    "execMap": {
+        "ts": "tsx"
+    },
+    "ext": "ts,js,json",
+    "watch": ["src/**", ".env"],
+    "ignore": [".git", ".husky", ".vscode", "coverage", "node_modules", "tests"]
+}
