@@ -2,7 +2,7 @@ import { type Static, Type } from '@sinclair/typebox';
 
 export const assetIdParamSchema = Type.Object(
     {
-        assetId: Type.Number()
+        assetId: Type.Integer()
     },
     {
         additionalProperties: false
@@ -13,7 +13,7 @@ export type AssetIdParam = Static<typeof assetIdParamSchema>;
 
 export const characterIdParamSchema = Type.Object(
     {
-        characterId: Type.Number()
+        characterId: Type.Integer()
     },
     {
         additionalProperties: false
@@ -24,7 +24,7 @@ export type CharacterIdParam = Static<typeof characterIdParamSchema>;
 
 export const directoryIdParamSchema = Type.Object(
     {
-        directoryId: Type.Number()
+        directoryId: Type.Integer()
     },
     {
         additionalProperties: false
@@ -46,7 +46,7 @@ export type GameIdParam = Static<typeof gameIdParamSchema>;
 
 export const noteIdParamSchema = Type.Object(
     {
-        noteId: Type.Number()
+        noteId: Type.Integer()
     },
     {
         additionalProperties: false
@@ -68,7 +68,7 @@ export type NoteActionParam = Static<typeof noteActionParamSchema>;
 
 export const sessionIdParamSchema = Type.Object(
     {
-        sessionId: Type.Number()
+        sessionId: Type.Integer()
     },
     {
         additionalProperties: false
@@ -79,7 +79,7 @@ export type SessionIdParam = Static<typeof sessionIdParamSchema>;
 
 export const sketchIdParamSchema = Type.Object(
     {
-        sketchId: Type.Number()
+        sketchId: Type.Integer()
     },
     {
         additionalProperties: false
@@ -90,7 +90,7 @@ export type SketchIdParam = Static<typeof sketchIdParamSchema>;
 
 export const userIdParamSchema = Type.Object(
     {
-        userId: Type.Number()
+        userId: Type.Integer()
     },
     {
         additionalProperties: false

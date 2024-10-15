@@ -14,7 +14,7 @@ export type AssetTypeQuery = {
 
 export const userQuerySchema = Type.Partial(
     Type.Object({
-        user: Type.Number()
+        user: Type.Integer()
     })
 );
 
