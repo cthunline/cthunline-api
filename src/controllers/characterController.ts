@@ -225,10 +225,14 @@ export const characterController = async (app: FastifyInstance) => {
             // move temporary file to character's directory
             const { filePath, fileName } = typedFile;
             const portraitFileName = `${characterId}${path.extname(fileName)}`;
-            await fs.promises.rename(
+            // we copy then delete source instead of moving/renaming
+            // because moving/renaming can fail if source and destination
+            // are on different partition
+            await fs.promises.copyFile(
                 filePath,
                 path.join(portraitDirPath, portraitFileName)
             );
+            await fs.promises.unlink(filePath);
             // save portrait on character
             const portrait = path.join(portraitDirName, portraitFileName);
             const updatedCharacter = await updateCharacterById(characterId, {

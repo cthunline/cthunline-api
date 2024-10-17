@@ -114,7 +114,16 @@ export const assetController = async (app: FastifyInstance) => {
             // move temporary files to user's directory
             await Promise.all(
                 typedAssetFiles.map(({ filePath, fileName }) =>
-                    fs.promises.rename(filePath, path.join(userDir, fileName))
+                    (async () => {
+                        // we copy then delete source instead of moving/renaming
+                        // because moving/renaming can fail if source and destination
+                        // are on different partition
+                        await fs.promises.copyFile(
+                            filePath,
+                            path.join(userDir, fileName)
+                        );
+                        await fs.promises.unlink(filePath);
+                    })()
                 )
             );
             // save assets in database
