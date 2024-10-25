@@ -1,0 +1,28 @@
+skip_clone: true
+
+steps:
+- name: clone
+  image: alpine/git:latest
+  pull: true
+  commands:
+  - git clone https://github.com/cthunline/cthunline-docker.git .
+  - apk add --no-cache coreutils
+  - API_TAG=$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' --tags https://github.com/cthunline/cthunline-api.git '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3 | cut --delimiter='v' --fields=2)
+  - WEB_TAG=$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' --tags https://github.com/cthunline/cthunline-web.git '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3 | cut --delimiter='v' --fields=2)
+  - echo "latest,$API_TAG-$WEB_TAG" > .tags
+  when:
+    event:
+    - tag
+- name: docker  
+  image: plugins/docker:latest
+  pull: true
+  settings:
+    repo: cthunline/cthunline
+    username:
+      from_secret: docker_user
+    password:
+      from_secret: docker_token
+    squash: true
+  when:
+    event:
+    - tag
