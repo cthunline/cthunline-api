@@ -67,7 +67,7 @@ export const mainController = async (app: FastifyInstance) => {
         )
     );
 
-    const isProd = getEnv('ENVIRONMENT') === 'prod';
+    const isProd = getEnv('NODE_ENV') === 'production';
 
     // serve static assets
     await app.register(FastifyStatic, {

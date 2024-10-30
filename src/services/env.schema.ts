@@ -11,7 +11,10 @@ export const envSchema = Type.Object({
     DEFAULT_THEME: Type.Union([Type.Literal('dark'), Type.Literal('light')]),
     DEFAULT_LOCALE: Type.Union([Type.Literal('fr'), Type.Literal('en')]),
     // server
-    ENVIRONMENT: Type.Union([Type.Literal('dev'), Type.Literal('prod')]),
+    NODE_ENV: Type.Union([
+        Type.Literal('development'),
+        Type.Literal('production')
+    ]),
     HOST: Type.RegExp(ajvFormats.get('ipv4') as RegExp),
     PORT: Type.Integer({ minimum: 1 }),
     JWT_SECRET: Type.String({ minLength: 32, maxLength: 32 }),

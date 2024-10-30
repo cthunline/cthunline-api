@@ -21,7 +21,7 @@ export const getEnv = <T extends keyof Env>(key: T) => env[key];
 Dynamicaly change an environment variable value for testing purpose
 */
 export const mockEnvVar = <T extends keyof Env>(key: T, value: Env[T]) => {
-    if (env.ENVIRONMENT === 'dev') {
+    if (env.NODE_ENV === 'development') {
         env[key] = value;
     }
 };
@@ -31,7 +31,7 @@ Reset an environment variable value to its initial value.
 Can be used if environment variable values are changed for testing purposes.
 */
 export const resetEnvVar = <T extends keyof Env>(key: T) => {
-    if (env.ENVIRONMENT === 'dev') {
+    if (env.NODE_ENV === 'development') {
         env[key] = initialEnv[key];
     }
 };

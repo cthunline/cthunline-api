@@ -5,7 +5,7 @@ import FormData from 'form-data';
 import { afterAll, beforeAll, expect } from 'vitest';
 
 import { app, initApp } from '../../../src/app.js';
-import { getEnv } from '../../../src/services/env.js';
+import { getEnv, mockEnvVar } from '../../../src/services/env.js';
 
 import { Agent } from './agent.helper.js';
 import { assertError, assertUser } from './assert.helper.js';
@@ -15,6 +15,15 @@ export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 export const httpMethods: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
 beforeAll(async () => {
+    // force some environment variables values in test mode
+    mockEnvVar('NODE_ENV', 'development'); // force development mode
+    mockEnvVar('RL_WINDOW_DURATION', 1); // set short window for rate limit
+    mockEnvVar('RL_MAX_REQUESTS', 999); // set large number of requests for rate limit
+    mockEnvVar('CACHE_SKETCH_SAVE_MS', 100); // fixed sketch cache saving delay
+    mockEnvVar('ASSET_MAX_SIZE_MB', 20); // fixed max asset total size
+    mockEnvVar('ASSET_MAX_SIZE_MB_PER_FILE', 5); // fixed max asset size per file
+    mockEnvVar('PORTRAIT_MAX_SIZE_MB', 2); // fixed max portrait size
+    // init app
     await initApp();
     await app.listen({ port: getEnv('PORT'), host: '0.0.0.0' });
     await app.ready();
