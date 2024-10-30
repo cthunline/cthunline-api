@@ -13,8 +13,8 @@ steps:
   when:
     event:
     - tag
-- name: docker  
-  image: plugins/docker:latest
+- name: docker
+  image: woodpeckerci/plugin-docker-buildx:latest
   pull: true
   settings:
     repo: cthunline/cthunline
