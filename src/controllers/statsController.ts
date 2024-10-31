@@ -1,24 +1,15 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
 import { getInstanceStats } from './helpers/stats.js';
 
-export const statsController = async (app: FastifyInstance) => {
+export const statsController: FastifyPluginAsyncTypebox = async (app) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
 
     // get statistics about the instance
     app.route({
         method: 'GET',
         url: '/statistics',
-        handler: async (
-            {
-                user
-            }: FastifyRequest<{
-                Params: {
-                    sessionId: string;
-                };
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ user }, rep) => {
             const stats = await getInstanceStats(app, user.id);
             rep.send(stats);
         }

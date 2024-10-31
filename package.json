@@ -47,6 +47,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
+        "@fastify/type-provider-typebox": "^5.0.0",
         "@tsconfig/recommended": "^1.0.8",
         "@types/bcrypt": "^5.0.2",
         "@types/deep-equal-in-any-order": "^1.0.3",

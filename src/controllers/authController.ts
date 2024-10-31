@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
 import { cache } from '../services/cache.js';
 import { encrypt, generateJwt, verifyPassword } from '../services/crypto.js';
@@ -11,20 +11,20 @@ import {
     getCookieOptions,
     getJwtCacheKey
 } from './helpers/auth.js';
-import { type LoginBody, loginSchema } from './schemas/auth.js';
+import { loginSchema } from './schemas/auth.js';
 
-export const authController = async (app: FastifyInstance) => {
+export const authController: FastifyPluginAsyncTypebox = async (app) => {
     // check authentication validity
     app.route({
         method: 'GET',
         url: '/auth',
-        handler: async (req: FastifyRequest, rep: FastifyReply) => {
+        handler: async (req, rep) => {
             // biome-ignore lint/suspicious/useAwait: fastify handler require async
             rep.send(req.user);
         }
     });
 
-    await app.register(async (routeApp: FastifyInstance) => {
+    const rlSubController: FastifyPluginAsyncTypebox = async (routeApp) => {
         // rate limiter
         await registerRateLimiter(routeApp);
         // login using an email, if the email is valid sends a magic link to the user by email
@@ -32,12 +32,7 @@ export const authController = async (app: FastifyInstance) => {
             method: 'POST',
             url: '/auth',
             schema: { body: loginSchema },
-            handler: async (
-                req: FastifyRequest<{
-                    Body: LoginBody;
-                }>,
-                rep: FastifyReply
-            ) => {
+            handler: async (req, rep) => {
                 const { email, password } = req.body;
                 const unsafeUser = await getUnsafeUserByEmail(email);
                 if (!unsafeUser || !unsafeUser.isEnabled) {
@@ -59,13 +54,15 @@ export const authController = async (app: FastifyInstance) => {
                 rep.cookie('jwt', encryptedJwt, getCookieOptions()).send(user);
             }
         });
-    });
+    };
+
+    await app.register(rlSubController);
 
     // logout
     app.route({
         method: 'DELETE',
         url: '/auth',
-        handler: async ({ user }: FastifyRequest, rep: FastifyReply) => {
+        handler: async ({ user }, rep) => {
             const cacheKey = getJwtCacheKey(user.id);
             await cache.del(cacheKey);
             // delete jwt cookie on client

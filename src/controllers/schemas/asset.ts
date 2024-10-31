@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 import { multipartFileSchema } from './definitions.js';
 
@@ -30,8 +30,6 @@ export const createDirectorySchema = Type.Object(
     }
 );
 
-export type CreateDirectoryBody = Static<typeof createDirectorySchema>;
-
 export const updateDirectorySchema = Type.Partial(
     Type.Pick(createDirectorySchema, ['name']),
     {
@@ -39,5 +37,3 @@ export const updateDirectorySchema = Type.Partial(
         minProperties: 1
     }
 );
-
-export type UpdateDirectoryBody = Static<typeof updateDirectorySchema>;

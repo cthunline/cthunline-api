@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 export const assetIdParamSchema = Type.Object(
     {
@@ -9,8 +9,6 @@ export const assetIdParamSchema = Type.Object(
     }
 );
 
-export type AssetIdParam = Static<typeof assetIdParamSchema>;
-
 export const characterIdParamSchema = Type.Object(
     {
         characterId: Type.Integer()
@@ -19,8 +17,6 @@ export const characterIdParamSchema = Type.Object(
         additionalProperties: false
     }
 );
-
-export type CharacterIdParam = Static<typeof characterIdParamSchema>;
 
 export const directoryIdParamSchema = Type.Object(
     {
@@ -31,8 +27,6 @@ export const directoryIdParamSchema = Type.Object(
     }
 );
 
-export type DirectoryIdParam = Static<typeof directoryIdParamSchema>;
-
 export const gameIdParamSchema = Type.Object(
     {
         gameId: Type.String()
@@ -41,8 +35,6 @@ export const gameIdParamSchema = Type.Object(
         additionalProperties: false
     }
 );
-
-export type GameIdParam = Static<typeof gameIdParamSchema>;
 
 export const noteIdParamSchema = Type.Object(
     {
@@ -53,8 +45,6 @@ export const noteIdParamSchema = Type.Object(
     }
 );
 
-export type NoteIdParam = Static<typeof noteIdParamSchema>;
-
 export const noteActionParamSchema = Type.Object(
     {
         action: Type.Union([Type.Literal('up'), Type.Literal('down')])
@@ -63,8 +53,6 @@ export const noteActionParamSchema = Type.Object(
         additionalProperties: false
     }
 );
-
-export type NoteActionParam = Static<typeof noteActionParamSchema>;
 
 export const sessionIdParamSchema = Type.Object(
     {
@@ -75,8 +63,6 @@ export const sessionIdParamSchema = Type.Object(
     }
 );
 
-export type SessionIdParam = Static<typeof sessionIdParamSchema>;
-
 export const sketchIdParamSchema = Type.Object(
     {
         sketchId: Type.Integer()
@@ -86,8 +72,6 @@ export const sketchIdParamSchema = Type.Object(
     }
 );
 
-export type SketchIdParam = Static<typeof sketchIdParamSchema>;
-
 export const userIdParamSchema = Type.Object(
     {
         userId: Type.Integer()
@@ -96,5 +80,3 @@ export const userIdParamSchema = Type.Object(
         additionalProperties: false
     }
 );
-
-export type UserIdParam = Static<typeof userIdParamSchema>;

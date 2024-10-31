@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 import { sketchSchema } from './definitions.js';
 
@@ -13,8 +13,6 @@ export const createSessionSchema = Type.Object(
     }
 );
 
-export type CreateSessionBody = Static<typeof createSessionSchema>;
-
 export const updateSessionSchema = Type.Partial(
     Type.Omit(createSessionSchema, ['gameId']),
     {
@@ -22,5 +20,3 @@ export const updateSessionSchema = Type.Partial(
         minProperties: 1
     }
 );
-
-export type UpdateSessionBody = Static<typeof updateSessionSchema>;

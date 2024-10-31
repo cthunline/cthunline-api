@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import stream from 'node:stream';
-import type { Static, TSchema } from '@sinclair/typebox';
+import type { Static, TSchema } from '@fastify/type-provider-typebox';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 
 import { emptyObjectSchema } from '../controllers/schemas/definitions.js';

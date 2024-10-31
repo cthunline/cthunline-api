@@ -1,5 +1,7 @@
-import { Type } from '@sinclair/typebox';
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import {
+    type FastifyPluginAsyncTypebox,
+    Type
+} from '@fastify/type-provider-typebox';
 
 import type { Note } from '../drizzle/schema.js';
 import { ConflictError, InternError } from '../services/errors.js';
@@ -17,22 +19,14 @@ import {
 import { getSessionByIdOrThrow } from '../services/queries/session.js';
 import { controlSelf } from './helpers/auth.js';
 import { deleteCachedNote, updateCachedNoteIfExists } from './helpers/note.js';
+import { createNoteSchema, updateNoteSchema } from './schemas/note.js';
 import {
-    type CreateNoteBody,
-    type UpdateNoteBody,
-    createNoteSchema,
-    updateNoteSchema
-} from './schemas/note.js';
-import {
-    type NoteActionParam,
-    type NoteIdParam,
-    type SessionIdParam,
     noteActionParamSchema,
     noteIdParamSchema,
     sessionIdParamSchema
 } from './schemas/params.js';
 
-export const noteController = async (app: FastifyInstance) => {
+export const noteController: FastifyPluginAsyncTypebox = async (app) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
 
     // get current user's notes in a session
@@ -43,15 +37,7 @@ export const noteController = async (app: FastifyInstance) => {
         schema: {
             params: sessionIdParamSchema
         },
-        handler: async (
-            {
-                params: { sessionId },
-                user
-            }: FastifyRequest<{
-                Params: SessionIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { sessionId }, user }, rep) => {
             await getSessionByIdOrThrow(sessionId);
             const notes = await getUserSessionNotes(user.id, sessionId);
             const userNotes: Note[] = [];
@@ -78,17 +64,7 @@ export const noteController = async (app: FastifyInstance) => {
             params: sessionIdParamSchema,
             body: createNoteSchema
         },
-        handler: async (
-            {
-                params: { sessionId },
-                body,
-                user
-            }: FastifyRequest<{
-                Params: SessionIdParam;
-                Body: CreateNoteBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { sessionId }, body, user }, rep) => {
             await getSessionByIdOrThrow(sessionId);
             const position = await getUserSessionNoteNextPosition(
                 user.id,
@@ -113,15 +89,7 @@ export const noteController = async (app: FastifyInstance) => {
         schema: {
             params: noteIdParamSchema
         },
-        handler: async (
-            {
-                params: { noteId },
-                user
-            }: FastifyRequest<{
-                Params: NoteIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { noteId }, user }, rep) => {
             const note = await getUserNoteByIdOrThrow(user.id, noteId);
             rep.send(note);
         }
@@ -135,17 +103,7 @@ export const noteController = async (app: FastifyInstance) => {
             params: noteIdParamSchema,
             body: updateNoteSchema
         },
-        handler: async (
-            {
-                params: { noteId },
-                body,
-                user
-            }: FastifyRequest<{
-                Params: NoteIdParam;
-                Body: UpdateNoteBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { noteId }, body, user }, rep) => {
             const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
             const updatedNote = await updateNoteById(noteId, body);
@@ -165,16 +123,7 @@ export const noteController = async (app: FastifyInstance) => {
                 additionalProperties: false
             })
         },
-        handler: async (
-            {
-                params: { noteId, action },
-                user
-            }: FastifyRequest<{
-                Params: NoteIdParam & NoteActionParam;
-                Body: UpdateNoteBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { noteId, action }, user }, rep) => {
             const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
             let positionToSwitch: number;
@@ -216,16 +165,7 @@ export const noteController = async (app: FastifyInstance) => {
         schema: {
             params: noteIdParamSchema
         },
-        handler: async (
-            {
-                params: { noteId },
-                user
-            }: FastifyRequest<{
-                Params: NoteIdParam;
-                Body: UpdateNoteBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { noteId }, user }, rep) => {
             const note = await getUserNoteByIdOrThrow(user.id, noteId);
             controlSelf(note.userId, user);
             await deleteNoteById(noteId);

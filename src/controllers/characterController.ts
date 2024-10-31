@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Character as CharacterData } from '@cthunline/games';
-import { Type } from '@sinclair/typebox';
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import {
+    type FastifyPluginAsyncTypebox,
+    Type
+} from '@fastify/type-provider-typebox';
 
 import {
     ConflictError,
@@ -30,21 +32,14 @@ import {
     updateCachedCharacterIfExists
 } from './helpers/character.js';
 import {
-    type CreateCharacterBody,
-    type UpdateCharacterBody,
     createCharacterSchema,
     updateCharacterSchema,
     uploadPortraitFilesSchema
 } from './schemas/character.js';
-import {
-    type CharacterIdParam,
-    type UserIdParam,
-    characterIdParamSchema,
-    userIdParamSchema
-} from './schemas/params.js';
-import { type UserQuery, userQuerySchema } from './schemas/query.js';
+import { characterIdParamSchema, userIdParamSchema } from './schemas/params.js';
+import { userQuerySchema } from './schemas/query.js';
 
-export const characterController = async (app: FastifyInstance) => {
+export const characterController: FastifyPluginAsyncTypebox = async (app) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
 
     // get all characters
@@ -55,14 +50,7 @@ export const characterController = async (app: FastifyInstance) => {
         schema: {
             querystring: userQuerySchema
         },
-        handler: async (
-            {
-                query: { user: userId }
-            }: FastifyRequest<{
-                Querystring: UserQuery;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ query: { user: userId } }, rep) => {
             if (userId) {
                 await getUserByIdOrThrow(userId);
             }
@@ -76,15 +64,7 @@ export const characterController = async (app: FastifyInstance) => {
         method: 'POST',
         url: '/characters',
         schema: { body: createCharacterSchema },
-        handler: async (
-            {
-                body,
-                user
-            }: FastifyRequest<{
-                Body: CreateCharacterBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ body, user }, rep) => {
             const userId = user.id;
             const { gameId, name, data } = body;
             if (!isValidGameId(gameId)) {
@@ -108,14 +88,7 @@ export const characterController = async (app: FastifyInstance) => {
         schema: {
             params: characterIdParamSchema
         },
-        handler: async (
-            {
-                params: { characterId }
-            }: FastifyRequest<{
-                Params: CharacterIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { characterId } }, rep) => {
             const character = await getCharacterByIdOrThrow(characterId);
             rep.send(character);
         }
@@ -129,17 +102,7 @@ export const characterController = async (app: FastifyInstance) => {
             params: characterIdParamSchema,
             body: updateCharacterSchema
         },
-        handler: async (
-            {
-                body,
-                params: { characterId },
-                user
-            }: FastifyRequest<{
-                Params: CharacterIdParam;
-                Body: UpdateCharacterBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ body, params: { characterId }, user }, rep) => {
             const { gameId, userId } =
                 await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
@@ -162,15 +125,7 @@ export const characterController = async (app: FastifyInstance) => {
         schema: {
             params: characterIdParamSchema
         },
-        handler: async (
-            {
-                params: { characterId },
-                user
-            }: FastifyRequest<{
-                Params: CharacterIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { characterId }, user }, rep) => {
             const { userId } = await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
             await deleteCharacterById(characterId);
@@ -189,12 +144,7 @@ export const characterController = async (app: FastifyInstance) => {
         onResponse: async () => {
             await cleanMultipartFiles();
         },
-        handler: async (
-            req: FastifyRequest<{
-                Params: CharacterIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async (req, rep) => {
             const {
                 user,
                 params: { characterId }
@@ -258,15 +208,7 @@ export const characterController = async (app: FastifyInstance) => {
         schema: {
             params: characterIdParamSchema
         },
-        handler: async (
-            {
-                params: { characterId },
-                user
-            }: FastifyRequest<{
-                Params: CharacterIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { characterId }, user }, rep) => {
             const character = await getCharacterByIdOrThrow(characterId);
             controlSelf(character.userId, user);
             if (character.portrait) {
@@ -295,13 +237,8 @@ export const characterController = async (app: FastifyInstance) => {
             )
         },
         handler: async (
-            {
-                params: { characterId, userId: targetUserId },
-                user
-            }: FastifyRequest<{
-                Params: CharacterIdParam & UserIdParam;
-            }>,
-            rep: FastifyReply
+            { params: { characterId, userId: targetUserId }, user },
+            rep
         ) => {
             const [character, targetUser] = await Promise.all([
                 getCharacterByIdOrThrow(characterId),

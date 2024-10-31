@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 import { sketchSchema } from './definitions.js';
 
@@ -12,11 +12,7 @@ export const createSketchSchema = Type.Object(
     }
 );
 
-export type CreateSketchBody = Static<typeof createSketchSchema>;
-
 export const updateSketchSchema = Type.Partial(createSketchSchema, {
     additionalProperties: false,
     minProperties: 1
 });
-
-export type UpdateSketchBody = Static<typeof updateSketchSchema>;

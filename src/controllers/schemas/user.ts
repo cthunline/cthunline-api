@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 const fullUserSchema = Type.Object({
     name: Type.String({ minLength: 1 }),
@@ -22,8 +22,6 @@ export const createUserSchema = Type.Omit(
     }
 );
 
-export type CreateUserBody = Static<typeof createUserSchema>;
-
 export const updateUserSchema = Type.Partial(
     Type.Omit(fullUserSchema, ['invitationCode']),
     {
@@ -32,8 +30,6 @@ export const updateUserSchema = Type.Partial(
     }
 );
 
-export type UpdateUserBody = Static<typeof updateUserSchema>;
-
 export const registerUserSchema = Type.Pick(
     fullUserSchema,
     ['name', 'email', 'password', 'invitationCode'],
@@ -41,5 +37,3 @@ export const registerUserSchema = Type.Pick(
         additionalProperties: false
     }
 );
-
-export type RegisterUserBody = Static<typeof registerUserSchema>;

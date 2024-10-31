@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
 import { cache } from '../services/cache.js';
 import { hashPassword, verifyPassword } from '../services/crypto.js';
@@ -23,16 +23,11 @@ import {
     controlUniqueEmail,
     defaultUserData
 } from './helpers/user.js';
-import { type UserIdParam, userIdParamSchema } from './schemas/params.js';
-import { type DisabledQuery, disabledQuerySchema } from './schemas/query.js';
-import {
-    type CreateUserBody,
-    type UpdateUserBody,
-    createUserSchema,
-    updateUserSchema
-} from './schemas/user.js';
+import { userIdParamSchema } from './schemas/params.js';
+import { disabledQuerySchema } from './schemas/query.js';
+import { createUserSchema, updateUserSchema } from './schemas/user.js';
 
-export const userController = async (app: FastifyInstance) => {
+export const userController: FastifyPluginAsyncTypebox = async (app) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
 
     // get all users
@@ -42,14 +37,7 @@ export const userController = async (app: FastifyInstance) => {
         schema: {
             querystring: disabledQuerySchema
         },
-        handler: async (
-            {
-                query: { disabled }
-            }: FastifyRequest<{
-                Querystring: DisabledQuery;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ query: { disabled } }, rep) => {
             const users = await getUsers(disabled);
             rep.send({ users });
         }
@@ -61,14 +49,7 @@ export const userController = async (app: FastifyInstance) => {
         url: '/users',
         schema: { body: createUserSchema },
         onRequest: controlAdminMiddleware,
-        handler: async (
-            {
-                body
-            }: FastifyRequest<{
-                Body: CreateUserBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ body }, rep) => {
             await controlUniqueEmail(body.email);
             if (body.locale) {
                 controlLocale(body.locale);
@@ -91,14 +72,7 @@ export const userController = async (app: FastifyInstance) => {
         schema: {
             params: userIdParamSchema
         },
-        handler: async (
-            {
-                params: { userId }
-            }: FastifyRequest<{
-                Params: UserIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { userId } }, rep) => {
             const user = await getUserByIdOrThrow(userId);
             rep.send(user);
         }
@@ -112,22 +86,12 @@ export const userController = async (app: FastifyInstance) => {
             params: userIdParamSchema,
             body: updateUserSchema
         },
-        handler: async (
-            {
-                params: { userId },
-                body,
-                user: reqUser
-            }: FastifyRequest<{
-                Params: UserIdParam;
-                Body: UpdateUserBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { userId }, body, user: reqUser }, rep) => {
             try {
                 controlAdmin(reqUser);
             } catch {
                 controlSelf(userId, reqUser);
-                controlAdminFields<UpdateUserBody>(body);
+                controlAdminFields(body);
             }
             const userData = await getUnsafeUserByIdOrThrow(userId);
             if (body.locale) {

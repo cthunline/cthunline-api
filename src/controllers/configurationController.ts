@@ -1,13 +1,15 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
 import { getEnv } from '../services/env.js';
 
-export const configurationController = async (app: FastifyInstance) => {
+export const configurationController: FastifyPluginAsyncTypebox = async (
+    app
+) => {
     // public configuration
     app.route({
         method: 'GET',
         url: '/configuration',
-        handler: async (_req: FastifyRequest, rep: FastifyReply) => {
+        handler: async (_req, rep) => {
             // biome-ignore lint/suspicious/useAwait: fastify handler require async
             rep.send({
                 registrationEnabled: getEnv('REGISTRATION_ENABLED'),

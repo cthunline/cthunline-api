@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 import { multipartFileSchema } from './definitions.js';
 
@@ -13,8 +13,6 @@ export const createCharacterSchema = Type.Object(
     }
 );
 
-export type CreateCharacterBody = Static<typeof createCharacterSchema>;
-
 export const updateCharacterSchema = Type.Partial(
     Type.Omit(createCharacterSchema, ['gameId']),
     {
@@ -22,8 +20,6 @@ export const updateCharacterSchema = Type.Partial(
         minProperties: 1
     }
 );
-
-export type UpdateCharacterBody = Static<typeof updateCharacterSchema>;
 
 export const uploadPortraitFilesSchema = Type.Object(
     {

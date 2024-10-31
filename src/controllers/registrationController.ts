@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
 import { hashPassword } from '../services/crypto.js';
 import { getEnv } from '../services/env.js';
@@ -11,10 +11,12 @@ import {
     generateInvitationCode
 } from './helpers/registration.js';
 import { controlUniqueEmail, defaultUserData } from './helpers/user.js';
-import { type RegisterUserBody, registerUserSchema } from './schemas/user.js';
+import { registerUserSchema } from './schemas/user.js';
 
-export const registrationController = async (app: FastifyInstance) => {
-    await app.register(async (routeApp: FastifyInstance) => {
+export const registrationController: FastifyPluginAsyncTypebox = async (
+    app
+) => {
+    const rlSubController: FastifyPluginAsyncTypebox = async (routeApp) => {
         // rate limiter
         await registerRateLimiter(routeApp);
         // register a new user
@@ -22,14 +24,7 @@ export const registrationController = async (app: FastifyInstance) => {
             method: 'POST',
             url: '/register',
             schema: { body: registerUserSchema },
-            handler: async (
-                {
-                    body
-                }: FastifyRequest<{
-                    Body: RegisterUserBody;
-                }>,
-                rep: FastifyReply
-            ) => {
+            handler: async ({ body }, rep) => {
                 if (!getEnv('REGISTRATION_ENABLED')) {
                     throw new ForbiddenError('Registration is disabled');
                 }
@@ -50,18 +45,15 @@ export const registrationController = async (app: FastifyInstance) => {
                 rep.send(createdUser);
             }
         });
-    });
+    };
+
+    await app.register(rlSubController);
 
     // generate a new invitation
     app.route({
         method: 'POST',
         url: '/invitation',
-        handler: async (
-            _req: FastifyRequest<{
-                Body: RegisterUserBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async (_req, rep) => {
             if (!getEnv('REGISTRATION_ENABLED')) {
                 throw new ForbiddenError('Registration is disabled');
             }

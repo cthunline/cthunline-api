@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { type Static, Type } from '@fastify/type-provider-typebox';
 
 export const requestDiceSchema = Type.Partial(
     Type.Object({

@@ -1,4 +1,8 @@
-import { type Static, type TSchema, Type } from '@sinclair/typebox';
+import {
+    type Static,
+    type TSchema,
+    Type
+} from '@fastify/type-provider-typebox';
 
 import type { MultipartFileData } from '../../services/multipart.js';
 
@@ -14,8 +18,6 @@ export const drawingPathSchema = Type.Object(
     }
 );
 
-export type DrawingPathBody = Static<typeof drawingPathSchema>;
-
 export const imageSchema = Type.Object(
     {
         id: Type.String({ minLength: 1 }),
@@ -30,8 +32,6 @@ export const imageSchema = Type.Object(
         additionalProperties: false
     }
 );
-
-export type ImageBody = Static<typeof imageSchema>;
 
 export const textSchema = Type.Object(
     {
@@ -84,8 +84,6 @@ export const tokenSchema = Type.Object(
 );
 
 export type TokenBody = Static<typeof tokenSchema>;
-
-export type TextBody = Static<typeof textSchema>;
 
 export const sketchSchema = Type.Object(
     {

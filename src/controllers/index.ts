@@ -1,6 +1,6 @@
 import path from 'node:path';
 import FastifyStatic from '@fastify/static';
-import type { FastifyInstance, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
 import { assetController } from './assetController.js';
 import { authController } from './authController.js';
@@ -24,10 +24,10 @@ import { importMetaUrlDirname } from '../services/tools.js';
 
 const dirname = importMetaUrlDirname(import.meta.url);
 
-export const mainController = async (app: FastifyInstance) => {
+export const mainController: FastifyPluginAsyncTypebox = async (app) => {
     app.decorateRequest('user', null);
 
-    app.addHook('onRequest', async (req: FastifyRequest) => {
+    app.addHook('onRequest', async (req) => {
         // public routes
         if (
             (req.method === 'GET' && req.url === '/api/configuration') || // public configuration route

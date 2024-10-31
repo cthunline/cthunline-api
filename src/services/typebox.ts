@@ -1,4 +1,4 @@
-import type { Static, TSchema } from '@sinclair/typebox';
+import type { Static, TSchema } from '@fastify/type-provider-typebox';
 import { Value } from '@sinclair/typebox/value';
 
 import { ValidationError } from './errors.js';

@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
 import {
     createSketch,
@@ -9,20 +9,10 @@ import {
 } from '../services/queries/sketch.js';
 import { controlSelf } from './helpers/auth.js';
 import { controlSessionGameMaster } from './helpers/session.js';
-import {
-    type SessionIdParam,
-    type SketchIdParam,
-    sessionIdParamSchema,
-    sketchIdParamSchema
-} from './schemas/params.js';
-import {
-    type CreateSketchBody,
-    type UpdateSketchBody,
-    createSketchSchema,
-    updateSketchSchema
-} from './schemas/sketch.js';
+import { sessionIdParamSchema, sketchIdParamSchema } from './schemas/params.js';
+import { createSketchSchema, updateSketchSchema } from './schemas/sketch.js';
 
-export const sketchController = async (app: FastifyInstance) => {
+export const sketchController: FastifyPluginAsyncTypebox = async (app) => {
     // biome-ignore lint/suspicious/useAwait: fastify controllers require async
 
     // get all sketchs belonging to current user in the given session
@@ -32,15 +22,7 @@ export const sketchController = async (app: FastifyInstance) => {
         schema: {
             params: sessionIdParamSchema
         },
-        handler: async (
-            {
-                user,
-                params: { sessionId }
-            }: FastifyRequest<{
-                Params: SessionIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ user, params: { sessionId } }, rep) => {
             const session = await controlSessionGameMaster(sessionId, user.id);
             const sketchs = await getUserSessionSketchs(user.id, session.id);
             rep.send({ sketchs });
@@ -55,17 +37,7 @@ export const sketchController = async (app: FastifyInstance) => {
             params: sessionIdParamSchema,
             body: createSketchSchema
         },
-        handler: async (
-            {
-                params: { sessionId },
-                body,
-                user
-            }: FastifyRequest<{
-                Params: SessionIdParam;
-                Body: CreateSketchBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { sessionId }, body, user }, rep) => {
             const session = await controlSessionGameMaster(sessionId, user.id);
             const createdSketch = await createSketch({
                 ...body,
@@ -84,17 +56,7 @@ export const sketchController = async (app: FastifyInstance) => {
             params: sketchIdParamSchema,
             body: updateSketchSchema
         },
-        handler: async (
-            {
-                params: { sketchId },
-                body,
-                user
-            }: FastifyRequest<{
-                Params: SketchIdParam;
-                Body: UpdateSketchBody;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { sketchId }, body, user }, rep) => {
             await getUserSketchByIdOrThrow(user.id, sketchId);
             const updatedSketch = await updateSketchById(sketchId, body);
             rep.send(updatedSketch);
@@ -108,15 +70,7 @@ export const sketchController = async (app: FastifyInstance) => {
         schema: {
             params: sketchIdParamSchema
         },
-        handler: async (
-            {
-                params: { sketchId },
-                user
-            }: FastifyRequest<{
-                Params: SketchIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { sketchId }, user }, rep) => {
             const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
             rep.send(sketch);
         }
@@ -129,15 +83,7 @@ export const sketchController = async (app: FastifyInstance) => {
         schema: {
             params: sketchIdParamSchema
         },
-        handler: async (
-            {
-                params: { sketchId },
-                user
-            }: FastifyRequest<{
-                Params: SketchIdParam;
-            }>,
-            rep: FastifyReply
-        ) => {
+        handler: async ({ params: { sketchId }, user }, rep) => {
             const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
             controlSelf(sketch.userId, user);
             await deleteSketchById(sketchId);

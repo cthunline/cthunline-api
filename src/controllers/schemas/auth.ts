@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 export const loginSchema = Type.Object(
     {
@@ -9,5 +9,3 @@ export const loginSchema = Type.Object(
         additionalProperties: false
     }
 );
-
-export type LoginBody = Static<typeof loginSchema>;

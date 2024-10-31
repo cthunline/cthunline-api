@@ -1,4 +1,4 @@
-import { type Static, Type } from '@sinclair/typebox';
+import { Type } from '@fastify/type-provider-typebox';
 
 export const createNoteSchema = Type.Object(
     {
@@ -11,11 +11,7 @@ export const createNoteSchema = Type.Object(
     }
 );
 
-export type CreateNoteBody = Static<typeof createNoteSchema>;
-
 export const updateNoteSchema = Type.Partial(createNoteSchema, {
     additionalProperties: false,
     minProperties: 1
 });
-
-export type UpdateNoteBody = Static<typeof updateNoteSchema>;
