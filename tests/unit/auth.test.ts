@@ -20,6 +20,8 @@ import {
 import { users } from '../functional/data/users.data.js';
 import { expectAsync } from '../functional/helpers/assert.helper.js';
 
+type FakeMiddlewareType = (req: object) => Promise<void>;
+
 describe('[Unit] Auth', () => {
     describe('hashPassword + verifyPassword', () => {
         test('Should hash and verify password', async () => {
@@ -78,10 +80,14 @@ describe('[Unit] Auth', () => {
             const reqAdmin = { user: { isAdmin: true } };
             const reqNotAdmin = { user: { isAdmin: false } };
             await expectAsync(
-                controlAdminMiddleware(reqAdmin as FastifyRequest)
+                (controlAdminMiddleware as FakeMiddlewareType)(
+                    reqAdmin as FastifyRequest
+                )
             );
             await expectAsync(
-                controlAdminMiddleware(reqNotAdmin as FastifyRequest),
+                (controlAdminMiddleware as FakeMiddlewareType)(
+                    reqNotAdmin as FastifyRequest
+                ),
                 ForbiddenError
             );
         });

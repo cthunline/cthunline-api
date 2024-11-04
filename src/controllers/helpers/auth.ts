@@ -1,6 +1,9 @@
 import type { CookieSerializeOptions } from '@fastify/cookie';
 import dayjs from 'dayjs';
-import type { FastifyRequest } from 'fastify';
+import type {
+    FastifyRequest,
+    onRequestAsyncHookHandler as OnRequestAsyncHookHandler
+} from 'fastify';
 import ms from 'ms';
 
 import type { SafeUser } from '../../drizzle/schema.js';
@@ -54,7 +57,9 @@ export const controlAdmin = (user: SafeUser) => {
 /**
 Middleware checking that the currently authenticated user is an admin.
 */
-export const controlAdminMiddleware = async ({ user }: FastifyRequest) => {
+export const controlAdminMiddleware: OnRequestAsyncHookHandler = async ({
+    user
+}) => {
     // biome-ignore lint/suspicious/useAwait: fastify middlewares require async
     controlAdmin(user);
 };

@@ -4,7 +4,7 @@ import ajvFormats from 'ajv-formats';
 export const envSchema = Type.Object({
     // app
     DEFAULT_ADMIN_NAME: Type.String({ minLength: 1 }),
-    DEFAULT_ADMIN_EMAIL: Type.RegExp(ajvFormats.get('email') as RegExp),
+    DEFAULT_ADMIN_EMAIL: Type.String({ format: 'email' }),
     DEFAULT_ADMIN_PASSWORD: Type.String({ minLength: 1 }),
     REGISTRATION_ENABLED: Type.Boolean(),
     INVITATION_ENABLED: Type.Optional(Type.Boolean()),

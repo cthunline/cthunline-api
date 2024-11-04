@@ -5,8 +5,11 @@ since it is used in a lot of files in the code base
 import { envious } from '@pitininja/envious';
 
 import { envSchema } from './env.schema.js';
+import { formats } from './formats.js';
 
-const env = envious(envSchema);
+const env = envious(envSchema, {
+    formats
+});
 
 type Env = typeof env;
 

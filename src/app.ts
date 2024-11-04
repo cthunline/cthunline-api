@@ -3,6 +3,7 @@ import 'dotenv/config';
 import fastifyCookie from '@fastify/cookie';
 import fastifyHelmet from '@fastify/helmet';
 import fastifyMultipart from '@fastify/multipart';
+import { TypeBoxValidatorCompiler } from '@fastify/type-provider-typebox';
 import fastify from 'fastify';
 import fastifySocketIo from 'fastify-socket.io';
 import qs from 'qs';
@@ -13,17 +14,16 @@ import { initDb, migrateDb } from './services/db.js';
 import { getEnv } from './services/env.js';
 import { errorHandler, schemaErrorFormatter } from './services/errors.js';
 import { fastifyLogger, log } from './services/log.js';
-import { setValidatorCompilers } from './services/validator.js';
+import { initTypeboxFormats } from './services/typebox.js';
 import { socketRouter } from './sockets/index.js';
+
+initTypeboxFormats();
 
 export const app = fastify({
     loggerInstance: fastifyLogger,
     trustProxy: getEnv('REVERSE_PROXY'),
     querystringParser: (str) => qs.parse(str)
-});
-
-// set schema validation compilers
-setValidatorCompilers(app);
+}).setValidatorCompiler(TypeBoxValidatorCompiler);
 
 export const initApp = async () => {
     try {
