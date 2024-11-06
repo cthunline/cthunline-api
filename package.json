@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.18.0",
+    "version": "1.18.1",
     "type": "module",
     "scripts": {
         "dev": "tsx watch --clear-screen=false --include \"./src/**\" src/index.ts",
@@ -53,9 +53,9 @@
         "@types/deep-equal-in-any-order": "^1.0.3",
         "@types/jsonwebtoken": "^9.0.7",
         "@types/ms": "^0.7.34",
-        "@types/node": "^22.8.7",
+        "@types/node": "^22.9.0",
         "@types/pg": "^8.11.10",
-        "@types/qs": "^6.9.16",
+        "@types/qs": "^6.9.17",
         "@types/type-detect": "^4.0.3",
         "@vitest/coverage-istanbul": "^2.1.4",
         "deep-equal-in-any-order": "^2.0.6",

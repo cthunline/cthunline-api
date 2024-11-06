@@ -1,6 +1,13 @@
 import { Type } from '@sinclair/typebox';
 import ajvFormats from 'ajv-formats';
 
+const logLevelSchema = Type.Union([
+    Type.Literal('debug'),
+    Type.Literal('info'),
+    Type.Literal('warn'),
+    Type.Literal('error')
+]);
+
 export const envSchema = Type.Object({
     // app
     DEFAULT_ADMIN_NAME: Type.String({ minLength: 1 }),
@@ -22,12 +29,8 @@ export const envSchema = Type.Object({
     COOKIE_SECRET: Type.String({ minLength: 32, maxLength: 32 }),
     COOKIE_DURATION: Type.TemplateLiteral('${number}${w|d|h|m|s|ms}'),
     COOKIE_SECURE: Type.Boolean(),
-    LOG_LEVEL: Type.Union([
-        Type.Literal('debug'),
-        Type.Literal('info'),
-        Type.Literal('warn'),
-        Type.Literal('error')
-    ]),
+    LOG_LEVEL: logLevelSchema,
+    FASTIFY_LOG_LEVEL: Type.Optional(logLevelSchema),
     LOG_DIR: Type.Optional(Type.String({ minLength: 1 })),
     REVERSE_PROXY: Type.Boolean(),
     RL_WINDOW_DURATION: Type.Integer({ minimum: 1 }),

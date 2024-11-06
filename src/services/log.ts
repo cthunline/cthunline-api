@@ -6,8 +6,8 @@ import pretty from 'pino-pretty';
 
 import { getEnv } from './env.js';
 
-const environment = getEnv('NODE_ENV');
-const level = getEnv('LOG_LEVEL');
+const logLevel = getEnv('LOG_LEVEL');
+const fastifyLogLevel = getEnv('FASTIFY_LOG_LEVEL');
 
 /**
 Log stream in console (pretty format)
@@ -53,7 +53,7 @@ Logger instance that can be used in code to log stuff.
 */
 export const log = pino(
     {
-        level
+        level: logLevel
     },
     pino.multistream(streams)
 );
@@ -66,7 +66,7 @@ It has a specific level depending on the environment.
 */
 export const fastifyLogger: FastifyBaseLogger = pino(
     {
-        level: environment === 'production' ? 'warn' : level
+        level: fastifyLogLevel ?? logLevel
     },
     pino.multistream(streams)
 );
