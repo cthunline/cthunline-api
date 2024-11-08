@@ -1,3 +1,10 @@
+when:
+  branch:
+  - master
+  event:
+  - push
+  - pull_request
+
 services:
 - name: postgres
   image: postgres:bookworm
@@ -17,12 +24,6 @@ steps:
   commands:
   - npm i
   - cp .env.ci .env.test
-  when:
-    branch:
-    - master
-    event:
-    - push
-    - pull_request
 - name: lint
   image: node:22-alpine
   pull: true
@@ -30,12 +31,6 @@ steps:
   - npm run lint
   depends_on:
   - install
-  when:
-    branch:
-    - master
-    event:
-    - push
-    - pull_request
 - name: test
   image: node:22-alpine
   pull: true
@@ -43,12 +38,6 @@ steps:
   - npm run test
   depends_on:
   - install
-  when:
-    branch:
-    - master
-    event:
-    - push
-    - pull_request
 - name: sonarqube
   image: sonarsource/sonar-scanner-cli:latest
   pull: true

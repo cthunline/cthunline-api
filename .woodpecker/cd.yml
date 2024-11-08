@@ -1,3 +1,7 @@
+when:
+  event:
+  - tag
+
 skip_clone: true
 
 steps:
@@ -10,9 +14,6 @@ steps:
   - API_TAG=$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' --tags https://github.com/cthunline/cthunline-api.git '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3 | cut --delimiter='v' --fields=2)
   - WEB_TAG=$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' --tags https://github.com/cthunline/cthunline-web.git '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3 | cut --delimiter='v' --fields=2)
   - echo "latest,$API_TAG-$WEB_TAG" > .tags
-  when:
-    event:
-    - tag
 - name: docker
   image: woodpeckerci/plugin-docker-buildx:latest
   pull: true
@@ -23,6 +24,3 @@ steps:
     password:
       from_secret: docker_token
     squash: true
-  when:
-    event:
-    - tag
