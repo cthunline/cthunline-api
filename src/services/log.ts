@@ -9,18 +9,45 @@ import { getEnv } from './env.js';
 const logLevel = getEnv('LOG_LEVEL');
 const fastifyLogLevel = getEnv('FASTIFY_LOG_LEVEL');
 
-/**
-Log stream in console (pretty format)
-*/
-const streams: StreamEntry[] = [{ stream: pretty() }];
+type RequestLog = {
+    req: {
+        method: string;
+        url: string;
+        hostname: string;
+        remoteAddress: string;
+    };
+};
+
+const isRequestLog = (log: Record<string, unknown>): log is RequestLog =>
+    typeof log.req === 'object' &&
+    log.req !== null &&
+    Object.hasOwn(log.req, 'method') &&
+    Object.hasOwn(log.req, 'url');
+
+const steams: StreamEntry[] = [
+    {
+        // log stream in console (pretty format)
+        stream: pretty({
+            translateTime: 'yyyy-mm-dd HH:mm:ss.lp',
+            hideObject: true,
+            messageFormat: (log, messageKey) => {
+                let reqMessage = '';
+                if (isRequestLog(log)) {
+                    reqMessage = ` - ${log.req.method} ${log.req.url}`;
+                }
+                return `${log[messageKey] ?? ''}${reqMessage}`;
+            }
+        })
+    }
+];
 
 // array containing messages to display after logger initialization
 const output: { message: string; level: Level }[] = [];
 
-// controls log directory exists and is writable (if provided)
 let logDirIsValid = false;
 const logDir = getEnv('LOG_DIR');
 if (logDir) {
+    // controls log if directory exists and is writable
     try {
         fs.accessSync(logDir, fs.constants.F_OK);
         fs.accessSync(logDir, fs.constants.W_OK);
@@ -38,12 +65,10 @@ if (logDir) {
     });
 }
 
-/**
-Log stream in file (JSON format)
-*/
 if (logDir && logDirIsValid) {
+    // log stream in file (JSON format)
     const logFilePath = path.join(logDir, 'cthunline.log');
-    streams.push({
+    steams.push({
         stream: fs.createWriteStream(logFilePath)
     });
 }
@@ -55,7 +80,7 @@ export const log = pino(
     {
         level: logLevel
     },
-    pino.multistream(streams)
+    pino.multistream(steams)
 );
 
 /**
@@ -68,7 +93,7 @@ export const fastifyLogger: FastifyBaseLogger = pino(
     {
         level: fastifyLogLevel ?? logLevel
     },
-    pino.multistream(streams)
+    pino.multistream(steams)
 );
 
 // logs initialization output if there is any
