@@ -24,7 +24,7 @@ const isRequestLog = (log: Record<string, unknown>): log is RequestLog =>
     Object.hasOwn(log.req, 'method') &&
     Object.hasOwn(log.req, 'url');
 
-const steams: StreamEntry[] = [
+const streams: StreamEntry[] = [
     {
         // log stream in console (pretty format)
         stream: pretty({
@@ -68,7 +68,7 @@ if (logDir) {
 if (logDir && logDirIsValid) {
     // log stream in file (JSON format)
     const logFilePath = path.join(logDir, 'cthunline.log');
-    steams.push({
+    streams.push({
         stream: fs.createWriteStream(logFilePath)
     });
 }
@@ -80,7 +80,7 @@ export const log = pino(
     {
         level: logLevel
     },
-    pino.multistream(steams)
+    pino.multistream(streams)
 );
 
 /**
@@ -93,7 +93,7 @@ export const fastifyLogger: FastifyBaseLogger = pino(
     {
         level: fastifyLogLevel ?? logLevel
     },
-    pino.multistream(steams)
+    pino.multistream(streams)
 );
 
 // logs initialization output if there is any
