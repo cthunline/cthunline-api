@@ -24,23 +24,6 @@ const isRequestLog = (log: Record<string, unknown>): log is RequestLog =>
     Object.hasOwn(log.req, 'method') &&
     Object.hasOwn(log.req, 'url');
 
-const streams: StreamEntry[] = [
-    {
-        // log stream in console (pretty format)
-        stream: pretty({
-            translateTime: 'yyyy-mm-dd HH:mm:ss.lp',
-            hideObject: true,
-            messageFormat: (log, messageKey) => {
-                let reqMessage = '';
-                if (isRequestLog(log)) {
-                    reqMessage = ` - ${log.req.method} ${log.req.url}`;
-                }
-                return `${log[messageKey] ?? ''}${reqMessage}`;
-            }
-        })
-    }
-];
-
 // array containing messages to display after logger initialization
 const output: { message: string; level: Level }[] = [];
 
@@ -65,13 +48,34 @@ if (logDir) {
     });
 }
 
-if (logDir && logDirIsValid) {
-    // log stream in file (JSON format)
-    const logFilePath = path.join(logDir, 'cthunline.log');
-    streams.push({
-        stream: fs.createWriteStream(logFilePath)
-    });
-}
+const getStreams = (level: Level) => {
+    const streams: StreamEntry[] = [
+        {
+            level,
+            // log stream in console (pretty format)
+            stream: pretty({
+                translateTime: 'yyyy-mm-dd HH:mm:ss.lp',
+                hideObject: true,
+                messageFormat: (log, messageKey) => {
+                    let reqMessage = '';
+                    if (isRequestLog(log)) {
+                        reqMessage = ` - ${log.req.method} ${log.req.url}`;
+                    }
+                    return `${log[messageKey] ?? ''}${reqMessage}`;
+                }
+            })
+        }
+    ];
+    if (logDir && logDirIsValid) {
+        // log stream in file (JSON format)
+        const logFilePath = path.join(logDir, 'cthunline.log');
+        streams.push({
+            level,
+            stream: fs.createWriteStream(logFilePath)
+        });
+    }
+    return streams;
+};
 
 /**
 Logger instance that can be used in code to log stuff.
@@ -80,7 +84,7 @@ export const log = pino(
     {
         level: logLevel
     },
-    pino.multistream(streams)
+    pino.multistream(getStreams(logLevel))
 );
 
 /**
@@ -93,7 +97,7 @@ export const fastifyLogger: FastifyBaseLogger = pino(
     {
         level: fastifyLogLevel ?? logLevel
     },
-    pino.multistream(streams)
+    pino.multistream(getStreams(fastifyLogLevel ?? logLevel))
 );
 
 // logs initialization output if there is any
