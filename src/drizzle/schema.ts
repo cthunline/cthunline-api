@@ -32,9 +32,7 @@ export const users = pgTable(
             .defaultNow()
             .notNull()
     },
-    ({ email }) => ({
-        emailIndex: uniqueIndex('email_index').on(email)
-    })
+    ({ email }) => [uniqueIndex('email_index').on(email)]
 );
 
 export type User = typeof users.$inferSelect;
@@ -145,9 +143,7 @@ export const invitations = pgTable(
             .defaultNow()
             .notNull()
     },
-    ({ code }) => ({
-        codeIndex: uniqueIndex('code_index').on(code)
-    })
+    ({ code }) => [uniqueIndex('code_index').on(code)]
 );
 
 export type Invitation = typeof invitations.$inferSelect;
