@@ -39,7 +39,7 @@ export const userController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ query: { disabled } }, rep) => {
             const users = await getUsers(disabled);
-            rep.send({ users });
+            return rep.send({ users });
         }
     });
 
@@ -61,7 +61,7 @@ export const userController: FastifyPluginAsyncTypebox = async (app) => {
                 ...cleanBody,
                 password: hashedPassword
             });
-            rep.send(createdUser);
+            return rep.send(createdUser);
         }
     });
 
@@ -74,7 +74,7 @@ export const userController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ params: { userId } }, rep) => {
             const user = await getUserByIdOrThrow(userId);
-            rep.send(user);
+            return rep.send(user);
         }
     });
 
@@ -123,7 +123,7 @@ export const userController: FastifyPluginAsyncTypebox = async (app) => {
                     });
                 }
             }
-            rep.send(updatedUser);
+            return rep.send(updatedUser);
         }
     });
 };

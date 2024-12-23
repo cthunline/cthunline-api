@@ -55,7 +55,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
                 await getUserByIdOrThrow(userId);
             }
             const characters = await getCharacters(userId);
-            rep.send({ characters });
+            return rep.send({ characters });
         }
     });
 
@@ -77,7 +77,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
                 name,
                 data: data as CharacterData
             });
-            rep.send(character);
+            return rep.send(character);
         }
     });
 
@@ -90,7 +90,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ params: { characterId } }, rep) => {
             const character = await getCharacterByIdOrThrow(characterId);
-            rep.send(character);
+            return rep.send(character);
         }
     });
 
@@ -114,7 +114,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
                 body as typeof body & { data?: CharacterData }
             );
             await updateCachedCharacterIfExists(character);
-            rep.send(character);
+            return rep.send(character);
         }
     });
 
@@ -130,7 +130,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
             controlSelf(userId, user);
             await deleteCharacterById(characterId);
             await deleteCachedCharacter(characterId);
-            rep.send({});
+            return rep.send({});
         }
     });
 
@@ -197,7 +197,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
                 await fs.promises.rm(path.join(assetDir, character.portrait));
             }
             //
-            rep.send(updatedCharacter);
+            return rep.send(updatedCharacter);
         }
     });
 
@@ -217,10 +217,9 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
                     fs.promises.rm(path.join(assetDir, character.portrait))
                 ]);
                 await updateCachedCharacterIfExists(updatedCharacter);
-                rep.send(updatedCharacter);
-            } else {
-                rep.send(character);
+                return rep.send(updatedCharacter);
             }
+            return rep.send(character);
         }
     });
 
@@ -254,7 +253,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
                 userId: targetUserId
             });
             await updateCachedCharacterIfExists(updatedCharacter);
-            rep.send({});
+            return rep.send({});
         }
     });
 };

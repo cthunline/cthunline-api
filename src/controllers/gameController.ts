@@ -12,7 +12,7 @@ export const gameController: FastifyPluginAsyncTypebox = async (app) => {
         handler: async (_req, rep) => {
             // biome-ignore lint/suspicious/useAwait: fastify handler require async
             const games = Object.values(gamesData);
-            rep.send({ games });
+            return rep.send({ games });
         }
     });
 
@@ -28,7 +28,7 @@ export const gameController: FastifyPluginAsyncTypebox = async (app) => {
             if (!isValidGameId(gameId)) {
                 throw new NotFoundError('Game not found');
             }
-            rep.send(gamesData[gameId]);
+            return rep.send(gamesData[gameId]);
         }
     });
 };

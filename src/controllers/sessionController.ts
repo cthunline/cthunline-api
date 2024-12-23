@@ -24,7 +24,7 @@ export const sessionController: FastifyPluginAsyncTypebox = async (app) => {
         url: '/sessions',
         handler: async (_req, rep) => {
             const sessions = await getSessions();
-            rep.send({ sessions });
+            return rep.send({ sessions });
         }
     });
 
@@ -43,7 +43,7 @@ export const sessionController: FastifyPluginAsyncTypebox = async (app) => {
                 sketch: sketch ?? defaultSketchData,
                 masterId: user.id
             });
-            rep.send(createdSession);
+            return rep.send(createdSession);
         }
     });
 
@@ -56,7 +56,7 @@ export const sessionController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ params: { sessionId } }, rep) => {
             const session = await getSessionByIdOrThrow(sessionId);
-            rep.send(session);
+            return rep.send(session);
         }
     });
 
@@ -72,7 +72,7 @@ export const sessionController: FastifyPluginAsyncTypebox = async (app) => {
             const session = await getSessionByIdOrThrow(sessionId);
             controlSelf(session.masterId, user);
             const updatedSession = await updateSessionById(session.id, body);
-            rep.send(updatedSession);
+            return rep.send(updatedSession);
         }
     });
 
@@ -88,7 +88,7 @@ export const sessionController: FastifyPluginAsyncTypebox = async (app) => {
             controlSelf(session.masterId, user);
             await deleteSessionNotes(sessionId);
             await deleteSessionById(sessionId);
-            rep.send({});
+            return rep.send({});
         }
     });
 };

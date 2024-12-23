@@ -42,7 +42,7 @@ export const registrationController: FastifyPluginAsyncTypebox = async (
                     ...cleanBody,
                     password: hashedPassword
                 });
-                rep.send(createdUser);
+                return rep.send(createdUser);
             }
         });
     };
@@ -61,7 +61,7 @@ export const registrationController: FastifyPluginAsyncTypebox = async (
                 throw new ForbiddenError('Invitation codes are disabled');
             }
             const { code } = await createInvitation(generateInvitationCode());
-            rep.send({ code });
+            return rep.send({ code });
         }
     });
 };

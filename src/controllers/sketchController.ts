@@ -25,7 +25,7 @@ export const sketchController: FastifyPluginAsyncTypebox = async (app) => {
         handler: async ({ user, params: { sessionId } }, rep) => {
             const session = await controlSessionGameMaster(sessionId, user.id);
             const sketchs = await getUserSessionSketchs(user.id, session.id);
-            rep.send({ sketchs });
+            return rep.send({ sketchs });
         }
     });
 
@@ -44,7 +44,7 @@ export const sketchController: FastifyPluginAsyncTypebox = async (app) => {
                 userId: user.id,
                 sessionId: session.id
             });
-            rep.send(createdSketch);
+            return rep.send(createdSketch);
         }
     });
 
@@ -59,7 +59,7 @@ export const sketchController: FastifyPluginAsyncTypebox = async (app) => {
         handler: async ({ params: { sketchId }, body, user }, rep) => {
             await getUserSketchByIdOrThrow(user.id, sketchId);
             const updatedSketch = await updateSketchById(sketchId, body);
-            rep.send(updatedSketch);
+            return rep.send(updatedSketch);
         }
     });
 
@@ -72,7 +72,7 @@ export const sketchController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ params: { sketchId }, user }, rep) => {
             const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
-            rep.send(sketch);
+            return rep.send(sketch);
         }
     });
 
@@ -87,7 +87,7 @@ export const sketchController: FastifyPluginAsyncTypebox = async (app) => {
             const sketch = await getUserSketchByIdOrThrow(user.id, sketchId);
             controlSelf(sketch.userId, user);
             await deleteSketchById(sketchId);
-            rep.send({});
+            return rep.send({});
         }
     });
 };

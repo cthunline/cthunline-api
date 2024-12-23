@@ -62,7 +62,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ query: { type }, user }, rep) => {
             const assets = await getUserAssets(user.id, type);
-            rep.send({ assets });
+            return rep.send({ assets });
         }
     });
 
@@ -128,7 +128,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
                 })
             );
             //
-            rep.send({ assets });
+            return rep.send({ assets });
         }
     });
 
@@ -141,7 +141,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ params: { assetId }, user }, rep) => {
             const asset = await getUserAssetByIdOrThrow(user.id, assetId);
-            rep.send(asset);
+            return rep.send(asset);
         }
     });
 
@@ -161,7 +161,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
                 deleteAssetById(assetId),
                 fs.promises.rm(path.join(assetDir, assetPath))
             ]);
-            rep.send({});
+            return rep.send({});
         }
     });
 
@@ -171,7 +171,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
         url: '/directories',
         handler: async ({ user }, rep) => {
             const directories = await getUserDirectories(user.id);
-            rep.send({ directories });
+            return rep.send({ directories });
         }
     });
 
@@ -189,7 +189,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
                 ...body,
                 userId: user.id
             });
-            rep.send(directory);
+            return rep.send(directory);
         }
     });
 
@@ -205,7 +205,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
                 user.id,
                 directoryId
             );
-            rep.send(directory);
+            return rep.send(directory);
         }
     });
 
@@ -220,7 +220,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
         handler: async ({ body, params: { directoryId }, user }, rep) => {
             await getUserDirectoryByIdOrThrow(user.id, directoryId);
             const directory = await updateDirectoryById(directoryId, body);
-            rep.send(directory);
+            return rep.send(directory);
         }
     });
 
@@ -262,7 +262,7 @@ export const assetController: FastifyPluginAsyncTypebox = async (app) => {
             }
             // delete directory (children directories will cascade-deleted)
             await deleteDirectoryById(directoryId);
-            rep.send({});
+            return rep.send({});
         }
     });
 };

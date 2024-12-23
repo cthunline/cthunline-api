@@ -20,7 +20,7 @@ export const authController: FastifyPluginAsyncTypebox = async (app) => {
         url: '/auth',
         handler: async (req, rep) => {
             // biome-ignore lint/suspicious/useAwait: fastify handler require async
-            rep.send(req.user);
+            return rep.send(req.user);
         }
     });
 
@@ -51,7 +51,9 @@ export const authController: FastifyPluginAsyncTypebox = async (app) => {
                     user
                 });
                 const encryptedJwt = encrypt(jwt, getEnv('CRYPTO_SECRET'));
-                rep.cookie('jwt', encryptedJwt, getCookieOptions()).send(user);
+                return rep
+                    .cookie('jwt', encryptedJwt, getCookieOptions())
+                    .send(user);
             }
         });
     };
@@ -66,7 +68,7 @@ export const authController: FastifyPluginAsyncTypebox = async (app) => {
             const cacheKey = getJwtCacheKey(user.id);
             await cache.del(cacheKey);
             // delete jwt cookie on client
-            rep.clearCookie('jwt').send({});
+            return rep.clearCookie('jwt').send({});
         }
     });
 };

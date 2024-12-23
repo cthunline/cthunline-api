@@ -49,7 +49,7 @@ export const noteController: FastifyPluginAsyncTypebox = async (app) => {
                     sharedNotes.push(note);
                 }
             }
-            rep.send({
+            return rep.send({
                 notes: userNotes,
                 sharedNotes
             });
@@ -78,7 +78,7 @@ export const noteController: FastifyPluginAsyncTypebox = async (app) => {
                 sessionId,
                 userId: user.id
             });
-            rep.send(createdNote);
+            return rep.send(createdNote);
         }
     });
 
@@ -91,7 +91,7 @@ export const noteController: FastifyPluginAsyncTypebox = async (app) => {
         },
         handler: async ({ params: { noteId }, user }, rep) => {
             const note = await getUserNoteByIdOrThrow(user.id, noteId);
-            rep.send(note);
+            return rep.send(note);
         }
     });
 
@@ -108,7 +108,7 @@ export const noteController: FastifyPluginAsyncTypebox = async (app) => {
             controlSelf(note.userId, user);
             const updatedNote = await updateNoteById(noteId, body);
             await updateCachedNoteIfExists(updatedNote);
-            rep.send(updatedNote);
+            return rep.send(updatedNote);
         }
     });
 
@@ -154,7 +154,7 @@ export const noteController: FastifyPluginAsyncTypebox = async (app) => {
             );
             const updatedNote = await getUserNoteByIdOrThrow(user.id, noteId);
             await updateCachedNoteIfExists(updatedNote);
-            rep.send(updatedNote);
+            return rep.send(updatedNote);
         }
     });
 
@@ -173,7 +173,7 @@ export const noteController: FastifyPluginAsyncTypebox = async (app) => {
             // re-order note positions
             await reorderUserSessionNotes(user.id, note.sessionId);
             //
-            rep.send({});
+            return rep.send({});
         }
     });
 };

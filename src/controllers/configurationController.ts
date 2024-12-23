@@ -11,7 +11,7 @@ export const configurationController: FastifyPluginAsyncTypebox = async (
         url: '/configuration',
         handler: async (_req, rep) => {
             // biome-ignore lint/suspicious/useAwait: fastify handler require async
-            rep.send({
+            return rep.send({
                 registrationEnabled: getEnv('REGISTRATION_ENABLED'),
                 invitationEnabled: getEnv('INVITATION_ENABLED'),
                 defaultTheme: getEnv('DEFAULT_THEME'),

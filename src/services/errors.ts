@@ -100,7 +100,7 @@ export const errorHandler = (
     err: Error,
     _req: FastifyRequest,
     rep: FastifyReply
-): void => {
+) => {
     if (err instanceof CustomError) {
         // handles custom errors
         const response: ErrorJsonResponse = {
@@ -112,12 +112,11 @@ export const errorHandler = (
         if (err instanceof InternError) {
             log.error(err.stack);
         }
-        rep.status(err.status).send(response);
-    } else {
-        // if error is not handled throw an intern error and logs stack
-        log.error(err.stack);
-        rep.status(500).send({
-            error: 'Intern error'
-        });
+        return rep.status(err.status).send(response);
     }
+    // if error is not handled throw an intern error and logs stack
+    log.error(err.stack);
+    return rep.status(500).send({
+        error: 'Intern error'
+    });
 };

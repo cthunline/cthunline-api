@@ -11,7 +11,7 @@ export const statsController: FastifyPluginAsyncTypebox = async (app) => {
         url: '/statistics',
         handler: async ({ user }, rep) => {
             const stats = await getInstanceStats(app, user.id);
-            rep.send(stats);
+            return rep.send(stats);
         }
     });
 };
