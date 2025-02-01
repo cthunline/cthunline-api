@@ -7,6 +7,7 @@ import { cache } from '../../../src/services/cache.js';
 import { db, tables } from '../../../src/services/db.js';
 import { importMetaUrlDirname } from '../../../src/services/tools.js';
 import { assets } from '../data/assets.data.js';
+import { alienCharacters } from '../data/characters/alienCharacters.data.js';
 import { apocalypseWorldCharacters } from '../data/characters/apocalypseWorldCharacters.data.js';
 import { cocCharacters } from '../data/characters/cocCharacters.data.js';
 import { dnd5Characters } from '../data/characters/dnd5Characters.data.js';
@@ -26,6 +27,7 @@ export const notesData = notes;
 export const assetsData = assets;
 export const directoriesData = directories;
 export const charactersData = [
+    ...alienCharacters,
     ...apocalypseWorldCharacters,
     ...cocCharacters,
     ...swd6Characters,

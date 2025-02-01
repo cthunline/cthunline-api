@@ -127,6 +127,7 @@ describe('[API] Characters', () => {
         });
         test('Should create a character', async () => {
             const gameIds = [
+                'alien',
                 'apocalypseWorld',
                 'callOfCthulhu',
                 'starWarsD6',

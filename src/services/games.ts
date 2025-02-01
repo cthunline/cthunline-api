@@ -1,4 +1,5 @@
 import {
+    alien,
     apocalypseWorld,
     callOfCthulhu,
     dnd5,
@@ -13,6 +14,10 @@ export type GameId = keyof typeof games;
 List of available games.
 */
 export const games = {
+    alien: {
+        name: 'Alien',
+        schema: alien.schema
+    },
     apocalypseWorld: {
         name: 'Apocalypse World',
         schema: apocalypseWorld.schema
