@@ -58,7 +58,7 @@ export const alienCharacters: CharacterInsert[] = [
                 stressLevel: 0,
                 health: 2,
                 radiation: 0,
-                criticalInjuries: [],
+                criticalInjuries: '',
                 conditions: {
                     starving: false,
                     dehydrated: false,
@@ -79,9 +79,9 @@ export const alienCharacters: CharacterInsert[] = [
                 },
                 weapons: [],
                 encumbrance: 0,
-                gear: ['Personal data tablet'],
+                gear: 'Personal data tablet',
                 signatureItem: '',
-                tinyItems: []
+                tinyItems: ''
             },
             experience: {
                 experiencePoints: 0,
@@ -146,7 +146,7 @@ export const alienCharacters: CharacterInsert[] = [
                 stressLevel: 0,
                 health: 5,
                 radiation: 0,
-                criticalInjuries: [],
+                criticalInjuries: '',
                 conditions: {
                     starving: false,
                     dehydrated: false,
@@ -174,9 +174,9 @@ export const alienCharacters: CharacterInsert[] = [
                     }
                 ],
                 encumbrance: 0,
-                gear: [],
+                gear: '',
                 signatureItem: '',
-                tinyItems: []
+                tinyItems: ''
             },
             experience: {
                 experiencePoints: 0,
