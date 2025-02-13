@@ -11,9 +11,7 @@ export const alienCharacters: CharacterInsert[] = [
             biography: {
                 name: 'Ellie',
                 career: 'Scientist',
-                appearance: '53 y.o., brown hair, glasses',
-                personalAgenda:
-                    'To make sure the 26 Draconis Strain does not become a threat to human civilization'
+                appearance: '53 y.o., brown hair, glasses'
             },
             relationships: {
                 buddy: 'Sarah',
@@ -86,6 +84,11 @@ export const alienCharacters: CharacterInsert[] = [
             experience: {
                 experiencePoints: 0,
                 storyPoints: 0
+            },
+            agenda: {
+                personalAgenda:
+                    'To make sure the 26 Draconis Strain does not become a threat to human civilization',
+                objectives: 'Some objectives'
             }
         }
     },
@@ -99,9 +102,7 @@ export const alienCharacters: CharacterInsert[] = [
             biography: {
                 name: 'Sarah',
                 career: 'Marine',
-                appearance: '34 y.o., blond hair, muscular',
-                personalAgenda:
-                    'Terminate all threats to the Cronus crew with extreme prejudice, no matter the risks for you'
+                appearance: '34 y.o., blond hair, muscular'
             },
             relationships: {
                 buddy: 'Mary',
@@ -181,6 +182,11 @@ export const alienCharacters: CharacterInsert[] = [
             experience: {
                 experiencePoints: 0,
                 storyPoints: 0
+            },
+            agenda: {
+                personalAgenda:
+                    'Terminate all threats to the Cronus crew with extreme prejudice, no matter the risks for you',
+                objectives: 'Some other objectives'
             }
         }
     }
