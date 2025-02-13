@@ -1,6 +1,6 @@
 {
     "name": "cthunline-api",
-    "version": "1.21.0",
+    "version": "1.22.0",
     "type": "module",
     "scripts": {
         "dev": "tsx watch --clear-screen=false --include \"./src/**\" src/index.ts",

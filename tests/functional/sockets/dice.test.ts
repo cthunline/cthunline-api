@@ -1,6 +1,10 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
-import { assertSocketMeta, assertUser } from '../helpers/assert.helper.js';
+import {
+    assertDiceResult,
+    assertSocketMeta,
+    assertUser
+} from '../helpers/assert.helper.js';
 import { resetCache, resetData } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
 
@@ -58,7 +62,7 @@ describe('[Sockets] Dice', () => {
                 const socket = await socketHelper.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
                     socket.on('diceResult', (resultData: any) => {
-                        const { user, isMaster, request, isPrivate, result } =
+                        const { user, isMaster, request, isPrivate } =
                             resultData;
                         assertSocketMeta(resultData);
                         assertUser(user);
@@ -67,7 +71,7 @@ describe('[Sockets] Dice', () => {
                         expect(isPrivate).to.equal(
                             event === 'dicePrivateRequest'
                         );
-                        expect(result).to.be.a('number');
+                        assertDiceResult(resultData);
                         socket.disconnect();
                         resolve();
                     });
@@ -93,19 +97,14 @@ describe('[Sockets] Dice', () => {
                 (socket) =>
                     new Promise<void>((resolve, reject) => {
                         socket.on('diceResult', (resultData: any) => {
-                            const {
-                                user,
-                                isMaster,
-                                request,
-                                isPrivate,
-                                result
-                            } = resultData;
+                            const { user, isMaster, request, isPrivate } =
+                                resultData;
                             assertSocketMeta(resultData);
                             assertUser(user);
                             expect(isMaster).toEqual(false);
                             expect(request).toEqual(diceRequest);
                             expect(isPrivate).to.equal(false);
-                            expect(result).to.be.a('number');
+                            assertDiceResult(resultData);
                             socket.disconnect();
                             resolve();
                         });

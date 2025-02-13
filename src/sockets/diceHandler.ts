@@ -4,7 +4,11 @@ import type { SafeUser } from '../drizzle/schema.js';
 import { ForbiddenError } from '../services/errors.js';
 import { sum } from '../services/tools.js';
 import { validateSchema } from '../services/typebox.js';
-import type { DiceType, SocketDiceResult } from '../types/dice.js';
+import type {
+    DiceType,
+    SocketDiceResult,
+    SocketDiceResultDetails
+} from '../types/dice.js';
 import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
 import { meta } from './helper.js';
 import { type RequestDiceBody, requestDiceSchema } from './schemas/dice.js';
@@ -20,22 +24,23 @@ const getDiceResult = (
     isMaster: boolean,
     request: RequestDiceBody,
     isPrivate = false
-): SocketDiceResult => ({
-    user,
-    isMaster,
-    request,
-    isPrivate,
-    result: sum(
-        // sum results of all dice types
-        (Object.entries(request) as [DiceType, number | undefined][]).map(
-            ([diceType, diceCount]) =>
-                sum(
-                    // sum results of one dice type
-                    [...Array(diceCount)].map(() => rollDice(diceType))
-                )
-        )
-    )
-});
+): SocketDiceResult => {
+    const details: SocketDiceResultDetails = {};
+    for (const diceType of Object.keys(request) as DiceType[]) {
+        const diceCount = request[diceType];
+        details[diceType] = [...Array(diceCount)].map(() => rollDice(diceType));
+    }
+    return {
+        user,
+        isMaster,
+        request,
+        isPrivate,
+        total: sum(
+            Object.values(details).map((diceResults) => sum(diceResults))
+        ),
+        details
+    };
+};
 
 export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
     // dice roll request / result sent to every player in session

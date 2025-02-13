@@ -2,6 +2,7 @@ import { expect } from 'vitest';
 
 import type { AppErrorConstructor } from '../../../src/services/errors.js';
 import { locales } from '../../../src/services/locale.js';
+import { type DiceType, diceTypes } from '../../../src/types/dice.js';
 
 export const expectAsync = async (
     promise: Promise<any>,
@@ -328,4 +329,22 @@ export const assertError = (data: Record<string, any>) => {
 export const assertSocketMeta = (data: Record<string, any>) => {
     expect(data).to.have.property('dateTime');
     expect(data.dateTime).toBeDateString();
+};
+
+export const assertDiceResult = (data: Record<string, any>) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('total');
+    expect(data.total).to.be.a('number');
+    expect(data).to.have.property('details');
+    expect(data.details).to.be.an('object');
+    expect(Object.keys(data.details)).to.satisfy((dTypes: DiceType[]) =>
+        dTypes.every((dType: DiceType) => diceTypes.includes(dType))
+    );
+    for (const dType of Object.keys(data.details) as DiceType[]) {
+        const results = data.details[dType];
+        expect(results).to.be.an('array');
+        for (const result of results) {
+            expect(result).to.be.a('number');
+        }
+    }
 };
