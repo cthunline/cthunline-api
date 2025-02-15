@@ -51,7 +51,13 @@ export const alienCharacters: CharacterInsert[] = [
                     }
                 }
             },
-            talents: ['Analyze'],
+            talents: [
+                {
+                    name: 'Analyze',
+                    description:
+                        'Talent description with instructions about how to use it'
+                }
+            ],
             status: {
                 stressLevel: 0,
                 health: 2,
@@ -142,7 +148,13 @@ export const alienCharacters: CharacterInsert[] = [
                     }
                 }
             },
-            talents: ['Overkill'],
+            talents: [
+                {
+                    name: 'Overkill',
+                    description:
+                        'Talent description with instructions about how to use it'
+                }
+            ],
             status: {
                 stressLevel: 0,
                 health: 5,
