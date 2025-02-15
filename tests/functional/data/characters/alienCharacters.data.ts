@@ -60,6 +60,7 @@ export const alienCharacters: CharacterInsert[] = [
             ],
             status: {
                 stressLevel: 0,
+                maxHealth: 3,
                 health: 2,
                 radiation: 0,
                 criticalInjuries: '',
@@ -157,6 +158,7 @@ export const alienCharacters: CharacterInsert[] = [
             ],
             status: {
                 stressLevel: 0,
+                maxHealth: 5,
                 health: 5,
                 radiation: 0,
                 criticalInjuries: '',

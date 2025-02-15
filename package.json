@@ -18,7 +18,7 @@
         "format": "npx @biomejs/biome check --write --error-on-warnings && npx tsc --noEmit"
     },
     "dependencies": {
-        "@cthunline/games": "^3.7.4",
+        "@cthunline/games": "^3.7.6",
         "@fastify/cookie": "^11.0.2",
         "@fastify/helmet": "^13.0.1",
         "@fastify/multipart": "^9.0.3",
