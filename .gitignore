@@ -4,6 +4,7 @@ coverage
 web
 .nyc_output
 .scannerwork
+*.tsbuildinfo
 
 .env*
 !.env.sample

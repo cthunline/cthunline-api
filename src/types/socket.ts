@@ -20,7 +20,7 @@ import type {
 import type { NoteSocketUpdateBody } from '../sockets/schemas/note.js';
 import type { AlienRollResult, SocketDiceResult } from './dice.js';
 
-export interface ListenEvents {
+type ListenEvents = {
     sketchUpdate: (data: SketchBody) => void;
     tokenUpdate: (data: TokenBody) => void;
     diceRequest: (data: DiceRequestBody) => void;
@@ -32,9 +32,9 @@ export interface ListenEvents {
     characterUpdate: () => void;
     noteUpdate: (data: NoteSocketUpdateBody) => void;
     noteDelete: (data: NoteSocketUpdateBody) => void;
-}
+};
 
-export interface EmitEvents {
+type EmitEvents = {
     error: (data: unknown) => void;
     join: (data: SocketConnectData) => void;
     leave: (data: SocketConnectData) => void;
@@ -46,11 +46,11 @@ export interface EmitEvents {
     characterUpdate: (data: SocketCharacterUpdateData) => void;
     noteUpdate: (data: SocketNoteUpdateData) => void;
     noteDelete: (data: SocketNoteDeleteData) => void;
-}
+};
 
-export type ServerSideEvents = object;
+type ServerSideEvents = object;
 
-export type SocketData = {
+type SocketData = {
     cookies: { [key: string]: string };
     user: SafeUser;
     sessionId: number;
@@ -82,7 +82,7 @@ export type SocketIoSocket = Socket<
     SocketData
 >;
 
-export type SocketBaseData = {
+type SocketBaseData = {
     user: SafeUser;
     isMaster: boolean;
 };
@@ -100,40 +100,40 @@ export type SocketSessionUser = SafeUser & {
           }
     );
 
-export type SocketConnectData = SocketMeta<
+type SocketConnectData = SocketMeta<
     SocketBaseData & {
         users: SocketSessionUser[];
     }
 >;
 
-export type SocketSketchUpdateData = SocketMeta<
+type SocketSketchUpdateData = SocketMeta<
     SocketBaseData & {
         sketch: SketchBody;
     }
 >;
 
-export type SocketDiceResultData = SocketMeta<SocketDiceResult>;
+type SocketDiceResultData = SocketMeta<SocketDiceResult>;
 
-export type SocketAudioPlayData = SocketMeta<
+type SocketAudioPlayData = SocketMeta<
     SocketBaseData & {
         asset: Asset;
         time?: number;
     }
 >;
 
-export type SocketCharacterUpdateData = SocketMeta<
+type SocketCharacterUpdateData = SocketMeta<
     SocketBaseData & {
         character: Character;
     }
 >;
 
-export type SocketNoteUpdateData = SocketMeta<
+type SocketNoteUpdateData = SocketMeta<
     SocketBaseData & {
         note: Note;
     }
 >;
 
-export type SocketNoteDeleteData = SocketMeta<
+type SocketNoteDeleteData = SocketMeta<
     SocketBaseData & {
         noteId: number;
     }
