@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
 import {
-    assertDiceResult,
+    assertDiceResponse,
     assertSocketMeta,
     assertUser
 } from '../helpers/assert.helper.js';
@@ -23,9 +23,11 @@ describe('[Sockets] Dice', () => {
             data: [
                 {},
                 undefined,
-                { D4: 2, invalidKey: 3 },
-                { D8: 2, D12: 0 },
-                { D20: 2, D100: 'invalidValue' }
+                { invalid: [] },
+                { rolls: [] },
+                { rolls: [{ dice: 'D4', invalidKey: 3 }] },
+                { rolls: [{ dice: 'D4', color: 2 }] },
+                { rolls: [{ dice: 'invalid' }] }
             ],
             expectedStatus: 400,
             isMaster: true
@@ -36,7 +38,7 @@ describe('[Sockets] Dice', () => {
         await socketHelper.testError({
             emitEvent: 'dicePrivateRequest',
             onEvent: 'diceResult',
-            data: { D4: 2 },
+            data: { rolls: [{ dice: 'D4' }] },
             expectedStatus: 403,
             isMaster: false
         });
@@ -45,33 +47,36 @@ describe('[Sockets] Dice', () => {
     test('Should request dice rolls', async () => {
         const requestData = [
             {
-                D4: 3
+                rolls: [{ dice: 'D4' }, { dice: 'D4' }, { dice: 'D4' }]
             },
             {
-                D6: 1,
-                D8: 2
+                rolls: [{ dice: 'D6' }, { dice: 'D8' }, { dice: 'D8' }]
             },
             {
-                D12: 3,
-                D20: 2,
-                D100: 3
+                rolls: [
+                    { dice: 'D12', color: 'yellow' },
+                    { dice: 'D12', color: 'red' },
+                    { dice: 'D12' },
+                    { dice: 'D20' },
+                    { dice: 'D20' },
+                    { dice: 'D100' }
+                ]
             }
         ];
         for (const data of requestData) {
             for (const event of ['diceRequest', 'dicePrivateRequest']) {
                 const socket = await socketHelper.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', (resultData: any) => {
-                        const { user, isMaster, request, isPrivate } =
-                            resultData;
-                        assertSocketMeta(resultData);
+                    socket.on('diceResult', (res: any) => {
+                        const { user, isMaster, rolls, isPrivate } = res;
+                        assertSocketMeta(res);
                         assertUser(user);
                         expect(isMaster).toEqual(true);
-                        expect(request).toEqual(data);
+                        expect(rolls).toEqual(data.rolls);
                         expect(isPrivate).to.equal(
                             event === 'dicePrivateRequest'
                         );
-                        assertDiceResult(resultData);
+                        assertDiceResponse(res);
                         socket.disconnect();
                         resolve();
                     });
@@ -89,22 +94,25 @@ describe('[Sockets] Dice', () => {
         const {
             sockets: [masterSocket, player1Socket, player2Socket]
         } = await socketHelper.setupSession();
-        const diceRequest = {
-            D6: 3
+        const data = {
+            rolls: [
+                { dice: 'D12', color: 'yellow' },
+                { dice: 'D12', color: 'red' },
+                { dice: 'D12' }
+            ]
         };
         await Promise.all([
             ...[masterSocket, player1Socket, player2Socket].map(
                 (socket) =>
                     new Promise<void>((resolve, reject) => {
-                        socket.on('diceResult', (resultData: any) => {
-                            const { user, isMaster, request, isPrivate } =
-                                resultData;
-                            assertSocketMeta(resultData);
+                        socket.on('diceResult', (res: any) => {
+                            const { user, isMaster, rolls, isPrivate } = res;
+                            assertSocketMeta(res);
                             assertUser(user);
                             expect(isMaster).toEqual(false);
-                            expect(request).toEqual(diceRequest);
+                            expect(rolls).toEqual(data.rolls);
                             expect(isPrivate).to.equal(false);
-                            assertDiceResult(resultData);
+                            assertDiceResponse(res);
                             socket.disconnect();
                             resolve();
                         });
@@ -114,7 +122,7 @@ describe('[Sockets] Dice', () => {
                         });
                     })
             ),
-            player1Socket.emit('diceRequest', diceRequest)
+            player1Socket.emit('diceRequest', data)
         ]);
     });
 });

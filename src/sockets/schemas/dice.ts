@@ -1,19 +1,32 @@
 import { type Static, Type } from '@fastify/type-provider-typebox';
 
-export const requestDiceSchema = Type.Partial(
-    Type.Object({
-        D4: Type.Integer({ minimum: 1 }),
-        D6: Type.Integer({ minimum: 1 }),
-        D8: Type.Integer({ minimum: 1 }),
-        D10: Type.Integer({ minimum: 1 }),
-        D12: Type.Integer({ minimum: 1 }),
-        D20: Type.Integer({ minimum: 1 }),
-        D100: Type.Integer({ minimum: 1 })
-    }),
+import { diceTypes } from '../../services/dice.js';
+
+const diceSchema = Type.Union(diceTypes.map((dice) => Type.Literal(dice)));
+
+const diceRequestRollSchema = Type.Object(
+    {
+        dice: diceSchema,
+        color: Type.Optional(Type.String({ minLength: 1 }))
+    },
     {
         additionalProperties: false,
         minProperties: 1
     }
 );
 
-export type RequestDiceBody = Static<typeof requestDiceSchema>;
+export type DiceRequestRoll = Static<typeof diceRequestRollSchema>;
+
+export const diceRequestSchema = Type.Object(
+    {
+        rolls: Type.Array(diceRequestRollSchema, {
+            minItems: 1
+        })
+    },
+    {
+        additionalProperties: false,
+        minProperties: 1
+    }
+);
+
+export type DiceRequestBody = Static<typeof diceRequestSchema>;

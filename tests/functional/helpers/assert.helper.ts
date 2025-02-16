@@ -1,8 +1,9 @@
 import { expect } from 'vitest';
 
+import { diceTypes } from '../../../src/services/dice.js';
 import type { AppErrorConstructor } from '../../../src/services/errors.js';
 import { locales } from '../../../src/services/locale.js';
-import { type DiceType, diceTypes } from '../../../src/types/dice.js';
+import type { DiceType } from '../../../src/types/dice.js';
 
 export const expectAsync = async (
     promise: Promise<any>,
@@ -331,20 +332,42 @@ export const assertSocketMeta = (data: Record<string, any>) => {
     expect(data.dateTime).toBeDateString();
 };
 
-export const assertDiceResult = (data: Record<string, any>) => {
+const assertDiceRoll = (data: Record<string, any>, withResult?: boolean) => {
+    expect(data).to.be.an('object');
+    expect(data).to.have.property('dice');
+    expect(data.dice).to.be.oneOf(diceTypes);
+    if (data.color) {
+        expect(data.color).to.be.a('string');
+    }
+    if (withResult) {
+        expect(data).to.have.property('result');
+        expect(data.result).to.be.a('number');
+    }
+};
+
+export const assertDiceResponse = (data: Record<string, any>) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('total');
     expect(data.total).to.be.a('number');
-    expect(data).to.have.property('details');
-    expect(data.details).to.be.an('object');
-    expect(Object.keys(data.details)).to.satisfy((dTypes: DiceType[]) =>
+    expect(data).to.have.property('aggregatedRolls');
+    expect(data.aggregatedRolls).to.be.an('object');
+    expect(Object.keys(data.aggregatedRolls)).to.satisfy((dTypes: DiceType[]) =>
         dTypes.every((dType: DiceType) => diceTypes.includes(dType))
     );
-    for (const dType of Object.keys(data.details) as DiceType[]) {
-        const results = data.details[dType];
-        expect(results).to.be.an('array');
-        for (const result of results) {
-            expect(result).to.be.a('number');
-        }
+    for (const dType of Object.keys(data.aggregatedRolls) as DiceType[]) {
+        const count = data.aggregatedRolls[dType];
+        expect(count).to.be.an('number');
+        expect(count).to.be.above(0);
     }
+    expect(data).to.have.property('rolls');
+    expect(data.rolls).to.be.an('array');
+    for (const reqRoll of data.rolls) {
+        assertDiceRoll(reqRoll);
+    }
+    expect(data).to.have.property('results');
+    expect(data.results).to.be.an('array');
+    for (const resRoll of data.results) {
+        assertDiceRoll(resRoll, true);
+    }
+    expect(data.results).to.have.lengthOf(data.rolls.length);
 };

@@ -13,15 +13,15 @@ import type {
 } from '../drizzle/schema.js';
 import type { SocketMeta } from '../sockets/helper.js';
 import type { PlayAudioBody } from '../sockets/schemas/audio.js';
-import type { RequestDiceBody } from '../sockets/schemas/dice.js';
+import type { DiceRequestBody } from '../sockets/schemas/dice.js';
 import type { NoteSocketUpdateBody } from '../sockets/schemas/note.js';
 import type { SocketDiceResult } from './dice.js';
 
 export interface ListenEvents {
     sketchUpdate: (data: SketchBody) => void;
     tokenUpdate: (data: TokenBody) => void;
-    diceRequest: (data: RequestDiceBody) => void;
-    dicePrivateRequest: (data: RequestDiceBody) => void;
+    diceRequest: (data: DiceRequestBody) => void;
+    dicePrivateRequest: (data: DiceRequestBody) => void;
     audioPlay: (data: PlayAudioBody) => void;
     audioStop: () => void;
     characterUpdate: () => void;
