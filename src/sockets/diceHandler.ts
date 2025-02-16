@@ -2,7 +2,7 @@ import { getAlienRollResult, getDiceResult } from '../services/dice.js';
 import { ForbiddenError } from '../services/errors.js';
 import { validateSchema } from '../services/typebox.js';
 import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
-import { meta } from './helper.js';
+import { meta, socketError } from './helper.js';
 import {
     type AlienRollRequest,
     type DiceRequestBody,
@@ -31,7 +31,7 @@ export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
                     meta(getDiceResult(user, isMaster, request))
                 );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 
@@ -47,7 +47,7 @@ export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
                 meta(getDiceResult(user, isMaster, request, true))
             );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 
@@ -65,7 +65,7 @@ export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
                     meta(getAlienRollResult(user, isMaster, request))
                 );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 
@@ -80,7 +80,7 @@ export const diceHandler = (io: SocketIoServer, socket: SocketIoSocket) => {
                 meta(getAlienRollResult(user, isMaster, request, true))
             );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 };

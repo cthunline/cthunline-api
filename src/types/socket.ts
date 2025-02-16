@@ -35,7 +35,7 @@ type ListenEvents = {
 };
 
 type EmitEvents = {
-    error: (data: unknown) => void;
+    error: (data: SocketErrorData) => void;
     join: (data: SocketConnectData) => void;
     leave: (data: SocketConnectData) => void;
     sketchUpdate: (data: SocketSketchUpdateData) => void;
@@ -138,3 +138,8 @@ type SocketNoteDeleteData = SocketMeta<
         noteId: number;
     }
 >;
+
+export type SocketErrorData = SocketMeta<{
+    message: string;
+    status?: number;
+}>;

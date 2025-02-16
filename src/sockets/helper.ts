@@ -1,8 +1,13 @@
 import dayjs from 'dayjs';
 import type { FastifyInstance } from 'fastify';
 
+import { CustomError } from '../services/errors.js';
 import { isInteger } from '../services/tools.js';
-import type { SocketIoServer, SocketSessionUser } from '../types/socket.js';
+import type {
+    SocketErrorData,
+    SocketIoServer,
+    SocketSessionUser
+} from '../types/socket.js';
 import type { SocketRoomStat } from '../types/stats.js';
 
 export type SocketMeta<T> = T & {
@@ -13,6 +18,19 @@ export const meta = <T>(emitData: T): SocketMeta<T> => ({
     dateTime: dayjs().toISOString(),
     ...emitData
 });
+
+export const socketError = (err: unknown): SocketErrorData => {
+    const data: SocketErrorData = meta({
+        message: 'Unexpected socket error'
+    });
+    if (err instanceof CustomError) {
+        data.message = err.message;
+        data.status = err.status;
+    } else if (err instanceof Error) {
+        data.message = err.message;
+    }
+    return data;
+};
 
 export const getSessionUsers = async (
     io: SocketIoServer,

@@ -4,7 +4,7 @@ import { cache } from '../services/cache.js';
 import { ForbiddenError } from '../services/errors.js';
 import { getCharacterByIdOrThrow } from '../services/queries/character.js';
 import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
-import { meta } from './helper.js';
+import { meta, socketError } from './helper.js';
 
 export const characterHandler = (
     io: SocketIoServer,
@@ -43,7 +43,7 @@ export const characterHandler = (
                 );
             }
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 };

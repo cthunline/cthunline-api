@@ -2,7 +2,7 @@ import { ForbiddenError, ValidationError } from '../services/errors.js';
 import { getAssetByIdOrThrow } from '../services/queries/asset.js';
 import { validateSchema } from '../services/typebox.js';
 import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
-import { meta } from './helper.js';
+import { meta, socketError } from './helper.js';
 import { type PlayAudioBody, playAudioSchema } from './schemas/audio.js';
 
 export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
@@ -29,7 +29,7 @@ export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 })
             );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 
@@ -48,7 +48,7 @@ export const audioHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 })
             );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 };

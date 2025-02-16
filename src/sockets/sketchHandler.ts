@@ -16,7 +16,7 @@ import { updateSessionById } from '../services/queries/session.js';
 import { resetTimeout } from '../services/tools.js';
 import { validateSchema } from '../services/typebox.js';
 import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
-import { meta } from './helper.js';
+import { meta, socketError } from './helper.js';
 
 const sketchSaveTimerMs = getEnv('CACHE_SKETCH_SAVE_MS') ?? 1000;
 
@@ -66,7 +66,7 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 })
             );
         } catch (err: unknown) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 
@@ -106,7 +106,7 @@ export const sketchHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 })
             );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 };

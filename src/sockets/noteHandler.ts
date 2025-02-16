@@ -5,7 +5,7 @@ import { ForbiddenError } from '../services/errors.js';
 import { getUserNoteByIdOrThrow } from '../services/queries/note.js';
 import { validateSchema } from '../services/typebox.js';
 import type { SocketIoServer, SocketIoSocket } from '../types/socket.js';
-import { meta } from './helper.js';
+import { meta, socketError } from './helper.js';
 import {
     type NoteSocketUpdateBody,
     noteSocketUpdateSchema
@@ -42,7 +42,7 @@ export const noteHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 })
             );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
     // notify users when a shared note is deleted / unshared
@@ -60,7 +60,7 @@ export const noteHandler = (_io: SocketIoServer, socket: SocketIoSocket) => {
                 })
             );
         } catch (err) {
-            socket.emit('error', meta(err));
+            socket.emit('error', socketError(err));
         }
     });
 };
