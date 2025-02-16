@@ -2,12 +2,11 @@ import { type Static, Type } from '@fastify/type-provider-typebox';
 
 import { diceTypes } from '../../services/dice.js';
 
-const diceSchema = Type.Union(diceTypes.map((dice) => Type.Literal(dice)));
+// -------------------------- standard rolls
 
 const diceRequestRollSchema = Type.Object(
     {
-        dice: diceSchema,
-        color: Type.Optional(Type.String({ minLength: 1 }))
+        dice: Type.Union(diceTypes.map((dice) => Type.Literal(dice)))
     },
     {
         additionalProperties: false,
@@ -30,3 +29,18 @@ export const diceRequestSchema = Type.Object(
 );
 
 export type DiceRequestBody = Static<typeof diceRequestSchema>;
+
+// -------------------------- game rolls
+
+export const alienRollSchema = Type.Object(
+    {
+        dices: Type.Integer({ minimum: 1 }),
+        stresses: Type.Integer({ minimum: 0 })
+    },
+    {
+        additionalProperties: false,
+        minProperties: 1
+    }
+);
+
+export type AlienRollRequest = Static<typeof alienRollSchema>;

@@ -1,7 +1,7 @@
 import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 
+import { isGameId } from '@cthunline/games';
 import { ValidationError } from '../services/errors.js';
-import { isValidGameId } from '../services/games.js';
 import { deleteSessionNotes } from '../services/queries/note.js';
 import {
     createSession,
@@ -35,7 +35,7 @@ export const sessionController: FastifyPluginAsyncTypebox = async (app) => {
         schema: { body: createSessionSchema },
         handler: async ({ body, user }, rep) => {
             const { gameId, sketch } = body;
-            if (!isValidGameId(gameId)) {
+            if (!isGameId(gameId)) {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
             const createdSession = await createSession({

@@ -1,13 +1,13 @@
 import { beforeAll, beforeEach, describe, test } from 'vitest';
 
 import {
-    assertDiceResponse,
+    assertAlienRollResponse,
     assertSocketMeta
 } from '../helpers/assert.helper.js';
 import { resetCache, resetData } from '../helpers/data.helper.js';
 import { socketHelper } from '../helpers/sockets.helper.js';
 
-describe('[Sockets] Dice', () => {
+describe('[Sockets] Dice for Alien', () => {
     beforeAll(async () => {
         await resetData();
     });
@@ -17,15 +17,16 @@ describe('[Sockets] Dice', () => {
 
     test('Should fail to request dice because of invalid data', async () => {
         await socketHelper.testError({
-            emitEvent: 'diceRequest',
-            onEvent: 'diceResult',
+            emitEvent: 'diceAlienRequest',
+            onEvent: 'diceAlienResult',
             data: [
                 {},
                 undefined,
-                { invalid: [] },
-                { rolls: [] },
-                { rolls: [{ dice: 'D4', invalidKey: 3 }] },
-                { rolls: [{ dice: 'invalid' }] }
+                { dices: 1 },
+                { stresses: 1 },
+                { dices: 0, stresses: 1 },
+                { dices: 'invalid', stresses: 1 },
+                { dices: 3, stresses: 1, invalid: 1 }
             ],
             expectedStatus: 400,
             isMaster: true
@@ -34,9 +35,9 @@ describe('[Sockets] Dice', () => {
 
     test('Should fail to request private dice roll because not game master', async () => {
         await socketHelper.testError({
-            emitEvent: 'dicePrivateRequest',
-            onEvent: 'diceResult',
-            data: { rolls: [{ dice: 'D4' }] },
+            emitEvent: 'diceAlienPrivateRequest',
+            onEvent: 'diceAlienResult',
+            data: { dices: 1, stresses: 1 },
             expectedStatus: 403,
             isMaster: false
         });
@@ -44,32 +45,22 @@ describe('[Sockets] Dice', () => {
 
     test('Should request dice rolls', async () => {
         const requestData = [
-            {
-                rolls: [{ dice: 'D4' }, { dice: 'D4' }, { dice: 'D4' }]
-            },
-            {
-                rolls: [{ dice: 'D6' }, { dice: 'D8' }, { dice: 'D8' }]
-            },
-            {
-                rolls: [
-                    { dice: 'D12' },
-                    { dice: 'D12' },
-                    { dice: 'D20' },
-                    { dice: 'D20' },
-                    { dice: 'D100' }
-                ]
-            }
+            { dices: 5, stresses: 0 },
+            { dices: 4, stresses: 2 }
         ];
         for (const data of requestData) {
-            for (const event of ['diceRequest', 'dicePrivateRequest']) {
+            for (const event of [
+                'diceAlienRequest',
+                'diceAlienPrivateRequest'
+            ]) {
                 const socket = await socketHelper.connectRole(true);
                 await new Promise<void>((resolve, reject) => {
-                    socket.on('diceResult', (res: any) => {
+                    socket.on('diceAlienResult', (res: any) => {
                         assertSocketMeta(res);
-                        assertDiceResponse(res, {
+                        assertAlienRollResponse(res, {
+                            ...data,
                             isMaster: true,
-                            isPrivate: event === 'dicePrivateRequest',
-                            rolls: data.rolls
+                            isPrivate: event === 'diceAlienPrivateRequest'
                         });
                         socket.disconnect();
                         resolve();
@@ -88,19 +79,17 @@ describe('[Sockets] Dice', () => {
         const {
             sockets: [masterSocket, player1Socket, player2Socket]
         } = await socketHelper.setupSession();
-        const data = {
-            rolls: [{ dice: 'D12' }, { dice: 'D12' }]
-        };
+        const data = { dices: 4, stresses: 2 };
         await Promise.all([
             ...[masterSocket, player1Socket, player2Socket].map(
                 (socket) =>
                     new Promise<void>((resolve, reject) => {
-                        socket.on('diceResult', (res: any) => {
+                        socket.on('diceAlienResult', (res: any) => {
                             assertSocketMeta(res);
-                            assertDiceResponse(res, {
+                            assertAlienRollResponse(res, {
+                                ...data,
                                 isMaster: false,
-                                isPrivate: false,
-                                rolls: data.rolls
+                                isPrivate: false
                             });
                             socket.disconnect();
                             resolve();
@@ -111,7 +100,7 @@ describe('[Sockets] Dice', () => {
                         });
                     })
             ),
-            player1Socket.emit('diceRequest', data)
+            player1Socket.emit('diceAlienRequest', data)
         ]);
     });
 });

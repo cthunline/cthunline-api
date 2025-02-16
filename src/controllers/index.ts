@@ -6,7 +6,6 @@ import { assetController } from './assetController.js';
 import { authController } from './authController.js';
 import { characterController } from './characterController.js';
 import { configurationController } from './configurationController.js';
-import { gameController } from './gameController.js';
 import { noteController } from './noteController.js';
 import { registrationController } from './registrationController.js';
 import { sessionController } from './sessionController.js';
@@ -53,7 +52,6 @@ export const mainController: FastifyPluginAsyncTypebox = async (app) => {
             authController,
             characterController,
             configurationController,
-            gameController,
             noteController,
             sessionController,
             sketchController,

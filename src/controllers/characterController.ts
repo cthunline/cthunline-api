@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Character as CharacterData } from '@cthunline/games';
+import {
+    type Character as CharacterData,
+    type GameId,
+    getGame,
+    isGameId
+} from '@cthunline/games';
 import {
     type FastifyPluginAsyncTypebox,
     Type
@@ -11,7 +16,6 @@ import {
     InternError,
     ValidationError
 } from '../services/errors.js';
-import { type GameId, games, isValidGameId } from '../services/games.js';
 import { cleanMultipartFiles, parseMultipart } from '../services/multipart.js';
 import {
     createCharacter,
@@ -67,10 +71,10 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
         handler: async ({ body, user }, rep) => {
             const userId = user.id;
             const { gameId, name, data } = body;
-            if (!isValidGameId(gameId)) {
+            if (!isGameId(gameId)) {
                 throw new ValidationError(`Invalid gameId ${gameId}`);
             }
-            validateSchema(games[gameId].schema, data);
+            validateSchema(getGame(gameId).schema, data);
             const character = await createCharacter({
                 userId,
                 gameId,
@@ -107,7 +111,7 @@ export const characterController: FastifyPluginAsyncTypebox = async (app) => {
                 await getCharacterByIdOrThrow(characterId);
             controlSelf(userId, user);
             if (body.data) {
-                validateSchema(games[gameId as GameId].schema, body.data);
+                validateSchema(getGame(gameId as GameId).schema, body.data);
             }
             const character = await updateCharacterById(
                 characterId,

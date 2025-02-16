@@ -27,15 +27,6 @@ export const directoryIdParamSchema = Type.Object(
     }
 );
 
-export const gameIdParamSchema = Type.Object(
-    {
-        gameId: Type.String()
-    },
-    {
-        additionalProperties: false
-    }
-);
-
 export const noteIdParamSchema = Type.Object(
     {
         noteId: Type.Integer()

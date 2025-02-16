@@ -28,7 +28,11 @@ export const compareDataWithExpected = (
 ) => {
     for (const key of Object.keys(expected)) {
         expect(data).to.have.property(key);
-        expect(data[key]).to.equal(expected[key]);
+        if (Array.isArray(expected[key])) {
+            expect(data[key]).to.eql(expected[key]);
+        } else {
+            expect(data[key]).to.equal(expected[key]);
+        }
     }
 };
 
@@ -332,6 +336,15 @@ export const assertSocketMeta = (data: Record<string, any>) => {
     expect(data.dateTime).toBeDateString();
 };
 
+const assertDiceRollCommonProperties = (data: Record<string, any>) => {
+    expect(data).to.have.property('user');
+    assertUser(data.user);
+    expect(data).to.have.property('isMaster');
+    expect(data.isMaster).to.be.a('boolean');
+    expect(data).to.have.property('isPrivate');
+    expect(data.isPrivate).to.be.a('boolean');
+};
+
 const assertDiceRoll = (data: Record<string, any>, withResult?: boolean) => {
     expect(data).to.be.an('object');
     expect(data).to.have.property('dice');
@@ -345,8 +358,12 @@ const assertDiceRoll = (data: Record<string, any>, withResult?: boolean) => {
     }
 };
 
-export const assertDiceResponse = (data: Record<string, any>) => {
+export const assertDiceResponse = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
     expect(data).to.be.an('object');
+    assertDiceRollCommonProperties(data);
     expect(data).to.have.property('total');
     expect(data.total).to.be.a('number');
     expect(data).to.have.property('aggregatedRolls');
@@ -370,4 +387,34 @@ export const assertDiceResponse = (data: Record<string, any>) => {
         assertDiceRoll(resRoll, true);
     }
     expect(data.results).to.have.lengthOf(data.rolls.length);
+    if (expected) {
+        compareDataWithExpected(data, expected);
+    }
+};
+
+export const assertAlienRollResponse = (
+    data: Record<string, any>,
+    expected?: Record<string, any>
+) => {
+    expect(data).to.be.an('object');
+    assertDiceRollCommonProperties(data);
+    expect(data).to.have.property('dices');
+    expect(data.dices).to.be.a('number');
+    expect(data).to.have.property('stresses');
+    expect(data.stresses).to.be.a('number');
+    expect(data).to.have.property('successes');
+    expect(data.successes).to.be.a('number');
+    expect(data).to.have.property('panics');
+    expect(data.panics).to.be.a('number');
+    expect(data).to.have.property('results');
+    expect(data.results).to.be.an('array');
+    for (const resRoll of data.results) {
+        assertDiceRoll(resRoll, true);
+        expect(resRoll).to.have.property('stress');
+        expect(resRoll.stress).to.be.a('boolean');
+    }
+    expect(data.results).to.have.lengthOf(data.dices + data.stresses);
+    if (expected) {
+        compareDataWithExpected(data, expected);
+    }
 };
