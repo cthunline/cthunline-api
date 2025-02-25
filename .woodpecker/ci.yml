@@ -16,6 +16,8 @@ services:
 - name: valkey
   image: valkey/valkey:latest
   pull: true
+  commands:
+    - valkey-server --save ""
 
 steps:
 - name: install
