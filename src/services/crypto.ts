@@ -34,9 +34,9 @@ export const verifyJwt = (token: string): SafeUser & JwtPayload => {
     }
 };
 
-// algorithm used for encryption / decryption (recommanded as other types (CBC, CTR) are insecure)
+// algorithm used for encryption / decryption (recommended as other types (CBC, CTR) are insecure)
 const cryptoAlgo = 'aes-256-gcm';
-// recommanded initialization vector length for GCM
+// recommended initialization vector length for GCM
 const cryptoIvLength = 12;
 
 /**

@@ -56,7 +56,7 @@ const createCacheClient = async (
         client.on('error', (err) => {
             reject(
                 new InternError(
-                    `Error while connecting to the cache server (KeyDB or Redis) : ${err.message}`
+                    `Error while connecting to the cache server (Valkey or Redis) : ${err.message}`
                 )
             );
         });

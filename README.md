@@ -17,7 +17,7 @@
 
 - NodeJS >= 16
 - PostgreSQL
-- KeyDB / Redis
+- Valkey / Redis
 
 ## Configuration
 

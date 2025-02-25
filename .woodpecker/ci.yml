@@ -13,8 +13,8 @@ services:
     POSTGRES_USER: cthunline
     POSTGRES_PASSWORD: cthunline
     POSTGRES_DB: cthunline_ci
-- name: keydb
-  image: eqalpha/keydb:latest
+- name: valkey
+  image: valkey/valkey:latest
   pull: true
 
 steps:
